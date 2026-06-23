@@ -16,6 +16,12 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AudioWaveform } from '../components/AudioWaveform';
+import {
+  ChapterInfoBanner,
+  CurriculumCoverageCard,
+  LearningObjectivesCard,
+  ReferenceAlignmentCard,
+} from '../components/RAGReportSections';
 import { useAuth } from '../context/AuthContext';
 import { archiveTeacherRecording, deleteTeacherRecording, retryRecording, updateTeacherRecording } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -519,6 +525,33 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
                   items={report.quantitative_metrics.priority_improvements}
                   title="Priority Improvements"
                 />
+              </View>
+            ) : null}
+
+            {/* ── RAG Evaluation Section ── */}
+            {(report.chapter_info || report.curriculum_coverage || report.accuracy_analysis || report.learning_objectives_achievement) ? (
+              <View style={styles.card}>
+                <Text style={styles.sectionLabel}>RAG-BASED EVALUATION</Text>
+
+                {/* Chapter info banner */}
+                {report.chapter_info ? (
+                  <ChapterInfoBanner data={report.chapter_info} />
+                ) : null}
+
+                {/* Curriculum coverage */}
+                {report.curriculum_coverage ? (
+                  <CurriculumCoverageCard data={report.curriculum_coverage} />
+                ) : null}
+
+                {/* Reference alignment */}
+                {report.accuracy_analysis ? (
+                  <ReferenceAlignmentCard data={report.accuracy_analysis} />
+                ) : null}
+
+                {/* Learning objectives */}
+                {report.learning_objectives_achievement && report.learning_objectives_achievement.length > 0 ? (
+                  <LearningObjectivesCard data={report.learning_objectives_achievement} />
+                ) : null}
               </View>
             ) : null}
           </View>

@@ -108,6 +108,28 @@ export type QuantitativeMetrics = {
   priority_improvements: string[];
 };
 
+export type CurriculumCoverage = {
+  covered_concepts: string[];
+  missing_concepts: string[];
+  coverage_percentage: number;
+};
+
+export type AccuracyAnalysis = {
+  correct_explanations: string[];
+  potential_inaccuracies: string[];
+};
+
+export type ChapterInfo = {
+  chapter_name: string | null;
+  document_count: number;
+  learning_objectives: string[];
+};
+
+export type LearningObjectiveStatus = {
+  objective: string;
+  status: 'achieved' | 'partial' | 'missing';
+};
+
 export type LLMReportOut = {
   id: number;
   recording_id: number;
@@ -115,6 +137,10 @@ export type LLMReportOut = {
   teaching_quality_notes: string | null;
   score_breakdown: ScoreBreakdown | null;
   quantitative_metrics: QuantitativeMetrics | null;
+  curriculum_coverage: CurriculumCoverage | null;
+  accuracy_analysis: AccuracyAnalysis | null;
+  chapter_info: ChapterInfo | null;
+  learning_objectives_achievement: LearningObjectiveStatus[] | null;
   created_at: string;
 };
 

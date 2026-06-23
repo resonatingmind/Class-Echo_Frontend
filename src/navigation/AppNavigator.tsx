@@ -17,6 +17,8 @@ import { SchoolAdminTeachersScreen } from '../screens/SchoolAdminTeachersScreen'
 import { SchoolAdminStudentsScreen } from '../screens/SchoolAdminStudentsScreen';
 import { SchoolAdminProfileScreen } from '../screens/SchoolAdminProfileScreen';
 import { SchoolAdminSubjectDetailScreen } from '../screens/SchoolAdminSubjectDetailScreen';
+import { SchoolAdminSubjectChaptersScreen } from '../screens/SchoolAdminSubjectChaptersScreen';
+import { SchoolAdminChapterDetailScreen } from '../screens/SchoolAdminChapterDetailScreen';
 
 // Auth screens
 import { LoginScreen } from '../screens/LoginScreen';
@@ -51,6 +53,8 @@ export type RootStackParamList = {
   SchoolAdminStudents: undefined;
   SchoolAdminProfile: undefined;
   SchoolAdminSubjectDetail: { subjectId: number; subjectName: string };
+  SchoolAdminSubjectChapters: { subjectId: number; subjectName: string };
+  SchoolAdminChapterDetail: { chapterId: number; chapterName: string; subjectName: string };
   // Teacher
   TeacherSubjects: undefined;
   TeacherSubjectDetail: { subjectId: number; subjectName: string };
@@ -61,6 +65,7 @@ export type RootStackParamList = {
   StudentHome: undefined;
   StudentSubjectDetail: { subjectId: number; subjectName: string };
   StudentProfile: undefined;
+  RecordingDetail: { recording: RecordingWithReport; subjectName: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -110,6 +115,8 @@ export function AppNavigator() {
           <Stack.Screen name="SchoolAdminStudents" component={SchoolAdminStudentsScreen} />
           <Stack.Screen name="SchoolAdminProfile" component={SchoolAdminProfileScreen} />
           <Stack.Screen name="SchoolAdminSubjectDetail" component={SchoolAdminSubjectDetailScreen} />
+          <Stack.Screen name="SchoolAdminSubjectChapters" component={SchoolAdminSubjectChaptersScreen} />
+          <Stack.Screen name="SchoolAdminChapterDetail" component={SchoolAdminChapterDetailScreen} />
           <Stack.Screen name="RecordingDetail" component={RecordingDetailScreen} />
         </>
       ) : session.role === 'teacher' ? (

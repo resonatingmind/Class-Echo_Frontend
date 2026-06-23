@@ -175,3 +175,43 @@ export type StudentProfileOut = {
   class_name: string;
   created_at: string;
 };
+
+export type ChapterOut = {
+  id: number;
+  subject_id: number;
+  name: string;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+  document_count: number;
+};
+
+export type ChapterCreatePayload = {
+  name: string;
+  description?: string | null;
+};
+
+export type ChapterUpdatePayload = {
+  name?: string | null;
+  description?: string | null;
+};
+
+export type ChapterDocumentOut = {
+  id: number;
+  chapter_id: number;
+  file_name: string;
+  storage_url: string;
+  file_type: string;
+  processing_status: string;
+  uploaded_at: string;
+};
+
+export type ChapterKnowledgeOut = {
+  chapter_id: number;
+  chapter_summary: string;
+  learning_objectives: string[];
+  key_concepts: string[];
+  must_cover_topics: string[];
+  common_misconceptions: string[];
+  generated_at: string;
+};

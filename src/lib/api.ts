@@ -11,6 +11,11 @@ import {
   SubjectOut,
   TeacherOut,
   TokenResponse,
+  ChapterOut,
+  ChapterCreatePayload,
+  ChapterUpdatePayload,
+  ChapterDocumentOut,
+  ChapterKnowledgeOut,
 } from '../types/api';
 
 import { notifyUnauthorized } from './authSession';
@@ -667,6 +672,46 @@ export async function getPublicSchools(search?: string) {
 
 export async function getPublicSchoolClasses(schoolId: number) {
   return request<ClassOut[]>(`/public/schools/${schoolId}/classes`);
+}
+
+// ── Chapters ──────────────────────────────────────────────────────────────────
+
+export async function getChapters(token: string, subjectId: number) {
+  return request<ChapterOut[]>(`/school/subjects/${subjectId}/chapters`, {}, token);
+}
+
+export async function createChapter(token: string, subjectId: number, payload: ChapterCreatePayload) {
+  return request<ChapterOut>(
+    `/school/subjects/${subjectId}/chapters`,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    },
+    token,
+  );
+}
+
+export async function updateChapter(token: string, chapterId: number, payload: ChapterUpdatePayload) {
+  return request<ChapterOut>(
+    `/school/chapters/${chapterId}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    },
+    token,
+  );
+}
+
+export async function deleteChapter(token: string, chapterId: number) {
+  return request<void>(`/school/chapters/${chapterId}`, { method: 'DELETE' }, token);
+}
+
+export async function getChapterDetails(token: string, chapterId: number) {
+  return request<ChapterOut>(`/school/chapters/${chapterId}`, {}, token);
+}
+
+export async function getChapterKnowledge(token: string, chapterId: number) {
+  return request<ChapterKnowledgeOut>(`/school/chapters/${chapterId}/knowledge`, {}, token);
 }
 
 export { API_BASE_URL, ApiError };

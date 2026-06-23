@@ -444,7 +444,7 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
                   colorIdx={idx}
                   onAssignPress={() => setAssignTarget(subject)}
                   onCardPress={() =>
-                    navigation.navigate('SchoolAdminSubjectDetail', {
+                    navigation.navigate('SchoolAdminSubjectChapters', {
                       subjectId: subject.id,
                       subjectName: subject.name,
                     })

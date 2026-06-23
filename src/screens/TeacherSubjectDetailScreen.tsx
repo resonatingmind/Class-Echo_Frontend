@@ -21,10 +21,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AudioWaveform } from '../components/AudioWaveform';
 import { useAuth } from '../context/AuthContext';
 import { buildWaveformBars, formatAudioTime, inferMimeTypeFromUri, isAudioMimeType } from '../lib/audio';
-import { getTeacherSubjectRecordings, getTeacherSubjectStudents, retryRecording, uploadRecording } from '../lib/api';
+import { getTeacherSubjectRecordings, getTeacherSubjectStudents, retryRecording, uploadRecording, getTeacherChapters } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
-import { RecordingStatus, RecordingWithReport, StudentOut } from '../types/api';
+import { RecordingStatus, RecordingWithReport, StudentOut, ChapterOut } from '../types/api';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'TeacherSubjectDetail'>;
 
@@ -149,6 +149,8 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
   const [activeTab, setActiveTab] = useState<DetailTab>('recordings');
   const [recordings, setRecordings] = useState<RecordingWithReport[]>([]);
   const [students, setStudents] = useState<StudentOut[]>([]);
+  const [chapters, setChapters] = useState<ChapterOut[]>([]);
+  const [selectedChapter, setSelectedChapter] = useState<ChapterOut | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -160,11 +162,8 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [pendingUri, setPendingUri] = useState<string | null>(null);
   const [pendingMime, setPendingMime] = useState('audio/mpeg');
-  const [chapterName, setChapterName] = useState('');
-  const [chapterNameError, setChapterNameError] = useState<string | null>(null);
   const [lectureTitle, setLectureTitle] = useState('');
   const [lectureTitleError, setLectureTitleError] = useState<string | null>(null);
-  const [isCreatingNewChapter, setIsCreatingNewChapter] = useState(false);
   const [description, setDescription] = useState('');
 
   const load = useCallback(
@@ -177,12 +176,14 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
       }
       setError(null);
       try {
-        const [recordingData, studentData] = await Promise.all([
+        const [recordingData, studentData, chapterData] = await Promise.all([
           getTeacherSubjectRecordings(session.token, subjectId),
           getTeacherSubjectStudents(session.token, subjectId),
+          getTeacherChapters(session.token, subjectId),
         ]);
         setRecordings(recordingData);
         setStudents(studentData);
+        setChapters(chapterData);
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Could not load subject details');
       } finally {
@@ -207,27 +208,6 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
     previewPlayer.replace(pendingUri);
   }, [pendingUri, previewPlayer, showUploadModal]);
 
-  const groupedRecordings = useMemo(() => {
-    const grouped = new Map<string, RecordingWithReport[]>();
-    for (const recording of recordings) {
-      const key = recording.chapter_name?.trim() || 'Untitled';
-      const bucket = grouped.get(key) ?? [];
-      bucket.push(recording);
-      grouped.set(key, bucket);
-    }
-    return Array.from(grouped.entries()).map(([chapter, items]) => ({ chapter, items }));
-  }, [recordings]);
-
-  const existingChapters = useMemo(() => {
-    const chapters = new Set<string>();
-    for (const recording of recordings) {
-      if (recording.chapter_name?.trim()) {
-        chapters.add(recording.chapter_name.trim());
-      }
-    }
-    return Array.from(chapters).sort();
-  }, [recordings]);
-
   const completedCount = recordings.filter((recording) => recording.status === 'completed').length;
   const previewBars = useMemo(() => buildWaveformBars(pendingUri ?? subjectName), [pendingUri, subjectName]);
   const previewProgress =
@@ -240,11 +220,8 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
     }
     setShowUploadModal(false);
     setPendingUri(null);
-    setChapterName('');
-    setChapterNameError(null);
     setLectureTitle('');
     setLectureTitleError(null);
-    setIsCreatingNewChapter(false);
     setDescription('');
   };
 
@@ -267,7 +244,6 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
 
       setPendingUri(asset.uri);
       setPendingMime(resolvedMime);
-      setChapterName('');
       setDescription('');
       setShowActionSheet(false);
       setShowUploadModal(true);
@@ -277,14 +253,10 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
   };
 
   const handleUpload = async () => {
-    if (!session || !pendingUri || uploading) {
+    if (!session || !pendingUri || uploading || !selectedChapter) {
       return;
     }
     let hasError = false;
-    if (!chapterName.trim()) {
-      setChapterNameError('Chapter name is required.');
-      hasError = true;
-    }
     if (!lectureTitle.trim()) {
       setLectureTitleError('Lecture title is required.');
       hasError = true;
@@ -301,7 +273,7 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
         subjectId,
         pendingUri,
         pendingMime,
-        chapterName.trim(),
+        selectedChapter.id,
         lectureTitle.trim(),
         description.trim() || undefined,
         undefined, // transcription
@@ -412,17 +384,19 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
           })}
         </View>
 
-        <View style={styles.actionRow}>
-          <Pressable onPress={() => setShowActionSheet(true)} style={styles.actionButton}>
-            <Ionicons color="#fff" name="add-circle-outline" size={18} />
-            <Text style={styles.actionButtonText}>Upload New Recording</Text>
-          </Pressable>
-        </View>
+        {activeTab === 'recordings' && selectedChapter !== null ? (
+          <View style={styles.actionRow}>
+            <Pressable onPress={() => setShowActionSheet(true)} style={styles.actionButton}>
+              <Ionicons color="#fff" name="add-circle-outline" size={18} />
+              <Text style={styles.actionButtonText}>Upload New Recording</Text>
+            </Pressable>
+          </View>
+        ) : null}
 
-        {recordings.length > 0 ? (
+        {filteredRecordings.length > 0 ? (
           <View style={styles.statsStrip}>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>{recordings.length}</Text>
+              <Text style={styles.statValue}>{filteredRecordings.length}</Text>
               <Text style={styles.statLabel}>TOTAL</Text>
             </View>
             <View style={styles.statDivider} />
@@ -433,7 +407,7 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
               <Text style={[styles.statValue, { color: colors.warning }]}>
-                {recordings.length - completedCount}
+                {filteredRecordings.length - completedCount}
               </Text>
               <Text style={styles.statLabel}>PENDING</Text>
             </View>
@@ -452,21 +426,93 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
             <Text style={styles.emptyBody}>{error}</Text>
           </View>
         ) : activeTab === 'recordings' ? (
-          groupedRecordings.length === 0 ? (
-            <View style={styles.center}>
-              <Ionicons color={colors.textMuted} name="mic-outline" size={40} />
-              <Text style={styles.emptyTitle}>No recordings yet</Text>
-              <Text style={styles.emptyBody}>Record or upload your first audio lesson below.</Text>
-            </View>
+          selectedChapter === null ? (
+            chapters.length === 0 ? (
+              <View style={styles.center}>
+                <Ionicons color={colors.textMuted} name="folder-open-outline" size={40} />
+                <Text style={styles.emptyTitle}>No chapters yet</Text>
+                <Text style={styles.emptyBody}>Chapters will be shown here. Please contact your school administrator to add chapters for this subject.</Text>
+              </View>
+            ) : (
+              <View style={styles.sectionStack}>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>Chapters</Text>
+                  <Text style={styles.sectionCount}>{chapters.length}</Text>
+                </View>
+                {chapters.map((chapter) => {
+                  const chapterRecordings = recordings.filter(
+                    (r) => r.chapter_id === chapter.id || (r.chapter_id === null && r.chapter_name === chapter.name)
+                  );
+                  return (
+                    <Pressable
+                      key={chapter.id}
+                      onPress={() => setSelectedChapter(chapter)}
+                      style={styles.card}
+                    >
+                      <View style={styles.cardIcon}>
+                        <Ionicons color={colors.accent} name="folder-outline" size={20} />
+                      </View>
+                      <View style={styles.cardContent}>
+                        <Text numberOfLines={1} style={styles.cardTitle}>
+                          {chapter.name}
+                        </Text>
+                        <Text numberOfLines={2} style={styles.cardMeta}>
+                          {chapter.description || 'No description provided.'}
+                        </Text>
+                        <Text style={[styles.cardMeta, { color: colors.accent, fontWeight: '600', marginTop: 4 }]}>
+                          {chapterRecordings.length} {chapterRecordings.length === 1 ? 'recording' : 'recordings'}
+                        </Text>
+                      </View>
+                      <Ionicons color={colors.textMuted} name="chevron-forward" size={16} />
+                    </Pressable>
+                  );
+                })}
+              </View>
+            )
           ) : (
             <View style={styles.sectionStack}>
-              {groupedRecordings.map((group) => (
-                <View key={group.chapter} style={styles.section}>
+              <Pressable
+                onPress={() => setSelectedChapter(null)}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 6,
+                  marginBottom: 8,
+                }}
+              >
+                <Ionicons color={colors.accent} name="arrow-back" size={18} />
+                <Text style={{ color: colors.accent, fontWeight: '700', fontSize: 15 }}>
+                  Back to Chapters
+                </Text>
+              </Pressable>
+              
+              <View style={[styles.card, { backgroundColor: colors.accentSoft, borderColor: colors.accent, borderStyle: 'dashed' }]}>
+                <View style={[styles.cardIcon, { backgroundColor: colors.surface }]}>
+                  <Ionicons color={colors.accent} name="folder-open" size={20} />
+                </View>
+                <View style={styles.cardContent}>
+                  <Text style={[styles.cardTitle, { color: colors.accentDark }]}>
+                    {selectedChapter.name}
+                  </Text>
+                  <Text style={[styles.cardMeta, { color: colors.textSecondary }]}>
+                    {selectedChapter.description || 'No description provided.'}
+                  </Text>
+                </View>
+              </View>
+
+              {filteredRecordings.length === 0 ? (
+                <View style={styles.center}>
+                  <Ionicons color={colors.textMuted} name="mic-outline" size={40} />
+                  <Text style={styles.emptyTitle}>No recordings in this chapter</Text>
+                  <Text style={styles.emptyBody}>Record or upload your first lesson for this chapter.</Text>
+                </View>
+              ) : (
+                <View style={{ gap: 12 }}>
                   <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionTitle}>{group.chapter}</Text>
-                    <Text style={styles.sectionCount}>{group.items.length}</Text>
+                    <Text style={styles.sectionTitle}>Recordings</Text>
+                    <Text style={styles.sectionCount}>{filteredRecordings.length}</Text>
                   </View>
-                  {group.items.map((recording) => (
+                  {filteredRecordings.map((recording) => (
                     <RecordingRow
                       key={recording.id}
                       onPress={() => navigation.navigate('RecordingDetail', { recording, subjectName })}
@@ -476,7 +522,7 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
                     />
                   ))}
                 </View>
-              ))}
+              )}
             </View>
           )
         ) : students.length === 0 ? (
@@ -508,7 +554,12 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
             <Pressable
               onPress={() => {
                 setShowActionSheet(false);
-                navigation.navigate('TeacherRecording', { subjectId, subjectName, existingChapters });
+                navigation.navigate('TeacherRecording', {
+                  subjectId,
+                  subjectName,
+                  chapterId: selectedChapter?.id,
+                  chapterName: selectedChapter?.name,
+                });
               }}
               style={styles.sheetOption}
             >
@@ -539,7 +590,7 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
           <Pressable style={[styles.sheet, styles.uploadSheet]}>
             <View style={styles.sheetHandle} />
             <Text style={styles.sheetTitle}>Upload Audio Recording</Text>
-            <Text style={styles.sheetSubtitle}>Add the chapter details, review the audio, then upload it for analysis.</Text>
+            <Text style={styles.sheetSubtitle}>Add the details, review the audio, then upload it for analysis.</Text>
 
             <View style={styles.previewCard}>
               <View style={styles.previewHeader}>
@@ -568,76 +619,20 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
               <AudioWaveform bars={previewBars} progress={previewProgress} />
             </View>
 
-            <Text style={styles.inputLabel}>CHAPTER *</Text>
-            {existingChapters.length > 0 ? (
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
-                {existingChapters.map((ch) => {
-                  const isSelected = !isCreatingNewChapter && chapterName === ch;
-                  return (
-                    <Pressable
-                      key={ch}
-                      onPress={() => {
-                        setIsCreatingNewChapter(false);
-                        setChapterName(ch);
-                        setChapterNameError(null);
-                      }}
-                      style={{
-                        paddingHorizontal: 12,
-                        paddingVertical: 6,
-                        borderRadius: 12,
-                        borderWidth: 1,
-                        borderColor: isSelected ? colors.accent : colors.border,
-                        backgroundColor: isSelected ? colors.accentSoft : colors.surfaceSoft,
-                      }}
-                    >
-                      <Text style={{ color: isSelected ? colors.accentDark : colors.textPrimary, fontSize: 13, fontWeight: '600' }}>
-                        {ch}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-                <Pressable
-                  onPress={() => {
-                    setIsCreatingNewChapter(true);
-                    setChapterName('');
-                    setChapterNameError(null);
-                  }}
-                  style={{
-                    paddingHorizontal: 12,
-                    paddingVertical: 6,
-                    borderRadius: 12,
-                    borderWidth: 1,
-                    borderColor: isCreatingNewChapter ? colors.accent : colors.border,
-                    backgroundColor: isCreatingNewChapter ? colors.accentSoft : colors.surfaceSoft,
-                  }}
-                >
-                  <Text style={{ color: isCreatingNewChapter ? colors.accentDark : colors.textPrimary, fontSize: 13, fontWeight: '700' }}>
-                    + Create New Chapter
-                  </Text>
-                </Pressable>
-              </View>
-            ) : null}
-
-            {(existingChapters.length === 0 || isCreatingNewChapter) ? (
-              <TextInput
-                autoCapitalize="words"
-                onChangeText={(val) => {
-                  setChapterName(val);
-                  if (val.trim()) {
-                    setChapterNameError(null);
-                  }
-                }}
-                placeholder="Enter new chapter name"
-                placeholderTextColor={colors.textPlaceholder}
-                style={[styles.input, chapterNameError && { borderColor: '#E53935' }, { marginBottom: 8 }]}
-                value={chapterName}
-              />
-            ) : null}
-            {chapterNameError ? (
-              <Text style={{ color: '#E53935', fontSize: 12, marginTop: -4, marginBottom: 8, fontWeight: '600' }}>
-                {chapterNameError}
+            <Text style={styles.inputLabel}>CHAPTER</Text>
+            <View style={{
+              paddingHorizontal: 14,
+              paddingVertical: 12,
+              borderRadius: 16,
+              backgroundColor: colors.surfaceMuted,
+              borderWidth: 1,
+              borderColor: colors.border,
+              marginBottom: 12,
+            }}>
+              <Text style={{ color: colors.textPrimary, fontSize: 15, fontWeight: '600' }}>
+                {selectedChapter?.name}
               </Text>
-            ) : null}
+            </View>
 
             <Text style={styles.inputLabel}>LECTURE TITLE *</Text>
             <TextInput

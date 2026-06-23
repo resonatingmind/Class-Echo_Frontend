@@ -58,7 +58,7 @@ export type RootStackParamList = {
   // Teacher
   TeacherSubjects: undefined;
   TeacherSubjectDetail: { subjectId: number; subjectName: string };
-  TeacherRecording: { subjectId: number; subjectName: string; existingChapters?: string[] };
+  TeacherRecording: { subjectId: number; subjectName: string; existingChapters?: string[]; chapterId?: number; chapterName?: string };
   TeacherProfile: undefined;
   RecordingDetail: { recording: RecordingWithReport; subjectName: string };
   // Student

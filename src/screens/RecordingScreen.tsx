@@ -49,7 +49,7 @@ function safelyPausePlayer(player: { pause: () => void }) {
 
 export function RecordingScreen({ navigation, route }: Props) {
   const { session } = useAuth();
-  const { subjectId, subjectName, existingChapters = [] } = route.params;
+  const { subjectId, subjectName, existingChapters = [], chapterId, chapterName: paramChapterName } = route.params;
 
   const recorder = useAudioRecorder(RECORDER_OPTIONS);
   const recorderState = useAudioRecorderState(recorder, 120);
@@ -57,11 +57,8 @@ export function RecordingScreen({ navigation, route }: Props) {
   const previewStatus = useAudioPlayerStatus(previewPlayer);
 
   const [state, setState] = useState<RecordState>('idle');
-  const [chapterName, setChapterName] = useState('');
-  const [chapterNameError, setChapterNameError] = useState<string | null>(null);
   const [lectureTitle, setLectureTitle] = useState('');
   const [lectureTitleError, setLectureTitleError] = useState<string | null>(null);
-  const [isCreatingNewChapter, setIsCreatingNewChapter] = useState(false);
   const [transcription, setTranscription] = useState('');
   const [description, setDescription] = useState('');
   const [uploading, setUploading] = useState(false);
@@ -261,11 +258,8 @@ export function RecordingScreen({ navigation, route }: Props) {
     setRecordedUri(null);
     setRecordedDuration(0);
     setMeterBars([]);
-    setChapterName('');
-    setChapterNameError(null);
     setLectureTitle('');
     setLectureTitleError(null);
-    setIsCreatingNewChapter(false);
     setTranscription('');
     setDescription('');
     setLiveTranscript('');
@@ -291,14 +285,10 @@ export function RecordingScreen({ navigation, route }: Props) {
   };
 
   const handleUpload = async () => {
-    if (!session || !recordedUri || uploading) {
+    if (!session || !recordedUri || uploading || !chapterId) {
       return;
     }
     let hasError = false;
-    if (!chapterName.trim()) {
-      setChapterNameError('Chapter name is required.');
-      hasError = true;
-    }
     if (!lectureTitle.trim()) {
       setLectureTitleError('Lecture title is required.');
       hasError = true;
@@ -317,7 +307,7 @@ export function RecordingScreen({ navigation, route }: Props) {
       recordedUri,
       uploadUri,
       resolvedMime,
-      chapterName: chapterName.trim(),
+      chapterId,
       lectureTitle: lectureTitle.trim(),
       hasDescription: Boolean(description.trim()),
       hasTranscription: Boolean(transcription.trim()),
@@ -328,7 +318,7 @@ export function RecordingScreen({ navigation, route }: Props) {
         subjectId,
         recordedUri,
         resolvedMime,
-        chapterName.trim(),
+        chapterId,
         lectureTitle.trim(),
         description.trim() || undefined,
         transcription.trim() || undefined,
@@ -507,76 +497,20 @@ export function RecordingScreen({ navigation, route }: Props) {
             </View>
 
             <View style={styles.metaCard}>
-              <Text style={styles.metaLabel}>CHAPTER *</Text>
-              {existingChapters.length > 0 ? (
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
-                  {existingChapters.map((ch) => {
-                    const isSelected = !isCreatingNewChapter && chapterName === ch;
-                    return (
-                      <Pressable
-                        key={ch}
-                        onPress={() => {
-                          setIsCreatingNewChapter(false);
-                          setChapterName(ch);
-                          setChapterNameError(null);
-                        }}
-                        style={{
-                          paddingHorizontal: 12,
-                          paddingVertical: 6,
-                          borderRadius: 12,
-                          borderWidth: 1,
-                          borderColor: isSelected ? colors.accent : colors.border,
-                          backgroundColor: isSelected ? colors.accentSoft : colors.surfaceSoft,
-                        }}
-                      >
-                        <Text style={{ color: isSelected ? colors.accentDark : colors.textPrimary, fontSize: 13, fontWeight: '600' }}>
-                          {ch}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                  <Pressable
-                    onPress={() => {
-                      setIsCreatingNewChapter(true);
-                      setChapterName('');
-                      setChapterNameError(null);
-                    }}
-                    style={{
-                      paddingHorizontal: 12,
-                      paddingVertical: 6,
-                      borderRadius: 12,
-                      borderWidth: 1,
-                      borderColor: isCreatingNewChapter ? colors.accent : colors.border,
-                      backgroundColor: isCreatingNewChapter ? colors.accentSoft : colors.surfaceSoft,
-                    }}
-                  >
-                    <Text style={{ color: isCreatingNewChapter ? colors.accentDark : colors.textPrimary, fontSize: 13, fontWeight: '700' }}>
-                      + Create New Chapter
-                    </Text>
-                  </Pressable>
-                </View>
-              ) : null}
-
-              {(existingChapters.length === 0 || isCreatingNewChapter) ? (
-                <TextInput
-                  autoCapitalize="words"
-                  onChangeText={(val) => {
-                    setChapterName(val);
-                    if (val.trim()) {
-                      setChapterNameError(null);
-                    }
-                  }}
-                  placeholder="Enter new chapter name"
-                  placeholderTextColor={colors.textPlaceholder}
-                  style={[styles.input, chapterNameError && { borderColor: '#E53935' }, { marginBottom: 8 }]}
-                  value={chapterName}
-                />
-              ) : null}
-              {chapterNameError ? (
-                <Text style={{ color: '#E53935', fontSize: 12, marginTop: -4, marginBottom: 8, fontWeight: '600' }}>
-                  {chapterNameError}
+              <Text style={styles.metaLabel}>CHAPTER</Text>
+              <View style={{
+                paddingHorizontal: 14,
+                paddingVertical: 12,
+                borderRadius: 16,
+                backgroundColor: colors.surfaceMuted,
+                borderWidth: 1,
+                borderColor: colors.border,
+                marginBottom: 12,
+              }}>
+                <Text style={{ color: colors.textPrimary, fontSize: 15, fontWeight: '600' }}>
+                  {paramChapterName}
                 </Text>
-              ) : null}
+              </View>
 
               <Text style={styles.metaLabel}>LECTURE TITLE *</Text>
               <TextInput

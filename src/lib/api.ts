@@ -469,7 +469,7 @@ export async function uploadRecording(
   subjectId: number,
   fileUri: string,
   mimeType: string,
-  chapterName?: string,
+  chapterId: number,
   lectureTitle?: string,
   description?: string,
   transcription?: string,
@@ -479,7 +479,7 @@ export async function uploadRecording(
   const form = new FormData();
   const normalizedType = normalizeMimeType(fileUri, mimeType);
   await appendFile(form, 'file', fileUri, normalizedType, 'recording');
-  if (chapterName) form.append('chapter_name', chapterName);
+  form.append('chapter_id', String(chapterId));
   if (lectureTitle) form.append('lecture_title', lectureTitle);
   if (description) form.append('description', description);
   if (transcription) form.append('transcription', transcription);
@@ -678,6 +678,10 @@ export async function getPublicSchoolClasses(schoolId: number) {
 
 export async function getChapters(token: string, subjectId: number) {
   return request<ChapterOut[]>(`/school/subjects/${subjectId}/chapters`, {}, token);
+}
+
+export async function getTeacherChapters(token: string, subjectId: number) {
+  return request<ChapterOut[]>(`/teacher/subjects/${subjectId}/chapters`, {}, token);
 }
 
 export async function createChapter(token: string, subjectId: number, payload: ChapterCreatePayload) {

@@ -129,6 +129,7 @@ export type RecordingWithReport = {
   subject_id: number;
   teacher_id: number;
   chapter_name: string | null;
+  chapter_id: number | null;
   lecture_title: string | null;
   description: string | null;
   transcription: string | null;

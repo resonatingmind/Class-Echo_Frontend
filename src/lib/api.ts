@@ -714,4 +714,65 @@ export async function getChapterKnowledge(token: string, chapterId: number) {
   return request<ChapterKnowledgeOut>(`/school/chapters/${chapterId}/knowledge`, {}, token);
 }
 
+export async function getChapterDocuments(token: string, chapterId: number) {
+  return request<ChapterDocumentOut[]>(`/school/chapters/${chapterId}/documents`, {}, token);
+}
+
+export async function deleteChapterDocument(token: string, documentId: number) {
+  return request<void>(`/school/chapters/documents/${documentId}`, { method: 'DELETE' }, token);
+}
+
+export async function uploadChapterDocument(
+  token: string,
+  chapterId: number,
+  fileUri: string,
+  mimeType: string,
+  fileName: string,
+  onProgress?: (pct: number) => void,
+): Promise<ChapterDocumentOut> {
+  const form = new FormData();
+  const normalizedType = normalizeMimeType(fileUri, mimeType);
+  const uploadUri = normalizeUploadUri(fileUri);
+
+  // XMLHttpRequests expect objects when appending files in React Native
+  form.append('file', {
+    uri: uploadUri,
+    type: normalizedType,
+    name: fileName,
+  } as unknown as Blob);
+
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `${API_BASE_URL}/school/chapters/${chapterId}/documents`);
+    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && onProgress) {
+        onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status === 401) {
+        notifyUnauthorized();
+      }
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          resolve(JSON.parse(xhr.responseText) as ChapterDocumentOut);
+        } catch {
+          reject(new ApiError('Invalid response from server', xhr.status));
+        }
+      } else {
+        reject(new ApiError(`Upload failed (${xhr.status})`, xhr.status));
+      }
+    };
+
+    xhr.onerror = () => reject(new ApiError('Network request failed', 0));
+    xhr.ontimeout = () => reject(new ApiError('Upload timed out', 0));
+    xhr.timeout = 5 * 60 * 1000;
+
+    xhr.send(form);
+  });
+}
+
 export { API_BASE_URL, ApiError };

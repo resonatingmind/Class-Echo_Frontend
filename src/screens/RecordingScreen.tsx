@@ -246,7 +246,11 @@ export function RecordingScreen({ navigation, route }: Props) {
     } catch {
       // ignore cleanup failures
     }
-    navigation.goBack();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate("TeacherSubjects");
+    }
   };
 
   const reRecord = async () => {
@@ -329,7 +333,11 @@ export function RecordingScreen({ navigation, route }: Props) {
         subjectId,
         recordedUri,
       });
-      navigation.goBack();
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      } else {
+        navigation.navigate("TeacherSubjects");
+      };
     } catch (e) {
       console.error('[recording] upload:failure', {
         subjectId,
@@ -349,7 +357,13 @@ export function RecordingScreen({ navigation, route }: Props) {
       <View style={styles.header}>
         <Pressable
           hitSlop={8}
-          onPress={state === 'recording' ? () => void cancelRecording() : () => navigation.goBack()}
+          onPress={state === 'recording' ? () => void cancelRecording() : () => {
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            } else {
+              navigation.navigate("TeacherSubjects");
+            }
+          }}
           style={styles.headerBack}
         >
           <Ionicons color={colors.textPrimary} name="arrow-back" size={22} />

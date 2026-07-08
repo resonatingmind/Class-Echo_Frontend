@@ -198,7 +198,13 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
     <SafeAreaView edges={['top']} style={styles.safe}>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <Pressable onPress={() => {
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        } else {
+          navigation.navigate("SchoolAdminClasses");
+        }
+        }} style={styles.backBtn}>
           <Ionicons color={colors.textPrimary} name="arrow-back" size={22} />
         </Pressable>
         <Text style={styles.headerTitle} numberOfLines={1}>

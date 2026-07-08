@@ -6,16 +6,16 @@ import {
   useEffect,
   useMemo,
   useState,
-} from 'react';
+} from "react";
 
-import * as SecureStore from '../lib/secureStore';
+import * as SecureStore from "../lib/secureStore";
 
-import { login } from '../lib/api';
-import { setUnauthorizedHandler } from '../lib/authSession';
-import { UserRole } from '../types/api';
+import { login } from "../lib/api";
+import { setUnauthorizedHandler } from "../lib/authSession";
+import { UserRole } from "../types/api";
 
-const TOKEN_KEY = 'auth_token';
-const ROLE_KEY = 'auth_role';
+const TOKEN_KEY = "auth_token";
+const ROLE_KEY = "auth_role";
 
 type Session = {
   token: string;
@@ -58,22 +58,31 @@ export function AuthProvider({ children }: PropsWithChildren) {
     await SecureStore.setItemAsync(ROLE_KEY, role);
   }, []);
 
-  const signIn = useCallback(async (username: string, password: string) => {
-    setIsLoading(true);
-    try {
-      const response = await login(username, password);
-      const newSession = { token: response.access_token, role: response.role };
-      await persistSession(newSession.token, newSession.role);
-      setSession(newSession);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [persistSession]);
+  const signIn = useCallback(
+    async (username: string, password: string) => {
+      setIsLoading(true);
+      try {
+        const response = await login(username, password);
+        const newSession = {
+          token: response.access_token,
+          role: response.role,
+        };
+        await persistSession(newSession.token, newSession.role);
+        setSession(newSession);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [persistSession],
+  );
 
-  const signInDirect = useCallback(async (token: string, role: UserRole) => {
-    await persistSession(token, role);
-    setSession({ token, role });
-  }, [persistSession]);
+  const signInDirect = useCallback(
+    async (token: string, role: UserRole) => {
+      await persistSession(token, role);
+      setSession({ token, role });
+    },
+    [persistSession],
+  );
 
   const signOut = useCallback(async () => {
     await SecureStore.deleteItemAsync(TOKEN_KEY);
@@ -106,7 +115,7 @@ export function useAuth() {
   const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
 
   return context;

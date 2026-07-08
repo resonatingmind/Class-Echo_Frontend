@@ -9,23 +9,28 @@ import {
   StudentProfileOut,
   StudentWithClassOut,
   SubjectOut,
+  SubjectWithClassOut,
   TeacherOut,
+  SchoolDashboardOverview,
+  SchoolAnalytics,
+  TeacherRanking,
+  RecentActivity,
   TokenResponse,
   ChapterOut,
   ChapterCreatePayload,
   ChapterUpdatePayload,
   ChapterDocumentOut,
   ChapterKnowledgeOut,
-} from '../types/api';
+  TeacherRecording,
+} from "../types/api";
 
-import { notifyUnauthorized } from './authSession';
+import { notifyUnauthorized } from "./authSession";
 
 // Switch to local backend for development:
 // Android emulator: 'http://10.0.2.2:8000'
 // iOS simulator / Expo Go on device: 'http://localhost:8000'
 // Production: 'http://104.154.218.1:8000'
-const API_BASE_URL =
-  'http://localhost:8000';
+const API_BASE_URL = "http://localhost:8000";
 
 class ApiError extends Error {
   status: number;
@@ -37,11 +42,11 @@ class ApiError extends Error {
 }
 
 function debugLog(label: string, payload?: unknown) {
-  console.log(`[api] ${label}`, payload ?? '');
+  console.log(`[api] ${label}`, payload ?? "");
 }
 
 function debugError(label: string, payload?: unknown) {
-  console.error(`[api] ${label}`, payload ?? '');
+  console.error(`[api] ${label}`, payload ?? "");
 }
 
 async function appendFile(
@@ -56,7 +61,7 @@ async function appendFile(
   const ext = inferFileExtension(uploadUri, normalizedType);
   const name = `${fallbackPrefix}_${Date.now()}.${ext}`;
 
-  debugLog('appendFile', {
+  debugLog("appendFile", {
     fieldName,
     originalUri: fileUri,
     uploadUri,
@@ -65,9 +70,10 @@ async function appendFile(
   });
 
   if (
-    uploadUri.startsWith('blob:') ||
-    uploadUri.startsWith('data:') ||
-    (typeof window !== 'undefined' && !window.navigator.userAgent?.includes('ReactNative'))
+    uploadUri.startsWith("blob:") ||
+    uploadUri.startsWith("data:") ||
+    (typeof window !== "undefined" &&
+      !window.navigator.userAgent?.includes("ReactNative"))
   ) {
     try {
       const response = await fetch(uploadUri);
@@ -75,31 +81,28 @@ async function appendFile(
       form.append(fieldName, blob, name);
       return;
     } catch (err) {
-      debugError('appendFile:web_fetch_failed', err);
+      debugError("appendFile:web_fetch_failed", err);
     }
   }
 
-  form.append(
-    fieldName,
-    {
-      uri: uploadUri,
-      type: normalizedType,
-      name,
-    } as unknown as Blob,
-  );
+  form.append(fieldName, {
+    uri: uploadUri,
+    type: normalizedType,
+    name,
+  } as unknown as Blob);
 }
 
 function normalizeUploadUri(fileUri: string) {
   if (
-    fileUri.startsWith('file://')
-    || fileUri.startsWith('content://')
-    || fileUri.startsWith('http://')
-    || fileUri.startsWith('https://')
+    fileUri.startsWith("file://") ||
+    fileUri.startsWith("content://") ||
+    fileUri.startsWith("http://") ||
+    fileUri.startsWith("https://")
   ) {
     return fileUri;
   }
 
-  if (fileUri.startsWith('/')) {
+  if (fileUri.startsWith("/")) {
     return `file://${fileUri}`;
   }
 
@@ -107,52 +110,52 @@ function normalizeUploadUri(fileUri: string) {
 }
 
 function normalizeMimeType(fileUri: string, mimeType?: string | null) {
-  const normalized = mimeType?.split(';')[0]?.trim().toLowerCase();
+  const normalized = mimeType?.split(";")[0]?.trim().toLowerCase();
   if (normalized) {
     return normalized;
   }
 
-  const ext = fileUri.split('.').pop()?.toLowerCase() ?? '';
+  const ext = fileUri.split(".").pop()?.toLowerCase() ?? "";
   switch (ext) {
-    case 'jpg':
-    case 'jpeg':
-      return 'image/jpeg';
-    case 'png':
-      return 'image/png';
-    case 'webp':
-      return 'image/webp';
-    case 'mp3':
-      return 'audio/mpeg';
-    case 'wav':
-      return 'audio/wav';
-    case 'm4a':
-      return 'audio/mp4';
-    case 'ogg':
-      return 'audio/ogg';
-    case 'webm':
-      return 'audio/webm';
-    case 'aac':
-      return 'audio/aac';
+    case "jpg":
+    case "jpeg":
+      return "image/jpeg";
+    case "png":
+      return "image/png";
+    case "webp":
+      return "image/webp";
+    case "mp3":
+      return "audio/mpeg";
+    case "wav":
+      return "audio/wav";
+    case "m4a":
+      return "audio/mp4";
+    case "ogg":
+      return "audio/ogg";
+    case "webm":
+      return "audio/webm";
+    case "aac":
+      return "audio/aac";
     default:
-      return 'application/octet-stream';
+      return "application/octet-stream";
   }
 }
 
 function inferFileExtension(fileUri: string, mimeType: string) {
-  const fromUri = fileUri.split('?')[0]?.split('.').pop()?.toLowerCase();
+  const fromUri = fileUri.split("?")[0]?.split(".").pop()?.toLowerCase();
   if (fromUri && fromUri.length <= 5) {
     return fromUri;
   }
 
   switch (mimeType) {
-    case 'image/jpeg':
-      return 'jpg';
-    case 'audio/mpeg':
-      return 'mp3';
-    case 'audio/mp4':
-      return 'm4a';
+    case "image/jpeg":
+      return "jpg";
+    case "audio/mpeg":
+      return "mp3";
+    case "audio/mp4":
+      return "m4a";
     default:
-      return mimeType.split('/')[1] ?? 'bin';
+      return mimeType.split("/")[1] ?? "bin";
   }
 }
 
@@ -163,17 +166,17 @@ async function request<T>(
 ): Promise<T> {
   const headers = new Headers(init.headers);
 
-  if (!headers.has('Content-Type') && !(init.body instanceof FormData)) {
-    headers.set('Content-Type', 'application/json');
+  if (!headers.has("Content-Type") && !(init.body instanceof FormData)) {
+    headers.set("Content-Type", "application/json");
   }
 
   if (token) {
-    headers.set('Authorization', `Bearer ${token}`);
+    headers.set("Authorization", `Bearer ${token}`);
   }
 
-  debugLog('request:start', {
+  debugLog("request:start", {
     path,
-    method: init.method ?? 'GET',
+    method: init.method ?? "GET",
     hasToken: Boolean(token),
     isFormData: init.body instanceof FormData,
   });
@@ -185,9 +188,9 @@ async function request<T>(
       headers,
     });
   } catch (error) {
-    debugError('request:network_error', {
+    debugError("request:network_error", {
       path,
-      method: init.method ?? 'GET',
+      method: init.method ?? "GET",
       hasToken: Boolean(token),
       isFormData: init.body instanceof FormData,
       error,
@@ -195,13 +198,13 @@ async function request<T>(
     const message =
       error instanceof Error && error.message
         ? error.message
-        : 'Network request failed';
+        : "Network request failed";
     throw new ApiError(message, 0);
   }
 
-  debugLog('request:response', {
+  debugLog("request:response", {
     path,
-    method: init.method ?? 'GET',
+    method: init.method ?? "GET",
     status: response.status,
     ok: response.ok,
   });
@@ -210,11 +213,11 @@ async function request<T>(
     if (response.status === 401 && token) {
       notifyUnauthorized();
     }
-    let message = 'Request failed';
+    let message = "Request failed";
     const raw = await response.text();
-    debugError('request:http_error', {
+    debugError("request:http_error", {
       path,
-      method: init.method ?? 'GET',
+      method: init.method ?? "GET",
       status: response.status,
       raw,
     });
@@ -239,20 +242,17 @@ async function request<T>(
 export async function login(username: string, password: string) {
   const body = `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
 
-  return request<TokenResponse>(
-    '/auth/login',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body,
+  return request<TokenResponse>("/auth/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
     },
-  );
+    body,
+  });
 }
 
 export async function getAdminSchools(token: string) {
-  return request<SchoolOut[]>('/admin/schools', {}, token);
+  return request<SchoolOut[]>("/admin/schools", {}, token);
 }
 
 export async function createAdminSchool(
@@ -260,9 +260,9 @@ export async function createAdminSchool(
   payload: SchoolCreatePayload,
 ) {
   return request<SchoolOut>(
-    '/admin/schools',
+    "/admin/schools",
     {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(payload),
     },
     token,
@@ -280,13 +280,17 @@ export async function updateAdminSchool(
 ) {
   return request<SchoolOut>(
     `/admin/schools/${schoolId}`,
-    { method: 'PUT', body: JSON.stringify(payload) },
+    { method: "PUT", body: JSON.stringify(payload) },
     token,
   );
 }
 
 export async function deleteAdminSchool(token: string, schoolId: number) {
-  return request<void>(`/admin/schools/${schoolId}`, { method: 'DELETE' }, token);
+  return request<void>(
+    `/admin/schools/${schoolId}`,
+    { method: "DELETE" },
+    token,
+  );
 }
 
 export async function getAdminSchoolClasses(token: string, schoolId: number) {
@@ -298,7 +302,11 @@ export async function getAdminClass(
   schoolId: number,
   classId: number,
 ) {
-  return request<ClassOut>(`/admin/schools/${schoolId}/classes/${classId}`, {}, token);
+  return request<ClassOut>(
+    `/admin/schools/${schoolId}/classes/${classId}`,
+    {},
+    token,
+  );
 }
 
 export async function getAdminClassSubjects(
@@ -338,19 +346,23 @@ export async function getAdminSubjectRecordings(
 }
 
 export async function deleteAdminRecording(token: string, recordingId: number) {
-  return request<void>(`/admin/recordings/${recordingId}`, { method: 'DELETE' }, token);
+  return request<void>(
+    `/admin/recordings/${recordingId}`,
+    { method: "DELETE" },
+    token,
+  );
 }
 
 export async function getSchoolAdminClasses(token: string) {
-  return request<ClassOut[]>('/school/classes', {}, token);
+  return request<ClassOut[]>("/school/classes", {}, token);
 }
 
 export async function getSchoolAdminTeachers(token: string) {
-  return request<TeacherOut[]>('/school/teachers', {}, token);
+  return request<TeacherOut[]>("/school/teachers", {}, token);
 }
 
 export async function getSchoolAdminMe(token: string) {
-  return request<SchoolAdminProfileOut>('/school/me', {}, token);
+  return request<SchoolAdminProfileOut>("/school/me", {}, token);
 }
 
 export async function updateSchoolAdminMe(
@@ -362,14 +374,14 @@ export async function updateSchoolAdminMe(
   },
 ) {
   return request<SchoolAdminProfileOut>(
-    '/school/me',
-    { method: 'PUT', body: JSON.stringify(payload) },
+    "/school/me",
+    { method: "PUT", body: JSON.stringify(payload) },
     token,
   );
 }
 
 export async function getTeacherSubjects(token: string) {
-  return request<SubjectOut[]>('/teacher/subjects', {}, token);
+  return request<SubjectOut[]>("/teacher/subjects", {}, token);
 }
 
 export async function getTeacherSubject(token: string, subjectId: number) {
@@ -387,8 +399,15 @@ export async function getTeacherSubjectRecordings(
   );
 }
 
-export async function getTeacherSubjectStudents(token: string, subjectId: number) {
-  return request<StudentOut[]>(`/teacher/subjects/${subjectId}/students`, {}, token);
+export async function getTeacherSubjectStudents(
+  token: string,
+  subjectId: number,
+) {
+  return request<StudentOut[]>(
+    `/teacher/subjects/${subjectId}/students`,
+    {},
+    token,
+  );
 }
 
 // ── School Admin: Classes ─────────────────────────────────────────────────────
@@ -398,16 +417,35 @@ export type ClassCreatePayload = {
   profile_image_url?: string | null;
 };
 
-export async function createSchoolAdminClass(token: string, payload: ClassCreatePayload) {
-  return request<ClassOut>('/school/classes', { method: 'POST', body: JSON.stringify(payload) }, token);
+export async function createSchoolAdminClass(
+  token: string,
+  payload: ClassCreatePayload,
+) {
+  return request<ClassOut>(
+    "/school/classes",
+    { method: "POST", body: JSON.stringify(payload) },
+    token,
+  );
 }
 
-export async function updateSchoolAdminClass(token: string, classId: number, payload: ClassCreatePayload) {
-  return request<ClassOut>(`/school/classes/${classId}`, { method: 'PUT', body: JSON.stringify(payload) }, token);
+export async function updateSchoolAdminClass(
+  token: string,
+  classId: number,
+  payload: ClassCreatePayload,
+) {
+  return request<ClassOut>(
+    `/school/classes/${classId}`,
+    { method: "PUT", body: JSON.stringify(payload) },
+    token,
+  );
 }
 
 export async function deleteSchoolAdminClass(token: string, classId: number) {
-  return request<void>(`/school/classes/${classId}`, { method: 'DELETE' }, token);
+  return request<void>(
+    `/school/classes/${classId}`,
+    { method: "DELETE" },
+    token,
+  );
 }
 
 // ── School Admin: Subjects ────────────────────────────────────────────────────
@@ -418,29 +456,45 @@ export type SubjectCreatePayload = {
 };
 
 export async function getClassSubjects(token: string, classId: number) {
-  return request<SubjectOut[]>(`/school/classes/${classId}/subjects`, {}, token);
+  return request<SubjectOut[]>(
+    `/school/classes/${classId}/subjects`,
+    {},
+    token,
+  );
 }
 
-export async function createSubject(token: string, classId: number, payload: SubjectCreatePayload) {
+export async function createSubject(
+  token: string,
+  classId: number,
+  payload: SubjectCreatePayload,
+) {
   return request<SubjectOut>(
     `/school/classes/${classId}/subjects`,
-    { method: 'POST', body: JSON.stringify(payload) },
+    { method: "POST", body: JSON.stringify(payload) },
     token,
   );
 }
 
-export async function updateSubject(token: string, subjectId: number, payload: SubjectCreatePayload) {
+export async function updateSubject(
+  token: string,
+  subjectId: number,
+  payload: SubjectCreatePayload,
+) {
   return request<SubjectOut>(
     `/school/subjects/${subjectId}`,
-    { method: 'PUT', body: JSON.stringify(payload) },
+    { method: "PUT", body: JSON.stringify(payload) },
     token,
   );
 }
 
-export async function assignTeacherToSubject(token: string, subjectId: number, teacherId: number) {
+export async function assignTeacherToSubject(
+  token: string,
+  subjectId: number,
+  teacherId: number,
+) {
   return request<SubjectOut>(
     `/school/subjects/${subjectId}/assign-teacher`,
-    { method: 'PUT', body: JSON.stringify({ teacher_id: teacherId }) },
+    { method: "PUT", body: JSON.stringify({ teacher_id: teacherId }) },
     token,
   );
 }
@@ -454,12 +508,258 @@ export type TeacherCreatePayload = {
   profile_image_url?: string | null;
 };
 
-export async function createSchoolAdminTeacher(token: string, payload: TeacherCreatePayload) {
+export async function createSchoolAdminTeacher(
+  token: string,
+  payload: TeacherCreatePayload,
+) {
   return request<TeacherOut>(
-    '/school/teachers',
-    { method: 'POST', body: JSON.stringify(payload) },
+    "/school/teachers",
+    { method: "POST", body: JSON.stringify(payload) },
     token,
   );
+}
+
+// export type TeacherAnalytics = {
+//   teacher_id: number;
+
+//   teacher_name: string;
+
+//   total_lectures: number;
+//   completed_lectures: number;
+//   pending_lectures: number;
+//   failed_lectures: number;
+
+//   overall_score: number;
+
+//   engagement_score: number;
+
+//   confidence_score: number;
+
+//   clarity_score: number;
+
+//   fluency_score: number;
+
+//   pace_score: number;
+
+//   curriculum_coverage: number;
+
+//   accuracy_score: number;
+
+//   average_duration_seconds: number;
+
+//   recent_lectures: {
+//     recording_id: number;
+//     lecture_title: string | null;
+//     chapter_name: string | null;
+//     uploaded_at: string;
+//     overall_score: number | null;
+//     status: string;
+//   }[];
+// };
+
+export type SubjectPerformance = {
+  subject_id: number;
+
+  subject_name: string;
+
+  lectures: number;
+
+  average_score: number;
+
+  curriculum_coverage: number;
+
+  engagement_score: number;
+
+  accuracy_score: number;
+};
+
+export type MonthlyPerformance = {
+  month: string;
+
+  lectures: number;
+
+  average_score: number;
+};
+
+export type TeacherAnalytics = {
+  teacher_id: number;
+
+  teacher_name: string;
+
+  total_lectures: number;
+
+  completed_lectures: number;
+
+  pending_lectures: number;
+
+  failed_lectures: number;
+
+  overall_score: number;
+
+  engagement_score: number;
+
+  confidence_score: number;
+
+  clarity_score: number;
+
+  fluency_score: number;
+
+  pace_score: number;
+
+  curriculum_coverage: number;
+
+  accuracy_score: number;
+
+  average_duration_seconds: number;
+
+  highest_score: number;
+
+  lowest_score: number;
+
+  longest_lecture_seconds: number;
+
+  shortest_lecture_seconds: number;
+
+  total_recording_hours: number;
+
+  subject_performance: SubjectPerformance[];
+
+  monthly_performance: MonthlyPerformance[];
+
+  recent_lectures: {
+    recording_id: number;
+
+    lecture_title: string | null;
+
+    chapter_name: string | null;
+
+    uploaded_at: string;
+
+    overall_score: number | null;
+
+    status: string;
+  }[];
+};
+
+export type FilterOption = {
+  id: number;
+
+  name: string;
+
+  class_id?: number;
+
+  class_name?: string;
+};
+
+export type AnalyticsFilters = {
+  classes: FilterOption[];
+
+  subjects: FilterOption[];
+
+  statuses: string[];
+
+  semesters: number[];
+};
+
+export type TeacherAnalyticsFilters = {
+  classId?: number;
+  subjectId?: number;
+  semester?: number;
+  status?: string;
+  startDate?: string;
+  search?: string;
+  endDate?: string;
+};
+
+// export async function getTeacherAnalytics(token: string, teacherId: number) {
+//   return request<TeacherAnalytics>(
+//     `/school/teachers/${teacherId}/analytics`,
+//     {},
+//     token,
+//   );
+// }
+
+export async function getTeacherAnalytics(
+  token: string,
+  teacherId: number,
+  filters?: TeacherAnalyticsFilters,
+) {
+  const params = new URLSearchParams();
+
+  if (filters?.search?.trim()) {
+    params.append("search", filters.search.trim());
+  }
+  if (filters?.classId) {
+    params.append("class_id", String(filters.classId));
+  }
+
+  if (filters?.subjectId) {
+    params.append("subject_id", String(filters.subjectId));
+  }
+
+  if (filters?.semester) {
+    params.append("semester", String(filters.semester));
+  }
+
+  if (filters?.status) {
+    params.append("status", filters.status);
+  }
+
+  if (filters?.startDate) {
+    params.append("start_date", filters.startDate);
+  }
+
+  if (filters?.endDate) {
+    params.append("end_date", filters.endDate);
+  }
+
+  const query = params.toString();
+
+  return request<TeacherAnalytics>(
+    `/school/teachers/${teacherId}/analytics${query ? `?${query}` : ""}`,
+    {},
+    token,
+  );
+}
+
+export async function getTeacherAnalyticsFilters(
+  token: string,
+  teacherId: number,
+) {
+  return request<AnalyticsFilters>(
+    `/school/teachers/${teacherId}/analytics/filters`,
+    {},
+    token,
+  );
+}
+
+export interface TeacherSubjectSummary {
+  id: number;
+  name: string;
+  class_name: string;
+  chapter_count: number;
+  recording_count: number;
+}
+
+export interface TeacherStatistics {
+  total_classes: number;
+  total_subjects: number;
+  total_chapters: number;
+  total_recordings: number;
+}
+
+export interface TeacherProfile {
+  id: number;
+  name: string;
+  email: string;
+
+  assigned_at: string | null;
+
+  classes: string[];
+
+  subjects: TeacherSubjectSummary[];
+
+  statistics: TeacherStatistics;
 }
 
 // ── Teacher ───────────────────────────────────────────────────────────────────
@@ -478,17 +778,21 @@ export async function uploadRecording(
 ): Promise<RecordingWithReport> {
   const form = new FormData();
   const normalizedType = normalizeMimeType(fileUri, mimeType);
-  await appendFile(form, 'file', fileUri, normalizedType, 'recording');
-  form.append('chapter_id', String(chapterId));
-  if (lectureTitle) form.append('lecture_title', lectureTitle);
-  if (description) form.append('description', description);
-  if (transcription) form.append('transcription', transcription);
-  if (durationSeconds !== undefined) form.append('duration_seconds', String(durationSeconds));
+  await appendFile(form, "file", fileUri, normalizedType, "recording");
+  form.append("chapter_id", String(chapterId));
+  if (lectureTitle) form.append("lecture_title", lectureTitle);
+  if (description) form.append("description", description);
+  if (transcription) form.append("transcription", transcription);
+  if (durationSeconds !== undefined)
+    form.append("duration_seconds", String(durationSeconds));
 
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', `${API_BASE_URL}/teacher/subjects/${subjectId}/recordings`);
-    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+    xhr.open(
+      "POST",
+      `${API_BASE_URL}/teacher/subjects/${subjectId}/recordings`,
+    );
+    xhr.setRequestHeader("Authorization", `Bearer ${token}`);
 
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable && onProgress) {
@@ -504,53 +808,76 @@ export async function uploadRecording(
         try {
           resolve(JSON.parse(xhr.responseText) as RecordingWithReport);
         } catch {
-          reject(new ApiError('Invalid response from server', xhr.status));
+          reject(new ApiError("Invalid response from server", xhr.status));
         }
       } else {
         reject(new ApiError(`Upload failed (${xhr.status})`, xhr.status));
       }
     };
 
-    xhr.onerror = () => reject(new ApiError('Network request failed', 0));
-    xhr.ontimeout = () => reject(new ApiError('Upload timed out', 0));
+    xhr.onerror = () => reject(new ApiError("Network request failed", 0));
+    xhr.ontimeout = () => reject(new ApiError("Upload timed out", 0));
     xhr.timeout = 10 * 60 * 1000; // 10 min for large files
 
     xhr.send(form);
   });
 }
 
-export async function getTeacherRecordingReport(token: string, recordingId: number) {
-  return request<LLMReportOut>(`/teacher/recordings/${recordingId}/report`, {}, token);
+export async function getTeacherRecordingReport(
+  token: string,
+  recordingId: number,
+) {
+  return request<LLMReportOut>(
+    `/teacher/recordings/${recordingId}/report`,
+    {},
+    token,
+  );
 }
 
 export async function retryRecording(token: string, recordingId: number) {
-  return request<RecordingWithReport>(`/teacher/recordings/${recordingId}/retry`, { method: 'POST' }, token);
+  return request<RecordingWithReport>(
+    `/teacher/recordings/${recordingId}/retry`,
+    { method: "POST" },
+    token,
+  );
 }
 
 export async function updateTeacherRecording(
   token: string,
   recordingId: number,
-  payload: { chapter_name?: string | null; lecture_title?: string | null; description?: string | null },
+  payload: {
+    chapter_name?: string | null;
+    lecture_title?: string | null;
+    description?: string | null;
+  },
 ) {
   return request<RecordingWithReport>(
     `/teacher/recordings/${recordingId}`,
-    { method: 'PATCH', body: JSON.stringify(payload) },
+    { method: "PATCH", body: JSON.stringify(payload) },
     token,
   );
 }
 
-export async function archiveTeacherRecording(token: string, recordingId: number) {
+export async function archiveTeacherRecording(
+  token: string,
+  recordingId: number,
+) {
   return request<RecordingWithReport>(
     `/teacher/recordings/${recordingId}/archive`,
-    { method: 'POST' },
+    { method: "POST" },
     token,
   );
 }
 
-export async function deleteTeacherRecording(token: string, recordingId: number) {
+export async function deleteTeacherRecording(
+  token: string,
+  recordingId: number,
+) {
+  console.log("Deleting recording:", recordingId);
+
   return request<void>(
     `/teacher/recordings/${recordingId}`,
-    { method: 'DELETE' },
+    { method: "DELETE" },
     token,
   );
 }
@@ -560,8 +887,8 @@ export async function updateTeacherMe(
   payload: { name?: string | null },
 ) {
   return request<TeacherOut>(
-    '/teacher/me',
-    { method: 'PUT', body: JSON.stringify(payload) },
+    "/teacher/me",
+    { method: "PUT", body: JSON.stringify(payload) },
     token,
   );
 }
@@ -572,8 +899,12 @@ export async function uploadTeacherProfileImage(
   mimeType: string,
 ) {
   const form = new FormData();
-  await appendFile(form, 'file', imageUri, mimeType, 'teacher_profile');
-  return request<TeacherOut>('/teacher/profile-image', { method: 'POST', body: form, headers: {} }, token);
+  await appendFile(form, "file", imageUri, mimeType, "teacher_profile");
+  return request<TeacherOut>(
+    "/teacher/profile-image",
+    { method: "POST", body: form, headers: {} },
+    token,
+  );
 }
 
 // ── Student ───────────────────────────────────────────────────────────────────
@@ -588,30 +919,44 @@ export type StudentSignupPayload = {
 };
 
 export async function studentSignup(payload: StudentSignupPayload) {
-  return request<TokenResponse>('/auth/student/signup', {
-    method: 'POST',
+  return request<TokenResponse>("/auth/student/signup", {
+    method: "POST",
     body: JSON.stringify(payload),
   });
 }
 
 export async function getTeacherMe(token: string) {
-  return request<TeacherOut>('/teacher/me', {}, token);
+  return request<TeacherOut>("/teacher/me", {}, token);
 }
 
 export async function getSchoolAdminStudents(token: string) {
-  return request<StudentWithClassOut[]>('/school/students', {}, token);
+  return request<StudentWithClassOut[]>("/school/students", {}, token);
 }
 
-export async function getSchoolSubjectRecordings(token: string, subjectId: number) {
-  return request<RecordingWithReport[]>(`/school/subjects/${subjectId}/recordings`, {}, token);
+export async function getSchoolSubjectRecordings(
+  token: string,
+  subjectId: number,
+) {
+  return request<RecordingWithReport[]>(
+    `/school/subjects/${subjectId}/recordings`,
+    {},
+    token,
+  );
 }
 
-export async function getSchoolSubjectStudents(token: string, subjectId: number) {
-  return request<StudentOut[]>(`/school/subjects/${subjectId}/students`, {}, token);
+export async function getSchoolSubjectStudents(
+  token: string,
+  subjectId: number,
+) {
+  return request<StudentOut[]>(
+    `/school/subjects/${subjectId}/students`,
+    {},
+    token,
+  );
 }
 
 export async function getStudentMe(token: string) {
-  return request<StudentProfileOut>('/student/me', {}, token);
+  return request<StudentProfileOut>("/student/me", {}, token);
 }
 
 export async function updateStudentMe(
@@ -619,8 +964,8 @@ export async function updateStudentMe(
   payload: { name?: string | null; mobile_number?: string | null },
 ) {
   return request<StudentProfileOut>(
-    '/student/me',
-    { method: 'PUT', body: JSON.stringify(payload) },
+    "/student/me",
+    { method: "PUT", body: JSON.stringify(payload) },
     token,
   );
 }
@@ -631,16 +976,31 @@ export async function uploadStudentProfileImage(
   mimeType: string,
 ) {
   const form = new FormData();
-  await appendFile(form, 'file', imageUri, mimeType, 'student_profile');
-  return request<StudentProfileOut>('/student/profile-image', { method: 'POST', body: form, headers: {} }, token);
+  await appendFile(form, "file", imageUri, mimeType, "student_profile");
+  return request<StudentProfileOut>(
+    "/student/profile-image",
+    { method: "POST", body: form, headers: {} },
+    token,
+  );
 }
 
 export async function getStudentSubjects(token: string, classId: number) {
-  return request<SubjectOut[]>(`/student/classes/${classId}/subjects`, {}, token);
+  return request<SubjectOut[]>(
+    `/student/classes/${classId}/subjects`,
+    {},
+    token,
+  );
 }
 
-export async function getStudentSubjectRecordings(token: string, subjectId: number) {
-  return request<RecordingWithReport[]>(`/student/subjects/${subjectId}/recordings`, {}, token);
+export async function getStudentSubjectRecordings(
+  token: string,
+  subjectId: number,
+) {
+  return request<RecordingWithReport[]>(
+    `/student/subjects/${subjectId}/recordings`,
+    {},
+    token,
+  );
 }
 
 export async function uploadSchoolAdminProfileImage(
@@ -649,8 +1009,12 @@ export async function uploadSchoolAdminProfileImage(
   mimeType: string,
 ) {
   const form = new FormData();
-  await appendFile(form, 'file', imageUri, mimeType, 'school_admin_profile');
-  return request<SchoolAdminProfileOut>('/school/profile-image', { method: 'POST', body: form, headers: {} }, token);
+  await appendFile(form, "file", imageUri, mimeType, "school_admin_profile");
+  return request<SchoolAdminProfileOut>(
+    "/school/profile-image",
+    { method: "POST", body: form, headers: {} },
+    token,
+  );
 }
 
 export async function uploadSchoolLogo(
@@ -659,14 +1023,18 @@ export async function uploadSchoolLogo(
   mimeType: string,
 ) {
   const form = new FormData();
-  await appendFile(form, 'file', imageUri, mimeType, 'school_logo');
-  return request<SchoolOut>('/school/logo', { method: 'POST', body: form, headers: {} }, token);
+  await appendFile(form, "file", imageUri, mimeType, "school_logo");
+  return request<SchoolOut>(
+    "/school/logo",
+    { method: "POST", body: form, headers: {} },
+    token,
+  );
 }
 
 // ── Public (unauthenticated) ──────────────────────────────────────────────────
 
 export async function getPublicSchools(search?: string) {
-  const suffix = search ? `?search=${encodeURIComponent(search)}` : '';
+  const suffix = search ? `?search=${encodeURIComponent(search)}` : "";
   return request<SchoolOut[]>(`/public/schools${suffix}`);
 }
 
@@ -677,29 +1045,45 @@ export async function getPublicSchoolClasses(schoolId: number) {
 // ── Chapters ──────────────────────────────────────────────────────────────────
 
 export async function getChapters(token: string, subjectId: number) {
-  return request<ChapterOut[]>(`/school/subjects/${subjectId}/chapters`, {}, token);
+  return request<ChapterOut[]>(
+    `/school/subjects/${subjectId}/chapters`,
+    {},
+    token,
+  );
 }
 
 export async function getTeacherChapters(token: string, subjectId: number) {
-  return request<ChapterOut[]>(`/teacher/subjects/${subjectId}/chapters`, {}, token);
+  return request<ChapterOut[]>(
+    `/teacher/subjects/${subjectId}/chapters`,
+    {},
+    token,
+  );
 }
 
-export async function createChapter(token: string, subjectId: number, payload: ChapterCreatePayload) {
+export async function createChapter(
+  token: string,
+  subjectId: number,
+  payload: ChapterCreatePayload,
+) {
   return request<ChapterOut>(
     `/school/subjects/${subjectId}/chapters`,
     {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(payload),
     },
     token,
   );
 }
 
-export async function updateChapter(token: string, chapterId: number, payload: ChapterUpdatePayload) {
+export async function updateChapter(
+  token: string,
+  chapterId: number,
+  payload: ChapterUpdatePayload,
+) {
   return request<ChapterOut>(
     `/school/chapters/${chapterId}`,
     {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(payload),
     },
     token,
@@ -707,7 +1091,11 @@ export async function updateChapter(token: string, chapterId: number, payload: C
 }
 
 export async function deleteChapter(token: string, chapterId: number) {
-  return request<void>(`/school/chapters/${chapterId}`, { method: 'DELETE' }, token);
+  return request<void>(
+    `/school/chapters/${chapterId}`,
+    { method: "DELETE" },
+    token,
+  );
 }
 
 export async function getChapterDetails(token: string, chapterId: number) {
@@ -715,16 +1103,81 @@ export async function getChapterDetails(token: string, chapterId: number) {
 }
 
 export async function getChapterKnowledge(token: string, chapterId: number) {
-  return request<ChapterKnowledgeOut>(`/school/chapters/${chapterId}/knowledge`, {}, token);
+  return request<ChapterKnowledgeOut>(
+    `/school/chapters/${chapterId}/knowledge`,
+    {},
+    token,
+  );
 }
 
 export async function getChapterDocuments(token: string, chapterId: number) {
-  return request<ChapterDocumentOut[]>(`/school/chapters/${chapterId}/documents`, {}, token);
+  return request<ChapterDocumentOut[]>(
+    `/school/chapters/${chapterId}/documents`,
+    {},
+    token,
+  );
 }
 
 export async function deleteChapterDocument(token: string, documentId: number) {
-  return request<void>(`/school/chapters/documents/${documentId}`, { method: 'DELETE' }, token);
+  return request<void>(
+    `/school/chapters/documents/${documentId}`,
+    { method: "DELETE" },
+    token,
+  );
 }
+
+// export async function uploadChapterDocument(
+//   token: string,
+//   chapterId: number,
+//   fileUri: string,
+//   mimeType: string,
+//   fileName: string,
+//   onProgress?: (pct: number) => void,
+// ): Promise<ChapterDocumentOut> {
+//   const form = new FormData();
+//   const normalizedType = normalizeMimeType(fileUri, mimeType);
+//   const uploadUri = normalizeUploadUri(fileUri);
+
+//   // XMLHttpRequests expect objects when appending files in React Native
+//   form.append('file', {
+//     uri: uploadUri,
+//     type: normalizedType,
+//     name: fileName,
+//   } as unknown as Blob);
+
+//   return new Promise((resolve, reject) => {
+//     const xhr = new XMLHttpRequest();
+//     xhr.open('POST', `${API_BASE_URL}/school/chapters/${chapterId}/documents`);
+//     xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+//     xhr.upload.onprogress = (e) => {
+//       if (e.lengthComputable && onProgress) {
+//         onProgress(Math.round((e.loaded / e.total) * 100));
+//       }
+//     };
+
+//     xhr.onload = () => {
+//       if (xhr.status === 401) {
+//         notifyUnauthorized();
+//       }
+//       if (xhr.status >= 200 && xhr.status < 300) {
+//         try {
+//           resolve(JSON.parse(xhr.responseText) as ChapterDocumentOut);
+//         } catch {
+//           reject(new ApiError('Invalid response from server', xhr.status));
+//         }
+//       } else {
+//         reject(new ApiError(`Upload failed (${xhr.status})`, xhr.status));
+//       }
+//     };
+
+//     xhr.onerror = () => reject(new ApiError('Network request failed', 0));
+//     xhr.ontimeout = () => reject(new ApiError('Upload timed out', 0));
+//     xhr.timeout = 5 * 60 * 1000;
+
+//     xhr.send(form);
+//   });
+// }
 
 export async function uploadChapterDocument(
   token: string,
@@ -735,20 +1188,16 @@ export async function uploadChapterDocument(
   onProgress?: (pct: number) => void,
 ): Promise<ChapterDocumentOut> {
   const form = new FormData();
-  const normalizedType = normalizeMimeType(fileUri, mimeType);
-  const uploadUri = normalizeUploadUri(fileUri);
 
-  // XMLHttpRequests expect objects when appending files in React Native
-  form.append('file', {
-    uri: uploadUri,
-    type: normalizedType,
-    name: fileName,
-  } as unknown as Blob);
+  // Use the same helper as recording upload
+  await appendFile(form, "file", fileUri, mimeType, "chapter_document");
 
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', `${API_BASE_URL}/school/chapters/${chapterId}/documents`);
-    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+    xhr.open("POST", `${API_BASE_URL}/school/chapters/${chapterId}/documents`);
+
+    xhr.setRequestHeader("Authorization", `Bearer ${token}`);
 
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable && onProgress) {
@@ -760,23 +1209,96 @@ export async function uploadChapterDocument(
       if (xhr.status === 401) {
         notifyUnauthorized();
       }
+
       if (xhr.status >= 200 && xhr.status < 300) {
-        try {
-          resolve(JSON.parse(xhr.responseText) as ChapterDocumentOut);
-        } catch {
-          reject(new ApiError('Invalid response from server', xhr.status));
-        }
+        resolve(JSON.parse(xhr.responseText));
       } else {
-        reject(new ApiError(`Upload failed (${xhr.status})`, xhr.status));
+        console.log(xhr.responseText);
+        reject(new ApiError(xhr.responseText, xhr.status));
       }
     };
 
-    xhr.onerror = () => reject(new ApiError('Network request failed', 0));
-    xhr.ontimeout = () => reject(new ApiError('Upload timed out', 0));
-    xhr.timeout = 5 * 60 * 1000;
+    xhr.onerror = () => reject(new ApiError("Network request failed", 0));
 
     xhr.send(form);
   });
 }
 
 export { API_BASE_URL, ApiError };
+
+export async function getSchoolDashboardOverview(
+  token: string,
+): Promise<SchoolDashboardOverview> {
+  return request<SchoolDashboardOverview>(
+    "/school/dashboard/overview",
+    {},
+    token,
+  );
+}
+
+export async function getSchoolAnalytics(
+  token: string,
+): Promise<SchoolAnalytics> {
+  return request<SchoolAnalytics>("/school/dashboard/analytics", {}, token);
+}
+
+export async function getTeacherRanking(
+  token: string,
+): Promise<TeacherRanking> {
+  return request<TeacherRanking>(
+    "/school/dashboard/teacher-ranking",
+    {},
+    token,
+  );
+}
+
+export async function getRecentActivity(
+  token: string,
+): Promise<RecentActivity> {
+  return request<RecentActivity>(
+    "/school/dashboard/recent-activity",
+    {},
+    token,
+  );
+}
+
+export async function getTeacherRecordings(
+  token: string,
+  teacherId: number,
+): Promise<TeacherRecording[]> {
+  return request<TeacherRecording[]>(
+    `/school/teachers/${teacherId}/recordings`,
+    {},
+    token,
+  );
+}
+
+export async function getSchoolTeacherSubjects(token: string, teacherId: number) {
+  return request<SubjectWithClassOut[]>(
+    `/school/teachers/${teacherId}/subjects`,
+    {},
+    token,
+  );
+}
+
+export async function getTeacherProfile(
+  token: string,
+  teacherId: number,
+): Promise<TeacherProfile> {
+  return request<TeacherProfile>(
+    `/school/teachers/${teacherId}/profile`,
+    {},
+    token,
+  );
+}
+
+export async function getSchoolRecordingDetail(
+  token: string,
+  recordingId: number,
+): Promise<RecordingWithReport> {
+  return request<RecordingWithReport>(
+    `/school/recordings/${recordingId}`,
+    {},
+    token,
+  );
+}

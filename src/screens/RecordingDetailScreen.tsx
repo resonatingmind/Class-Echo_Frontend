@@ -268,7 +268,16 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
   const [editDescription, setEditDescription] = useState(initialRecording.description || '');
   const [updatingDetails, setUpdatingDetails] = useState(false);
 
-  const player = useAudioPlayer(recordingDetails.cloudinary_url, { updateInterval: 200 });
+  // const player = useAudioPlayer(recordingDetails.cloudinary_url, { updateInterval: 200 });
+
+  const audioUrl = recordingDetails.cloudinary_url.startsWith("http")
+    ? recordingDetails.cloudinary_url
+    : `http://127.0.0.1:8000/${recordingDetails.cloudinary_url}`;
+
+  const player = useAudioPlayer(audioUrl, {
+    updateInterval: 200,
+  });
+
   const playerStatus = useAudioPlayerStatus(player);
   const statusBadge = statusStyle(status);
   const waveform = useMemo(() => buildWaveformBars(recordingDetails.id), [recordingDetails.id]);
@@ -339,7 +348,11 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
             try {
               await archiveTeacherRecording(session.token, recordingDetails.id);
               setShowOptionsSheet(false);
-              navigation.goBack();
+              if (navigation.canGoBack()) {
+                navigation.goBack();
+              } else {
+                navigation.navigate("TeacherSubjects");
+              }
             } catch (e) {
               Alert.alert('Archive failed', e instanceof Error ? e.message : 'Could not archive recording.');
             }
@@ -363,7 +376,11 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
             try {
               await deleteTeacherRecording(session.token, recordingDetails.id);
               setShowOptionsSheet(false);
-              navigation.goBack();
+              if (navigation.canGoBack()) {
+                navigation.goBack();
+              } else {
+                navigation.navigate("TeacherSubjects");
+              }
             } catch (e) {
               Alert.alert('Delete failed', e instanceof Error ? e.message : 'Could not delete recording.');
             }

@@ -1,7 +1,11 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "../navigation/AppNavigator";
 
-import { colors } from '../theme/colors';
+
+import { colors } from "../theme/colors";
 
 type Tab = {
   key: string;
@@ -11,18 +15,41 @@ type Tab = {
 };
 
 const TABS: Tab[] = [
-  { key: 'classes', label: 'Classes', icon: 'school-outline', activeIcon: 'school' },
-  { key: 'teachers', label: 'Teachers', icon: 'people-outline', activeIcon: 'people' },
-  { key: 'students', label: 'Students', icon: 'people-circle-outline', activeIcon: 'people-circle' },
-  { key: 'profile', label: 'Profile', icon: 'person-outline', activeIcon: 'person' },
+  {
+    key: "dashboard",
+    label: "Dashboard",
+    icon: "grid-outline",
+    activeIcon: "grid",
+  },
+  {
+    key: "teachers",
+    label: "Teachers",
+    icon: "people-outline",
+    activeIcon: "people",
+  },
+  {
+    key: "students",
+    label: "Students",
+    icon: "people-circle-outline",
+    activeIcon: "people-circle",
+  },
+  {
+    key: "profile",
+    label: "Profile",
+    icon: "person-outline",
+    activeIcon: "person",
+  },
 ];
 
 type Props = {
   active: string;
-  onTabPress: (key: string) => void;
 };
 
-export function SchoolAdminTabBar({ active, onTabPress }: Props) {
+export function SchoolAdminTabBar({ active }: Props) {
+
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
   return (
     <View style={styles.bar}>
       {TABS.map((tab) => {
@@ -30,7 +57,33 @@ export function SchoolAdminTabBar({ active, onTabPress }: Props) {
         return (
           <Pressable
             key={tab.key}
-            onPress={() => onTabPress(tab.key)}
+            onPress={() => {
+              switch (tab.key) {
+                case "dashboard":
+                  navigation.navigate("SchoolAdminTabs", {
+                    screen: "SchoolAdminDashboard",
+                  });
+                  break;
+
+                case "teachers":
+                  navigation.navigate("SchoolAdminTabs", {
+                    screen: "SchoolAdminTeachers",
+                  });
+                  break;
+
+                case "students":
+                  navigation.navigate("SchoolAdminTabs", {
+                    screen: "SchoolAdminStudents",
+                  });
+                  break;
+
+                case "profile":
+                  navigation.navigate("SchoolAdminTabs", {
+                    screen: "SchoolAdminProfile",
+                  });
+                  break;
+              }
+            }}
             style={styles.tab}
           >
             <Ionicons
@@ -50,7 +103,7 @@ export function SchoolAdminTabBar({ active, onTabPress }: Props) {
 
 const styles = StyleSheet.create({
   bar: {
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: colors.surface,
     borderTopWidth: 1,
     borderTopColor: colors.border,
@@ -59,13 +112,13 @@ const styles = StyleSheet.create({
   },
   tab: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     gap: 4,
   },
   label: {
     color: colors.navInactive,
     fontSize: 10,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   labelActive: {
     color: colors.accent,

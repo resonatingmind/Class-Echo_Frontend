@@ -105,7 +105,9 @@ export function AdminClassDetailScreen({ navigation, route }: Props) {
   return (
     <SafeAreaView edges={['top']} style={styles.safe}>
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} style={styles.headerButton}>
+        <Pressable onPress={() => 
+          navigation.goBack()
+          } style={styles.headerButton}>
           <Ionicons color={colors.textPrimary} name="arrow-back" size={22} />
         </Pressable>
         <Text numberOfLines={1} style={styles.headerTitle}>

@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'school_admin' | 'teacher' | 'student';
+export type UserRole = "admin" | "school_admin" | "teacher" | "student";
 
 export type TokenResponse = {
   access_token: string;
@@ -79,6 +79,20 @@ export type SubjectOut = {
   class_: ClassBrief | null;
   teacher_id: number | null;
   teacher: TeacherBrief | null;
+  teacher_assigned_at: string | null;
+  created_at: string;
+};
+
+export type SubjectWithClassOut = {
+  id: number;
+  name: string;
+  profile_image_url: string | null;
+  class_id: number;
+  school_id: number;
+  teacher_id: number | null;
+  class_: ClassBrief | null;
+  teacher: TeacherBrief | null;
+  teacher_assigned_at: string | null;
   created_at: string;
 };
 
@@ -103,7 +117,7 @@ export type QuantitativeMetrics = {
   filler_words_heard: number;
   questions_asked: number;
   languages_detected: string[];
-  code_switching_frequency: 'none' | 'low' | 'medium' | 'high';
+  code_switching_frequency: "none" | "low" | "medium" | "high";
   top_strengths: string[];
   priority_improvements: string[];
 };
@@ -127,7 +141,7 @@ export type ChapterInfo = {
 
 export type LearningObjectiveStatus = {
   objective: string;
-  status: 'achieved' | 'partial' | 'missing';
+  status: "achieved" | "partial" | "missing";
 };
 
 export type LLMReportOut = {
@@ -144,11 +158,7 @@ export type LLMReportOut = {
   created_at: string;
 };
 
-export type RecordingStatus =
-  | 'pending'
-  | 'processing'
-  | 'completed'
-  | 'failed';
+export type RecordingStatus = "pending" | "processing" | "completed" | "failed";
 
 export type RecordingWithReport = {
   id: number;
@@ -241,4 +251,68 @@ export type ChapterKnowledgeOut = {
   must_cover_topics: string[];
   common_misconceptions: string[];
   generated_at: string;
+};
+
+export type SchoolDashboardOverview = {
+  total_teachers: number;
+  total_students: number;
+  total_classes: number;
+  total_subjects: number;
+  total_recordings: number;
+  pending_reports: number;
+};
+
+export type SchoolAnalytics = {
+  overall_score: number;
+  engagement_score: number;
+  confidence_score: number;
+  clarity_score: number;
+  fluency_score: number;
+  pace_score: number;
+  curriculum_coverage: number;
+  accuracy_score: number;
+};
+
+export type TeacherRankingItem = {
+  teacher_id: number;
+  teacher_name: string;
+  total_lectures: number;
+  overall_score: number;
+};
+
+export type TeacherRanking = {
+  teachers: TeacherRankingItem[];
+};
+
+export type RecentActivityItem = {
+  recording_id: number;
+  teacher_name: string;
+  lecture_title: string | null;
+  chapter_name: string | null;
+  uploaded_at: string;
+  status: string;
+};
+
+export type RecentActivity = {
+  activities: RecentActivityItem[];
+};
+
+export type TeacherRecording = {
+  id: number;
+
+  lecture_title: string | null;
+
+  chapter_name: string | null;
+
+  uploaded_at: string;
+
+  status: string;
+
+  overall_score: number | null;
+
+  subject_name: string;
+
+  cloudinary_url: string;
+
+  duration_seconds: number | null;
 };

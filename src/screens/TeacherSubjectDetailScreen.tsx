@@ -208,7 +208,21 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
     previewPlayer.replace(pendingUri);
   }, [pendingUri, previewPlayer, showUploadModal]);
 
-  const completedCount = recordings.filter((recording) => recording.status === 'completed').length;
+  const filteredRecordings = useMemo(() => {
+    if (!selectedChapter) {
+      return [];
+    }
+
+    return recordings.filter(
+      (r) =>
+        r.chapter_id === selectedChapter.id ||
+        (r.chapter_id === null && r.chapter_name === selectedChapter.name),
+    );
+  }, [recordings, selectedChapter]);
+
+  const completedCount = filteredRecordings.filter(
+    (recording) => recording.status === "completed",
+  ).length;
   const previewBars = useMemo(() => buildWaveformBars(pendingUri ?? subjectName), [pendingUri, subjectName]);
   const previewProgress =
     previewStatus.duration > 0 ? Math.min(1, previewStatus.currentTime / previewStatus.duration) : 0;
@@ -336,7 +350,13 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
   return (
     <SafeAreaView edges={['top']} style={styles.safe}>
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} style={styles.headerButton}>
+        <Pressable onPress={() => {
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          } else {
+            navigation.navigate("TeacherSubjects");
+          }
+        }} style={styles.headerButton}>
           <Ionicons color={colors.textPrimary} name="arrow-back" size={22} />
         </Pressable>
         <Text numberOfLines={1} style={styles.headerTitle}>

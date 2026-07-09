@@ -26,11 +26,9 @@ import {
 
 import { notifyUnauthorized } from "./authSession";
 
-// Switch to local backend for development:
-// Android emulator: 'http://10.0.2.2:8000'
-// iOS simulator / Expo Go on device: 'http://localhost:8000'
-// Production: 'http://104.154.218.1:8000'
-const API_BASE_URL = "http://localhost:8000";
+// Load from environment variable (Expo requires prefixing with EXPO_PUBLIC_)
+// Fall back to localhost if not specified
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:8000";
 
 class ApiError extends Error {
   status: number;

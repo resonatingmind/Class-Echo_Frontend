@@ -21,7 +21,7 @@ export function SchoolAdminTabNavigator() {
   return (
     <Tab.Navigator
       initialRouteName="SchoolAdminDashboard"
-      screenOptions={({ route }) => ({
+      screenOptions={({ route }: { route: any }) => ({
         headerShown: false,
 
         tabBarActiveTintColor: colors.accent,
@@ -33,7 +33,7 @@ export function SchoolAdminTabNavigator() {
           paddingTop: 8,
         },
 
-        tabBarIcon: ({ color, size }) => {
+        tabBarIcon: ({ color, size }: { color: string; size: number }) => {
           let icon: keyof typeof Ionicons.glyphMap = "ellipse";
 
           switch (route.name) {
@@ -60,25 +60,25 @@ export function SchoolAdminTabNavigator() {
     >
       <Tab.Screen
         name="SchoolAdminDashboard"
-        component={SchoolAdminDashboardScreen}
+        component={SchoolAdminDashboardScreen as any}
         options={{ title: "Dashboard" }}
       />
 
       <Tab.Screen
         name="SchoolAdminTeachers"
-        component={SchoolAdminTeachersScreen}
+        component={SchoolAdminTeachersScreen as any}
         options={{ title: "Teachers" }}
       />
 
       <Tab.Screen
         name="SchoolAdminStudents"
-        component={SchoolAdminStudentsScreen}
+        component={SchoolAdminStudentsScreen as any}
         options={{ title: "Students" }}
       />
 
       <Tab.Screen
         name="SchoolAdminProfile"
-        component={SchoolAdminProfileScreen}
+        component={SchoolAdminProfileScreen as any}
         options={{ title: "Profile" }}
       />
     </Tab.Navigator>

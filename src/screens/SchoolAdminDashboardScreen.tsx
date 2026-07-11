@@ -286,6 +286,28 @@ export function SchoolAdminDashboardScreen({ navigation }: Props) {
 
             <Text style={styles.quickSubtitle}>Soon</Text>
           </Pressable>
+
+          <Pressable
+            style={styles.quickCard}
+            onPress={() => navigation.navigate("SchoolAdminMapping")}
+          >
+            <Ionicons name="git-network" size={34} color={colors.accent} />
+
+            <Text style={styles.quickTitle}>Mappings</Text>
+
+            <Text style={styles.quickSubtitle}>Class ↔ Subject</Text>
+          </Pressable>
+
+          <Pressable
+            style={styles.quickCard}
+            onPress={() => navigation.navigate("SchoolAdminTimeSlots")}
+          >
+            <Ionicons name="time" size={34} color={colors.accent} />
+
+            <Text style={styles.quickTitle}>Time Slots</Text>
+
+            <Text style={styles.quickSubtitle}>Periods</Text>
+          </Pressable>
         </View>
 
         {/* <View style={styles.quickActions}>

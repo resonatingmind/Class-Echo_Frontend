@@ -22,6 +22,13 @@ import {
   ChapterDocumentOut,
   ChapterKnowledgeOut,
   TeacherRecording,
+  MappingOut,
+  MappingCreate,
+  MappingUpdate,
+  TimeSlotOut,
+  TimeSlotCreate,
+  TimetableOut,
+  TimetableCreate,
 } from "../types/api";
 
 import { notifyUnauthorized } from "./authSession";
@@ -1297,6 +1304,186 @@ export async function getSchoolRecordingDetail(
   return request<RecordingWithReport>(
     `/school/recordings/${recordingId}`,
     {},
+    token,
+  );
+}
+
+// ── Mappings ──────────────────────────────────────────────────────────────────
+
+export async function getAdminMappings(token: string) {
+  return request<MappingOut[]>("/school/mappings", {}, token);
+}
+
+export async function createAdminMapping(token: string, payload: MappingCreate) {
+  return request<MappingOut>(
+    "/school/mappings",
+    { method: "POST", body: JSON.stringify(payload) },
+    token,
+  );
+}
+
+export async function updateAdminMapping(
+  token: string,
+  mappingId: number,
+  payload: MappingUpdate,
+) {
+  return request<MappingOut>(
+    `/school/mappings/${mappingId}`,
+    { method: "PUT", body: JSON.stringify(payload) },
+    token,
+  );
+}
+
+export async function deleteAdminMapping(token: string, mappingId: number) {
+  return request<void>(
+    `/school/mappings/${mappingId}`,
+    { method: "DELETE" },
+    token,
+  );
+}
+
+// ── Teacher Classes ───────────────────────────────────────────────────────────
+
+export async function getTeacherClasses(token: string) {
+  return request<MappingOut[]>("/teacher/classes", {}, token);
+}
+
+// ── Chapter Recordings (by chapter) ──────────────────────────────────────────
+
+export async function getSchoolChapterRecordings(
+  token: string,
+  chapterId: number,
+) {
+  return request<RecordingWithReport[]>(
+    `/school/chapters/${chapterId}/recordings`,
+    {},
+    token,
+  );
+}
+
+export async function getTeacherChapterRecordings(
+  token: string,
+  subjectId: number,
+  chapterId: number,
+) {
+  return request<RecordingWithReport[]>(
+    `/teacher/subjects/${subjectId}/chapters/${chapterId}/recordings`,
+    {},
+    token,
+  );
+}
+
+// ── Time Slots ────────────────────────────────────────────────────────────────
+
+export async function getSchoolTimeSlots(token: string) {
+  return request<TimeSlotOut[]>("/school/time-slots", {}, token);
+}
+
+export async function createSchoolTimeSlot(
+  token: string,
+  payload: TimeSlotCreate,
+) {
+  return request<TimeSlotOut>(
+    "/school/time-slots",
+    { method: "POST", body: JSON.stringify(payload) },
+    token,
+  );
+}
+
+export async function updateSchoolTimeSlot(
+  token: string,
+  id: number,
+  payload: Partial<TimeSlotCreate>,
+) {
+  return request<TimeSlotOut>(
+    `/school/time-slots/${id}`,
+    { method: "PUT", body: JSON.stringify(payload) },
+    token,
+  );
+}
+
+export async function deleteSchoolTimeSlot(token: string, id: number) {
+  return request<void>(`/school/time-slots/${id}`, { method: "DELETE" }, token);
+}
+
+// ── Teacher Timetable ─────────────────────────────────────────────────────────
+
+export async function getTeacherTimetable(token: string) {
+  return request<TimetableOut[]>("/teacher/timetable", {}, token);
+}
+
+export async function createTeacherTimetableEntry(
+  token: string,
+  payload: TimetableCreate,
+) {
+  return request<TimetableOut>(
+    "/teacher/timetable",
+    { method: "POST", body: JSON.stringify(payload) },
+    token,
+  );
+}
+
+export async function updateTeacherTimetableEntry(
+  token: string,
+  id: number,
+  payload: Partial<TimetableCreate>,
+) {
+  return request<TimetableOut>(
+    `/teacher/timetable/${id}`,
+    { method: "PUT", body: JSON.stringify(payload) },
+    token,
+  );
+}
+
+export async function deleteTeacherTimetableEntry(token: string, id: number) {
+  return request<void>(`/teacher/timetable/${id}`, { method: "DELETE" }, token);
+}
+
+// ── School Timetable (admin view) ─────────────────────────────────────────────
+
+export async function getSchoolTimetable(
+  token: string,
+  teacherId?: number,
+  academicYear?: string,
+) {
+  const params = new URLSearchParams();
+  if (teacherId) params.append("teacher_id", String(teacherId));
+  if (academicYear) params.append("academic_year", academicYear);
+  const qs = params.toString();
+  return request<TimetableOut[]>(
+    `/school/timetable${qs ? `?${qs}` : ""}`,
+    {},
+    token,
+  );
+}
+
+export async function createSchoolTimetableEntry(
+  token: string,
+  payload: TimetableCreate & { teacher_id?: number | null },
+) {
+  return request<TimetableOut>(
+    "/school/timetable",
+    { method: "POST", body: JSON.stringify(payload) },
+    token,
+  );
+}
+
+export async function updateSchoolTimetableEntry(
+  token: string,
+  id: number,
+  payload: Partial<TimetableCreate & { teacher_id?: number | null }>,
+) {
+  return request<TimetableOut>(
+    `/school/timetable/${id}`,
+    { method: "PUT", body: JSON.stringify(payload) },
+    token,
+  );
+}
+
+export async function deleteSchoolTimetableEntry(token: string, id: number) {
+  return request<void>(
+    `/school/timetable/${id}`,
+    { method: "DELETE" },
     token,
   );
 }

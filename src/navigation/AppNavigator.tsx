@@ -43,6 +43,17 @@ import { RecordingScreen } from "../screens/RecordingScreen";
 import { TeacherProfileScreen } from "../screens/TeacherProfileScreen";
 import { TeacherSubjectDetailScreen } from "../screens/TeacherSubjectDetailScreen";
 import { TeacherSubjectsScreen } from "../screens/TeacherSubjectsScreen";
+import { TeacherDashboardScreen } from "../screens/TeacherDashboardScreen";
+import { TeacherChapterScreen } from "../screens/TeacherChapterScreen";
+import { TeacherReferenceMaterialScreen } from "../screens/TeacherReferenceMaterialScreen";
+import { TeacherTimetableScreen } from "../screens/TeacherTimetableScreen";
+
+// School Admin new screens
+import { SchoolAdminMappingScreen } from "../screens/SchoolAdminMappingScreen";
+import { SchoolAdminChapterScreen } from "../screens/SchoolAdminChapterScreen";
+import { ReferenceMaterialScreen } from "../screens/ReferenceMaterialScreen";
+import { SchoolAdminTimeSlotsScreen } from "../screens/SchoolAdminTimeSlotsScreen";
+import { SchoolAdminChapterRecordingsScreen } from "../screens/SchoolAdminChapterRecordingsScreen";
 
 export type RootStackParamList = {
   // Auth
@@ -87,6 +98,23 @@ export type RootStackParamList = {
     chapterName: string;
     subjectName: string;
   };
+  // School Admin new
+  SchoolAdminMapping: undefined;
+  SchoolAdminChapterView: {
+    subjectId: number;
+    subjectName: string;
+    section?: string;
+    className?: string;
+    teacherName?: string;
+    year?: string;
+  };
+  ReferenceMaterial: { chapterId: number; chapterName: string };
+  SchoolAdminTimeSlots: undefined;
+  SchoolAdminChapterRecordings: {
+    chapterId: number;
+    chapterName: string;
+    subjectName: string;
+  };
   // Teacher
   TeacherSubjects: undefined;
   TeacherSubjectDetail: { subjectId: number; subjectName: string };
@@ -98,6 +126,19 @@ export type RootStackParamList = {
     chapterName?: string;
   };
   TeacherProfile: undefined;
+  TeacherDashboard: undefined;
+  TeacherChapterView: {
+    subjectId: number;
+    subjectName: string;
+    section?: string;
+    className?: string;
+  };
+  TeacherReferenceMaterial: {
+    chapterId: number;
+    chapterName: string;
+    subjectId: number;
+  };
+  TeacherTimetable: undefined;
 
   // Student
   StudentHome: undefined;
@@ -117,7 +158,7 @@ function roleHome(role: UserRole): keyof RootStackParamList {
     case "school_admin":
       return "SchoolAdminTabs";
     case "teacher":
-      return "TeacherSubjects";
+      return "TeacherDashboard";
     case "student":
       return "StudentHome";
     default:
@@ -218,6 +259,28 @@ export function AppNavigator() {
             component={SchoolAdminChapterDetailScreen}
           />
 
+          {/* New mapping / chapter / time-slot screens */}
+          <Stack.Screen
+            name="SchoolAdminMapping"
+            component={SchoolAdminMappingScreen}
+          />
+          <Stack.Screen
+            name="SchoolAdminChapterView"
+            component={SchoolAdminChapterScreen}
+          />
+          <Stack.Screen
+            name="ReferenceMaterial"
+            component={ReferenceMaterialScreen}
+          />
+          <Stack.Screen
+            name="SchoolAdminTimeSlots"
+            component={SchoolAdminTimeSlotsScreen}
+          />
+          <Stack.Screen
+            name="SchoolAdminChapterRecordings"
+            component={SchoolAdminChapterRecordingsScreen}
+          />
+
           <Stack.Screen
             name="RecordingDetail"
             component={RecordingDetailScreen}
@@ -225,6 +288,22 @@ export function AppNavigator() {
         </>
       ) : session.role === "teacher" ? (
         <>
+          <Stack.Screen
+            name="TeacherDashboard"
+            component={TeacherDashboardScreen}
+          />
+          <Stack.Screen
+            name="TeacherChapterView"
+            component={TeacherChapterScreen}
+          />
+          <Stack.Screen
+            name="TeacherReferenceMaterial"
+            component={TeacherReferenceMaterialScreen}
+          />
+          <Stack.Screen
+            name="TeacherTimetable"
+            component={TeacherTimetableScreen}
+          />
           <Stack.Screen
             name="TeacherSubjects"
             component={TeacherSubjectsScreen}

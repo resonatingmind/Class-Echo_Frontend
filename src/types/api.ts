@@ -316,3 +316,82 @@ export type TeacherRecording = {
 
   duration_seconds: number | null;
 };
+
+// ── Mapping Types ─────────────────────────────────────────────────────────────
+
+export type MappingOut = {
+  id: number;
+  class_id: number;
+  class_: { id: number; name: string } | null;
+  section: string | null;
+  name: string;
+  teacher_id: number | null;
+  teacher: { id: number; name: string; email: string } | null;
+  academic_year: string | null;
+  status: string;
+  created_at: string;
+};
+
+export type MappingCreate = {
+  class_id: number;
+  section?: string | null;
+  subject_name: string;
+  teacher_id?: number | null;
+  academic_year?: string | null;
+  status?: string;
+};
+
+export type MappingUpdate = {
+  section?: string | null;
+  teacher_id?: number | null;
+  academic_year?: string | null;
+  status?: string | null;
+};
+
+// ── Time Slot Types ───────────────────────────────────────────────────────────
+
+export type TimeSlotOut = {
+  id: number;
+  school_id: number;
+  name: string;
+  start_time: string;
+  end_time: string;
+  duration_minutes: number | null;
+  is_break: boolean;
+  display_order: number;
+  created_at: string;
+};
+
+export type TimeSlotCreate = {
+  name: string;
+  start_time: string;
+  end_time: string;
+  duration_minutes?: number | null;
+  is_break?: boolean;
+  display_order?: number;
+};
+
+// ── Timetable Types ───────────────────────────────────────────────────────────
+
+export type TimetableOut = {
+  id: number;
+  school_id: number;
+  teacher_id: number | null;
+  teacher: { id: number; name: string } | null;
+  subject_id: number | null;
+  subject: { id: number; name: string } | null;
+  day_of_week: number;
+  time_slot_id: number;
+  time_slot: TimeSlotOut;
+  room_number: string | null;
+  academic_year: string | null;
+  created_at: string;
+};
+
+export type TimetableCreate = {
+  subject_id?: number | null;
+  day_of_week: number;
+  time_slot_id: number;
+  room_number?: string | null;
+  academic_year?: string | null;
+};

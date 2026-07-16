@@ -2,7 +2,7 @@ import { NavigatorScreenParams } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import { SchoolAdminTabParamList } from "./SchoolAdminTabNavigator";
-
+import { SchoolAdminPlannerDetailScreen } from "../screens/SchoolAdminPlannerDetailScreen";
 import { useAuth } from "../context/AuthContext";
 import { RecordingWithReport, UserRole } from "../types/api";
 import { SchoolAdminTabNavigator } from "./SchoolAdminTabNavigator";
@@ -18,15 +18,13 @@ import { SchoolAdminTeacherRecordingsScreen } from "../screens/SchoolAdminTeache
 // School Admin screens
 import { SchoolAdminClassDetailScreen } from "../screens/SchoolAdminClassDetailScreen";
 import { SchoolAdminClassesScreen } from "../screens/SchoolAdminClassesScreen";
-import { SchoolAdminTeachersScreen } from "../screens/SchoolAdminTeachersScreen";
+import { SchoolAdminPlannerScreen } from "../screens/SchoolAdminPlannerScreen";
 import { SchoolAdminTeacherDetailScreen } from "../screens/SchoolAdminTeacherDetailScreen";
-import { SchoolAdminStudentsScreen } from "../screens/SchoolAdminStudentsScreen";
-import { SchoolAdminProfileScreen } from "../screens/SchoolAdminProfileScreen";
 import { SchoolAdminSubjectDetailScreen } from "../screens/SchoolAdminSubjectDetailScreen";
 import { SchoolAdminSubjectChaptersScreen } from "../screens/SchoolAdminSubjectChaptersScreen";
 import { SchoolAdminChapterDetailScreen } from "../screens/SchoolAdminChapterDetailScreen";
+import { TeacherChapterDetailScreen } from "../screens/TeacherChapterDetailScreen";
 import { SchoolAdminTeacherAnalyticsScreen } from "../screens/SchoolAdminTeacherAnalyticsScreen";
-import { SchoolAdminDashboardScreen } from "../screens/SchoolAdminDashboardScreen";
 
 // Auth screens
 import { LoginScreen } from "../screens/LoginScreen";
@@ -42,7 +40,8 @@ import { RecordingDetailScreen } from "../screens/RecordingDetailScreen";
 import { RecordingScreen } from "../screens/RecordingScreen";
 import { TeacherProfileScreen } from "../screens/TeacherProfileScreen";
 import { TeacherSubjectDetailScreen } from "../screens/TeacherSubjectDetailScreen";
-import { TeacherSubjectsScreen } from "../screens/TeacherSubjectsScreen";
+import { TeacherSubjectWorkspaceScreen } from "../screens/TeacherSubjectWorkspaceScreen";
+import { TeacherTabNavigator } from "./TeacherTabNavigator";
 
 export type RootStackParamList = {
   // Auth
@@ -56,6 +55,7 @@ export type RootStackParamList = {
     schoolId: number;
     classId: number;
     className: string;
+    section: string;
     schoolName: string;
   };
   AdminSubjectDetail: {
@@ -65,31 +65,56 @@ export type RootStackParamList = {
   };
   // School Admin
   SchoolAdminTabs: NavigatorScreenParams<SchoolAdminTabParamList>;
-  //SchoolAdminDashboard: undefined;
   SchoolAdminClasses: undefined;
-  SchoolAdminClassDetail: { classId: number; className: string };
-  //SchoolAdminTeachers: undefined;
+
+  SchoolAdminClassDetail: {
+    classId: number;
+    className: string;
+    section: string;
+  };
+  SchoolAdminTeachers: undefined;
   SchoolAdminTeacherDetail: {
     teacherId: number;
   };
   SchoolAdminTeacherAnalytics: {
     teacherId: number;
   };
+
   SchoolAdminTeacherRecordings: {
-    teacherId: number;
+    teacherId?: number;
+    chapterId?: number;
+    subjectName?: string;
+    chapterName?: string;
   };
-  //SchoolAdminStudents: undefined;
-  //SchoolAdminProfile: undefined;
+  SchoolAdminPlanner: undefined;
+
+  SchoolAdminPlannerDetail: {
+    subjectId: number;
+  };
   SchoolAdminSubjectDetail: { subjectId: number; subjectName: string };
   SchoolAdminSubjectChapters: { subjectId: number; subjectName: string };
   SchoolAdminChapterDetail: {
     chapterId: number;
     chapterName: string;
     subjectName: string;
+
+    openUpload?: boolean;
   };
-  // Teacher
-  TeacherSubjects: undefined;
+
+  TeacherChapterDetail: {
+    chapterId: number;
+    chapterName: string;
+    subjectName: string;
+    openUpload?: boolean;
+  };
+  TeacherTabs: undefined;
   TeacherSubjectDetail: { subjectId: number; subjectName: string };
+  TeacherSubjectWorkspace: {
+    subjectId: number;
+    subjectName: string;
+    className: string;
+    section: string;
+  };
   TeacherRecording: {
     subjectId: number;
     subjectName: string;
@@ -112,12 +137,10 @@ function roleHome(role: UserRole): keyof RootStackParamList {
   switch (role) {
     case "admin":
       return "AdminSchools";
-    // case "school_admin":
-    //   return "SchoolAdminDashboard";
     case "school_admin":
       return "SchoolAdminTabs";
     case "teacher":
-      return "TeacherSubjects";
+      return "TeacherTabs";
     case "student":
       return "StudentHome";
     default:
@@ -127,13 +150,11 @@ function roleHome(role: UserRole): keyof RootStackParamList {
 
 export function AppNavigator() {
   const { session, isLoading } = useAuth();
-  // const initialRoute = session ? roleHome(session.role) : "Login";
   if (isLoading) {
     return null;
   }
   return (
     <Stack.Navigator
-      // initialRouteName={initialRoute}
       screenOptions={{
         headerShown: false,
         contentStyle: { backgroundColor: "#FAF9F9" },
@@ -184,6 +205,16 @@ export function AppNavigator() {
           />
 
           <Stack.Screen
+            name="SchoolAdminPlanner"
+            component={SchoolAdminPlannerScreen}
+          />
+
+          <Stack.Screen
+            name="SchoolAdminPlannerDetail"
+            component={SchoolAdminPlannerDetailScreen}
+          />
+
+          <Stack.Screen
             name="SchoolAdminClassDetail"
             component={SchoolAdminClassDetailScreen}
           />
@@ -225,14 +256,23 @@ export function AppNavigator() {
         </>
       ) : session.role === "teacher" ? (
         <>
-          <Stack.Screen
-            name="TeacherSubjects"
-            component={TeacherSubjectsScreen}
-          />
+          <Stack.Screen name="TeacherTabs" component={TeacherTabNavigator} />
+
           <Stack.Screen
             name="TeacherSubjectDetail"
             component={TeacherSubjectDetailScreen}
           />
+
+          <Stack.Screen
+            name="TeacherSubjectWorkspace"
+            component={TeacherSubjectWorkspaceScreen}
+          />
+
+          <Stack.Screen
+            name="TeacherChapterDetail"
+            component={TeacherChapterDetailScreen}
+          />
+
           <Stack.Screen name="TeacherRecording" component={RecordingScreen} />
           <Stack.Screen
             name="TeacherProfile"

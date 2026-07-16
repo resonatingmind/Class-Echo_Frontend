@@ -111,11 +111,21 @@ export function FilterSelector({
 }
 
 const styles = StyleSheet.create({
+  // selector: {
+  //   width: "48%",
+  //   backgroundColor: colors.surface,
+  //   borderRadius: 14,
+  //   padding: 14,
+  //   borderWidth: 1,
+  //   borderColor: "#E5E7EB",
+  // },
+
   selector: {
-    width: "48%",
+    width: "100%",
     backgroundColor: colors.surface,
-    borderRadius: 14,
-    padding: 14,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderWidth: 1,
     borderColor: "#E5E7EB",
   },

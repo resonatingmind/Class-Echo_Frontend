@@ -195,12 +195,12 @@ export function TeacherProfileScreen({ navigation }: Props) {
         </ScrollView>
       )}
 
-      <TeacherTabBar
+      {/* <TeacherTabBar
         active="account"
         onTabPress={(key) => {
           if (key === 'home') navigation.navigate('TeacherSubjects');
         }}
-      />
+      /> */}
     </SafeAreaView>
   );
 }

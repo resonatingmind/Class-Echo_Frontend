@@ -108,7 +108,12 @@ export type RootStackParamList = {
     openUpload?: boolean;
   };
   TeacherTabs: undefined;
-  TeacherSubjectDetail: { subjectId: number; subjectName: string };
+  TeacherSubjectDetail: {
+    subjectId: number;
+    subjectName: string;
+    initialChapterId?: number;
+    initialTab?: "recordings" | "students";
+  };
   TeacherSubjectWorkspace: {
     subjectId: number;
     subjectName: string;

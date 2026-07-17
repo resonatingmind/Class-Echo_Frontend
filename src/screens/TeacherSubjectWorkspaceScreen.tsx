@@ -29,7 +29,6 @@ import {
 } from "../lib/api";
 import { ChapterOut } from "../types/api";
 
-
 type Props = NativeStackScreenProps<
   RootStackParamList,
   "TeacherSubjectWorkspace"
@@ -40,291 +39,308 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
   const { session } = useAuth();
   const token = session?.token ?? "";
 
-    const [chapters, setChapters] = useState<ChapterOut[]>([]);
+  const [chapters, setChapters] = useState<ChapterOut[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editorVisible, setEditorVisible] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [confirmVisible, setConfirmVisible] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [selectedChapter, setSelectedChapter] = useState<ChapterOut | null>(
+    null,
+  );
+  const [actionSheetVisible, setActionSheetVisible] = useState(false);
+  const [editing, setEditing] = useState(false);
 
-    const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filter, setFilter] = useState<"all" | "withPdf" | "withoutPdf">("all");
 
-    const [editorVisible, setEditorVisible] = useState(false);
+  const loadChapters = useCallback(async () => {
+    if (!token) return;
+    try {
+      setLoading(true);
+      const data = await getTeacherChapters(token, subjectId);
+      setChapters(data);
+    } finally {
+      setLoading(false);
+    }
+  }, [token, subjectId]);
 
-    const [creating, setCreating] = useState(false);
-    const [confirmVisible, setConfirmVisible] = useState(false);
-    const [deleting, setDeleting] = useState(false);
+  useEffect(() => {
+    loadChapters();
+  }, [loadChapters]);
 
-    const [selectedChapter, setSelectedChapter] = useState<ChapterOut | null>(
-      null,
-    );
-
-    const [actionSheetVisible, setActionSheetVisible] = useState(false);
-    const [editing, setEditing] = useState(false);
-
-    const loadChapters = useCallback(async () => {
-      if (!token) {
-        return;
-      }
-
+  const handleCreateChapter = useCallback(
+    async (data: { name: string; description: string }) => {
+      if (!token) return;
       try {
-        setLoading(true);
-
-        const data = await getTeacherChapters(token, subjectId);
-
-        setChapters(data);
+        setCreating(true);
+        await createTeacherChapter(token, subjectId, {
+          name: data.name,
+          description: data.description || null,
+        });
+        setEditing(false);
+        setSelectedChapter(null);
+        await loadChapters();
+      } catch (error) {
+        Alert.alert(
+          "Unable to create chapter",
+          "A chapter with this name already exists or something went wrong.",
+        );
       } finally {
-        setLoading(false);
+        setCreating(false);
       }
-    }, [token, subjectId]);
+    },
+    [token, subjectId, loadChapters],
+  );
 
-    useEffect(() => {
-      loadChapters();
-    }, [loadChapters]);
+  const handleUpdateChapter = useCallback(
+    async (data: { name: string; description: string }) => {
+      if (!token || !selectedChapter) return;
+      try {
+        setCreating(true);
+        await updateTeacherChapter(token, selectedChapter.id, {
+          name: data.name,
+          description: data.description || null,
+        });
+        setEditing(false);
+        setEditorVisible(false);
+        await loadChapters();
+      } finally {
+        setCreating(false);
+      }
+    },
+    [token, selectedChapter, loadChapters],
+  );
 
-    const handleCreateChapter = useCallback(
-      async (data: { name: string; description: string }) => {
-        if (!token) {
-          return;
-        }
+  const handleDeleteChapter = useCallback(async () => {
+    if (!token || !selectedChapter) return;
+    try {
+      setDeleting(true);
+      await deleteTeacherChapter(token, selectedChapter.id);
+      setConfirmVisible(false);
+      setSelectedChapter(null);
+      await loadChapters();
+    } catch (error) {
+      console.error(error);
+      setConfirmVisible(false);
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Unable to delete the chapter.";
+      Alert.alert("Error", message);
+    } finally {
+      setDeleting(false);
+    }
+  }, [token, selectedChapter, loadChapters]);
 
-        try {
-          setCreating(true);
 
-          await createTeacherChapter(token, subjectId, {
-            name: data.name,
-            description: data.description || null,
-          });
+const filteredChapters = chapters.filter((chapter) => {
+  const query = searchQuery.trim().toLowerCase();
 
-          setEditing(false);
-          setSelectedChapter(null);
+  const matchesSearch =
+    !query ||
+    chapter.name.toLowerCase().includes(query) ||
+    (chapter.description ?? "").toLowerCase().includes(query);
 
-          await loadChapters();
-        } catch (error) {
-          Alert.alert(
-            "Unable to create chapter",
-            "A chapter with this name already exists or something went wrong.",
-          );
-        } finally {
-          setCreating(false);
-        }
-      },
-      [token, subjectId, loadChapters],
-    );
+  const matchesFilter =
+    filter === "all"
+      ? true
+      : filter === "withPdf"
+        ? chapter.document_count > 0
+        : chapter.document_count === 0;
 
-    const handleUpdateChapter = useCallback(
-      async (data: { name: string; description: string }) => {
-        if (!token || !selectedChapter) {
-          return;
-        }
-
-        try {
-          setCreating(true);
-
-          await updateTeacherChapter(token, selectedChapter.id, {
-            name: data.name,
-            description: data.description || null,
-          });
-
-          setEditing(false);
-          setEditorVisible(false);
-
-          await loadChapters();
-        } finally {
-          setCreating(false);
-        }
-      },
-      [token, selectedChapter, loadChapters],
-    );
-
-        const handleDeleteChapter = useCallback(async () => {
-          if (!token || !selectedChapter) {
-            return;
-          }
-
-          try {
-            setDeleting(true);
-
-            await deleteTeacherChapter(token, selectedChapter.id);
-
-            setConfirmVisible(false);
-            setSelectedChapter(null);
-
-            await loadChapters();
-          } catch (error) {
-            console.error(error);
-
-            setConfirmVisible(false);
-            const message =
-              error instanceof Error
-                ? error.message
-                : "Unable to delete the chapter.";
-
-            window.alert(message);
-          } finally {
-            setDeleting(false);
-          }
-        }, [token, selectedChapter, loadChapters]);
+  return matchesSearch && matchesFilter;
+});
 
   return (
     <SafeAreaView style={styles.safe}>
+      {/* Header Container */}
       <View style={styles.header}>
-        <Pressable
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
-        </Pressable>
-
-        <View style={styles.headerContent}>
-          <Text style={styles.subject}>{subjectName}</Text>
-
-          <Text style={styles.subtitle}>
-            Class {className} • Section {section}
-          </Text>
+        <View style={styles.headerCenteredContent}>
+          <Pressable
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
+          </Pressable>
+          <View style={styles.headerTextWrapper}>
+            <Text style={styles.subject}>{subjectName}</Text>
+            <Text style={styles.subtitle}>
+              Class {className} • Section {section}
+            </Text>
+          </View>
         </View>
       </View>
 
-      {/* <View style={styles.content}> */}
+      {/* Main Content Body */}
       <View style={styles.content}>
         <View style={styles.workspaceCard}>
-          <TextInput placeholder="Search chapter..." style={styles.search} />
+          <TextInput
+            placeholder="Search chapter..."
+            placeholderTextColor="#94A3B8"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            style={styles.search}
+          />
 
           <View style={styles.toolbar}>
-            <Pressable style={styles.filterButton}>
-              <Text style={styles.filterText}>All Chapters</Text>
+            <Pressable
+              style={styles.filterButton}
+              onPress={() => {
+                setFilter((prev) => {
+                  if (prev === "all") return "withPdf";
+                  if (prev === "withPdf") return "withoutPdf";
+                  return "all";
+                });
+              }}
+            >
+              <Text style={styles.filterText}>
+                {filter === "all"
+                  ? "All Chapters"
+                  : filter === "withPdf"
+                    ? "With PDF"
+                    : "Without PDF"}
+              </Text>
             </Pressable>
-
             <Pressable
               style={styles.addButton}
               onPress={() => setEditorVisible(true)}
             >
               <Ionicons name="add" size={18} color="#fff" />
-
               <Text style={styles.addText}>Add Chapter</Text>
             </Pressable>
           </View>
 
-          <View style={styles.tableHeader}>
-            <Text style={[styles.headerCell, { flex: 2 }]}>Chapter</Text>
+          {/* Table Framework */}
+          <View style={styles.tableWrapper}>
+            <View style={styles.tableHeader}>
+              <Text style={[styles.headerCell, styles.chapterColumn]}>
+                Chapter
+              </Text>
+              <Text style={[styles.headerCell, styles.displayColumn]}>
+                Display Title
+              </Text>
+              <Text style={[styles.headerCell, styles.pdfColumn]}>PDF</Text>
+              <Text style={[styles.headerCell, styles.recordingColumn]}>
+                Recordings
+              </Text>
+              <Text style={[styles.headerCell, styles.scoreColumn]}>Score</Text>
+              <Text style={[styles.headerCell, styles.actionColumn]}>
+                Action
+              </Text>
+            </View>
 
-            <Text style={[styles.headerCell, { flex: 2 }]}>Display Title</Text>
-
-            <Text style={[styles.headerCell, { flex: 1 }]}>PDF</Text>
-
-            <Text style={[styles.headerCell, { flex: 1.3 }]}>Recordings</Text>
-
-            <Text style={[styles.headerCell, { flex: 1 }]}>Score</Text>
-
-            <Text style={[styles.headerCell, { flex: 0.8 }]}>Action</Text>
-          </View>
-
-          {loading ? (
-            <Text
-              style={{
-                paddingVertical: 30,
-                textAlign: "center",
-              }}
-            >
-              Loading chapters...
-            </Text>
-          ) : (
-            <FlatList
-              data={chapters}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => (
-                <View style={styles.row}>
-                  <Text style={[styles.cell, { flex: 2 }]}>{item.name}</Text>
-
-                  <Text numberOfLines={1} style={[styles.cell, { flex: 2 }]}>
-                    {item.description || "--"}
-                  </Text>
-
-                  <View
-                    style={{
-                      flex: 1,
-                      alignItems: "center",
-                    }}
-                  >
-                    <Pressable
+            {loading ? (
+              <Text style={styles.loadingText}>Loading chapters...</Text>
+            ) : (
+              <FlatList
+                // data={chapters}
+                data={filteredChapters}
+                keyExtractor={(item) => item.id.toString()}
+                showsVerticalScrollIndicator={false}
+                renderItem={({ item }) => (
+                  <View style={styles.row}>
+                    <Text
                       style={[
-                        styles.pdfButton,
-                        {
-                          backgroundColor: item.document_count
-                            ? "#DBEAFE"
-                            : "#F3F4F6",
-                        },
+                        styles.cell,
+                        styles.chapterColumn,
+                        styles.boldText,
                       ]}
-                      onPress={() => {
-                        navigation.navigate("TeacherChapterDetail", {
-                          chapterId: item.id,
-                          chapterName: item.name,
-                          subjectName,
-                          openUpload: item.document_count === 0,
-                        });
-                      }}
+                      numberOfLines={1}
                     >
-                      <Text
-                        style={[
-                          styles.pdfText,
-                          {
-                            color: item.document_count
-                              ? colors.accent
-                              : "#6B7280",
-                          },
-                        ]}
-                      >
-                        {item.document_count ? "PDF" : "Add"}
-                      </Text>
-                    </Pressable>
-                  </View>
-
-                  <Text style={[styles.cell, { flex: 1.3 }]}>▶ 0</Text>
-
-                  <View
-                    style={{
-                      flex: 1,
-                      alignItems: "center",
-                    }}
-                  >
-                    <View
+                      {item.name}
+                    </Text>
+                    <Text
+                      numberOfLines={1}
                       style={[
-                        styles.aiBadge,
-                        {
-                          backgroundColor: "#F3F4F6",
-                        },
+                        styles.cell,
+                        styles.displayColumn,
+                        styles.mutedText,
                       ]}
                     >
-                      <Text
+                      {item.description || "--"}
+                    </Text>
+
+                    <View style={styles.pdfColumn}>
+                      <Pressable
                         style={[
-                          styles.aiText,
+                          styles.pdfButton,
                           {
-                            color: "#6B7280",
+                            backgroundColor: item.document_count
+                              ? "#E0F2FE"
+                              : "#F8FAFC",
                           },
                         ]}
+                        onPress={() => {
+                          navigation.navigate("TeacherChapterDetail", {
+                            chapterId: item.id,
+                            chapterName: item.name,
+                            subjectName,
+                            openUpload: item.document_count === 0,
+                          });
+                        }}
                       >
-                        No Score
-                      </Text>
+                        <Text
+                          style={[
+                            styles.pdfText,
+                            {
+                              color: item.document_count
+                                ? "#0284C7"
+                                : "#64748B",
+                            },
+                          ]}
+                        >
+                          {item.document_count ? "PDF" : "Add"}
+                        </Text>
+                      </Pressable>
+                    </View>
+
+                    <View style={styles.recordingColumn}>
+                      <Pressable
+                        onPress={() => {
+                          navigation.navigate("TeacherSubjectDetail", {
+                            subjectId,
+                            subjectName,
+                            initialChapterId: item.id,
+                            initialTab: "recordings",
+                          });
+                        }}
+                        style={styles.recordingPlayCircle}
+                      >
+                        <Ionicons
+                          name="play"
+                          size={14}
+                          color="#0284C7"
+                          style={{ marginLeft: 2 }}
+                        />
+                      </Pressable>
+                    </View>
+
+                    <View style={styles.scoreColumn}>
+                      <View style={styles.aiBadge}>
+                        <Text style={styles.aiText}>No Score</Text>
+                      </View>
+                    </View>
+
+                    <View style={styles.actionColumn}>
+                      <Pressable
+                        style={styles.manageButton}
+                        onPress={() => {
+                          setSelectedChapter(item);
+                          setActionSheetVisible(true);
+                        }}
+                      >
+                        <Text style={styles.manageText}>Manage</Text>
+                      </Pressable>
                     </View>
                   </View>
-
-                  <View
-                    style={{
-                      flex: 0.8,
-                      alignItems: "center",
-                    }}
-                  >
-                    <Pressable
-                      style={styles.manageButton}
-                      onPress={() => {
-                        setSelectedChapter(item);
-                        setActionSheetVisible(true);
-                      }}
-                    >
-                      <Text style={styles.manageText}>Manage</Text>
-                    </Pressable>
-                  </View>
-                </View>
-              )}
-            />
-          )}
+                )}
+              />
+            )}
+          </View>
         </View>
       </View>
+
       <ChapterEditorModal
         visible={editorVisible}
         title={editing ? "Edit Chapter" : "Add Chapter"}
@@ -338,24 +354,19 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
         }}
         onSave={editing ? handleUpdateChapter : handleCreateChapter}
       />
+
       <ChapterActionSheet
         visible={actionSheetVisible}
         chapterName={selectedChapter?.name}
         onClose={() => setActionSheetVisible(false)}
         onEdit={() => {
           setActionSheetVisible(false);
-
           setEditing(true);
-
           setEditorVisible(true);
         }}
         onReferenceMaterial={() => {
-          if (!selectedChapter) {
-            return;
-          }
-
+          if (!selectedChapter) return;
           setActionSheetVisible(false);
-
           navigation.navigate("TeacherChapterDetail", {
             chapterId: selectedChapter.id,
             chapterName: selectedChapter.name,
@@ -364,7 +375,6 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
         }}
         onDelete={() => {
           setActionSheetVisible(false);
-
           setConfirmVisible(true);
         }}
       />
@@ -380,9 +390,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
         confirmText="Delete"
         destructive
         loading={deleting}
-        onCancel={() => {
-          setConfirmVisible(false);
-        }}
+        onCancel={() => setConfirmVisible(false)}
         onConfirm={handleDeleteChapter}
       />
     </SafeAreaView>
@@ -392,188 +400,164 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: "#F8FAFC",
   },
-
   header: {
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E2E8F0",
+    paddingHorizontal: 24,
+    paddingVertical: 18,
+  },
+  headerCenteredContent: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    maxWidth: 1280,
+    width: "100%",
+    selfAlign: "center",
   },
-
   backButton: {
-    width: 42,
-    height: 42,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#F1F5F9",
     justifyContent: "center",
     alignItems: "center",
   },
-
-  headerContent: {
-    marginLeft: 12,
-    flex: 1,
-  },
-
-  subject: {
-    fontSize: 22,
-    fontWeight: "800",
-    color: colors.textPrimary,
-  },
-
-  subtitle: {
-    marginTop: 4,
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-
-  body: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 30,
-  },
-
-  title: {
-    marginTop: 24,
-    fontSize: 24,
-    fontWeight: "800",
-    color: colors.textPrimary,
-  },
-
-  description: {
-    marginTop: 12,
-    textAlign: "center",
-    fontSize: 15,
-    lineHeight: 24,
-    color: colors.textSecondary,
-  },
+  headerTextWrapper: { marginLeft: 16, flex: 1 },
+  subject: { fontSize: 24, fontWeight: "800", color: "#0F172A" },
+  subtitle: { marginTop: 2, fontSize: 14, color: "#64748B", fontWeight: "500" },
   content: {
     flex: 1,
-    padding: 20,
+    padding: 24,
+    alignItems: "center",
   },
-
+  workspaceCard: {
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    width: "100%",
+    maxWidth: 1280,
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 12,
+    elevation: 2,
+  },
   search: {
     height: 48,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: "#E2E8F0",
     borderRadius: 12,
     paddingHorizontal: 16,
-    backgroundColor: "#fff",
+    backgroundColor: "#F8FAFC",
+    fontSize: 15,
+    color: "#0F172A",
   },
-
   toolbar: {
-    marginTop: 18,
+    marginTop: 20,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 20,
   },
-
   filterButton: {
     paddingHorizontal: 16,
     height: 40,
     borderRadius: 10,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: "#F1F5F9",
     justifyContent: "center",
   },
-
-  filterText: {
-    fontWeight: "600",
-  },
-
+  filterText: { fontWeight: "600", color: "#334155", fontSize: 14 },
   addButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.accent,
-    paddingHorizontal: 14,
+    backgroundColor: "#0284C7",
+    paddingHorizontal: 16,
     height: 42,
     borderRadius: 10,
   },
-
-  addText: {
-    color: "#fff",
-    marginLeft: 6,
-    fontWeight: "700",
+  addText: { color: "#fff", marginLeft: 6, fontWeight: "700", fontSize: 14 },
+  tableWrapper: {
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    overflow: "hidden",
   },
-
   tableHeader: {
     flexDirection: "row",
     backgroundColor: "#F8FAFC",
     paddingVertical: 14,
-    paddingHorizontal: 12,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E2E8F0",
   },
-
   headerCell: {
     fontWeight: "700",
     fontSize: 13,
     color: "#475569",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
-
   row: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 18,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
     borderBottomWidth: 1,
-    borderColor: colors.border,
+    borderBottomColor: "#F1F5F9",
     backgroundColor: "#fff",
   },
-
-  cell: {
-    fontSize: 14,
-    color: colors.textPrimary,
-  },
-  workspaceCard: {
-    backgroundColor: "#fff",
-    borderRadius: 18,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-
+  cell: { fontSize: 14, color: "#0F172A" },
+  boldText: { fontWeight: "600", color: "#1E293B" },
+  mutedText: { color: "#64748B" },
   pdfButton: {
-    minWidth: 58,
+    minWidth: 64,
     height: 32,
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "transparent",
   },
-
-  pdfText: {
-    fontWeight: "700",
-    fontSize: 12,
-  },
-
+  pdfText: { fontWeight: "700", fontSize: 12 },
   aiBadge: {
-    minWidth: 70,
-    paddingVertical: 6,
+    paddingVertical: 4,
     paddingHorizontal: 10,
-    borderRadius: 20,
+    borderRadius: 12,
+    backgroundColor: "#F1F5F9",
     alignItems: "center",
   },
-
-  aiText: {
-    fontWeight: "700",
-    fontSize: 12,
-  },
+  aiText: { fontWeight: "600", fontSize: 12, color: "#64748B" },
   manageButton: {
-    backgroundColor: "#DBEAFE",
+    backgroundColor: "#F1F5F9",
     paddingHorizontal: 14,
-    paddingVertical: 7,
+    paddingVertical: 8,
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
   },
-
-  manageText: {
-    color: colors.accent,
-    fontWeight: "700",
-    fontSize: 12,
+  manageText: { color: "#334155", fontWeight: "700", fontSize: 13 },
+  chapterColumn: { flex: 2.5 },
+  displayColumn: { flex: 2.5 },
+  pdfColumn: { flex: 1, alignItems: "center", textAlign: "center" },
+  recordingColumn: { flex: 1.2, alignItems: "center", textAlign: "center" },
+  scoreColumn: { flex: 1.2, alignItems: "center", textAlign: "center" },
+  actionColumn: { flex: 1, alignItems: "center", textAlign: "center" },
+  recordingPlayCircle: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "#E0F2FE",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadingText: {
+    paddingVertical: 40,
+    textAlign: "center",
+    color: "#64748B",
+    fontSize: 14,
   },
 });

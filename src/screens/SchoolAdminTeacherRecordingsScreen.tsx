@@ -19,6 +19,7 @@ import { RootStackParamList } from "../navigation/AppNavigator";
 import { useAuth } from "../context/AuthContext";
 import {
   getTeacherRecordings,
+  getChapterRecordings,
   getSchoolRecordingDetail,
   getSchoolTeacherSubjects,
 } from "../lib/api";
@@ -34,7 +35,7 @@ export function SchoolAdminTeacherRecordingsScreen({
   route,
   navigation,
 }: Props) {
-  const { teacherId } = route.params;
+  const { teacherId, chapterId, chapterName } = route.params;
 
   const { session } = useAuth();
 
@@ -64,13 +65,26 @@ export function SchoolAdminTeacherRecordingsScreen({
     setLoading(true);
 
     try {
-      const [recordingsData, subjectsData] = await Promise.all([
-        getTeacherRecordings(session.token, teacherId),
-        getSchoolTeacherSubjects(session.token, teacherId),
-      ]);
 
-      setRecordings(recordingsData);
-      setSubjects(subjectsData);
+      if (chapterId) {
+        const recordingsData = await getChapterRecordings(
+          session.token,
+          chapterId,
+        );
+
+        setRecordings(recordingsData);
+
+        setSubjects([]);
+      } else {
+        const [recordingsData, subjectsData] = await Promise.all([
+          getTeacherRecordings(session.token, teacherId!),
+          getSchoolTeacherSubjects(session.token, teacherId!),
+        ]);
+
+        setRecordings(recordingsData);
+
+        setSubjects(subjectsData);
+      }
 
     } finally {
       setLoading(false);
@@ -182,15 +196,24 @@ export function SchoolAdminTeacherRecordingsScreen({
             if (navigation.canGoBack()) {
               navigation.goBack();
             } else {
-              navigation.navigate("SchoolAdminTeacherDetail", {
-                teacherId: route.params.teacherId,
-              });
+              if (chapterId) {
+                navigation.goBack();
+              } else {
+                navigation.navigate("SchoolAdminTeacherDetail", {
+                  teacherId: teacherId!,
+                });
+              }
             }
           }}
         >
           <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
         </Pressable>
-        <Text style={styles.heading}>Teacher Recordings</Text>
+
+        <Text style={styles.heading}>
+          {chapterId
+            ? (chapterName ?? "Chapter Recordings")
+            : "Teacher Recordings"}
+        </Text>
 
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
@@ -401,33 +424,6 @@ export function SchoolAdminTeacherRecordingsScreen({
               ))}
 
               {/* ---------- SUBJECT ---------- */}
-
-              {/* <Text style={styles.modalHeading}>Subject</Text>
-
-              <ScrollView
-                style={{ maxHeight: 180 }}
-                showsVerticalScrollIndicator={false}
-              >
-                {subjects.map((subject) => (
-                  <Pressable
-                    key={subject}
-                    style={styles.option}
-                    onPress={() => setTempSubject(subject)}
-                  >
-                    <Ionicons
-                      name={
-                        tempSubject === subject
-                          ? "radio-button-on"
-                          : "radio-button-off"
-                      }
-                      size={20}
-                      color={colors.accent}
-                    />
-
-                    <Text style={styles.optionText}>{subject}</Text>
-                  </Pressable>
-                ))}
-              </ScrollView> */}
 
               <Text style={styles.modalHeading}>Subject</Text>
 

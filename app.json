@@ -45,8 +45,7 @@
     "plugins": [
       "expo-audio",
       "expo-secure-store",
-      "./plugins/withCleartextTraffic",
-      "@react-native-community/datetimepicker"
+      "./plugins/withCleartextTraffic"
     ]
   }
 }

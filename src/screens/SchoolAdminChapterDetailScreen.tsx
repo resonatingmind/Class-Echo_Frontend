@@ -22,7 +22,8 @@ import {
   getChapterDocuments,
   deleteChapterDocument,
   uploadChapterDocument,
-} from '../lib/api';
+} from "../lib/api";
+
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 import { ChapterDocumentOut, ChapterKnowledgeOut, ChapterOut } from '../types/api';
@@ -46,12 +47,19 @@ function statusStyle(status: string) {
 
 export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
   const { session } = useAuth();
-  const { chapterId, chapterName, subjectName } = route.params;
+  const {
+    chapterId,
+    chapterName,
+    subjectName,
+    openUpload,
+  } = route.params;
 
   const [chapter, setChapter] = useState<ChapterOut | null>(null);
   const [knowledge, setKnowledge] = useState<ChapterKnowledgeOut | null>(null);
   const [documents, setDocuments] = useState<ChapterDocumentOut[]>([]);
-  const [activeTab, setActiveTab] = useState<ActiveTab>('profile');
+  const [activeTab, setActiveTab] = useState<ActiveTab>(
+    openUpload ? "documents" : "profile",
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -162,6 +170,16 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
       Alert.alert('Error', 'Could not launch file picker.');
     }
   };
+
+  useEffect(() => {
+    if (!openUpload) return;
+
+    const timer = setTimeout(() => {
+      handlePickDocument();
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [openUpload]);
 
   const handleDeleteDocument = (doc: ChapterDocumentOut) => {
     Alert.alert(

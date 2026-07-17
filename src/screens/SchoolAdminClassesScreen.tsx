@@ -60,6 +60,9 @@ function ClassCard({
         </View>
         <View style={styles.cardInfo}>
           <Text style={styles.cardName}>{classItem.name}</Text>
+
+          <Text style={styles.cardSection}>Section {classItem.section}</Text>
+
           <Text style={styles.cardDate}>
             Added{" "}
             {new Date(classItem.created_at).toLocaleDateString("en-US", {
@@ -85,20 +88,23 @@ function CreateClassModal({
 }) {
   const { session } = useAuth();
   const [name, setName] = useState("");
+  const [section, setSection] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const canSubmit = name.trim().length > 1;
+ const canSubmit = name.trim().length > 1 && section.trim().length > 0;
 
   const handleCreate = async () => {
     if (!session || !canSubmit || submitting) return;
     setSubmitting(true);
     setError(null);
     try {
-      const cls = await createSchoolAdminClass(session.token, {
-        name: name.trim(),
-      });
+        const cls = await createSchoolAdminClass(session.token, {
+          name: name.trim(),
+          section: section.trim(),
+        });
       setName("");
+      setSection("A");
       onCreated(cls);
       onClose();
     } catch (e) {
@@ -110,6 +116,7 @@ function CreateClassModal({
 
   const handleClose = () => {
     setName("");
+    setSection("");
     setError(null);
     onClose();
   };
@@ -142,6 +149,20 @@ function CreateClassModal({
               returnKeyType="done"
               style={styles.modalInput}
               value={name}
+            />
+          </View>
+
+          <View style={styles.modalField}>
+            <Text style={styles.modalFieldLabel}>SECTION</Text>
+
+            <TextInput
+              value={section}
+              onChangeText={setSection}
+              placeholder="e.g. A"
+              placeholderTextColor={colors.textPlaceholder}
+              autoCapitalize="characters"
+              maxLength={20}
+              style={styles.modalInput}
             />
           </View>
 
@@ -279,7 +300,7 @@ export function SchoolAdminClassesScreen({ navigation }: Props) {
       </View>
 
       {/* Tab strip */}
-      <View style={styles.tabStrip}>
+      {/* <View style={styles.tabStrip}>
         <View style={styles.tabActive}>
           <Text style={styles.tabActiveText}>Classes</Text>
         </View>
@@ -294,6 +315,36 @@ export function SchoolAdminClassesScreen({ navigation }: Props) {
           <Text style={styles.tabInactiveText}>Teachers</Text>
         </Pressable>
         <View style={styles.tabSpacer} />
+        <Pressable onPress={() => setShowCreate(true)} style={styles.tabAddBtn}>
+          <Ionicons color="#fff" name="add" size={18} />
+        </Pressable>
+      </View> */}
+
+      <View style={styles.tabStrip}>
+        <View style={styles.tabsContainer}>
+          <View style={styles.tabActive}>
+            <Text style={styles.tabActiveText}>Classes</Text>
+          </View>
+
+          <Pressable
+            onPress={() =>
+              navigation.navigate("SchoolAdminTabs", {
+                screen: "SchoolAdminTeachers",
+              })
+            }
+            style={styles.tabInactive}
+          >
+            <Text style={styles.tabInactiveText}>Teachers</Text>
+          </Pressable>
+
+          <Pressable
+            onPress={() => navigation.navigate("SchoolAdminPlanner")}
+            style={styles.tabInactive}
+          >
+            <Text style={styles.tabInactiveText}>Planner</Text>
+          </Pressable>
+        </View>
+
         <Pressable onPress={() => setShowCreate(true)} style={styles.tabAddBtn}>
           <Ionicons color="#fff" name="add" size={18} />
         </Pressable>
@@ -360,6 +411,7 @@ export function SchoolAdminClassesScreen({ navigation }: Props) {
                   navigation.navigate("SchoolAdminClassDetail", {
                     classId: cls.id,
                     className: cls.name,
+                    section: cls.section,
                   })
                 }
               />
@@ -428,6 +480,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
     gap: 8,
+  },
+  tabsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    flex: 1,
   },
   tabActive: {
     borderRadius: 999,
@@ -514,6 +572,11 @@ const styles = StyleSheet.create({
   cardIconText: { fontSize: 16, fontWeight: "800" },
   cardInfo: { flex: 1, gap: 4 },
   cardName: { color: colors.textPrimary, fontSize: 16, fontWeight: "700" },
+  cardSection: {
+    color: colors.accent,
+    fontSize: 13,
+    fontWeight: "600",
+  },
   cardDate: { color: colors.textMuted, fontSize: 12 },
   // Create button
   createBtn: {

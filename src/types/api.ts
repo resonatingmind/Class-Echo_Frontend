@@ -33,6 +33,7 @@ export type SchoolCreatePayload = {
 export type ClassOut = {
   id: number;
   name: string;
+  section: string;
   profile_image_url: string | null;
   school_id: number;
   created_at: string;
@@ -69,18 +70,23 @@ export type SchoolAdminProfileOut = {
 export type ClassBrief = {
   id: number;
   name: string;
+  section: string;
+  profile_image_url?: string | null;
 };
 
 export type SubjectOut = {
   id: number;
   name: string;
-  profile_image_url: string | null;
+
   class_id: number;
-  class_: ClassBrief | null;
-  teacher_id: number | null;
-  teacher: TeacherBrief | null;
-  teacher_assigned_at: string | null;
-  created_at: string;
+
+  class_?: ClassBrief;
+
+  teacher?: TeacherOut | null;
+
+  academic_year?: string;
+
+  status?: string;
 };
 
 export type SubjectWithClassOut = {
@@ -315,4 +321,140 @@ export type TeacherRecording = {
   cloudinary_url: string;
 
   duration_seconds: number | null;
+};
+
+export type PlannerItemOut = {
+  subject_id: number;
+
+  class_id: number;
+  class_name: string;
+  section: string;
+
+  teacher_id: number | null;
+  teacher_name: string | null;
+
+  subject_name: string;
+
+  academic_year: string;
+
+  chapter_count: number;
+
+  recording_count: number;
+
+  created_at: string;
+};
+
+export type PlannerStatistics = {
+  total_chapters: number;
+  total_documents: number;
+  total_recordings: number;
+  average_score: number | null;
+};
+
+export type PlannerChapter = {
+  id: number;
+
+  subject_id: number;
+
+  teacher_id: number | null;
+
+  name: string;
+
+  document_count: number;
+
+  recording_count: number;
+
+  average_score: number | null;
+
+  status: string;
+};
+
+export type PlannerSubjectDetail = {
+  subject_id: number;
+
+  subject_name: string;
+
+  class_name: string;
+
+  teacher_name: string | null;
+
+  academic_year: string;
+
+  statistics: PlannerStatistics;
+
+  chapters: PlannerChapter[];
+};
+
+export type TeacherLookupOut = {
+  exists: boolean;
+
+  id?: number;
+
+  name?: string;
+
+  email: string;
+};
+
+export type ClassLookupOut = {
+  exists: boolean;
+
+  id?: number;
+
+  name?: string;
+
+  section?: string;
+};
+
+export type QuickAssignmentRequest = {
+  teacher_email: string;
+  teacher_name: string;
+  temporary_password: string;
+
+  class_name: string;
+  section: string;
+  subject_name: string;
+};
+
+export type QuickAssignmentResponse = {
+  status: "created" | "already_assigned" | "replace_required";
+
+  message: string;
+
+  teacher_id: number;
+  class_id: number;
+  subject_id: number;
+
+  current_teacher_name?: string;
+  current_teacher_email?: string;
+};
+
+export type ReplaceAssignmentRequest = {
+  teacher_id: number;
+  subject_id: number;
+};
+
+export type ReplaceAssignmentResponse = {
+  success: boolean;
+  message: string;
+};
+
+export type TeacherDashboardStatus =
+  | "No Recording"
+  | "Processing"
+  | "Completed"
+  | "Failed";
+
+export type TeacherDashboardSubject = {
+  subject_id: number;
+  subject_name: string;
+  class_name: string;
+  section: string;
+  academic_year: string;
+  student_count: number;
+  recording_count: number;
+  ai_status: TeacherDashboardStatus;
+};
+
+export type TeacherDashboardResponse = {
+  subjects: TeacherDashboardSubject[];
 };

@@ -18,4 +18,12 @@ export const colors = {
   footer: '#F4F3F3',
   fab: '#F5A623',
   cardShadow: 'rgba(26, 28, 28, 0.08)',
+  surfaceElevated: '#FFFFFF',
+  surfaceSubtle: '#F6F7F9',
+  divider: 'rgba(0,0,0,0.06)',
+  accentLight: '#EBF5FF',
+  textLabel: '#8E97A3',
+  scoreHigh: '#16A34A',
+  scoreMid: '#D97706',
+  scoreLow: '#DC2626',
 } as const;

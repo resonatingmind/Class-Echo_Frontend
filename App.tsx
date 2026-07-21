@@ -1,18 +1,17 @@
-import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, NavigationContainerRef } from '@react-navigation/native';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import * as SplashScreen from 'expo-splash-screen';
+import { useEffect, useRef } from "react";
 
 import { AuthProvider } from './src/context/AuthContext';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { colors } from './src/theme/colors';
 import * as Linking from "expo-linking";
 
-import { useRef } from "react";
-import {
-  NavigationContainerRef,
-} from "@react-navigation/native";
+SplashScreen.preventAutoHideAsync();
 
 const navigationTheme = {
   ...DefaultTheme,
@@ -139,9 +138,21 @@ const linking = {
 export default function App() {
   const navigationRef = useRef<NavigationContainerRef<any>>(null);
   const [fontsLoaded] = useFonts({
+    // Inter fonts: add these once the .ttf files are in assets/fonts/
+    // 'Inter-Regular': require('./assets/fonts/Inter-Regular.ttf'),
+    // 'Inter-Medium': require('./assets/fonts/Inter-Medium.ttf'),
+    // 'Inter-SemiBold': require('./assets/fonts/Inter-SemiBold.ttf'),
+    // 'Inter-Bold': require('./assets/fonts/Inter-Bold.ttf'),
+    // 'Inter-ExtraBold': require('./assets/fonts/Inter-ExtraBold.ttf'),
     ...Ionicons.font,
     ...Feather.font,
   });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
 
   if (!fontsLoaded) {
     return null;

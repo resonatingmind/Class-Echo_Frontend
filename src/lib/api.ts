@@ -31,6 +31,9 @@ import {
   ReplaceAssignmentRequest,
   ReplaceAssignmentResponse,
   TeacherDashboardResponse,
+  TimetableEntryOut,
+  TimetableEntryPayload,
+  TimetableImportResult,
 } from "../types/api";
 
 import { notifyUnauthorized } from "./authSession";
@@ -373,7 +376,6 @@ export async function getSchoolPlanner(
 ): Promise<PlannerItemOut[]> {
   return request<PlannerItemOut[]>("/school/planner", {}, token);
 }
-
 
 export async function getSchoolAdminMe(token: string) {
   return request<SchoolAdminProfileOut>("/school/me", {}, token);
@@ -754,8 +756,6 @@ export interface TeacherProfile {
   statistics: TeacherStatistics;
 }
 
-
-
 // ── Teacher ───────────────────────────────────────────────────────────────────
 
 export async function uploadRecording(
@@ -878,7 +878,6 @@ export async function deleteTeacherRecording(
   token: string,
   recordingId: number,
 ) {
-
   return request<void>(
     `/teacher/recordings/${recordingId}`,
     { method: "DELETE" },
@@ -947,7 +946,6 @@ export async function lookupClass(
     token,
   );
 }
-
 
 export async function quickAssignment(
   token: string,
@@ -1160,7 +1158,6 @@ export async function updateTeacherChapter(
   );
 }
 
-
 export async function deleteTeacherChapter(token: string, chapterId: number) {
   return request<void>(
     `/teacher/chapters/${chapterId}`,
@@ -1170,7 +1167,6 @@ export async function deleteTeacherChapter(token: string, chapterId: number) {
     token,
   );
 }
-
 
 export async function createChapter(
   token: string,
@@ -1282,7 +1278,6 @@ export async function uploadChapterDocument(
   });
 }
 
-
 export async function uploadTeacherChapterDocument(
   token: string,
   chapterId: number,
@@ -1328,7 +1323,6 @@ export async function uploadTeacherChapterDocument(
   });
 }
 
-
 export async function getTeacherChapterDetails(
   token: string,
   chapterId: number,
@@ -1347,7 +1341,6 @@ export async function getTeacherChapterKnowledge(
   );
 }
 
-
 export async function getTeacherChapterDocuments(
   token: string,
   chapterId: number,
@@ -1358,7 +1351,6 @@ export async function getTeacherChapterDocuments(
     token,
   );
 }
-
 
 export async function deleteTeacherChapterDocument(
   token: string,
@@ -1372,7 +1364,6 @@ export async function deleteTeacherChapterDocument(
     token,
   );
 }
-
 
 export { API_BASE_URL, ApiError };
 
@@ -1423,7 +1414,10 @@ export async function getTeacherRecordings(
   );
 }
 
-export async function getSchoolTeacherSubjects(token: string, teacherId: number) {
+export async function getSchoolTeacherSubjects(
+  token: string,
+  teacherId: number,
+) {
   return request<SubjectWithClassOut[]>(
     `/school/teachers/${teacherId}/subjects`,
     {},
@@ -1451,4 +1445,86 @@ export async function getSchoolRecordingDetail(
     {},
     token,
   );
+}
+
+// ── School Admin: Timetable ─────────────────────────────────────────────────
+
+export async function getSchoolAdminTimetable(
+  token: string,
+  filters?: { classId?: number; dayOfWeek?: string },
+) {
+  const params = new URLSearchParams();
+  if (filters?.classId !== undefined) {
+    params.set("class_id", String(filters.classId));
+  }
+  if (filters?.dayOfWeek !== undefined) {
+    params.set("day_of_week", String(filters.dayOfWeek));
+  }
+  const query = params.toString() ? `?${params.toString()}` : "";
+
+  return request<TimetableEntryOut[]>(`/school/timetable${query}`, {}, token);
+}
+
+export async function createTimetableEntry(
+  token: string,
+  payload: TimetableEntryPayload,
+) {
+  return request<TimetableEntryOut>(
+    "/school/timetable",
+    { method: "POST", body: JSON.stringify(payload) },
+    token,
+  );
+}
+
+export async function updateTimetableEntry(
+  token: string,
+  entryId: number,
+  payload: Partial<TimetableEntryPayload>,
+) {
+  return request<TimetableEntryOut>(
+    `/school/timetable/${entryId}`,
+    { method: "PUT", body: JSON.stringify(payload) },
+    token,
+  );
+}
+
+export async function deleteTimetableEntry(token: string, entryId: number) {
+  return request<void>(
+    `/school/timetable/${entryId}`,
+    { method: "DELETE" },
+    token,
+  );
+}
+
+export async function importSchoolTimetable(
+  token: string,
+  fileUri: string,
+  mimeType: string,
+  fileName: string,
+  replaceExisting: boolean,
+): Promise<TimetableImportResult> {
+  const form = new FormData();
+  await appendFile(
+    form,
+    "file",
+    fileUri,
+    mimeType,
+    fileName.replace(/\.[^/.]+$/, ""),
+  );
+
+  return request<TimetableImportResult>(
+    `/school/timetable/import?replace_existing=${replaceExisting ? "true" : "false"}`,
+    { method: "POST", body: form },
+    token,
+  );
+}
+
+export function getTimetableTemplateUrl() {
+  return `${API_BASE_URL}/school/timetable/template`;
+}
+
+// ── Teacher: Timetable (read-only) ──────────────────────────────────────────
+
+export async function getTeacherTimetable(token: string) {
+  return request<TimetableEntryOut[]>("/teacher/timetable", {}, token);
 }

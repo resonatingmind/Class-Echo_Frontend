@@ -27,7 +27,6 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { Ionicons } from "@expo/vector-icons";
 
-
 type Props = NativeStackScreenProps<RootStackParamList, "SchoolAdminTabs">;
 
 export function SchoolAdminDashboardScreen({ navigation }: Props) {
@@ -279,12 +278,15 @@ export function SchoolAdminDashboardScreen({ navigation }: Props) {
             <Text style={styles.quickSubtitle}>Browse</Text>
           </Pressable>
 
-          <Pressable style={styles.quickCard}>
-            <Ionicons name="analytics" size={34} color={colors.accent} />
+          <Pressable
+            style={styles.quickCard}
+            onPress={() => navigation.navigate("SchoolAdminTimetable")}
+          >
+            <Ionicons name="calendar" size={34} color={colors.accent} />
 
-            <Text style={styles.quickTitle}>Reports</Text>
+            <Text style={styles.quickTitle}>Timetable</Text>
 
-            <Text style={styles.quickSubtitle}>Soon</Text>
+            <Text style={styles.quickSubtitle}>Manage</Text>
           </Pressable>
         </View>
 

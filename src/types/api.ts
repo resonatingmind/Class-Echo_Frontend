@@ -458,3 +458,70 @@ export type TeacherDashboardSubject = {
 export type TeacherDashboardResponse = {
   subjects: TeacherDashboardSubject[];
 };
+
+// ── Timetable ──────────────────────────────────────────────────────────────
+
+export const TIMETABLE_DAYS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+] as const;
+
+export const DEFAULT_ACADEMIC_YEAR = "2026-27";
+
+export type TimetableClassBrief = {
+  id: number;
+  name: string;
+  section: string;
+};
+
+export type TimetableSubjectBrief = {
+  id: number;
+  name: string;
+};
+
+export type TimetableTeacherBrief = {
+  id: number;
+  name: string;
+};
+
+export type TimetableEntryOut = {
+  id: number;
+  school_id: number;
+  class_id: number;
+  subject_id: number;
+  teacher_id: number;
+  day_of_week: string; // "Monday" ... "Saturday"
+  period_number: number;
+  start_time: string;
+  end_time: string;
+  room: string | null;
+  academic_year: string;
+  class_: TimetableClassBrief | null;
+  subject: TimetableSubjectBrief | null;
+  teacher: TimetableTeacherBrief | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type TimetableEntryPayload = {
+  class_id: number;
+  subject_id: number;
+  teacher_id: number;
+  day_of_week: string;
+  period_number: number;
+  start_time: string;
+  end_time: string;
+  room?: string | null;
+  academic_year?: string;
+};
+
+export type TimetableImportResult = {
+  created: number;
+  updated: number;
+  skipped: number;
+  errors: string[];
+};

@@ -1,100 +1,96 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
-
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 import { PlannerChapter } from "../../types/api";
-
 import { colors } from "../../theme/colors";
+import { CHAPTER_COLUMNS } from "./PlannerChapterTable";
 
 type Props = {
   chapter: PlannerChapter;
+  isLast?: boolean;
 
   onOpenDocuments: () => void;
-
   onAddDocument: () => void;
-
   onOpenRecordings: () => void;
+};
+
+const STATUS_STYLES: Record<
+  string,
+  { bg: string; text: string; icon: keyof typeof Ionicons.glyphMap }
+> = {
+  Completed: { bg: "#E7F6EC", text: colors.success, icon: "checkmark-circle" },
+  Processing: { bg: "#FDF3E3", text: colors.warning, icon: "time-outline" },
+};
+
+const DEFAULT_STATUS_STYLE = {
+  bg: "#FBE7E7",
+  text: "#DC2626",
+  icon: "ellipse-outline" as keyof typeof Ionicons.glyphMap,
 };
 
 export function PlannerChapterRow({
   chapter,
+  isLast,
   onOpenDocuments,
   onAddDocument,
   onOpenRecordings,
 }: Props) {
+  const statusStyle = STATUS_STYLES[chapter.status] ?? DEFAULT_STATUS_STYLE;
+
   return (
-    <View style={styles.row}>
-      <Text style={[styles.chapter, { width: 240 }]}>{chapter.name}</Text>
+    <View style={[styles.row, !isLast && styles.rowDivider]}>
+      <Text
+        style={[styles.chapterName, { width: CHAPTER_COLUMNS.chapter }]}
+        numberOfLines={2}
+      >
+        {chapter.name}
+      </Text>
 
-      {/* Reference Material */}
-
-      <View style={[styles.cell, { width: 180 }]}>
-        {/* <Pressable onPress={onOpenDocuments}>
-          <Text style={styles.link}>📄 {chapter.document_count}</Text>
+      <View style={[styles.cell, { width: CHAPTER_COLUMNS.material }]}>
+        <Pressable onPress={onOpenDocuments} style={styles.countChip}>
+          <Ionicons name="document-text-outline" size={14} color="#7C3AED" />
+          <Text style={[styles.countChipText, { color: "#7C3AED" }]}>
+            {chapter.document_count}
+          </Text>
         </Pressable>
 
-        <Pressable onPress={onAddDocument} style={styles.addButton}>
-          <Ionicons name="add" size={16} color={colors.primary} />
-        </Pressable> */}
-
-        <Pressable onPress={onOpenDocuments} style={styles.actionChip}>
-          <Ionicons name="document-text-outline" size={16} color="#2563EB" />
-
-          <Text style={styles.actionText}>View ({chapter.document_count})</Text>
-        </Pressable>
-
-        <Pressable onPress={onAddDocument} style={styles.addChip}>
-          <Ionicons name="add" size={16} color="#16A34A" />
-
-          <Text style={styles.addText}>Add</Text>
-        </Pressable>
-      </View>
-
-      {/* Recordings */}
-
-      <View style={[styles.cell, { width: 180 }]}>
-        <Pressable onPress={onOpenRecordings}>
-          {/* <Text style={styles.link}>🎥 {chapter.recording_count}</Text> */}
-          <View style={styles.recordingChip}>
-            <Ionicons name="videocam-outline" size={16} color="#EA580C" />
-
-            <Text style={styles.recordingText}>{chapter.recording_count}</Text>
-          </View>
+        <Pressable
+          onPress={onAddDocument}
+          style={styles.addButton}
+          hitSlop={6}
+          accessibilityLabel={`Add material to ${chapter.name}`}
+        >
+          <Ionicons name="add" size={14} color={colors.accentDark} />
         </Pressable>
       </View>
 
-      {/* AI Score */}
+      <View style={[styles.cell, { width: CHAPTER_COLUMNS.recordings }]}>
+        <Pressable onPress={onOpenRecordings} style={styles.countChip}>
+          <Ionicons name="videocam-outline" size={14} color="#EA580C" />
+          <Text style={[styles.countChipText, { color: "#EA580C" }]}>
+            {chapter.recording_count}
+          </Text>
+        </Pressable>
+      </View>
 
-      {/* <Text style={[styles.score, { width: 110 }]}>
-        {chapter.average_score == null ? "--" : `${chapter.average_score}%`}
-      </Text> */}
-
-      <View style={styles.scoreChip}>
-        <Ionicons name="sparkles" size={14} color="#16A34A" />
-
-        <Text style={styles.scoreText}>
-          {chapter.average_score == null ? "--" : `${chapter.average_score}%`}
+      <View style={{ width: CHAPTER_COLUMNS.score }}>
+        <Text
+          style={[
+            styles.scoreText,
+            chapter.average_score == null && styles.scoreTextMuted,
+          ]}
+        >
+          {chapter.average_score == null ? "—" : `${chapter.average_score}%`}
         </Text>
       </View>
 
-      {/* Status */}
-
-      <View style={[styles.statusContainer, { width: 120 }]}>
-        <View
-          style={[
-            styles.dot,
-            {
-              backgroundColor:
-                chapter.status === "Completed"
-                  ? "#22C55E"
-                  : chapter.status === "Processing"
-                    ? "#F59E0B"
-                    : "#EF4444",
-            },
-          ]}
-        />
-
-        <Text style={styles.status}>{chapter.status}</Text>
+      <View style={{ width: CHAPTER_COLUMNS.status, alignItems: "flex-end" }}>
+        <View style={[styles.statusPill, { backgroundColor: statusStyle.bg }]}>
+          <Ionicons name={statusStyle.icon} size={12} color={statusStyle.text} />
+          <Text style={[styles.statusText, { color: statusStyle.text }]}>
+            {chapter.status}
+          </Text>
+        </View>
       </View>
     </View>
   );
@@ -102,178 +98,77 @@ export function PlannerChapterRow({
 
 const styles = StyleSheet.create({
   row: {
-    minHeight: 82,
-
+    minHeight: 60,
     flexDirection: "row",
-
     alignItems: "center",
-
-    paddingHorizontal: 20,
-
-    borderBottomWidth: 1,
-
-    borderBottomColor: "#F1F5F9",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
   },
 
-  chapter: {
-    fontSize: 16,
+  rowDivider: {
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
 
-    fontWeight: "700",
-
+  chapterName: {
+    fontSize: 13,
+    fontWeight: "600",
     color: colors.textPrimary,
+    paddingRight: 12,
   },
 
   cell: {
     flexDirection: "row",
-
     alignItems: "center",
-
-    gap: 10,
+    gap: 8,
   },
 
-  link: {
-    fontSize: 15,
+  countChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    height: 28,
+    paddingHorizontal: 10,
+    borderRadius: 999,
+    backgroundColor: colors.surfaceMuted,
+  },
 
-    color: colors.primary,
-
+  countChipText: {
+    fontSize: 12,
     fontWeight: "700",
   },
 
   addButton: {
-    width: 28,
-
-    height: 28,
-
-    borderRadius: 14,
-
-    backgroundColor: "#EFF6FF",
-
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: colors.accentSoft,
+    alignItems: "center",
     justifyContent: "center",
-
-    alignItems: "center",
-  },
-
-  score: {
-    fontSize: 15,
-
-    fontWeight: "700",
-
-    color: colors.textPrimary,
-  },
-
-  statusContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-
-  dot: {
-    width: 10,
-
-    height: 10,
-
-    borderRadius: 5,
-
-    marginRight: 8,
-  },
-
-  status: {
-    fontSize: 14,
-
-    color: colors.textPrimary,
-
-    fontWeight: "600",
-  },
-  actionChip: {
-    flexDirection: "row",
-    alignItems: "center",
-
-    backgroundColor: "#EFF6FF",
-
-    borderRadius: 20,
-
-    paddingHorizontal: 12,
-
-    paddingVertical: 7,
-
-    gap: 6,
-  },
-
-  actionText: {
-    color: "#2563EB",
-
-    fontWeight: "700",
-
-    fontSize: 13,
-  },
-
-  addChip: {
-    flexDirection: "row",
-
-    alignItems: "center",
-
-    backgroundColor: "#ECFDF3",
-
-    borderRadius: 20,
-
-    paddingHorizontal: 10,
-
-    paddingVertical: 7,
-
-    gap: 4,
-  },
-
-  addText: {
-    color: "#16A34A",
-
-    fontWeight: "700",
-
-    fontSize: 13,
-  },
-
-  recordingChip: {
-    flexDirection: "row",
-
-    alignItems: "center",
-
-    backgroundColor: "#FFF7ED",
-
-    borderRadius: 20,
-
-    paddingHorizontal: 12,
-
-    paddingVertical: 7,
-
-    gap: 6,
-  },
-
-  recordingText: {
-    color: "#EA580C",
-
-    fontWeight: "700",
-  },
-
-  scoreChip: {
-    flexDirection: "row",
-
-    alignItems: "center",
-
-    backgroundColor: "#ECFDF3",
-
-    borderRadius: 20,
-
-    paddingHorizontal: 10,
-
-    paddingVertical: 6,
-
-    gap: 4,
   },
 
   scoreText: {
+    fontSize: 13,
     fontWeight: "700",
+    color: colors.textPrimary,
+  },
 
-    color: "#16A34A",
+  scoreTextMuted: {
+    fontWeight: "400",
+    color: colors.textMuted,
+  },
+
+  statusPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
+  },
+
+  statusText: {
+    fontSize: 11,
+    fontWeight: "700",
   },
 });

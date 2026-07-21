@@ -142,11 +142,15 @@ function StudentRow({ student }: { student: StudentOut }) {
 
 export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
   const { session } = useAuth();
-  const { subjectId, subjectName } = route.params;
+  // const { subjectId, subjectName } = route.params;
+  const { subjectId, subjectName, initialChapterId, initialTab } = route.params;
   const previewPlayer = useAudioPlayer(null, { updateInterval: 180 });
   const previewStatus = useAudioPlayerStatus(previewPlayer);
 
-  const [activeTab, setActiveTab] = useState<DetailTab>('recordings');
+  // const [activeTab, setActiveTab] = useState<DetailTab>('recordings');
+  const [activeTab, setActiveTab] = useState<DetailTab>(
+    initialTab ?? "recordings",
+  );
   const [recordings, setRecordings] = useState<RecordingWithReport[]>([]);
   const [students, setStudents] = useState<StudentOut[]>([]);
   const [chapters, setChapters] = useState<ChapterOut[]>([]);
@@ -184,6 +188,16 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
         setRecordings(recordingData);
         setStudents(studentData);
         setChapters(chapterData);
+        
+        if (initialChapterId) {
+          const initialChapter = chapterData.find(
+            (chapter) => chapter.id === initialChapterId,
+          );
+
+          if (initialChapter) {
+            setSelectedChapter(initialChapter);
+          }
+        }
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Could not load subject details');
       } finally {

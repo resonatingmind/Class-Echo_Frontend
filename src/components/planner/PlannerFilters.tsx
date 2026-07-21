@@ -1,4 +1,11 @@
-import { View, TextInput, Pressable, Text, StyleSheet } from "react-native";
+import {
+  ScrollView,
+  TextInput,
+  Pressable,
+  Text,
+  View,
+  StyleSheet,
+} from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 import { colors } from "../../theme/colors";
@@ -8,99 +15,132 @@ type Props = {
   onSearchChange: (value: string) => void;
 
   selectedClass: string | null;
+  selectedSection: string | null;
   selectedSubject: string | null;
   selectedTeacher: string | null;
   selectedYear: string | null;
 
   onClassPress: () => void;
+  onSectionPress: () => void;
   onSubjectPress: () => void;
   onTeacherPress: () => void;
   onYearPress: () => void;
 
   onSelectedClassClear?: () => void;
+  onSelectedSectionClear?: () => void;
   onSelectedSubjectClear?: () => void;
   onSelectedTeacherClear?: () => void;
   onSelectedYearClear?: () => void;
+
+  onClearAll?: () => void;
 };
 
 export function PlannerFilters({
   search,
   onSearchChange,
   selectedClass,
+  selectedSection,
   selectedSubject,
   selectedTeacher,
   selectedYear,
   onClassPress,
+  onSectionPress,
   onSubjectPress,
   onTeacherPress,
   onYearPress,
   onSelectedClassClear,
+  onSelectedSectionClear,
   onSelectedSubjectClear,
   onSelectedTeacherClear,
   onSelectedYearClear,
+  onClearAll,
 }: Props) {
+  const hasActiveFilters =
+    selectedClass != null ||
+    selectedSection != null ||
+    selectedSubject != null ||
+    selectedTeacher != null ||
+    selectedYear != null;
+
   return (
     <>
       <View style={styles.searchContainer}>
-        <Ionicons name="search-outline" size={20} color="#64748B" />
+        <Ionicons name="search-outline" size={20} color={colors.textMuted} />
 
         <TextInput
           value={search}
           onChangeText={onSearchChange}
-          placeholder="Search assignment..."
-          placeholderTextColor="#94A3B8"
+          placeholder="Search class, subject or teacher"
+          placeholderTextColor={colors.textPlaceholder}
           style={styles.input}
         />
       </View>
 
-      <View style={styles.row}>
-        <FilterButton
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.filterRow}
+      >
+        <Ionicons
+          name="filter-outline"
+          size={16}
+          color={colors.textMuted}
+          style={{ marginRight: 2 }}
+        />
+
+        <FilterChip
           title={selectedClass ?? "Class"}
           selected={selectedClass != null}
           onPress={onClassPress}
-          onClear={() => onSelectedClassClear?.()}
+          onClear={onSelectedClassClear}
         />
 
-        <FilterButton
+        <FilterChip
+          title={selectedSection ? `Section ${selectedSection}` : "Section"}
+          selected={selectedSection != null}
+          onPress={onSectionPress}
+          onClear={onSelectedSectionClear}
+        />
+
+        <FilterChip
           title={selectedSubject ?? "Subject"}
           selected={selectedSubject != null}
           onPress={onSubjectPress}
-          onClear={() => onSelectedSubjectClear?.()}
+          onClear={onSelectedSubjectClear}
         />
-      </View>
 
-      <View style={styles.row}>
-        <FilterButton
+        <FilterChip
           title={selectedTeacher ?? "Teacher"}
           selected={selectedTeacher != null}
           onPress={onTeacherPress}
-          onClear={() => onSelectedTeacherClear?.()}
+          onClear={onSelectedTeacherClear}
         />
 
-        <FilterButton
-          title={selectedYear ?? "Academic Year"}
+        <FilterChip
+          title={selectedYear ?? "Academic year"}
           selected={selectedYear != null}
           onPress={onYearPress}
-          onClear={() => onSelectedYearClear?.()}
+          onClear={onSelectedYearClear}
         />
-      </View>
+
+        {hasActiveFilters ? (
+          <Pressable style={styles.clearAll} onPress={onClearAll}>
+            <Text style={styles.clearAllText}>Clear all</Text>
+          </Pressable>
+        ) : null}
+      </ScrollView>
     </>
   );
 }
 
-type FilterButtonProps = {
+type FilterChipProps = {
   title: string;
   selected: boolean;
   onPress: () => void;
   onClear?: () => void;
 };
 
-function FilterButton({
-  title,
-  selected,
-  onPress,
-  onClear,
-}: FilterButtonProps) {
+function FilterChip({ title, selected, onPress, onClear }: FilterChipProps) {
   return (
     <Pressable
       onPress={onPress}
@@ -121,10 +161,10 @@ function FilterButton({
             onClear?.();
           }}
         >
-          <Ionicons name="close-circle" size={20} color={colors.primary} />
+          <Ionicons name="close-circle" size={16} color={colors.accentDark} />
         </Pressable>
       ) : (
-        <Ionicons name="chevron-down" size={18} color="#64748B" />
+        <Ionicons name="chevron-down" size={16} color={colors.textMuted} />
       )}
     </Pressable>
   );
@@ -132,19 +172,19 @@ function FilterButton({
 
 const styles = StyleSheet.create({
   searchContainer: {
-    height: 50,
+    height: 48,
     borderRadius: 12,
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
 
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
 
     flexDirection: "row",
     alignItems: "center",
 
     paddingHorizontal: 14,
 
-    marginBottom: 18,
+    marginBottom: 12,
   },
 
   input: {
@@ -154,42 +194,54 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 
-  row: {
+  filterRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 12,
+    alignItems: "center",
+    gap: 8,
+    paddingBottom: 4,
+    marginBottom: 8,
   },
 
   filter: {
-    width: "48%",
+    height: 38,
 
-    height: 46,
-
-    borderRadius: 12,
+    borderRadius: 999,
 
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
 
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
 
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
 
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    gap: 6,
   },
 
   filterSelected: {
-    borderColor: colors.primary,
-    backgroundColor: "#EFF6FF",
+    borderColor: colors.accent,
+    backgroundColor: colors.accentSoft,
   },
 
   filterText: {
-    fontSize: 14,
+    fontSize: 13,
     color: colors.textPrimary,
     fontWeight: "600",
   },
   selectedText: {
-    color: colors.primary,
+    color: colors.accentDark,
+  },
+
+  clearAll: {
+    height: 38,
+    justifyContent: "center",
+    paddingHorizontal: 10,
+  },
+
+  clearAllText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: colors.textSecondary,
   },
 });

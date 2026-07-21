@@ -21,7 +21,7 @@ export function PlannerHeader({ onCreatePress }: Props) {
       <Pressable style={styles.button} onPress={onCreatePress}>
         <Ionicons name="add" size={18} color="#fff" />
 
-        <Text style={styles.buttonText}>New Assignment</Text>
+        <Text style={styles.buttonText}>Quick assignment</Text>
       </Pressable>
     </View>
   );
@@ -30,9 +30,11 @@ export function PlannerHeader({ onCreatePress }: Props) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 24,
+    gap: 12,
+    marginBottom: 20,
   },
 
   title: {
@@ -51,7 +53,7 @@ const styles = StyleSheet.create({
     height: 48,
     paddingHorizontal: 18,
     borderRadius: 12,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
 
     flexDirection: "row",
     alignItems: "center",

@@ -1,7 +1,16 @@
 import { ScrollView, View, Text, StyleSheet } from "react-native";
 
 import { PlannerChapter } from "../../types/api";
+import { colors } from "../../theme/colors";
 import { PlannerChapterRow } from "./PlannerChapterRow";
+
+export const CHAPTER_COLUMNS = {
+  chapter: 260,
+  material: 140,
+  recordings: 140,
+  score: 100,
+  status: 130,
+};
 
 type Props = {
   chapters: PlannerChapter[];
@@ -23,25 +32,39 @@ export function PlannerChapterTable({
     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
       <View style={styles.table}>
         <View style={styles.header}>
-          <Text style={[styles.heading, { width: 240 }]}>Chapter</Text>
-
-          <Text style={[styles.heading, { width: 180 }]}>
-            Reference Material
+          <Text style={[styles.heading, { width: CHAPTER_COLUMNS.chapter }]}>
+            Chapter
           </Text>
 
-          <Text style={[styles.heading, { width: 180 }]}>
-            Lecture Recordings
+          <Text style={[styles.heading, { width: CHAPTER_COLUMNS.material }]}>
+            Material
           </Text>
 
-          <Text style={[styles.heading, { width: 110 }]}>AI Score</Text>
+          <Text
+            style={[styles.heading, { width: CHAPTER_COLUMNS.recordings }]}
+          >
+            Recordings
+          </Text>
 
-          <Text style={[styles.heading, { width: 120 }]}>Status</Text>
+          <Text style={[styles.heading, { width: CHAPTER_COLUMNS.score }]}>
+            AI score
+          </Text>
+
+          <Text
+            style={[
+              styles.heading,
+              { width: CHAPTER_COLUMNS.status, textAlign: "right" },
+            ]}
+          >
+            Status
+          </Text>
         </View>
 
-        {chapters.map((chapter) => (
+        {chapters.map((chapter, index) => (
           <PlannerChapterRow
             key={chapter.id}
             chapter={chapter}
+            isLast={index === chapters.length - 1}
             onOpenDocuments={() => onOpenDocuments(chapter)}
             onAddDocument={() => onAddDocument(chapter)}
             onOpenRecordings={() => onOpenRecordings(chapter)}
@@ -54,34 +77,26 @@ export function PlannerChapterTable({
 
 const styles = StyleSheet.create({
   table: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
+    backgroundColor: colors.surface,
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
     overflow: "hidden",
   },
 
   header: {
-    height: 60,
-
+    height: 44,
     flexDirection: "row",
-
     alignItems: "center",
-
-    backgroundColor: "#EEF2F7",
-
-    borderBottomWidth: 1,
-
-    borderBottomColor: "#E2E8F0",
-
-    paddingHorizontal: 18,
+    backgroundColor: colors.surfaceMuted,
+    paddingHorizontal: 16,
   },
 
   heading: {
-    fontSize: 14,
-
+    fontSize: 11,
     fontWeight: "700",
-
-    color: "#64748B",
+    color: colors.textMuted,
+    textTransform: "uppercase",
+    letterSpacing: 0.3,
   },
 });

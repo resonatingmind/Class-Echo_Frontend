@@ -1,47 +1,59 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
-import { TimetablePeriod } from "./timetableData";
+import { TimetableEntryOut } from "../../../types/api";
 import { colors } from "../../../theme/colors";
 
 type Props = {
-  period: TimetablePeriod;
-  onEdit?: (period: TimetablePeriod) => void;
+  period: TimetableEntryOut;
 };
 
-export function PeriodCard({ period, onEdit }: Props) {
+const ACCENTS = [
+  { bg: "#EAF3FF", border: "#CFE3FF", chip: colors.accentDark },
+  { bg: "#EAFBF1", border: "#CBEFDA", chip: "#127A40" },
+  { bg: "#FFF6E8", border: "#FBE3B8", chip: "#92400E" },
+  { bg: "#F6F0FF", border: "#E2D3FA", chip: "#6B21A8" },
+  { bg: "#FFEEF2", border: "#F9C7D3", chip: "#9B1239" },
+];
+
+export function PeriodCard({ period }: Props) {
+  const accent = ACCENTS[(period.period_number - 1) % ACCENTS.length];
+  const subjectLabel = period.subject?.name ?? "Subject";
+  const className = period.class_
+    ? `${period.class_.name} • Section ${period.class_.section}`
+    : null;
+
   return (
-    <View style={styles.card}>
-      {/* Top Row */}
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.time}>
-            {period.startTime} - {period.endTime}
-          </Text>
-
-          <Text style={styles.period}>Period {period.period}</Text>
-        </View>
-
-        <Pressable style={styles.editButton} onPress={() => onEdit?.(period)}>
-          <Ionicons name="create-outline" size={18} color={colors.accent} />
-
-          <Text style={styles.editText}>Edit</Text>
-        </Pressable>
+    <View style={[styles.card, { borderColor: accent.border }]}>
+      <View style={[styles.periodBadge, { backgroundColor: accent.bg }]}>
+        <Text style={[styles.periodBadgeText, { color: accent.chip }]}>
+          P{period.period_number}
+        </Text>
       </View>
 
-      {/* Subject */}
-      <Text style={styles.subject}>{period.subject}</Text>
+      <View style={styles.body}>
+        <View style={styles.headerRow}>
+          <Text style={styles.subject} numberOfLines={1}>
+            {subjectLabel}
+          </Text>
 
-      {/* Class */}
-      <Text style={styles.info}>
-        {period.className} • Section {period.section}
-      </Text>
+          <Text style={styles.time}>
+            {period.start_time} - {period.end_time}
+          </Text>
+        </View>
 
-      {/* Room */}
-      <View style={styles.roomRow}>
-        <Ionicons name="location-outline" size={16} color="#6B7280" />
+        {className ? <Text style={styles.info}>{className}</Text> : null}
 
-        <Text style={styles.room}>Room {period.room}</Text>
+        {period.room ? (
+          <View style={styles.roomRow}>
+            <Ionicons
+              name="location-outline"
+              size={14}
+              color={colors.textMuted}
+            />
+            <Text style={styles.room}>Room {period.room}</Text>
+          </View>
+        ) : null}
       </View>
     </View>
   );
@@ -49,69 +61,66 @@ export function PeriodCard({ period, onEdit }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 14,
-    padding: 18,
-    marginBottom: 14,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-
-  header: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    overflow: "hidden",
   },
 
-  time: {
+  periodBadge: {
+    width: 56,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  periodBadgeText: {
+    fontSize: 13,
+    fontWeight: "800",
+  },
+
+  body: {
+    flex: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    gap: 4,
+  },
+
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+
+  subject: {
+    flex: 1,
     fontSize: 16,
     fontWeight: "700",
     color: colors.textPrimary,
   },
 
-  period: {
-    marginTop: 4,
+  time: {
     fontSize: 13,
+    fontWeight: "600",
     color: colors.textSecondary,
   },
 
-  subject: {
-    marginTop: 16,
-    fontSize: 20,
-    fontWeight: "700",
-    color: colors.textPrimary,
-  },
-
   info: {
-    marginTop: 6,
-    fontSize: 15,
+    fontSize: 13,
     color: colors.textSecondary,
   },
 
   roomRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 12,
+    gap: 4,
+    marginTop: 2,
   },
 
   room: {
-    marginLeft: 6,
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-
-  editButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-
-  editText: {
-    marginLeft: 6,
-    color: colors.accent,
-    fontWeight: "600",
+    fontSize: 12,
+    color: colors.textMuted,
   },
 });

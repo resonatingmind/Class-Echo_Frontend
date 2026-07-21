@@ -12,6 +12,14 @@ type Props = {
   onBack: () => void;
 };
 
+function toTitleCase(value: string): string {
+  return value
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => word[0].toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 export function PlannerDetailHeader({
   subjectName,
   className,
@@ -22,32 +30,30 @@ export function PlannerDetailHeader({
   return (
     <>
       <Pressable onPress={onBack} style={styles.backButton}>
-        <Ionicons name="arrow-back" size={22} color={colors.primary} />
+        <Ionicons name="arrow-back" size={20} color={colors.accentDark} />
 
         <Text style={styles.backText}>Academic Planner</Text>
       </Pressable>
 
       <View style={styles.container}>
-        <Text style={styles.subject}>{subjectName}</Text>
+        <Text style={styles.subject}>{toTitleCase(subjectName)}</Text>
 
         <View style={styles.infoRow}>
-          <InfoItem title="Class" value={className} />
-
-          <InfoItem title="Teacher" value={teacherName ?? "--"} />
-
-          <InfoItem title="Academic Year" value={academicYear} />
+          <InfoPill value={className} />
+          <InfoPill value={teacherName ?? "No teacher assigned"} />
+          <InfoPill value={academicYear} />
         </View>
       </View>
     </>
   );
 }
 
-function InfoItem({ title, value }: { title: string; value: string }) {
+function InfoPill({ value }: { value: string }) {
   return (
-    <View style={styles.infoCard}>
-      <Text style={styles.infoTitle}>{title}</Text>
-
-      <Text style={styles.infoValue}>{value}</Text>
+    <View style={styles.pill}>
+      <Text style={styles.pillText} numberOfLines={1}>
+        {value}
+      </Text>
     </View>
   );
 }
@@ -56,51 +62,43 @@ const styles = StyleSheet.create({
   backButton: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 24,
+    marginBottom: 14,
   },
 
   backText: {
-    marginLeft: 8,
-    color: colors.primary,
-    fontSize: 16,
+    marginLeft: 6,
+    color: colors.textSecondary,
+    fontSize: 13,
     fontWeight: "600",
   },
 
   container: {
-    marginBottom: 24,
+    marginBottom: 16,
   },
 
   subject: {
-    fontSize: 30,
+    fontSize: 24,
     fontWeight: "800",
     color: colors.textPrimary,
-    marginBottom: 20,
+    marginBottom: 10,
   },
 
   infoRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 12,
+    flexWrap: "wrap",
+    gap: 8,
   },
 
-  infoCard: {
-    flex: 1,
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
+  pill: {
+    backgroundColor: colors.surfaceMuted,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
   },
 
-  infoTitle: {
-    fontSize: 13,
-    color: "#64748B",
-    marginBottom: 8,
-  },
-
-  infoValue: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: colors.textPrimary,
+  pillText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: colors.textSecondary,
   },
 });

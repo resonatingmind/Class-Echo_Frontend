@@ -5,9 +5,10 @@ import {
   TextInput,
   StyleSheet,
   Pressable,
+  ScrollView
 } from "react-native";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { TeacherSection } from "./TeacherSection";
 import { ClassSection } from "./ClassSection";
@@ -24,9 +25,20 @@ type Props = {
   onClose: () => void;
   token: string;
   onSuccess: () => Promise<void>;
+  initialAssignment?: {
+    className: string;
+    section: string;
+    subject: string;
+  } | null;
 };
 
-export function QuickAssignmentModal({ visible, onClose, token, onSuccess }: Props) {
+export function QuickAssignmentModal({
+  visible,
+  onClose,
+  token,
+  onSuccess,
+  initialAssignment,
+}: Props) {
   const [teacherEmail, setTeacherEmail] = useState("");
   const [teacherName, setTeacherName] = useState("");
   const [password, setPassword] = useState("");
@@ -48,6 +60,14 @@ export function QuickAssignmentModal({ visible, onClose, token, onSuccess }: Pro
     useState<QuickAssignmentResponse | null>(null);
 
   const [replacing, setReplacing] = useState(false);
+
+  useEffect(() => {
+    if (!visible) return;
+    setClassName(initialAssignment?.className ?? "");
+    setSection(initialAssignment?.section ?? "");
+    setSubject(initialAssignment?.subject ?? "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible, initialAssignment]);
 
   async function handleAssign() {
     try {
@@ -150,73 +170,75 @@ export function QuickAssignmentModal({ visible, onClose, token, onSuccess }: Pro
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
-      <View style={styles.overlay}>
-        <View style={styles.card}>
-          <Text style={styles.title}>Quick Assignment</Text>
+      <ScrollView>
+        <View style={styles.overlay}>
+          <View style={styles.card}>
+            <Text style={styles.title}>Quick Assignment</Text>
 
-          <Text style={styles.subtitle}>
-            Create or assign teachers, classes and subjects.
-          </Text>
+            <Text style={styles.subtitle}>
+              Create or assign teachers, classes and subjects.
+            </Text>
 
-          <TeacherSection
-            token={token}
-            teacherEmail={teacherEmail}
-            teacherName={teacherName}
-            password={password}
-            onTeacherEmailChange={setTeacherEmail}
-            onTeacherNameChange={setTeacherName}
-            onPasswordChange={setPassword}
-            onLookupChange={setTeacherLookup}
-          />
-          <ClassSection
-            token={token}
-            className={className}
-            section={section}
-            subject={subject}
-            onClassNameChange={setClassName}
-            onSectionChange={setSection}
-            onSubjectChange={setSubject}
-            onLookupChange={setClassLookup}
-          />
+            <TeacherSection
+              token={token}
+              teacherEmail={teacherEmail}
+              teacherName={teacherName}
+              password={password}
+              onTeacherEmailChange={setTeacherEmail}
+              onTeacherNameChange={setTeacherName}
+              onPasswordChange={setPassword}
+              onLookupChange={setTeacherLookup}
+            />
+            <ClassSection
+              token={token}
+              className={className}
+              section={section}
+              subject={subject}
+              onClassNameChange={setClassName}
+              onSectionChange={setSection}
+              onSubjectChange={setSubject}
+              onLookupChange={setClassLookup}
+            />
 
-          <AssignmentSummary
-            teacherExists={teacherLookup.exists}
-            teacherName={teacherName}
-            classExists={classLookup.exists}
-            className={className}
-            section={section}
-            subject={subject}
-          />
+            <AssignmentSummary
+              teacherExists={teacherLookup.exists}
+              teacherName={teacherName}
+              classExists={classLookup.exists}
+              className={className}
+              section={section}
+              subject={subject}
+            />
 
-          <View style={styles.actions}>
-            <Pressable style={styles.cancel} onPress={onClose}>
-              <Text style={styles.cancelText}>Cancel</Text>
-            </Pressable>
+            <View style={styles.actions}>
+              <Pressable style={styles.cancel} onPress={onClose}>
+                <Text style={styles.cancelText}>Cancel</Text>
+              </Pressable>
 
-            <Pressable
-              onPress={handleAssign}
-              disabled={
-                submitting ||
-                !teacherEmail ||
-                !className ||
-                !section ||
-                !subject
-              }
-              style={[
-                styles.assign,
-                (!teacherEmail || !className || !section || !subject) && {
-                  opacity: 0.5,
-                },
-              ]}
-              // disabled={!teacherEmail || !className || !section || !subject}
-            >
-              <Text style={styles.assignText}>
-                {submitting ? "Assigning..." : "Assign"}
-              </Text>
-            </Pressable>
+              <Pressable
+                onPress={handleAssign}
+                disabled={
+                  submitting ||
+                  !teacherEmail ||
+                  !className ||
+                  !section ||
+                  !subject
+                }
+                style={[
+                  styles.assign,
+                  (!teacherEmail || !className || !section || !subject) && {
+                    opacity: 0.5,
+                  },
+                ]}
+                // disabled={!teacherEmail || !className || !section || !subject}
+              >
+                <Text style={styles.assignText}>
+                  {submitting ? "Assigning..." : "Assign"}
+                </Text>
+              </Pressable>
+            </View>
           </View>
         </View>
-      </View>
+      </ScrollView>
     </Modal>
   );
 }
@@ -291,7 +313,7 @@ const styles = StyleSheet.create({
   },
 
   assign: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
 
     marginLeft: 12,
 

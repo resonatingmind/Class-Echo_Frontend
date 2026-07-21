@@ -25,6 +25,7 @@ import { SchoolAdminSubjectChaptersScreen } from "../screens/SchoolAdminSubjectC
 import { SchoolAdminChapterDetailScreen } from "../screens/SchoolAdminChapterDetailScreen";
 import { TeacherChapterDetailScreen } from "../screens/TeacherChapterDetailScreen";
 import { SchoolAdminTeacherAnalyticsScreen } from "../screens/SchoolAdminTeacherAnalyticsScreen";
+import { SchoolAdminTimetableScreen } from "../screens/SchoolAdminTimetableScreen";
 
 // Auth screens
 import { LoginScreen } from "../screens/LoginScreen";
@@ -88,6 +89,8 @@ export type RootStackParamList = {
   };
   SchoolAdminPlanner: undefined;
 
+  SchoolAdminTimetable: undefined;
+
   SchoolAdminPlannerDetail: {
     subjectId: number;
   };
@@ -108,7 +111,12 @@ export type RootStackParamList = {
     openUpload?: boolean;
   };
   TeacherTabs: undefined;
-  TeacherSubjectDetail: { subjectId: number; subjectName: string };
+  TeacherSubjectDetail: {
+    subjectId: number;
+    subjectName: string;
+    initialChapterId?: number;
+    initialTab?: "recordings" | "students";
+  };
   TeacherSubjectWorkspace: {
     subjectId: number;
     subjectName: string;
@@ -207,6 +215,11 @@ export function AppNavigator() {
           <Stack.Screen
             name="SchoolAdminPlanner"
             component={SchoolAdminPlannerScreen}
+          />
+
+          <Stack.Screen
+            name="SchoolAdminTimetable"
+            component={SchoolAdminTimetableScreen}
           />
 
           <Stack.Screen

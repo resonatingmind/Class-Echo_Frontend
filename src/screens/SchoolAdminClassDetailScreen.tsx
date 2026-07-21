@@ -24,6 +24,7 @@ import {
   updateSchoolAdminClass,
 } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { ScreenHeader } from '../components/common/ScreenHeader';
 import { colors } from '../theme/colors';
 import { SubjectOut, TeacherOut } from '../types/api';
 
@@ -408,30 +409,19 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
   });
 
   return (
-    <SafeAreaView edges={["top"]} style={styles.safe}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Pressable
-          onPress={() => {
-            if (navigation.canGoBack()) {
-              navigation.goBack();
-            } else {
-              navigation.navigate("SchoolAdminClasses");
-            }
-          }}
-          style={styles.backBtn}
-        >
-          <Ionicons color={colors.textPrimary} name="arrow-back" size={22} />
-        </Pressable>
-        <Text style={styles.headerTitle} numberOfLines={1}>
-          {className}
-        </Text>
-        <View style={styles.headerRight}>
+    <SafeAreaView edges={[]} style={styles.safe}>
+      <ScreenHeader
+        title={className}
+        onBack={() => {
+          if (navigation.canGoBack()) navigation.goBack();
+          else navigation.navigate("SchoolAdminClasses");
+        }}
+        rightActions={
           <View style={styles.avatarCircle}>
             <Ionicons color={colors.accent} name="person" size={16} />
           </View>
-        </View>
-      </View>
+        }
+      />
 
       <ScrollView
         contentContainerStyle={styles.scroll}
@@ -674,29 +664,6 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  backBtn: {
-    width: 36,
-    height: 36,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: "center",
-    color: colors.textPrimary,
-    fontSize: 17,
-    fontWeight: "700",
-  },
-  headerRight: { width: 36, alignItems: "flex-end" },
   avatarCircle: {
     width: 32,
     height: 32,

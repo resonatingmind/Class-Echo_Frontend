@@ -20,6 +20,7 @@ import {
   TeacherProfile,
 } from "../lib/api";
 import { RootStackParamList } from "../navigation/AppNavigator";
+import { ScreenHeader } from "../components/common/ScreenHeader";
 import { colors } from "../theme/colors";
 import { TeacherOut } from "../types/api";
 
@@ -96,26 +97,18 @@ try {
     );
   }
 
+  const handleBack = () => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate("SchoolAdminTabs", { screen: "SchoolAdminTeachers" });
+    }
+  };
+
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView edges={['bottom']} style={styles.safe}>
+      <ScreenHeader title="Teacher Profile" onBack={handleBack} />
       <ScrollView contentContainerStyle={styles.content}>
-        <Pressable
-          onPress={() => {
-            if (navigation.canGoBack()) {
-              navigation.goBack();
-            } else {
-              navigation.navigate("SchoolAdminTabs", {
-                screen: "SchoolAdminTeachers",
-              });
-            }
-          }}
-          style={styles.backButton}
-        >
-          <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
-        </Pressable>
-
-        <Text style={styles.title}>Teacher Profile</Text>
-
         <View style={styles.profileCard}>
           <View style={styles.avatar}>
             <Ionicons name="person" size={42} color={colors.accent} />
@@ -280,16 +273,6 @@ const styles = StyleSheet.create({
 
   errorText: {
     color: "red",
-  },
-
-  backButton: {
-    width: 40,
-  },
-
-  title: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: colors.textPrimary,
   },
 
   card: {

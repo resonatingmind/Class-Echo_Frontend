@@ -17,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../context/AuthContext';
 import { deleteAdminSchool, getAdminSchool, getAdminSchoolClasses, updateAdminSchool } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { ScreenHeader } from '../components/common/ScreenHeader';
 import { colors } from '../theme/colors';
 import { ClassOut, SchoolOut } from '../types/api';
 
@@ -215,22 +216,21 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
   };
 
   return (
-    <SafeAreaView edges={['top']} style={styles.safe}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Ionicons color={colors.textPrimary} name="arrow-back" size={22} />
-        </Pressable>
-        <Text style={styles.headerTitle}>School Profile</Text>
-        <View style={styles.headerRight}>
-          <Pressable onPress={openEdit} style={styles.iconBtn}>
-            <Ionicons color={colors.textPrimary} name="pencil-outline" size={20} />
-          </Pressable>
-          <Pressable onPress={handleDelete} style={styles.iconBtn}>
-            <Ionicons color="#EF4444" name="trash-outline" size={20} />
-          </Pressable>
-        </View>
-      </View>
+    <SafeAreaView edges={[]} style={styles.safe}>
+      <ScreenHeader
+        title="School Profile"
+        onBack={() => navigation.goBack()}
+        rightActions={
+          <>
+            <Pressable onPress={openEdit} style={styles.iconBtn}>
+              <Ionicons color={colors.textPrimary} name="pencil-outline" size={20} />
+            </Pressable>
+            <Pressable onPress={handleDelete} style={styles.iconBtn}>
+              <Ionicons color="#EF4444" name="trash-outline" size={20} />
+            </Pressable>
+          </>
+        }
+      />
 
       {/* Edit School Modal */}
       <Modal animationType="slide" transparent visible={showEdit} onRequestClose={() => setShowEdit(false)}>
@@ -354,32 +354,6 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  backBtn: {
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    color: colors.textPrimary,
-    fontSize: 17,
-    fontWeight: '700',
-  },
-  headerRight: {
-    flexDirection: 'row',
-    gap: 2,
   },
   iconBtn: {
     width: 36,

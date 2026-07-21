@@ -19,6 +19,7 @@ import {
   getSchoolSubjectStudents,
 } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { ScreenHeader } from '../components/common/ScreenHeader';
 import { colors } from '../theme/colors';
 import { RecordingStatus, RecordingWithReport, StudentOut } from '../types/api';
 
@@ -172,22 +173,14 @@ export function SchoolAdminSubjectDetailScreen({ navigation, route }: Props) {
   const completedCount = recordings.filter((recording) => recording.status === 'completed').length;
 
   return (
-    <SafeAreaView edges={['top']} style={styles.safe}>
-      <View style={styles.header}>
-        <Pressable onPress={() => {
-          if (navigation.canGoBack()) {
-            navigation.goBack();
-          } else {
-            navigation.navigate("SchoolAdminClasses");
-          }
-        }} style={styles.headerButton}>
-          <Ionicons color={colors.textPrimary} name="arrow-back" size={22} />
-        </Pressable>
-        <Text numberOfLines={1} style={styles.headerTitle}>
-          {subjectName}
-        </Text>
-        <View style={styles.headerButton} />
-      </View>
+    <SafeAreaView edges={[]} style={styles.safe}>
+      <ScreenHeader
+        title={subjectName}
+        onBack={() => {
+          if (navigation.canGoBack()) navigation.goBack();
+          else navigation.navigate("SchoolAdminClasses");
+        }}
+      />
 
       <ScrollView
         contentContainerStyle={styles.scroll}
@@ -310,23 +303,6 @@ export function SchoolAdminSubjectDetailScreen({ navigation, route }: Props) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  headerButton: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
   scroll: { paddingBottom: 40, gap: 16 },
   hero: {
     padding: 20,

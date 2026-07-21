@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Ionicons } from "@expo/vector-icons";
+import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 
-import { colors } from "../theme/colors";
+import { FloatingPillTabBar, FloatingTabItem } from "../components/common/FloatingPillTabBar";
 
 import { SchoolAdminDashboardScreen } from "../screens/SchoolAdminDashboardScreen";
 import { SchoolAdminTeachersScreen } from "../screens/SchoolAdminTeachersScreen";
@@ -17,70 +17,46 @@ export type SchoolAdminTabParamList = {
 
 const Tab = createBottomTabNavigator<SchoolAdminTabParamList>();
 
+const TABS: FloatingTabItem[] = [
+  { key: "SchoolAdminDashboard", label: "Dashboard", icon: "grid-outline",          activeIcon: "grid"          },
+  { key: "SchoolAdminTeachers",  label: "Teachers",  icon: "people-outline",        activeIcon: "people"        },
+  { key: "SchoolAdminStudents",  label: "Students",  icon: "people-circle-outline", activeIcon: "people-circle" },
+  { key: "SchoolAdminProfile",   label: "Profile",   icon: "person-outline",        activeIcon: "person"        },
+];
+
+function SchoolAdminTabBar({ state, navigation }: BottomTabBarProps) {
+  const handlePress = (index: number) => {
+    const route = state.routes[index];
+    const event = navigation.emit({
+      type: "tabPress",
+      target: route.key,
+      canPreventDefault: true,
+    });
+    if (state.index !== index && !event.defaultPrevented) {
+      navigation.navigate(route.name as never);
+    }
+  };
+
+  return (
+    <FloatingPillTabBar
+      tabs={TABS}
+      activeIndex={state.index}
+      onTabPress={handlePress}
+    />
+  );
+}
+
 export function SchoolAdminTabNavigator() {
   return (
     <Tab.Navigator
       initialRouteName="SchoolAdminDashboard"
-      screenOptions={({ route }: { route: any }) => ({
-        headerShown: false,
-
-        tabBarActiveTintColor: colors.accent,
-        tabBarInactiveTintColor: colors.navInactive,
-
-        tabBarStyle: {
-          height: 68,
-          paddingBottom: 8,
-          paddingTop: 8,
-        },
-
-        tabBarIcon: ({ color, size }: { color: string; size: number }) => {
-          let icon: keyof typeof Ionicons.glyphMap = "ellipse";
-
-          switch (route.name) {
-            case "SchoolAdminDashboard":
-              icon = "grid";
-              break;
-
-            case "SchoolAdminTeachers":
-              icon = "people";
-              break;
-
-            case "SchoolAdminStudents":
-              icon = "people-circle";
-              break;
-
-            case "SchoolAdminProfile":
-              icon = "person";
-              break;
-          }
-
-          return <Ionicons name={icon} size={size} color={color} />;
-        },
-      })}
+      tabBar={(props) => <SchoolAdminTabBar {...props} />}
+      screenOptions={{ headerShown: false }}
     >
-      <Tab.Screen
-        name="SchoolAdminDashboard"
-        component={SchoolAdminDashboardScreen as any}
-        options={{ title: "Dashboard" }}
-      />
-
-      <Tab.Screen
-        name="SchoolAdminTeachers"
-        component={SchoolAdminTeachersScreen as any}
-        options={{ title: "Teachers" }}
-      />
-
-      <Tab.Screen
-        name="SchoolAdminStudents"
-        component={SchoolAdminStudentsScreen as any}
-        options={{ title: "Students" }}
-      />
-
-      <Tab.Screen
-        name="SchoolAdminProfile"
-        component={SchoolAdminProfileScreen as any}
-        options={{ title: "Profile" }}
-      />
+      <Tab.Screen name="SchoolAdminDashboard" component={SchoolAdminDashboardScreen as any} options={{ title: "Dashboard" }} />
+      <Tab.Screen name="SchoolAdminTeachers"  component={SchoolAdminTeachersScreen as any}  options={{ title: "Teachers"  }} />
+      <Tab.Screen name="SchoolAdminStudents"  component={SchoolAdminStudentsScreen as any}  options={{ title: "Students"  }} />
+      <Tab.Screen name="SchoolAdminProfile"   component={SchoolAdminProfileScreen as any}   options={{ title: "Profile"   }} />
     </Tab.Navigator>
   );
 }

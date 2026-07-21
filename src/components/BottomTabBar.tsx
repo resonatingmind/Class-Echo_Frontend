@@ -1,59 +1,28 @@
-import { Feather, Ionicons } from '@expo/vector-icons';
-import { StyleSheet, Text, View } from 'react-native';
+import { FloatingPillTabBar, FloatingTabItem } from './common/FloatingPillTabBar';
 
-import { colors } from '../theme/colors';
+type BottomTabKey = 'home' | 'schools' | 'staff' | 'students' | 'settings';
 
-const items = [
-  { key: 'home', label: 'Home', icon: <Feather color={colors.navInactive} name="home" size={18} /> },
-  { key: 'schools', label: 'Schools', icon: <Ionicons color={colors.accentDark} name="school-outline" size={20} />, active: true },
-  { key: 'staff', label: 'Staff', icon: <Feather color={colors.navInactive} name="users" size={18} /> },
-  { key: 'students', label: 'Students', icon: <Ionicons color={colors.navInactive} name="people-outline" size={20} /> },
-  { key: 'settings', label: 'Settings', icon: <Feather color={colors.navInactive} name="settings" size={18} /> },
+type Props = {
+  active?: BottomTabKey;
+  onTabPress?: (key: BottomTabKey) => void;
+};
+
+const TABS: FloatingTabItem[] = [
+  { key: 'home',     label: 'Home',     icon: 'home-outline',         activeIcon: 'home'          },
+  { key: 'schools',  label: 'Schools',  icon: 'school-outline',       activeIcon: 'school'        },
+  { key: 'staff',    label: 'Staff',    icon: 'people-outline',       activeIcon: 'people'        },
+  { key: 'students', label: 'Students', icon: 'people-circle-outline', activeIcon: 'people-circle' },
+  { key: 'settings', label: 'Settings', icon: 'settings-outline',     activeIcon: 'settings'      },
 ];
 
-export function BottomTabBar() {
+export function BottomTabBar({ active = 'schools', onTabPress }: Props) {
+  const activeIndex = Math.max(TABS.findIndex((t) => t.key === active), 0);
+
   return (
-    <View style={styles.shell}>
-      {items.map((item) => (
-        <View key={item.key} style={styles.item}>
-          {item.icon}
-          <Text style={[styles.label, item.active && styles.labelActive]}>
-            {item.label}
-          </Text>
-        </View>
-      ))}
-    </View>
+    <FloatingPillTabBar
+      tabs={TABS}
+      activeIndex={activeIndex}
+      onTabPress={(i) => onTabPress?.(TABS[i].key as BottomTabKey)}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  shell: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 22,
-    paddingTop: 13,
-    paddingBottom: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#F1F5F9',
-    backgroundColor: 'rgba(255,255,255,0.92)',
-  },
-  item: {
-    minWidth: 52,
-    alignItems: 'center',
-    gap: 4,
-  },
-  label: {
-    color: colors.navInactive,
-    fontSize: 10,
-    fontWeight: '500',
-  },
-  labelActive: {
-    color: colors.accentDark,
-    fontWeight: '700',
-  },
-});

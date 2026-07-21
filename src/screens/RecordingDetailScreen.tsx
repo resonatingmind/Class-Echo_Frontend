@@ -25,6 +25,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { archiveTeacherRecording, deleteTeacherRecording, retryRecording, updateTeacherRecording } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { ScreenHeader } from '../components/common/ScreenHeader';
 import { colors } from '../theme/colors';
 import { DimensionScore, QuantitativeMetrics, RecordingStatus, ScoreBreakdown } from '../types/api';
 import { buildWaveformBars, formatAudioTime } from '../lib/audio';
@@ -394,18 +395,16 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
   const report = recording.report;
 
   return (
-    <SafeAreaView edges={['top']} style={styles.safe}>
-      <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Ionicons color={colors.textPrimary} name="arrow-back" size={22} />
-        </Pressable>
-        <Text style={styles.headerTitle} numberOfLines={1}>
-          {recording.lecture_title || recording.chapter_name || `Recording #${recording.id}`}
-        </Text>
-        <Pressable onPress={() => setShowOptionsSheet(true)} style={styles.backBtn}>
-          <Ionicons color={colors.textPrimary} name="ellipsis-horizontal" size={22} />
-        </Pressable>
-      </View>
+    <SafeAreaView edges={[]} style={styles.safe}>
+      <ScreenHeader
+        title={recording.lecture_title || recording.chapter_name || `Recording #${recording.id}`}
+        onBack={() => navigation.goBack()}
+        rightActions={
+          <Pressable onPress={() => setShowOptionsSheet(true)} style={styles.actionBtn}>
+            <Ionicons color={colors.textPrimary} name="ellipsis-horizontal" size={22} />
+          </Pressable>
+        }
+      />
 
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -723,16 +722,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
-  header: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: 16, paddingVertical: 12,
-    backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border,
-  },
-  backBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: {
-    flex: 1, textAlign: 'center', fontSize: 17, fontWeight: '700', color: colors.textPrimary,
-  },
-  headerSpacer: { width: 36 },
+  actionBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   scroll: { paddingBottom: 40, gap: 16 },
   hero: {
     padding: 20, backgroundColor: colors.surface,

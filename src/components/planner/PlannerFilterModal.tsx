@@ -62,7 +62,7 @@ export function PlannerFilterModal({
                     <Ionicons
                       name="checkmark"
                       size={20}
-                      color={colors.primary}
+                      color={colors.accent}
                     />
                   )}
                 </Pressable>
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   },
 
   activeText: {
-    color: colors.primary,
+    color: colors.accent,
 
     fontWeight: "700",
   },

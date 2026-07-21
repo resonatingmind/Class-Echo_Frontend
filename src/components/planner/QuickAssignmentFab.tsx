@@ -1,8 +1,6 @@
 import { Pressable, StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-
-
 import { colors } from "../../theme/colors";
 
 type Props = {
@@ -29,7 +27,7 @@ const styles = StyleSheet.create({
 
     borderRadius: 31,
 
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
 
     justifyContent: "center",
     alignItems: "center",

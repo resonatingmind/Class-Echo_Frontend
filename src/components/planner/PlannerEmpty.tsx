@@ -7,7 +7,7 @@ export function PlannerEmpty() {
   return (
     <View style={styles.container}>
       <View style={styles.iconCircle}>
-        <Ionicons name="search-outline" size={42} color={colors.primary} />
+        <Ionicons name="search-outline" size={42} color={colors.accent} />
       </View>
 
       <Text style={styles.title}>No matching assignments</Text>

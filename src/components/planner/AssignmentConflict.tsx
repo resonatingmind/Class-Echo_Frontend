@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   },
 
   replace: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 12,

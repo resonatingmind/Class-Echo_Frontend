@@ -37,10 +37,23 @@ import {
 } from "../types/api";
 
 import { notifyUnauthorized } from "./authSession";
+import { Platform } from "react-native";
+
+function getDefaultApiBaseUrl() {
+  if (typeof window !== "undefined" && window.location?.hostname) {
+    return `${window.location.protocol}//${window.location.hostname}:8000`;
+  }
+
+  if (Platform.OS === "android") {
+    return "http://10.0.2.2:8000";
+  }
+
+  return "http://localhost:8000";
+}
 
 // Load from environment variable (Expo requires prefixing with EXPO_PUBLIC_)
-// Fall back to localhost if not specified
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:8000";
+// Fall back to the current host on web, or the standard emulator host on Android.
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || getDefaultApiBaseUrl();
 
 class ApiError extends Error {
   status: number;

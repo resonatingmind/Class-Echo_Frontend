@@ -29,31 +29,29 @@ function getStatusStyle(status: TeacherDashboardSubject["ai_status"]) {
 export function TeacherAssignmentRow({ row, onPress, onViewPress}: Props) {
   const badgeStyle = getStatusStyle(row.ai_status);
 
-  const statusColor = (() => {
-    switch (row.ai_status) {
-      case "Completed":
-        return {
-          bg: "#DCFCE7",
-          text: "#15803D",
-        };
-
-      case "Processing":
-        return {
-          bg: "#FEF3C7",
-          text: "#B45309",
-        };
-
-      case "Failed":
-        return {
-          bg: "#FEE2E2",
-          text: "#B91C1C",
-        };
-
-      default:
-        return {
-          bg: "#F3F4F6",
-          text: "#6B7280",
-        };
+  const scoreColor = (() => {
+    if (row.average_score === null || row.average_score === undefined) {
+      return {
+        bg: "#F3F4F6",
+        text: "#6B7280",
+      };
+    }
+    const score = row.average_score;
+    if (score >= 8.0) {
+      return {
+        bg: "#DCFCE7",
+        text: "#15803D",
+      };
+    } else if (score >= 5.0) {
+      return {
+        bg: "#FEF3C7",
+        text: "#B45309",
+      };
+    } else {
+      return {
+        bg: "#FEE2E2",
+        text: "#B91C1C",
+      };
     }
   })();
 
@@ -114,16 +112,18 @@ export function TeacherAssignmentRow({ row, onPress, onViewPress}: Props) {
         <Text style={styles.cell}>{row.recording_count}</Text>
       </View>
 
-      {/* AI status */}
+      {/* Avg Score */}
       <View
         style={{
           flex: TABLE_COLUMNS.aiStatus,
           alignItems: "center",
         }}
       >
-        <View style={[styles.aiBadge, { backgroundColor: statusColor.bg }]}>
-          <Text style={[styles.aiText, { color: statusColor.text }]}>
-            {row.ai_status}
+        <View style={[styles.aiBadge, { backgroundColor: scoreColor.bg }]}>
+          <Text style={[styles.aiText, { color: scoreColor.text }]}>
+            {row.average_score !== null && row.average_score !== undefined
+              ? row.average_score.toFixed(1)
+              : "—"}
           </Text>
         </View>
       </View>

@@ -453,6 +453,7 @@ export type TeacherDashboardSubject = {
   student_count: number;
   recording_count: number;
   ai_status: TeacherDashboardStatus;
+  average_score?: number | null;
 };
 
 export type TeacherDashboardResponse = {

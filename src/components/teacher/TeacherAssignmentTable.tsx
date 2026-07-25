@@ -75,7 +75,7 @@ export function TeacherAssignmentTable({
             },
           ]}
         >
-          Status
+          Avg Score
         </Text>
 
         <Text

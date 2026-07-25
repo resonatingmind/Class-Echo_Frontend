@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
+import { ScreenHeader } from "../components/common/ScreenHeader";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { colors } from "../theme/colors";
 import { useAuth } from "../context/AuthContext";
@@ -364,28 +365,26 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
 
   // ─── UI ──────────────────────────────────────────────────────────────────
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
-          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
-        </Pressable>
-        <View style={{ flex: 1, marginLeft: 12 }}>
-          <Text style={styles.title}>Timetable</Text>
-          <Text style={styles.subtitle}>Day-wise class schedule</Text>
-        </View>
-        <Pressable
-          style={styles.importButton}
-          onPress={() => setShowImportModal(true)}
-        >
-          <Ionicons
-            name="cloud-upload-outline"
-            size={16}
-            color={colors.accentDark}
-          />
-          <Text style={styles.importButtonText}>Import</Text>
-        </Pressable>
-      </View>
+    <SafeAreaView style={styles.container} edges={[]}>
+      <ScreenHeader
+        variant="large"
+        title="Timetable"
+        subtitle="Day-wise class schedule"
+        onBack={() => navigation.goBack()}
+        rightActions={
+          <Pressable
+            style={styles.importButton}
+            onPress={() => setShowImportModal(true)}
+          >
+            <Ionicons
+              name="cloud-upload-outline"
+              size={16}
+              color={colors.accentDark}
+            />
+            <Text style={styles.importButtonText}>Import</Text>
+          </Pressable>
+        }
+      />
 
       {/* Day Selector */}
       <View style={styles.daySelectorWrap}>
@@ -597,16 +596,6 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 8,
-  },
-  title: { fontSize: 22, fontWeight: "800", color: colors.textPrimary },
-  subtitle: { marginTop: 2, fontSize: 12, color: colors.textSecondary },
 
   importButton: {
     flexDirection: "row",

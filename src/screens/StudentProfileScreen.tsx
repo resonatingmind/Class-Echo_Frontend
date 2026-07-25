@@ -24,6 +24,7 @@ import {
   uploadStudentProfileImage,
 } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { ScreenHeader } from '../components/common/ScreenHeader';
 import { colors } from '../theme/colors';
 import { StudentProfileOut } from '../types/api';
 
@@ -110,10 +111,8 @@ export function StudentProfileScreen({ navigation }: Props) {
   };
 
   return (
-    <SafeAreaView edges={['top']} style={styles.safe}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Profile</Text>
-      </View>
+    <SafeAreaView edges={[]} style={styles.safe}>
+      <ScreenHeader title="Profile" />
 
       {isLoading ? (
         <View style={styles.center}>
@@ -229,14 +228,6 @@ export function StudentProfileScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  headerTitle: { fontSize: 18, fontWeight: '800', color: colors.textPrimary },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   scroll: { padding: 20, paddingBottom: 32, gap: 18 },
   hero: { alignItems: 'center', gap: 12 },

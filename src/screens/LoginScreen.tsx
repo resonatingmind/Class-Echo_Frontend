@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useRef, useState } from "react";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -10,21 +10,21 @@ import {
   Text,
   TextInput,
   View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
 
-import { useAuth } from '../context/AuthContext';
-import { API_BASE_URL } from '../lib/api';
-import { RootStackParamList } from '../navigation/AppNavigator';
-import { colors } from '../theme/colors';
+import { useAuth } from "../context/AuthContext";
+import { API_BASE_URL } from "../lib/api";
+import { RootStackParamList } from "../navigation/AppNavigator";
+import { colors } from "../theme/colors";
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
+type Props = NativeStackScreenProps<RootStackParamList, "Login">;
 
 export function LoginScreen({ navigation }: Props) {
   const { isLoading, signIn } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -50,11 +50,11 @@ export function LoginScreen({ navigation }: Props) {
     addLog(`Platform = ${Platform.OS} / ${Platform.Version}`);
 
     // Test 1: plain GET to base URL
-    addLog('--- Test 1: GET base URL ---');
+    addLog("--- Test 1: GET base URL ---");
     try {
-      addLog('Sending fetch...');
+      addLog("Sending fetch...");
       const t0 = Date.now();
-      const res = await fetch(API_BASE_URL + '/', { method: 'GET' });
+      const res = await fetch(API_BASE_URL + "/", { method: "GET" });
       addLog(`Response: ${res.status} in ${Date.now() - t0}ms`);
       const body = await res.text();
       addLog(`Body: ${body.slice(0, 120)}`);
@@ -64,14 +64,14 @@ export function LoginScreen({ navigation }: Props) {
     }
 
     // Test 2: POST login with dummy creds to check reachability
-    addLog('--- Test 2: POST /auth/login ---');
+    addLog("--- Test 2: POST /auth/login ---");
     try {
-      addLog('Sending fetch...');
+      addLog("Sending fetch...");
       const t0 = Date.now();
-      const res = await fetch(API_BASE_URL + '/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'username=debug%40test.com&password=testpass',
+      const res = await fetch(API_BASE_URL + "/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "username=debug%40test.com&password=testpass",
       });
       addLog(`Response: ${res.status} in ${Date.now() - t0}ms`);
       const body = await res.text();
@@ -81,18 +81,27 @@ export function LoginScreen({ navigation }: Props) {
     }
 
     // Test 3: XHR
-    addLog('--- Test 3: XHR GET base URL ---');
+    addLog("--- Test 3: XHR GET base URL ---");
     await new Promise<void>((resolve) => {
       const xhr = new XMLHttpRequest();
-      xhr.open('GET', API_BASE_URL + '/');
+      xhr.open("GET", API_BASE_URL + "/");
       xhr.timeout = 8000;
-      xhr.onload = () => { addLog(`XHR status: ${xhr.status}`); resolve(); };
-      xhr.onerror = () => { addLog(`XHR onerror fired`); resolve(); };
-      xhr.ontimeout = () => { addLog(`XHR timed out`); resolve(); };
+      xhr.onload = () => {
+        addLog(`XHR status: ${xhr.status}`);
+        resolve();
+      };
+      xhr.onerror = () => {
+        addLog(`XHR onerror fired`);
+        resolve();
+      };
+      xhr.ontimeout = () => {
+        addLog(`XHR timed out`);
+        resolve();
+      };
       xhr.send();
     });
 
-    addLog('--- Done ---');
+    addLog("--- Done ---");
     setIsTesting(false);
   };
 
@@ -102,14 +111,18 @@ export function LoginScreen({ navigation }: Props) {
     try {
       await signIn(email.trim(), password);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed. Check your credentials.');
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Login failed. Check your credentials.",
+      );
     }
   };
 
   return (
-    <SafeAreaView edges={['top', 'bottom']} style={styles.safe}>
+    <SafeAreaView edges={["top", "bottom"]} style={styles.safe}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.flex}
       >
         <ScrollView
@@ -148,7 +161,10 @@ export function LoginScreen({ navigation }: Props) {
                   placeholder="name@university.edu"
                   placeholderTextColor={colors.textPlaceholder}
                   returnKeyType="next"
-                  style={[styles.input, error && !emailValid && styles.inputError]}
+                  style={[
+                    styles.input,
+                    error && !emailValid && styles.inputError,
+                  ]}
                   textContentType="emailAddress"
                   value={email}
                 />
@@ -177,7 +193,7 @@ export function LoginScreen({ navigation }: Props) {
                   >
                     <Ionicons
                       color={colors.textMuted}
-                      name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                      name={showPassword ? "eye-off-outline" : "eye-outline"}
                       size={20}
                     />
                   </Pressable>
@@ -186,7 +202,11 @@ export function LoginScreen({ navigation }: Props) {
 
               {error ? (
                 <View style={styles.errorBox}>
-                  <Ionicons color="#B42318" name="alert-circle-outline" size={16} />
+                  <Ionicons
+                    color="#B42318"
+                    name="alert-circle-outline"
+                    size={16}
+                  />
                   <Text style={styles.errorText}>{error}</Text>
                 </View>
               ) : null}
@@ -194,7 +214,10 @@ export function LoginScreen({ navigation }: Props) {
               <Pressable
                 disabled={!canSubmit || isLoading}
                 onPress={handleSignIn}
-                style={[styles.signInBtn, (!canSubmit || isLoading) && styles.signInBtnDisabled]}
+                style={[
+                  styles.signInBtn,
+                  (!canSubmit || isLoading) && styles.signInBtnDisabled,
+                ]}
               >
                 {isLoading ? (
                   <ActivityIndicator color="#fff" size="small" />
@@ -210,7 +233,7 @@ export function LoginScreen({ navigation }: Props) {
             {/* Sign up link */}
             <View style={styles.signupRow}>
               <Text style={styles.signupLabel}>Don't have an account?</Text>
-              <Pressable onPress={() => navigation.navigate('Signup')}>
+              <Pressable onPress={() => navigation.navigate("Signup")}>
                 <Text style={styles.signupLink}> Sign up</Text>
               </Pressable>
             </View>
@@ -221,9 +244,12 @@ export function LoginScreen({ navigation }: Props) {
             <Text style={styles.footerText}>
               © {new Date().getFullYear()} ClassEcho. All rights reserved.
             </Text>
-            <Pressable onPress={() => setShowDebug((v) => !v)} style={styles.debugToggle}>
+            <Pressable
+              onPress={() => setShowDebug((v) => !v)}
+              style={styles.debugToggle}
+            >
               <Text style={styles.debugToggleText}>
-                {showDebug ? 'Hide Debug' : 'Debug'}
+                {showDebug ? "Hide Debug" : "Debug"}
               </Text>
             </Pressable>
           </View>
@@ -235,11 +261,16 @@ export function LoginScreen({ navigation }: Props) {
                 <Pressable
                   disabled={isTesting}
                   onPress={runNetworkTest}
-                  style={[styles.debugRunBtn, isTesting && styles.debugRunBtnDisabled]}
+                  style={[
+                    styles.debugRunBtn,
+                    isTesting && styles.debugRunBtnDisabled,
+                  ]}
                 >
-                  {isTesting
-                    ? <ActivityIndicator color="#fff" size="small" />
-                    : <Text style={styles.debugRunText}>Run Test</Text>}
+                  {isTesting ? (
+                    <ActivityIndicator color="#fff" size="small" />
+                  ) : (
+                    <Text style={styles.debugRunText}>Run Test</Text>
+                  )}
                 </Pressable>
               </View>
               <ScrollView
@@ -247,11 +278,17 @@ export function LoginScreen({ navigation }: Props) {
                 style={styles.debugLog}
                 contentContainerStyle={styles.debugLogContent}
               >
-                {debugLogs.length === 0
-                  ? <Text style={styles.debugLogEmpty}>Tap "Run Test" to start.</Text>
-                  : debugLogs.map((line, i) => (
-                    <Text key={i} selectable style={styles.debugLogLine}>{line}</Text>
-                  ))}
+                {debugLogs.length === 0 ? (
+                  <Text style={styles.debugLogEmpty}>
+                    Tap "Run Test" to start.
+                  </Text>
+                ) : (
+                  debugLogs.map((line, i) => (
+                    <Text key={i} selectable style={styles.debugLogLine}>
+                      {line}
+                    </Text>
+                  ))
+                )}
               </ScrollView>
             </View>
           ) : null}
@@ -269,17 +306,21 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   scroll: {
     flexGrow: 1,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
   },
   body: {
+    width: "100%",
+    maxWidth: 480,
     paddingHorizontal: 24,
     paddingTop: 56,
     paddingBottom: 32,
     gap: 32,
   },
   logoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 10,
   },
   logoIcon: {
@@ -287,13 +328,13 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 10,
     backgroundColor: colors.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   logoText: {
     color: colors.textPrimary,
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: "700",
     letterSpacing: -0.3,
   },
   heading: {
@@ -302,7 +343,7 @@ const styles = StyleSheet.create({
   title: {
     color: colors.textPrimary,
     fontSize: 32,
-    fontWeight: '800',
+    fontWeight: "800",
     letterSpacing: -0.75,
     lineHeight: 38,
   },
@@ -318,16 +359,16 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   labelRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   fieldLabel: {
     color: colors.textMuted,
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: "700",
     letterSpacing: 1,
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
   },
   input: {
     height: 52,
@@ -340,32 +381,32 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   inputError: {
-    borderColor: '#F97066',
+    borderColor: "#F97066",
   },
   passwordWrap: {
-    position: 'relative',
+    position: "relative",
   },
   passwordInput: {
     paddingRight: 48,
   },
   eyeButton: {
-    position: 'absolute',
+    position: "absolute",
     right: 14,
     top: 0,
     bottom: 0,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   errorBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     borderRadius: 12,
-    backgroundColor: '#FFF1F1',
+    backgroundColor: "#FFF1F1",
     paddingHorizontal: 14,
     paddingVertical: 12,
   },
   errorText: {
-    color: '#B42318',
+    color: "#B42318",
     fontSize: 13,
     lineHeight: 18,
     flex: 1,
@@ -374,9 +415,9 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: 999,
     backgroundColor: colors.accent,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 8,
     marginTop: 4,
   },
@@ -384,15 +425,15 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   signInBtnText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: "700",
     letterSpacing: 0.2,
   },
   signupRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
   signupLabel: {
     color: colors.textSecondary,
@@ -401,12 +442,13 @@ const styles = StyleSheet.create({
   signupLink: {
     color: colors.accent,
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   footer: {
+    width: "100%",
+    maxWidth: 480,
     paddingVertical: 24,
-    paddingHorizontal: 24,
-    alignItems: 'center',
+    alignItems: "center",
     borderTopWidth: 1,
     borderTopColor: colors.border,
     gap: 8,
@@ -414,7 +456,7 @@ const styles = StyleSheet.create({
   footerText: {
     color: colors.textMuted,
     fontSize: 12,
-    textAlign: 'center',
+    textAlign: "center",
   },
   debugToggle: {
     paddingVertical: 4,
@@ -426,44 +468,45 @@ const styles = StyleSheet.create({
   debugToggleText: {
     color: colors.textMuted,
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   debugPanel: {
-    marginHorizontal: 16,
+    width: "100%",
+    maxWidth: 480,
     marginBottom: 24,
     borderRadius: 12,
-    backgroundColor: '#0d1117',
-    overflow: 'hidden',
+    backgroundColor: "#0d1117",
+    overflow: "hidden",
   },
   debugHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#30363d',
+    borderBottomColor: "#30363d",
   },
   debugTitle: {
-    color: '#e6edf3',
+    color: "#e6edf3",
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   debugRunBtn: {
-    backgroundColor: '#238636',
+    backgroundColor: "#238636",
     borderRadius: 6,
     paddingHorizontal: 14,
     paddingVertical: 6,
     minWidth: 80,
-    alignItems: 'center',
+    alignItems: "center",
   },
   debugRunBtnDisabled: {
     opacity: 0.6,
   },
   debugRunText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   debugLog: {
     height: 260,
@@ -473,14 +516,14 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   debugLogEmpty: {
-    color: '#8b949e',
+    color: "#8b949e",
     fontSize: 12,
-    fontStyle: 'italic',
+    fontStyle: "italic",
   },
   debugLogLine: {
-    color: '#e6edf3',
+    color: "#e6edf3",
     fontSize: 11,
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace",
     lineHeight: 18,
   },
 });

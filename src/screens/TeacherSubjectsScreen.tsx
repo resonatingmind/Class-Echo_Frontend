@@ -28,7 +28,6 @@ import {
   SelectionItem,
 } from "../components/common/SelectionBottomSheet";
 import { useAuth } from '../context/AuthContext';
-import { TeacherDashboardHeader } from "../components/teacher/TeacherDashboardHeader";
 import { TeacherAssignmentTable } from "../components/teacher/TeacherAssignmentTable";
 import { TeacherFilters } from "../components/teacher/TeacherFilters";
 import { ActiveFilterChips } from "../components/teacher/ActiveFilterChips";
@@ -301,8 +300,6 @@ export function TeacherSubjectsScreen({ navigation }: Props) {
           </View>
         ) : (
           <>
-            <TeacherDashboardHeader />
-
             <TeacherFilters
               search={search}
               onSearchChange={setSearch}

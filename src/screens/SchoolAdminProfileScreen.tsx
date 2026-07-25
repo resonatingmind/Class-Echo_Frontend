@@ -24,6 +24,7 @@ import {
   uploadSchoolLogo,
 } from "../lib/api";
 import { RootStackParamList } from "../navigation/AppNavigator";
+import { ScreenHeader } from "../components/common/ScreenHeader";
 import { colors } from "../theme/colors";
 import { SchoolAdminProfileOut } from "../types/api";
 
@@ -149,27 +150,19 @@ export function SchoolAdminProfileScreen({ navigation }: Props) {
 
 
   return (
-    <SafeAreaView edges={["top"]} style={styles.safe}>
-      <View style={styles.header}>
-        <Pressable
-          style={styles.headerLeft}
-          onPress={() => {
-            if (navigation.canGoBack()) {
-              navigation.goBack();
-            } else {
-              navigation.navigate("SchoolAdminTabs", {
-                screen: "SchoolAdminProfile",
-              });
-            }
-          }}
-        >
-          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
-        </Pressable>
-
-        <Text style={styles.headerTitle}>My Profile</Text>
-
-        <View style={styles.headerRight} />
-      </View>
+    <SafeAreaView edges={[]} style={styles.safe}>
+      <ScreenHeader
+        title="My Profile"
+        onBack={() => {
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          } else {
+            navigation.navigate("SchoolAdminTabs", {
+              screen: "SchoolAdminProfile",
+            });
+          }
+        }}
+      />
 
       {isLoading ? (
         <View style={styles.center}>
@@ -343,37 +336,6 @@ export function SchoolAdminProfileScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
-  // header: {
-  //   paddingHorizontal: 20,
-  //   paddingVertical: 14,
-  //   backgroundColor: colors.surface,
-  //   borderBottomWidth: 1,
-  //   borderBottomColor: colors.border,
-  // },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-  },
-
-  // headerTitle: { fontSize: 18, fontWeight: "800", color: colors.textPrimary },
-  headerTitle: {
-    flex: 1,
-    textAlign: "center",
-    fontSize: 24,
-    fontWeight: "700",
-    color: colors.textPrimary,
-  },
-  headerLeft: {
-    width: 40,
-    justifyContent: "center",
-    alignItems: "flex-start",
-  },
-  headerRight: {
-    width: 40,
-  },
   center: { flex: 1, alignItems: "center", justifyContent: "center" },
   scroll: { padding: 20, paddingBottom: 32, gap: 18 },
   hero: { alignItems: "center", gap: 12 },

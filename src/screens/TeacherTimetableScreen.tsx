@@ -18,6 +18,7 @@ import { InfoState } from "../components/InfoState";
 import { useAuth } from "../context/AuthContext";
 import { getTeacherTimetable } from "../lib/api";
 import { TIMETABLE_DAYS, TimetableEntryOut } from "../types/api";
+import { ScreenHeader } from "../components/common/ScreenHeader";
 import { colors } from "../theme/colors";
 
 const WEEKDAYS = TIMETABLE_DAYS;
@@ -80,22 +81,22 @@ export function TeacherTimetableScreen() {
   const weeklyCount = entries.length;
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
-      <View style={styles.header}>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.title}>My Timetable</Text>
-          <Text style={styles.subtitle}>
-            {weeklyCount > 0
-              ? `${weeklyCount} period${weeklyCount === 1 ? "" : "s"} this week`
-              : "Set by your school admin"}
-          </Text>
-        </View>
-
-        <View style={styles.viewOnlyPill}>
-          <Ionicons name="eye-outline" size={14} color={colors.accentDark} />
-          <Text style={styles.viewOnlyText}>View only</Text>
-        </View>
-      </View>
+    <SafeAreaView style={styles.container} edges={[]}>
+      <ScreenHeader
+        variant="large"
+        title="My Timetable"
+        subtitle={
+          weeklyCount > 0
+            ? `${weeklyCount} period${weeklyCount === 1 ? "" : "s"} this week`
+            : "Set by your school admin"
+        }
+        rightActions={
+          <View style={styles.viewOnlyPill}>
+            <Ionicons name="eye-outline" size={14} color={colors.accentDark} />
+            <Text style={styles.viewOnlyText}>View only</Text>
+          </View>
+        }
+      />
 
       <View style={styles.daySelectorWrap}>
         <DaySelector selectedDay={selectedDay} onSelectDay={setSelectedDay} />
@@ -143,26 +144,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-  },
-
-  header: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingTop: 12,
-  },
-
-  title: {
-    fontSize: 26,
-    fontWeight: "800",
-    color: colors.textPrimary,
-  },
-
-  subtitle: {
-    marginTop: 4,
-    fontSize: 14,
-    color: colors.textSecondary,
   },
 
   viewOnlyPill: {

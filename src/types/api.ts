@@ -47,6 +47,7 @@ export type TeacherOut = {
   school_id: number | null;
   school_name: string | null;
   created_at: string;
+  status: string;
 };
 
 export type TeacherBrief = {
@@ -59,6 +60,7 @@ export type SchoolAdminProfileOut = {
   id: number;
   name: string;
   email: string;
+  status: string;
   profile_pic_url: string | null;
   school_id: number;
   school_name: string;

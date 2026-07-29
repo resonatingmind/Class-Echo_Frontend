@@ -17,6 +17,10 @@ import {
   getPublicSchoolClasses,
   getPublicSchools,
   studentSignup,
+  registerTeacher,
+  registerSchool,
+  getTeacherMe,
+  getSchoolAdminMe,
 } from "../lib/api";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { colors } from "../theme/colors";
@@ -110,15 +114,88 @@ const dotStyles = StyleSheet.create({
   done: { backgroundColor: colors.accentDark },
 });
 
+
+// ── Role Tabs ─────────────────────────────────────────────────────────────────
+
+function RoleTabs({
+  role,
+  setRole,
+}: {
+  role: "student" | "teacher" | "school";
+  setRole: (r: "student" | "teacher" | "school") => void;
+}) {
+  return (
+    <View style={roleStyles.container}>
+      <Pressable
+        style={[roleStyles.tab, role === "student" && roleStyles.activeTab]}
+        onPress={() => setRole("student")}
+      >
+        <Text style={[roleStyles.tabText, role === "student" && roleStyles.activeText]}>Student</Text>
+      </Pressable>
+      <Pressable
+        style={[roleStyles.tab, role === "teacher" && roleStyles.activeTab]}
+        onPress={() => setRole("teacher")}
+      >
+        <Text style={[roleStyles.tabText, role === "teacher" && roleStyles.activeText]}>Teacher</Text>
+      </Pressable>
+      <Pressable
+        style={[roleStyles.tab, role === "school" && roleStyles.activeTab]}
+        onPress={() => setRole("school")}
+      >
+        <Text style={[roleStyles.tabText, role === "school" && roleStyles.activeText]}>School</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+const roleStyles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    backgroundColor: colors.border,
+    borderRadius: 12,
+    padding: 4,
+    marginHorizontal: 24,
+    marginTop: 12,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: "center",
+    borderRadius: 8,
+  },
+  activeTab: {
+    backgroundColor: colors.surface,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  tabText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: colors.textSecondary,
+  },
+  activeText: {
+    color: colors.textPrimary,
+  },
+});
+
 // ── Main Screen ───────────────────────────────────────────────────────────────
 
 export function SignupScreen({ navigation }: Props) {
   const { signInDirect } = useAuth();
 
+  const [role, setRole] = useState<"student" | "teacher" | "school">("student");
+
   // Step 1 — credentials
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // Step 1 — school admin specific
+  const [schoolName, setSchoolName] = useState("");
+  const [schoolAddress, setSchoolAddress] = useState("");
 
   // Step 2 — school
   const [schools, setSchools] = useState<SchoolOut[]>([]);
@@ -185,9 +262,21 @@ export function SignupScreen({ navigation }: Props) {
     }
   }
 
+  // Reset steps and state when role changes
+  useEffect(() => {
+    setStep(1);
+    setError(null);
+  }, [role]);
+
   function nextStep() {
     setError(null);
     if (step === 1) {
+      if (role === "school") {
+        if (!schoolName.trim()) {
+          setError("Please enter your school name");
+          return;
+        }
+      }
       if (!name.trim()) {
         setError("Please enter your full name");
         return;
@@ -200,32 +289,67 @@ export function SignupScreen({ navigation }: Props) {
         setError("Password must be at least 6 characters");
         return;
       }
-      setStep(2);
+      if (role === "school") {
+        void handleCreateAccount();
+      } else {
+        setStep(2);
+      }
     } else if (step === 2) {
       if (!selectedSchool) {
         setError("Please select a school");
         return;
       }
-      setStep(3);
+      if (role === "teacher") {
+        void handleCreateAccount();
+      } else {
+        setStep(3);
+      }
     }
   }
 
   async function handleCreateAccount() {
-    if (!selectedClass) {
-      setError("Please select a class");
-      return;
-    }
     setError(null);
     setSubmitting(true);
     try {
-      const resp = await studentSignup({
-        name: name.trim(),
-        email: email.trim(),
-        password,
-        school_id: selectedSchool!.id,
-        class_id: selectedClass.id,
-      });
-      signInDirect(resp.access_token, resp.role);
+      if (role === "student") {
+        if (!selectedClass) {
+          setError("Please select a class");
+          setSubmitting(false);
+          return;
+        }
+        const resp = await studentSignup({
+          name: name.trim(),
+          email: email.trim(),
+          password,
+          school_id: selectedSchool!.id,
+          class_id: selectedClass.id,
+        });
+        signInDirect(resp.access_token, resp.role);
+      } else if (role === "teacher") {
+        if (!selectedSchool) {
+          setError("Please select a school");
+          setSubmitting(false);
+          return;
+        }
+        const resp = await registerTeacher({
+          name: name.trim(),
+          email: email.trim(),
+          password,
+          school_id: selectedSchool!.id,
+        });
+        const me = await getTeacherMe(resp.access_token);
+        signInDirect(resp.access_token, resp.role, me.status);
+      } else if (role === "school") {
+        const resp = await registerSchool({
+          school_name: schoolName.trim(),
+          school_address: schoolAddress.trim() || undefined,
+          admin_name: name.trim(),
+          admin_email: email.trim(),
+          admin_password: password,
+        });
+        const me = await getSchoolAdminMe(resp.access_token);
+        signInDirect(resp.access_token, resp.role, me.status);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Signup failed");
     } finally {
@@ -248,26 +372,62 @@ export function SignupScreen({ navigation }: Props) {
                 ? "Choose School"
                 : "Choose Class"}
           </Text>
-          <StepDots step={step} />
+          {role === "student" ? (
+            <StepDots step={step} />
+          ) : role === "teacher" ? (
+            <View style={dotStyles.row}>
+              {[1, 2].map((s) => (
+                <View
+                  key={s}
+                  style={[
+                    dotStyles.dot,
+                    s === step ? dotStyles.active : s < step ? dotStyles.done : null,
+                  ]}
+                />
+              ))}
+            </View>
+          ) : null}
         </View>
         <View style={styles.backBtn} />
       </View>
 
+      {step === 1 && <RoleTabs role={role} setRole={setRole} />}
+
       {/* Step 1 — Credentials */}
       {step === 1 && (
         <View style={styles.body}>
-          <Text style={styles.stepHint}>Step 1 of 3 — Your Details</Text>
+          <Text style={styles.stepHint}>
+            {role === "student" ? "Step 1 of 3 — Your Details" : role === "teacher" ? "Step 1 of 2 — Your Details" : "Your Details"}
+          </Text>
           <View style={styles.form}>
+            {role === "school" && (
+              <>
+                <Field
+                  autoCapitalize="words"
+                  label="School Name"
+                  placeholder="Springfield High"
+                  value={schoolName}
+                  onChangeText={setSchoolName}
+                />
+                <Field
+                  autoCapitalize="words"
+                  label="School Address (optional)"
+                  placeholder="123 Main St"
+                  value={schoolAddress}
+                  onChangeText={setSchoolAddress}
+                />
+              </>
+            )}
             <Field
               autoCapitalize="words"
-              label="Full Name"
+              label={role === "school" ? "Your Name" : "Full Name"}
               placeholder="Alex Morgan"
               value={name}
               onChangeText={setName}
             />
             <Field
               keyboardType="email-address"
-              label="Email"
+              label={role === "school" ? "Your Email" : "Email"}
               placeholder="alex@school.edu"
               value={email}
               onChangeText={setEmail}
@@ -281,10 +441,27 @@ export function SignupScreen({ navigation }: Props) {
             />
           </View>
           {error ? <Text style={styles.error}>{error}</Text> : null}
-          <Pressable onPress={nextStep} style={styles.btn}>
-            <Text style={styles.btnText}>Continue</Text>
-            <Ionicons color="#fff" name="arrow-forward" size={18} />
+          <Pressable onPress={nextStep} style={styles.btn} disabled={submitting}>
+            {submitting ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <>
+                <Text style={styles.btnText}>{role === "school" ? "Create Account" : "Continue"}</Text>
+                {role === "school" ? (
+                  <Ionicons color="#fff" name="checkmark" size={18} />
+                ) : (
+                  <Ionicons color="#fff" name="arrow-forward" size={18} />
+                )}
+              </>
+            )}
           </Pressable>
+          {role !== "student" && (
+            <Text style={{ fontSize: 12, color: colors.textMuted, textAlign: "center", marginTop: -8 }}>
+              {role === "teacher" 
+                ? "Your school's admin will need to approve your request."
+                : "Class Echo's platform admin will need to approve your school."}
+            </Text>
+          )}
           <View style={styles.loginRow}>
             <Text style={styles.loginText}>Already have an account?</Text>
             <Pressable onPress={() => navigation.navigate("Login")}>
@@ -299,7 +476,7 @@ export function SignupScreen({ navigation }: Props) {
         <View style={styles.bodyFlex}>
           <View style={styles.searchWrap}>
             <Text style={styles.stepHint}>
-              Step 2 of 3 — Select Your School
+              {role === "teacher" ? "Step 2 of 2 — Select Your School" : "Step 2 of 3 — Select Your School"}
             </Text>
             <View style={styles.searchBar}>
               <Ionicons
@@ -370,10 +547,21 @@ export function SignupScreen({ navigation }: Props) {
           <View style={styles.bottomBtn}>
             <Pressable
               onPress={nextStep}
-              style={[styles.btn, !selectedSchool && styles.btnDisabled]}
+              disabled={submitting || !selectedSchool}
+              style={[styles.btn, (!selectedSchool || submitting) && styles.btnDisabled]}
             >
-              <Text style={styles.btnText}>Continue</Text>
-              <Ionicons color="#fff" name="arrow-forward" size={18} />
+              {submitting ? (
+                <ActivityIndicator color="#fff" size="small" />
+              ) : (
+                <>
+                  <Text style={styles.btnText}>{role === "teacher" ? "Create Account" : "Continue"}</Text>
+                  {role === "teacher" ? (
+                    <Ionicons color="#fff" name="checkmark" size={18} />
+                  ) : (
+                    <Ionicons color="#fff" name="arrow-forward" size={18} />
+                  )}
+                </>
+              )}
             </Pressable>
           </View>
         </View>

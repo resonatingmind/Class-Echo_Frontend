@@ -1006,6 +1006,36 @@ export async function studentSignup(payload: StudentSignupPayload) {
   });
 }
 
+export type RegisterTeacherPayload = {
+  name: string;
+  email: string;
+  password: string;
+  school_id: number;
+};
+
+export async function registerTeacher(payload: RegisterTeacherPayload) {
+  return request<TokenResponse>("/auth/teacher/register", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export type RegisterSchoolPayload = {
+  school_name: string;
+  school_address?: string;
+  admin_name: string;
+  admin_email: string;
+  admin_password: string;
+};
+
+export async function registerSchool(payload: RegisterSchoolPayload) {
+  return request<TokenResponse>("/auth/school/register", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+
 export async function getTeacherMe(token: string) {
   return request<TeacherOut>("/teacher/me", {}, token);
 }

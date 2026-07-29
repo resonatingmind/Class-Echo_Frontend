@@ -30,6 +30,7 @@ import { SchoolAdminTimetableScreen } from "../screens/SchoolAdminTimetableScree
 // Auth screens
 import { LoginScreen } from "../screens/LoginScreen";
 import { SignupScreen } from "../screens/SignupScreen";
+import { AwaitingApprovalScreen } from "../screens/AwaitingApprovalScreen";
 
 // Student screens
 import { StudentHomeScreen } from "../screens/StudentHomeScreen";
@@ -48,6 +49,7 @@ export type RootStackParamList = {
   // Auth
   Login: undefined;
   Signup: undefined;
+  AwaitingApproval: undefined;
   // Super Admin
   AdminSchools: undefined;
   AdminCreateSchool: undefined;
@@ -174,6 +176,8 @@ export function AppNavigator() {
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Signup" component={SignupScreen} />
         </>
+      ) : (session.role === "school_admin" || session.role === "teacher") && session.status !== "active" ? (
+        <Stack.Screen name="AwaitingApproval" component={AwaitingApprovalScreen} />
       ) : session.role === "admin" ? (
         <>
           <Stack.Screen name="AdminSchools" component={SchoolsScreen} />

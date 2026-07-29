@@ -4,6 +4,9 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "@react-navigation/native";
 import {
   ActivityIndicator,
+  Alert,
+  Modal,
+  Platform,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -16,7 +19,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AppLogo } from "../components/ui/AppLogo";
 import { useAuth } from "../context/AuthContext";
-import { getAdminSchools } from "../lib/api";
+import { getAdminSchools, deleteAdminSchool, suspendAdminSchool, reactivateAdminSchool } from "../lib/api";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { AppTheme } from "../theme/AppTheme";
 import { SchoolOut } from "../types/api";
@@ -26,9 +29,11 @@ type Props = NativeStackScreenProps<RootStackParamList, "AdminSchools">;
 function SchoolCard({
   school,
   onPress,
+  onOptionsPress,
 }: {
   school: SchoolOut;
   onPress: () => void;
+  onOptionsPress: () => void;
 }) {
   const initials = school.name
     .split(" ")
@@ -70,44 +75,73 @@ function SchoolCard({
   }
 
   return (
-    <Pressable onPress={onPress} style={styles.card}>
-      <View style={styles.cardTop}>
-        <View style={styles.cardIcon}>
-          <Text style={styles.cardInitials}>{initials}</Text>
-        </View>
-        <View style={styles.cardBody}>
-          <Text style={styles.cardName} numberOfLines={1}>
-            {school.name}
-          </Text>
-          <View style={styles.addressRow}>
-            <Ionicons color={AppTheme.colors.textSecondary} name="location-outline" size={12} />
-            <Text style={styles.cardAddress} numberOfLines={1}>
-              {school.address ?? "Address not added"}
+    <View style={styles.card}>
+      <View style={styles.cardRow}>
+        <Pressable onPress={onPress} style={styles.cardMainPressable}>
+          <View style={styles.cardTop}>
+            <View style={styles.cardIcon}>
+              <Text style={styles.cardInitials}>{initials}</Text>
+            </View>
+            <View style={styles.cardBody}>
+              <Text style={styles.cardName} numberOfLines={1}>
+                {school.name}
+              </Text>
+              <View style={styles.addressRow}>
+                <Ionicons color={AppTheme.colors.textSecondary} name="location-outline" size={12} />
+                <Text style={styles.cardAddress} numberOfLines={1}>
+                  {school.address ?? "Address not added"}
+                </Text>
+              </View>
+            </View>
+          </View>
+        </Pressable>
+        <Pressable onPress={onOptionsPress} hitSlop={12} style={styles.optionsBtn}>
+          <Ionicons color={AppTheme.colors.textSecondary} name="ellipsis-vertical" size={18} />
+        </Pressable>
+      </View>
+
+      <Pressable onPress={onPress}>
+        <View style={styles.cardDivider} />
+        <View style={styles.cardMeta}>
+          <View style={styles.metaItem}>
+            <Ionicons color={AppTheme.colors.textSecondary} name="grid-outline" size={14} />
+            <Text style={styles.metaText}>
+              Admin: {hasAdmin ? school.admin!.name : "—"}
+            </Text>
+          </View>
+          <View style={[styles.statusBadge, badgeStyle]}>
+            <View style={[styles.statusDot, dotStyle]} />
+            <Text style={[styles.statusText, textStyle]}>
+              {statusText}
             </Text>
           </View>
         </View>
-        <Ionicons color={AppTheme.colors.textSecondary} name="ellipsis-vertical" size={18} />
-      </View>
-
-      <View style={styles.cardDivider} />
-
-      <View style={styles.cardMeta}>
-        <View style={styles.metaItem}>
-          <Ionicons color={AppTheme.colors.textSecondary} name="grid-outline" size={14} />
-          <Text style={styles.metaText}>
-            Admin: {hasAdmin ? school.admin!.name : "—"}
-          </Text>
-        </View>
-        <View style={[styles.statusBadge, badgeStyle]}>
-          <View style={[styles.statusDot, dotStyle]} />
-          <Text style={[styles.statusText, textStyle]}>
-            {statusText}
-          </Text>
-        </View>
-      </View>
-    </Pressable>
+      </Pressable>
+    </View>
   );
 }
+
+const showAlert = (title: string, message: string, buttons?: { text: string; onPress?: () => void; style?: string }[]) => {
+  if (Platform.OS === 'web') {
+    if (buttons && buttons.length > 1) {
+      const confirmResult = window.confirm(`${title}\n\n${message}`);
+      if (confirmResult) {
+        const okBtn = buttons.find(b => b.style !== 'cancel');
+        if (okBtn && okBtn.onPress) okBtn.onPress();
+      } else {
+        const cancelBtn = buttons.find(b => b.style === 'cancel');
+        if (cancelBtn && cancelBtn.onPress) cancelBtn.onPress();
+      }
+    } else {
+      window.alert(`${title}\n\n${message}`);
+      if (buttons && buttons[0] && buttons[0].onPress) {
+        buttons[0].onPress();
+      }
+    }
+  } else {
+    Alert.alert(title, message, buttons as any);
+  }
+};
 
 export function SchoolsScreen({ navigation }: Props) {
   const { session, signOut } = useAuth();
@@ -116,6 +150,7 @@ export function SchoolsScreen({ navigation }: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedSchoolOptions, setSelectedSchoolOptions] = useState<SchoolOut | null>(null);
 
   const loadSchools = useCallback(
     async (silent = false) => {
@@ -144,6 +179,50 @@ export function SchoolsScreen({ navigation }: Props) {
     setRefreshing(true);
     void loadSchools(true);
   }, [loadSchools]);
+
+  const handleToggleSuspend = async (schoolId: number, suspend: boolean) => {
+    if (!session) return;
+    try {
+      if (suspend) {
+        await suspendAdminSchool(session.token, schoolId);
+        showAlert("Success", "School has been suspended.");
+      } else {
+        await reactivateAdminSchool(session.token, schoolId);
+        showAlert("Success", "School has been reactivated.");
+      }
+      void loadSchools(true);
+    } catch (err) {
+      showAlert("Error", err instanceof Error ? err.message : "Failed to toggle status");
+    }
+  };
+
+  const handleDeleteSchoolPrompt = (school: SchoolOut) => {
+    showAlert(
+      "Delete School",
+      `Are you sure you want to delete "${school.name}"? This action cannot be undone.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            if (!session) return;
+            try {
+              await deleteAdminSchool(session.token, school.id);
+              showAlert("Deleted", "School has been deleted.");
+              void loadSchools(true);
+            } catch (err) {
+              showAlert("Error", err instanceof Error ? err.message : "Failed to delete school");
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  const handleSchoolOptions = (school: SchoolOut) => {
+    setSelectedSchoolOptions(school);
+  };
 
   const filtered = schools.filter((s) => {
     const hay = [s.name, s.address ?? "", s.admin?.name ?? "", s.admin?.email ?? ""]
@@ -270,6 +349,7 @@ export function SchoolsScreen({ navigation }: Props) {
                       onPress={() =>
                         navigation.navigate("AdminSchoolDetail", { schoolId: school.id })
                       }
+                      onOptionsPress={() => handleSchoolOptions(school)}
                       school={school}
                     />
                   ))}
@@ -279,6 +359,72 @@ export function SchoolsScreen({ navigation }: Props) {
           </View>
         </ScrollView>
       </View>
+
+      {/* Quick Actions Modal */}
+      <Modal
+        animationType="fade"
+        transparent
+        visible={!!selectedSchoolOptions}
+        onRequestClose={() => setSelectedSchoolOptions(null)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalSheet}>
+            <View style={styles.modalHeader}>
+              <Text numberOfLines={1} style={styles.modalTitle}>{selectedSchoolOptions?.name}</Text>
+              <Pressable hitSlop={8} onPress={() => setSelectedSchoolOptions(null)}>
+                <Ionicons color={AppTheme.colors.textSecondary} name="close" size={22} />
+              </Pressable>
+            </View>
+            
+            <Pressable
+              style={styles.modalActionBtn}
+              onPress={() => {
+                const s = selectedSchoolOptions;
+                setSelectedSchoolOptions(null);
+                if (s) navigation.navigate("AdminSchoolDetail", { schoolId: s.id });
+              }}
+            >
+              <Ionicons name="eye-outline" size={18} color={AppTheme.colors.textPrimary} />
+              <Text style={styles.modalActionText}>View Details</Text>
+            </Pressable>
+
+            {selectedSchoolOptions?.admin ? (
+              <Pressable
+                style={styles.modalActionBtn}
+                onPress={() => {
+                  const s = selectedSchoolOptions;
+                  setSelectedSchoolOptions(null);
+                  if (s) {
+                    const isSuspended = s.admin?.status === 'suspended';
+                    void handleToggleSuspend(s.id, !isSuspended);
+                  }
+                }}
+              >
+                <Ionicons 
+                  name={selectedSchoolOptions.admin?.status === 'suspended' ? "checkmark-circle-outline" : "ban-outline"} 
+                  size={18} 
+                  color={selectedSchoolOptions.admin?.status === 'suspended' ? AppTheme.colors.success : AppTheme.colors.warning} 
+                />
+                <Text style={styles.modalActionText}>
+                  {selectedSchoolOptions.admin?.status === 'suspended' ? "Reactivate School" : "Suspend School"}
+                </Text>
+              </Pressable>
+            ) : null}
+
+            <Pressable
+              style={styles.modalActionBtn}
+              onPress={() => {
+                const s = selectedSchoolOptions;
+                setSelectedSchoolOptions(null);
+                if (s) handleDeleteSchoolPrompt(s);
+              }}
+            >
+              <Ionicons name="trash-outline" size={18} color={AppTheme.colors.error} />
+              <Text style={[styles.modalActionText, { color: AppTheme.colors.error }]}>Delete School</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -388,6 +534,8 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.body,
     padding: 0,
+    // @ts-ignore
+    outlineStyle: 'none',
   },
   list: {
     gap: AppTheme.spacing.m,
@@ -428,6 +576,20 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderWidth: 1,
     borderColor: AppTheme.colors.border,
+  },
+  cardRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  cardMainPressable: {
+    flex: 1,
+  },
+  optionsBtn: {
+    width: 48,
+    height: 48,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: AppTheme.spacing.m,
   },
   cardTop: {
     flexDirection: "row",
@@ -567,5 +729,48 @@ const styles = StyleSheet.create({
   },
   statChipTextInfo: {
     color: "#156FD6",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalSheet: {
+    width: "100%",
+    maxWidth: 400,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
+    padding: 24,
+    gap: 12,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  modalTitle: {
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.h3,
+    flex: 1,
+    marginRight: 8,
+  },
+  modalActionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: AppTheme.spacing.m,
+    paddingVertical: AppTheme.spacing.m,
+    paddingHorizontal: AppTheme.spacing.l,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.background,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+  },
+  modalActionText: {
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.body,
+    fontWeight: "600",
   },
 });

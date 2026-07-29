@@ -412,6 +412,8 @@ const styles = StyleSheet.create({
     ...AppTheme.typography.body,
     padding: 0,
     minHeight: 24,
+    // @ts-ignore
+    outlineStyle: 'none',
   },
   inputMultiline: {
     minHeight: 64,

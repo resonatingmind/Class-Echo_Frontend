@@ -1597,3 +1597,20 @@ export async function rejectAdminSchool(
     token,
   );
 }
+
+export async function suspendAdminSchool(token: string, schoolId: number) {
+  return request<SchoolOut>(
+    `/admin/schools/${schoolId}/suspend`,
+    { method: "POST" },
+    token,
+  );
+}
+
+export async function reactivateAdminSchool(token: string, schoolId: number) {
+  return request<SchoolOut>(
+    `/admin/schools/${schoolId}/reactivate`,
+    { method: "POST" },
+    token,
+  );
+}
+

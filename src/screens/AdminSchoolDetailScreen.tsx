@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Alert,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -15,7 +16,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '../context/AuthContext';
-import { deleteAdminSchool, getAdminSchool, getAdminSchoolClasses, updateAdminSchool, approveAdminSchool, rejectAdminSchool } from '../lib/api';
+import { deleteAdminSchool, getAdminSchool, getAdminSchoolClasses, updateAdminSchool, approveAdminSchool, rejectAdminSchool, suspendAdminSchool, reactivateAdminSchool } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { AppTheme } from '../theme/AppTheme';
 import { AppLogo } from '../components/ui/AppLogo';
@@ -131,6 +132,28 @@ function ClassRow({
   );
 }
 
+const showAlert = (title: string, message: string, buttons?: { text: string; onPress?: () => void; style?: string }[]) => {
+  if (Platform.OS === 'web') {
+    if (buttons && buttons.length > 1) {
+      const confirmResult = window.confirm(`${title}\n\n${message}`);
+      if (confirmResult) {
+        const okBtn = buttons.find(b => b.style !== 'cancel');
+        if (okBtn && okBtn.onPress) okBtn.onPress();
+      } else {
+        const cancelBtn = buttons.find(b => b.style === 'cancel');
+        if (cancelBtn && cancelBtn.onPress) cancelBtn.onPress();
+      }
+    } else {
+      window.alert(`${title}\n\n${message}`);
+      if (buttons && buttons[0] && buttons[0].onPress) {
+        buttons[0].onPress();
+      }
+    }
+  } else {
+    Alert.alert(title, message, buttons as any);
+  }
+};
+
 export function AdminSchoolDetailScreen({ navigation, route }: Props) {
   const { session, signOut } = useAuth();
   const [school, setSchool] = useState<SchoolOut | null>(null);
@@ -205,9 +228,9 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
     try {
       const updated = await approveAdminSchool(session.token, school.id);
       setSchool(updated);
-      Alert.alert('Success', 'School registration has been approved successfully.');
+      showAlert('Success', 'School registration has been approved successfully.');
     } catch (e) {
-      Alert.alert('Error', e instanceof Error ? e.message : 'Could not approve school');
+      showAlert('Error', e instanceof Error ? e.message : 'Could not approve school');
     } finally {
       setActionLoading(false);
     }
@@ -222,7 +245,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
       setSchool(updated);
       setShowRejectModal(false);
       setRejectReason('');
-      Alert.alert('Rejected', 'School registration request has been rejected.');
+      showAlert('Rejected', 'School registration request has been rejected.');
     } catch (e) {
       setRejectError(e instanceof Error ? e.message : 'Could not reject school');
     } finally {
@@ -230,9 +253,50 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
     }
   };
 
+  const handleSuspend = () => {
+    if (!session || !school) return;
+    showAlert(
+      'Suspend School',
+      `Are you sure you want to suspend "${school.name}"? The school admin and staff will lose access to the system.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Suspend',
+          style: 'destructive',
+          onPress: async () => {
+            setActionLoading(true);
+            try {
+              const updated = await suspendAdminSchool(session.token, school.id);
+              setSchool(updated);
+              showAlert('Success', 'School has been suspended.');
+            } catch (e) {
+              showAlert('Error', e instanceof Error ? e.message : 'Could not suspend school');
+            } finally {
+              setActionLoading(false);
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  const handleReactivate = async () => {
+    if (!session || !school) return;
+    setActionLoading(true);
+    try {
+      const updated = await reactivateAdminSchool(session.token, school.id);
+      setSchool(updated);
+      showAlert('Success', 'School has been reactivated successfully.');
+    } catch (e) {
+      showAlert('Error', e instanceof Error ? e.message : 'Could not reactivate school');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const handleDelete = () => {
     if (!session || !school) return;
-    Alert.alert(
+    showAlert(
       'Delete School',
       `Are you sure you want to delete "${school.name}"? This action cannot be undone.`,
       [
@@ -245,7 +309,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
               await deleteAdminSchool(session.token, school.id);
               navigation.goBack();
             } catch (e) {
-              Alert.alert('Error', e instanceof Error ? e.message : 'Could not delete school');
+              showAlert('Error', e instanceof Error ? e.message : 'Could not delete school');
             }
           },
         },
@@ -376,14 +440,21 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
                   <Text style={styles.breadcrumb}>DISTRICT MANAGEMENT</Text>
                   <Text style={styles.topTitle}>School Profile</Text>
                 </View>
-                <View style={styles.titleActions}>
-                  <Pressable onPress={openEdit} style={styles.actionBtn}>
-                    <Ionicons color={AppTheme.colors.textPrimary} name="pencil-outline" size={20} />
-                  </Pressable>
-                  <Pressable onPress={handleDelete} style={styles.actionBtn}>
-                    <Ionicons color={AppTheme.colors.error} name="trash-outline" size={20} />
-                  </Pressable>
-                </View>
+                {school ? (
+                  <View style={styles.titleActions}>
+                    {school.admin?.status === 'active' ? (
+                      <Pressable onPress={handleSuspend} style={styles.actionBtn}>
+                        <Ionicons color={AppTheme.colors.warning} name="ban-outline" size={20} />
+                      </Pressable>
+                    ) : null}
+                    <Pressable onPress={openEdit} style={styles.actionBtn}>
+                      <Ionicons color={AppTheme.colors.textPrimary} name="pencil-outline" size={20} />
+                    </Pressable>
+                    <Pressable onPress={handleDelete} style={styles.actionBtn}>
+                      <Ionicons color={AppTheme.colors.error} name="trash-outline" size={20} />
+                    </Pressable>
+                  </View>
+                ) : null}
               </View>
 
               {isLoading ? (
@@ -438,6 +509,25 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
                         This school registration has been rejected.
                         {school.admin.rejected_reason ? `\n\nReason: "${school.admin.rejected_reason}"` : ''}
                       </Text>
+                    </View>
+                  ) : school.admin?.status === 'suspended' ? (
+                    <View style={[styles.approvalCard, styles.suspendedCard]}>
+                      <View style={styles.approvalHeader}>
+                        <Ionicons color={AppTheme.colors.textSecondary} name="ban-outline" size={20} />
+                        <Text style={[styles.approvalTitle, { color: AppTheme.colors.textSecondary }]}>Account Suspended</Text>
+                      </View>
+                      <Text style={styles.approvalText}>
+                        This school's administrator account has been suspended. The admin and staff will not be able to log in.
+                      </Text>
+                      <View style={styles.approvalActions}>
+                        <Pressable
+                          onPress={handleReactivate}
+                          disabled={actionLoading}
+                          style={[styles.approveBtn, actionLoading && { opacity: 0.6 }]}
+                        >
+                          <Text style={styles.approveBtnText}>Reactivate</Text>
+                        </Pressable>
+                      </View>
                     </View>
                   ) : null}
 
@@ -567,6 +657,11 @@ const styles = StyleSheet.create({
     borderColor: AppTheme.colors.border,
     alignItems: 'center',
     gap: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   heroIconWrap: {
     width: 88,
@@ -618,6 +713,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: AppTheme.colors.border,
     overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   adminCardHeader: {
     flexDirection: 'row',
@@ -724,6 +824,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: AppTheme.colors.border,
     overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   tableHeader: {
     flexDirection: 'row',
@@ -786,6 +891,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 32,
     gap: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   emptyClassesText: {
     color: AppTheme.colors.textSecondary,
@@ -803,6 +913,10 @@ const styles = StyleSheet.create({
   rejectedCard: {
     backgroundColor: '#FDF2F2',
     borderColor: '#FDE8E8',
+  },
+  suspendedCard: {
+    backgroundColor: '#F3F4F6',
+    borderColor: '#E5E7EB',
   },
   approvalHeader: {
     flexDirection: 'row',
@@ -892,6 +1006,8 @@ const styles = StyleSheet.create({
     padding: 12,
     color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.body,
+    // @ts-ignore
+    outlineStyle: 'none',
   },
   inputMultiline: {
     minHeight: 80,

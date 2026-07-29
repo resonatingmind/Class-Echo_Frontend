@@ -174,6 +174,11 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
 
+  // Delete modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
   const load = async () => {
     if (!session) return;
     setIsLoading(true);
@@ -296,25 +301,28 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
 
   const handleDelete = () => {
     if (!session || !school) return;
-    showAlert(
-      'Delete School',
-      `Are you sure you want to delete "${school.name}"? This action cannot be undone.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteAdminSchool(session.token, school.id);
-              navigation.goBack();
-            } catch (e) {
-              showAlert('Error', e instanceof Error ? e.message : 'Could not delete school');
-            }
-          },
-        },
-      ],
-    );
+    setDeletePassword('');
+    setDeleteError(null);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!session || !school) return;
+    if (!deletePassword) {
+      setDeleteError('Password is required');
+      return;
+    }
+    setActionLoading(true);
+    setDeleteError(null);
+    try {
+      await deleteAdminSchool(session.token, school.id, deletePassword);
+      setShowDeleteModal(false);
+      navigation.goBack();
+    } catch (e) {
+      setDeleteError(e instanceof Error ? e.message : 'Could not delete school');
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   return (
@@ -419,6 +427,52 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
                 <Text style={styles.modalSaveBtnText}>Save Changes</Text>
               )}
             </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Delete School Modal */}
+      <Modal animationType="slide" transparent visible={showDeleteModal} onRequestClose={() => setShowDeleteModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalSheet}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Delete School</Text>
+              <Pressable hitSlop={8} onPress={() => setShowDeleteModal(false)}>
+                <Ionicons color={AppTheme.colors.textSecondary} name="close" size={22} />
+              </Pressable>
+            </View>
+            <Text style={styles.modalBodyText}>
+              Are you sure you want to permanently delete "{school?.name}"? This will remove all associated classes, subjects, teachers, students, and recordings.
+            </Text>
+            <Text style={[styles.inputLabel, { marginTop: 12 }]}>Admin Password *</Text>
+            <TextInput
+              secureTextEntry
+              onChangeText={setDeletePassword}
+              placeholder="••••••••"
+              placeholderTextColor={AppTheme.colors.textPlaceholder}
+              style={styles.input}
+              value={deletePassword}
+            />
+            {deleteError ? <Text style={styles.modalError}>{deleteError}</Text> : null}
+            <View style={{ flexDirection: 'row', gap: 12, marginTop: 4 }}>
+              <Pressable
+                onPress={() => setShowDeleteModal(false)}
+                style={[styles.modalCancelBtn, { flex: 1 }]}
+              >
+                <Text style={styles.modalCancelBtnText}>Cancel</Text>
+              </Pressable>
+              <Pressable
+                disabled={actionLoading}
+                onPress={() => { void confirmDelete(); }}
+                style={[styles.modalSaveBtn, { flex: 1, backgroundColor: AppTheme.colors.error }, actionLoading && { opacity: 0.6 }]}
+              >
+                {actionLoading ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={styles.modalSaveBtnText}>Confirm Delete</Text>
+                )}
+              </Pressable>
+            </View>
           </View>
         </View>
       </Modal>
@@ -991,6 +1045,12 @@ const styles = StyleSheet.create({
   modalTitle: {
     color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.h3,
+  },
+  modalBodyText: {
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.body,
+    lineHeight: 18,
+    marginBottom: 8,
   },
   inputLabel: {
     color: AppTheme.colors.textSecondary,

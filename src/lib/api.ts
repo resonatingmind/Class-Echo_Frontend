@@ -308,10 +308,16 @@ export async function updateAdminSchool(
   );
 }
 
-export async function deleteAdminSchool(token: string, schoolId: number) {
+export async function deleteAdminSchool(token: string, schoolId: number, password?: string) {
   return request<void>(
     `/admin/schools/${schoolId}`,
-    { method: "DELETE" },
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ password }),
+    },
     token,
   );
 }

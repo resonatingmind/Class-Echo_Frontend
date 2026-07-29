@@ -151,6 +151,12 @@ export function SchoolsScreen({ navigation }: Props) {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedSchoolOptions, setSelectedSchoolOptions] = useState<SchoolOut | null>(null);
+  
+  // Deletion modal states
+  const [selectedSchoolForDelete, setSelectedSchoolForDelete] = useState<SchoolOut | null>(null);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteSaving, setDeleteSaving] = useState(false);
 
   const loadSchools = useCallback(
     async (silent = false) => {
@@ -197,27 +203,29 @@ export function SchoolsScreen({ navigation }: Props) {
   };
 
   const handleDeleteSchoolPrompt = (school: SchoolOut) => {
-    showAlert(
-      "Delete School",
-      `Are you sure you want to delete "${school.name}"? This action cannot be undone.`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            if (!session) return;
-            try {
-              await deleteAdminSchool(session.token, school.id);
-              showAlert("Deleted", "School has been deleted.");
-              void loadSchools(true);
-            } catch (err) {
-              showAlert("Error", err instanceof Error ? err.message : "Failed to delete school");
-            }
-          }
-        }
-      ]
-    );
+    setDeletePassword('');
+    setDeleteError(null);
+    setSelectedSchoolForDelete(school);
+  };
+
+  const confirmDeleteSchool = async () => {
+    if (!session || !selectedSchoolForDelete) return;
+    if (!deletePassword) {
+      setDeleteError('Password is required');
+      return;
+    }
+    setDeleteSaving(true);
+    setDeleteError(null);
+    try {
+      await deleteAdminSchool(session.token, selectedSchoolForDelete.id, deletePassword);
+      setSelectedSchoolForDelete(null);
+      showAlert("Deleted", "School has been deleted successfully.");
+      void loadSchools(true);
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Failed to delete school");
+    } finally {
+      setDeleteSaving(false);
+    }
   };
 
   const handleSchoolOptions = (school: SchoolOut) => {
@@ -422,6 +430,52 @@ export function SchoolsScreen({ navigation }: Props) {
               <Ionicons name="trash-outline" size={18} color={AppTheme.colors.error} />
               <Text style={[styles.modalActionText, { color: AppTheme.colors.error }]}>Delete School</Text>
             </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Delete School Modal */}
+      <Modal animationType="slide" transparent visible={!!selectedSchoolForDelete} onRequestClose={() => setSelectedSchoolForDelete(null)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalSheet}>
+            <View style={styles.modalHeader}>
+              <Text numberOfLines={1} style={styles.modalTitle}>Delete School</Text>
+              <Pressable hitSlop={8} onPress={() => setSelectedSchoolForDelete(null)}>
+                <Ionicons color={AppTheme.colors.textSecondary} name="close" size={22} />
+              </Pressable>
+            </View>
+            <Text style={styles.modalBodyText}>
+              Are you sure you want to permanently delete "{selectedSchoolForDelete?.name}"? This will remove all associated classes, subjects, teachers, students, and recordings.
+            </Text>
+            <Text style={[styles.inputLabel, { marginTop: 12 }]}>Admin Password *</Text>
+            <TextInput
+              secureTextEntry
+              onChangeText={setDeletePassword}
+              placeholder="••••••••"
+              placeholderTextColor={AppTheme.colors.textPlaceholder}
+              style={[styles.input, { outlineStyle: "none" } as any]}
+              value={deletePassword}
+            />
+            {deleteError ? <Text style={styles.modalError}>{deleteError}</Text> : null}
+            <View style={{ flexDirection: 'row', gap: 12, marginTop: 4 }}>
+              <Pressable
+                onPress={() => setSelectedSchoolForDelete(null)}
+                style={[styles.modalCancelBtn, { flex: 1 }]}
+              >
+                <Text style={styles.modalCancelBtnText}>Cancel</Text>
+              </Pressable>
+              <Pressable
+                disabled={deleteSaving}
+                onPress={() => { void confirmDeleteSchool(); }}
+                style={[styles.modalSaveBtn, { flex: 1, backgroundColor: AppTheme.colors.error }, deleteSaving && { opacity: 0.6 }]}
+              >
+                {deleteSaving ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={styles.modalSaveBtnText}>Confirm Delete</Text>
+                )}
+              </Pressable>
+            </View>
           </View>
         </View>
       </Modal>
@@ -772,5 +826,56 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.body,
     fontWeight: "600",
+  },
+  modalBodyText: {
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.body,
+    lineHeight: 18,
+    marginBottom: 8,
+  },
+  inputLabel: {
+    color: AppTheme.colors.textSecondary,
+    fontSize: 12,
+    fontWeight: "700",
+    marginTop: 4,
+  },
+  input: {
+    backgroundColor: AppTheme.colors.background,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+    borderRadius: AppTheme.radius.medium,
+    padding: 12,
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.body,
+    // @ts-ignore
+    outlineStyle: "none",
+  },
+  modalError: {
+    color: AppTheme.colors.error,
+    ...AppTheme.typography.caption,
+  },
+  modalSaveBtn: {
+    backgroundColor: AppTheme.colors.primary,
+    paddingVertical: 12,
+    borderRadius: AppTheme.radius.medium,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  modalSaveBtnText: {
+    color: "#fff",
+    ...AppTheme.typography.button,
+  },
+  modalCancelBtn: {
+    backgroundColor: AppTheme.colors.surface,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+    paddingVertical: 12,
+    borderRadius: AppTheme.radius.medium,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  modalCancelBtnText: {
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.button,
   },
 });

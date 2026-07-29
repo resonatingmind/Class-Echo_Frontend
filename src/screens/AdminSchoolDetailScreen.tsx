@@ -258,7 +258,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
       {/* Global Header */}
       <View style={styles.globalHeader}>
         <View style={styles.headerLeft}>
-           <AppLogo hideText size={32} />
+           <AppLogo hideText size={24} />
         </View>
         <Text style={styles.headerTitle}>Super Admin</Text>
         <View style={styles.headerRight}>
@@ -481,7 +481,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
                       </View>
                     ) : (
                       <View style={styles.emptyClasses}>
-                        <Ionicons color={AppTheme.colors.textSecondary} name="school-outline" size={32} />
+                        <Ionicons color={AppTheme.colors.textSecondary} name="school-outline" size={24} />
                         <Text style={styles.emptyClassesText}>
                           No academic classes have been added to this school yet.
                         </Text>

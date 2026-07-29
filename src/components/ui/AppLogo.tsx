@@ -21,9 +21,9 @@ const styles = StyleSheet.create({
     gap: AppTheme.spacing.m,
   },
   logoIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
+    width: 38,
+    height: 38,
+    borderRadius: 12,
     backgroundColor: AppTheme.colors.primary,
     alignItems: "center",
     justifyContent: "center",

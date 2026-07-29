@@ -108,7 +108,7 @@ export function AdminClassDetailScreen({ navigation, route }: Props) {
       {/* Global Header */}
       <View style={styles.globalHeader}>
         <View style={styles.headerLeft}>
-           <AppLogo hideText size={32} />
+           <AppLogo hideText size={24} />
         </View>
         <Text style={styles.headerTitle}>Super Admin</Text>
         <View style={styles.headerRight}>

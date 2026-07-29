@@ -75,7 +75,7 @@ export function TeacherAssignmentTable({
             },
           ]}
         >
-          Status
+          Score
         </Text>
 
         <Text

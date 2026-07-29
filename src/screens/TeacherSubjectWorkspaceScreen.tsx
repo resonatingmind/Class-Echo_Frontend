@@ -5,6 +5,7 @@ import {
   FlatList,
   Pressable,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -12,6 +13,7 @@ import {
 } from "react-native";
 
 import { useCallback, useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../context/AuthContext";
 
 import { RootStackParamList } from "../navigation/AppNavigator";
@@ -26,8 +28,12 @@ import {
   getTeacherChapters,
   updateTeacherChapter,
   deleteTeacherChapter,
+  getTeacherSubjectRecordings,
+  getTeacherLearningPlans,
 } from "../lib/api";
-import { ChapterOut } from "../types/api";
+import { ChapterOut, LearningPlanOut, RecordingWithReport } from "../types/api";
+import { getTeacherStatusStyle } from "../components/teacher/teacherStatusStyles";
+import { ExpandedChapterDetailView } from "../components/ExpandedChapterDetailView";
 
 type Props = NativeStackScreenProps<
   RootStackParamList,
@@ -54,6 +60,12 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<"all" | "withPdf" | "withoutPdf">("all");
 
+  // Expanded chapter row state
+  const [expandedChapterId, setExpandedChapterId] = useState<number | null>(null);
+  const [expandedRecordings, setExpandedRecordings] = useState<Record<number, RecordingWithReport[]>>({});
+  const [expandedLps, setExpandedLps] = useState<Record<number, LearningPlanOut[]>>({});
+  const [loadingExpandedId, setLoadingExpandedId] = useState<number | null>(null);
+
   const loadChapters = useCallback(async () => {
     if (!token) return;
     try {
@@ -65,9 +77,33 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
     }
   }, [token, subjectId]);
 
-  useEffect(() => {
-    loadChapters();
-  }, [loadChapters]);
+  useFocusEffect(
+    useCallback(() => {
+      void loadChapters();
+    }, [loadChapters])
+  );
+
+  const toggleExpandChapter = async (chapId: number) => {
+    if (expandedChapterId === chapId) {
+      setExpandedChapterId(null);
+      return;
+    }
+    setExpandedChapterId(chapId);
+    if (!token) return;
+    setLoadingExpandedId(chapId);
+    try {
+      const [recs, lps] = await Promise.all([
+        getTeacherSubjectRecordings(token, subjectId, chapId),
+        getTeacherLearningPlans(token, subjectId, chapId),
+      ]);
+      setExpandedRecordings((prev) => ({ ...prev, [chapId]: recs }));
+      setExpandedLps((prev) => ({ ...prev, [chapId]: lps }));
+    } catch (err) {
+      console.error("Could not load expanded details", err);
+    } finally {
+      setLoadingExpandedId(null);
+    }
+  };
 
   const handleCreateChapter = useCallback(
     async (data: { name: string; description: string }) => {
@@ -172,8 +208,12 @@ const filteredChapters = chapters.filter((chapter) => {
         </View>
       </View>
 
-      {/* Main Content Body */}
-      <View style={styles.content}>
+      {/* Main Content Body - Smooth Vertical Scroll */}
+      <ScrollView
+        style={styles.content}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.workspaceCard}>
           <TextInput
             placeholder="Search chapter..."
@@ -211,135 +251,199 @@ const filteredChapters = chapters.filter((chapter) => {
             </Pressable>
           </View>
 
-          {/* Table Framework */}
-          <View style={styles.tableWrapper}>
-            <View style={styles.tableHeader}>
-              <Text style={[styles.headerCell, styles.chapterColumn]}>
-                Chapter
-              </Text>
-              <Text style={[styles.headerCell, styles.displayColumn]}>
-                Display Title
-              </Text>
-              <Text style={[styles.headerCell, styles.pdfColumn]}>PDF</Text>
-              <Text style={[styles.headerCell, styles.recordingColumn]}>
-                Recordings
-              </Text>
-              <Text style={[styles.headerCell, styles.scoreColumn]}>Score</Text>
-              <Text style={[styles.headerCell, styles.actionColumn]}>
-                Action
-              </Text>
-            </View>
+          {/* Full Width Responsive Table Framework */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={{ width: "100%" }}
+            contentContainerStyle={{ minWidth: "100%" }}
+          >
+            <View style={[styles.tableWrapper, { width: "100%" }]}>
+              <View style={styles.tableHeader}>
+                <Text style={[styles.headerCell, styles.chapterColumn]}>
+                  Chapter
+                </Text>
+                <Text style={[styles.headerCell, styles.pdfColumn]}>PDF</Text>
+                <Text style={[styles.headerCell, styles.recordingColumn]}>
+                  Recordings
+                </Text>
+                <Text style={[styles.headerCell, styles.statusColumn]}>Status</Text>
+                <Text style={[styles.headerCell, styles.actionColumn]}>
+                  Action
+                </Text>
+              </View>
 
-            {loading ? (
-              <Text style={styles.loadingText}>Loading chapters...</Text>
-            ) : (
-              <FlatList
-                // data={chapters}
-                data={filteredChapters}
-                keyExtractor={(item) => item.id.toString()}
-                showsVerticalScrollIndicator={false}
-                renderItem={({ item }) => (
-                  <View style={styles.row}>
-                    <Text
-                      style={[
-                        styles.cell,
-                        styles.chapterColumn,
-                        styles.boldText,
-                      ]}
-                      numberOfLines={1}
-                    >
-                      {item.name}
-                    </Text>
-                    <Text
-                      numberOfLines={1}
-                      style={[
-                        styles.cell,
-                        styles.displayColumn,
-                        styles.mutedText,
-                      ]}
-                    >
-                      {item.description || "--"}
-                    </Text>
+              {loading ? (
+                <Text style={styles.loadingText}>Loading chapters...</Text>
+              ) : (
+                filteredChapters.map((item) => {
+                  const status = item.ai_status ?? "No Recording";
+                  const statusStyle = getTeacherStatusStyle(status);
+                  const isExpanded = expandedChapterId === item.id;
+                  const recs = expandedRecordings[item.id] || [];
+                  const lps = expandedLps[item.id] || [];
+                  const isExLoading = loadingExpandedId === item.id;
 
-                    <View style={styles.pdfColumn}>
-                      <Pressable
-                        style={[
-                          styles.pdfButton,
-                          {
-                            backgroundColor: item.document_count
-                              ? "#E0F2FE"
-                              : "#F8FAFC",
-                          },
-                        ]}
-                        onPress={() => {
-                          navigation.navigate("TeacherChapterDetail", {
-                            chapterId: item.id,
-                            chapterName: item.name,
-                            subjectName,
-                            openUpload: item.document_count === 0,
-                          });
-                        }}
-                      >
-                        <Text
-                          style={[
-                            styles.pdfText,
-                            {
-                              color: item.document_count
-                                ? "#0284C7"
-                                : "#64748B",
-                            },
-                          ]}
+                  return (
+                    <View key={item.id}>
+                      <View style={[styles.row, isExpanded && { backgroundColor: "#F0F9FF" }]}>
+                        <Pressable
+                          style={[styles.chapterColumn, { flexDirection: "row", alignItems: "center", gap: 4 }]}
+                          onPress={() => void toggleExpandChapter(item.id)}
                         >
-                          {item.document_count ? "PDF" : "Add"}
-                        </Text>
-                      </Pressable>
-                    </View>
+                          <Ionicons
+                            name={isExpanded ? "chevron-down" : "chevron-forward"}
+                            size={16}
+                            color="#0284C7"
+                          />
+                          <Text
+                            style={[
+                              styles.boldText,
+                              { flex: 1, color: isExpanded ? "#0284C7" : "#0F172A" },
+                            ]}
+                            numberOfLines={1}
+                          >
+                            {item.name}
+                          </Text>
+                        </Pressable>
 
-                    <View style={styles.recordingColumn}>
-                      <Pressable
-                        onPress={() => {
-                          navigation.navigate("TeacherSubjectDetail", {
-                            subjectId,
-                            subjectName,
-                            initialChapterId: item.id,
-                            initialTab: "recordings",
-                          });
-                        }}
-                        style={styles.recordingPlayCircle}
-                      >
-                        <Ionicons
-                          name="play"
-                          size={14}
-                          color="#0284C7"
-                          style={{ marginLeft: 2 }}
-                        />
-                      </Pressable>
-                    </View>
+                        <View style={styles.pdfColumn}>
+                          <Pressable
+                            style={[
+                              styles.pdfButton,
+                              {
+                                backgroundColor: item.document_count
+                                  ? "#E0F2FE"
+                                  : "#F8FAFC",
+                              },
+                            ]}
+                            onPress={() => {
+                              navigation.navigate("TeacherChapterDetail", {
+                                chapterId: item.id,
+                                chapterName: item.name,
+                                subjectName,
+                                subjectId,
+                                openUpload: item.document_count === 0,
+                              });
+                            }}
+                          >
+                            <Text
+                              style={[
+                                styles.pdfText,
+                                {
+                                  color: item.document_count
+                                    ? "#0284C7"
+                                    : "#64748B",
+                                },
+                              ]}
+                            >
+                              {item.document_count ? "PDF" : "Add"}
+                            </Text>
+                          </Pressable>
+                        </View>
 
-                    <View style={styles.scoreColumn}>
-                      <View style={styles.aiBadge}>
-                        <Text style={styles.aiText}>No Score</Text>
+                        <View style={styles.recordingColumn}>
+                          <Pressable
+                            onPress={() => void toggleExpandChapter(item.id)}
+                            style={styles.recordingPlayCircle}
+                          >
+                            <Ionicons
+                              name={isExpanded ? "chevron-up" : "play"}
+                              size={14}
+                              color="#0284C7"
+                              style={{ marginLeft: isExpanded ? 0 : 2 }}
+                            />
+                          </Pressable>
+                        </View>
+
+                        <View style={styles.statusColumn}>
+                          <View
+                            style={[
+                              styles.aiBadge,
+                              { backgroundColor: statusStyle.bg },
+                            ]}
+                          >
+                            <Text
+                              style={[styles.aiText, { color: statusStyle.text }]}
+                            >
+                              {status}
+                            </Text>
+                          </View>
+                        </View>
+
+                        <View style={styles.actionColumn}>
+                          <Pressable
+                            style={styles.manageButton}
+                            onPress={() => {
+                              setSelectedChapter(item);
+                              setActionSheetVisible(true);
+                            }}
+                          >
+                            <Text style={styles.manageText}>Manage</Text>
+                          </Pressable>
+                        </View>
                       </View>
-                    </View>
 
-                    <View style={styles.actionColumn}>
-                      <Pressable
-                        style={styles.manageButton}
-                        onPress={() => {
-                          setSelectedChapter(item);
-                          setActionSheetVisible(true);
-                        }}
-                      >
-                        <Text style={styles.manageText}>Manage</Text>
-                      </Pressable>
+                      {isExpanded ? (
+                        <ExpandedChapterDetailView
+                          chapterId={item.id}
+                          chapterName={item.name}
+                          subjectId={subjectId}
+                          subjectName={subjectName}
+                          recordings={recs}
+                          learningPlans={lps}
+                          loading={isExLoading}
+                          role="teacher"
+                          onAddRecording={() => {
+                            navigation.navigate("TeacherRecording", {
+                              subjectId,
+                              subjectName,
+                              existingChapters: chapters.map((c) => c.name),
+                              chapterId: item.id,
+                              chapterName: item.name,
+                            });
+                          }}
+                          onAddLearningPlan={() => {
+                            navigation.navigate("TeacherChapterDetail", {
+                              chapterId: item.id,
+                              chapterName: item.name,
+                              subjectName,
+                              subjectId,
+                            });
+                          }}
+                          onAddDocument={() => {
+                            navigation.navigate("TeacherChapterDetail", {
+                              chapterId: item.id,
+                              chapterName: item.name,
+                              subjectName,
+                              subjectId,
+                              openUpload: true,
+                            });
+                          }}
+                          onViewRecordingReport={(rec) => {
+                            navigation.navigate("RecordingDetail", {
+                              recording: rec,
+                              subjectName,
+                            });
+                          }}
+                          onOpenChapterDetail={() => {
+                            navigation.navigate("TeacherChapterDetail", {
+                              chapterId: item.id,
+                              chapterName: item.name,
+                              subjectName,
+                              subjectId,
+                            });
+                          }}
+                        />
+                      ) : null}
                     </View>
-                  </View>
-                )}
-              />
-            )}
-          </View>
+                  );
+                })
+              )}
+            </View>
+          </ScrollView>
         </View>
-      </View>
+      </ScrollView>
 
       <ChapterEditorModal
         visible={editorVisible}
@@ -371,6 +475,7 @@ const filteredChapters = chapters.filter((chapter) => {
             chapterId: selectedChapter.id,
             chapterName: selectedChapter.name,
             subjectName,
+            subjectId,
           });
         }}
         onDelete={() => {
@@ -414,7 +519,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     maxWidth: 1280,
     width: "100%",
-    selfAlign: "center",
+    alignSelf: "center",
   },
   backButton: {
     width: 40,
@@ -429,8 +534,11 @@ const styles = StyleSheet.create({
   subtitle: { marginTop: 2, fontSize: 14, color: "#64748B", fontWeight: "500" },
   content: {
     flex: 1,
+  },
+  scrollContent: {
     padding: 24,
     alignItems: "center",
+    paddingBottom: 48,
   },
   workspaceCard: {
     backgroundColor: "#fff",
@@ -540,11 +648,10 @@ const styles = StyleSheet.create({
     borderColor: "#E2E8F0",
   },
   manageText: { color: "#334155", fontWeight: "700", fontSize: 13 },
-  chapterColumn: { flex: 2.5 },
-  displayColumn: { flex: 2.5 },
+  chapterColumn: { flex: 4.5 },
   pdfColumn: { flex: 1, alignItems: "center", textAlign: "center" },
   recordingColumn: { flex: 1.2, alignItems: "center", textAlign: "center" },
-  scoreColumn: { flex: 1.2, alignItems: "center", textAlign: "center" },
+  statusColumn: { flex: 1.2, alignItems: "center", textAlign: "center" },
   actionColumn: { flex: 1, alignItems: "center", textAlign: "center" },
   recordingPlayCircle: {
     width: 34,

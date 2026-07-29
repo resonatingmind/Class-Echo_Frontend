@@ -22,15 +22,27 @@ import {
   getTeacherChapterDocuments,
   deleteTeacherChapterDocument,
   uploadTeacherChapterDocument,
+  getTeacherLearningPlans,
+  createTeacherLearningPlan,
+  updateTeacherLearningPlan,
+  deleteTeacherLearningPlan,
 } from "../lib/api";
 
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
-import { ChapterDocumentOut, ChapterKnowledgeOut, ChapterOut } from '../types/api';
+import {
+  ChapterDocumentOut,
+  ChapterKnowledgeOut,
+  ChapterOut,
+  LearningPlanOut,
+  LearningPlanCreatePayload,
+} from '../types/api';
+import { LearningPlanTable } from "../components/teacher/LearningPlanTable";
+import { ChapterLearningPlanModal } from "../components/teacher/ChapterLearningPlanModal";
 
 type Props = NativeStackScreenProps<RootStackParamList, "TeacherChapterDetail">;
 
-type ActiveTab = 'profile' | 'documents' | 'metadata';
+type ActiveTab = 'planner' | 'profile' | 'documents' | 'metadata';
 
 function statusStyle(status: string) {
   const norm = status.toLowerCase();
@@ -57,8 +69,13 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
   const [chapter, setChapter] = useState<ChapterOut | null>(null);
   const [knowledge, setKnowledge] = useState<ChapterKnowledgeOut | null>(null);
   const [documents, setDocuments] = useState<ChapterDocumentOut[]>([]);
+  const [learningPlans, setLearningPlans] = useState<LearningPlanOut[]>([]);
+  const [lpModalVisible, setLpModalVisible] = useState(false);
+  const [selectedLpItem, setSelectedLpItem] = useState<LearningPlanOut | null>(null);
+  const [savingLp, setSavingLp] = useState(false);
+
   const [activeTab, setActiveTab] = useState<ActiveTab>(
-    openUpload ? "documents" : "profile",
+    openUpload ? "documents" : "planner",
   );
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -83,6 +100,18 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
         setChapter(detailData);
         setDocuments(docsData);
 
+        const subId = route.params.subjectId || detailData.subject_id;
+        try {
+          const lps = await getTeacherLearningPlans(
+            session.token,
+            subId,
+            chapterId,
+          );
+          setLearningPlans(lps);
+        } catch {
+          setLearningPlans([]);
+        }
+
         // Attempt to fetch knowledge profile (might 404 if not generated yet)
         try {
           const kbData = await getTeacherChapterKnowledge(
@@ -102,8 +131,51 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
         setRefreshing(false);
       }
     },
-    [session, chapterId],
+    [session, chapterId, route.params.subjectId],
   );
+
+  const handleSaveLearningPlan = async (payload: LearningPlanCreatePayload) => {
+    if (!session || !chapter) return;
+    const subId = route.params.subjectId || chapter.subject_id;
+    setSavingLp(true);
+    try {
+      if (selectedLpItem) {
+        await updateTeacherLearningPlan(session.token, selectedLpItem.id, payload);
+      } else {
+        await createTeacherLearningPlan(session.token, subId, chapterId, payload);
+      }
+      setLpModalVisible(false);
+      setSelectedLpItem(null);
+      void load(true);
+    } catch (e) {
+      Alert.alert("Error", "Could not save Learning Plan entry.");
+    } finally {
+      setSavingLp(false);
+    }
+  };
+
+  const handleDeleteLearningPlan = (item: LearningPlanOut) => {
+    Alert.alert(
+      "Delete Learning Plan Entry",
+      `Are you sure you want to delete "${item.sub_topic}"?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            if (!session) return;
+            try {
+              await deleteTeacherLearningPlan(session.token, item.id);
+              void load(true);
+            } catch (err) {
+              Alert.alert("Error", "Could not delete item.");
+            }
+          },
+        },
+      ],
+    );
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -242,24 +314,26 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
     <SafeAreaView edges={["top"]} style={styles.safe}>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable
-          onPress={() => {
-            navigation.goBack();
-          }}
-          style={styles.backBtn}
-        >
-          <Ionicons color={colors.textPrimary} name="arrow-back" size={22} />
-        </Pressable>
-        <Text style={styles.headerTitle} numberOfLines={1}>
-          {chapterName}
-        </Text>
-        <Pressable onPress={() => void load(true)} style={styles.backBtn}>
-          <Ionicons
-            color={colors.textSecondary}
-            name="refresh-outline"
-            size={22}
-          />
-        </Pressable>
+        <View style={styles.headerInner}>
+          <Pressable
+            onPress={() => {
+              navigation.goBack();
+            }}
+            style={styles.backBtn}
+          >
+            <Ionicons color={colors.textPrimary} name="arrow-back" size={22} />
+          </Pressable>
+          <Text style={styles.headerTitle} numberOfLines={1}>
+            {chapterName}
+          </Text>
+          <Pressable onPress={() => void load(true)} style={styles.backBtn}>
+            <Ionicons
+              color={colors.textSecondary}
+              name="refresh-outline"
+              size={22}
+            />
+          </Pressable>
+        </View>
       </View>
 
       <ScrollView
@@ -278,105 +352,139 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
       >
         {/* Hero Area */}
         <View style={styles.hero}>
-          <Text style={styles.heroKicker}>{subjectName.toUpperCase()}</Text>
-          <Text style={styles.heroTitle}>{chapterName}</Text>
-          {chapter?.description ? (
-            <Text style={styles.heroDesc}>{chapter.description}</Text>
-          ) : (
-            <Text style={[styles.heroDesc, { fontStyle: "italic" }]}>
-              No description added for this chapter.
-            </Text>
-          )}
-
-          <View style={styles.metaRow}>
-            <View style={styles.metaBadge}>
-              <Ionicons
-                color={colors.accentDark}
-                name="document-text"
-                size={14}
-              />
-              <Text style={styles.metaBadgeText}>
-                {chapter?.document_count ?? 0} reference files
+          <View style={styles.heroInner}>
+            <Text style={styles.heroKicker}>{subjectName.toUpperCase()}</Text>
+            <Text style={styles.heroTitle}>{chapterName}</Text>
+            {chapter?.description ? (
+              <Text style={styles.heroDesc}>{chapter.description}</Text>
+            ) : (
+              <Text style={[styles.heroDesc, { fontStyle: "italic" }]}>
+                No description added for this chapter.
               </Text>
-            </View>
-            {chapter && (
-              <Text style={styles.metaDate}>Last updated: {formattedDate}</Text>
             )}
+
+            <View style={styles.metaRow}>
+              <View style={styles.metaBadge}>
+                <Ionicons
+                  color={colors.accentDark}
+                  name="document-text"
+                  size={14}
+                />
+                <Text style={styles.metaBadgeText}>
+                  {chapter?.document_count ?? 0} reference files
+                </Text>
+              </View>
+              {chapter && (
+                <Text style={styles.metaDate}>Last updated: {formattedDate}</Text>
+              )}
+            </View>
           </View>
         </View>
 
-        {/* Tab Selector */}
-        <View style={styles.tabContainer}>
-          <Pressable
-            onPress={() => setActiveTab("profile")}
-            style={[
-              styles.tabButton,
-              activeTab === "profile" && styles.tabButtonActive,
-            ]}
-          >
-            <Ionicons
-              color={
-                activeTab === "profile" ? colors.accentDark : colors.textMuted
-              }
-              name="sparkles-outline"
-              size={14}
-            />
-            <Text
+        <View style={styles.mainContainer}>
+
+        {/* Tab Selector - Full Width */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={{ width: "100%" }}
+          contentContainerStyle={{ width: "100%", minWidth: "100%" }}
+        >
+          <View style={styles.tabContainer}>
+            <Pressable
+              onPress={() => setActiveTab("planner")}
               style={[
-                styles.tabText,
-                activeTab === "profile" && styles.tabTextActive,
+                styles.tabButton,
+                activeTab === "planner" && styles.tabButtonActive,
               ]}
             >
-              Knowledge Profile
-            </Text>
-          </Pressable>
-          <Pressable
-            onPress={() => setActiveTab("documents")}
-            style={[
-              styles.tabButton,
-              activeTab === "documents" && styles.tabButtonActive,
-            ]}
-          >
-            <Ionicons
-              color={
-                activeTab === "documents" ? colors.accentDark : colors.textMuted
-              }
-              name="document-text-outline"
-              size={14}
-            />
-            <Text
+              <Ionicons
+                color={
+                  activeTab === "planner" ? colors.accentDark : colors.textMuted
+                }
+                name="calendar-outline"
+                size={14}
+              />
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === "planner" && styles.tabTextActive,
+                ]}
+              >
+                Micro Planner
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setActiveTab("profile")}
               style={[
-                styles.tabText,
-                activeTab === "documents" && styles.tabTextActive,
+                styles.tabButton,
+                activeTab === "profile" && styles.tabButtonActive,
               ]}
             >
-              Documents
-            </Text>
-          </Pressable>
-          <Pressable
-            onPress={() => setActiveTab("metadata")}
-            style={[
-              styles.tabButton,
-              activeTab === "metadata" && styles.tabButtonActive,
-            ]}
-          >
-            <Ionicons
-              color={
-                activeTab === "metadata" ? colors.accentDark : colors.textMuted
-              }
-              name="information-circle-outline"
-              size={14}
-            />
-            <Text
+              <Ionicons
+                color={
+                  activeTab === "profile" ? colors.accentDark : colors.textMuted
+                }
+                name="sparkles-outline"
+                size={14}
+              />
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === "profile" && styles.tabTextActive,
+                ]}
+              >
+                Knowledge Profile
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setActiveTab("documents")}
               style={[
-                styles.tabText,
-                activeTab === "metadata" && styles.tabTextActive,
+                styles.tabButton,
+                activeTab === "documents" && styles.tabButtonActive,
               ]}
             >
-              Details
-            </Text>
-          </Pressable>
-        </View>
+              <Ionicons
+                color={
+                  activeTab === "documents" ? colors.accentDark : colors.textMuted
+                }
+                name="document-text-outline"
+                size={14}
+              />
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === "documents" && styles.tabTextActive,
+                ]}
+              >
+                Documents
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setActiveTab("metadata")}
+              style={[
+                styles.tabButton,
+                activeTab === "metadata" && styles.tabButtonActive,
+              ]}
+            >
+              <Ionicons
+                color={
+                  activeTab === "metadata" ? colors.accentDark : colors.textMuted
+                }
+                name="information-circle-outline"
+                size={14}
+              />
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === "metadata" && styles.tabTextActive,
+                ]}
+              >
+                Details
+              </Text>
+            </Pressable>
+          </View>
+        </ScrollView>
 
         {isLoading ? (
           <View style={styles.center}>
@@ -392,6 +500,36 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
             />
             <Text style={styles.emptyTitle}>Could not load details</Text>
             <Text style={styles.emptyBody}>{error}</Text>
+          </View>
+        ) : activeTab === "planner" ? (
+          <View style={styles.plannerSection}>
+            <View style={styles.plannerHeaderRow}>
+              <View style={styles.plannerHeaderTitles}>
+                <Text style={styles.sectionTitle}>MICRO PLANNER</Text>
+                <Text style={styles.plannerSub}>
+                  Subject: {subjectName} • Chapter: {chapterName}
+                </Text>
+              </View>
+              <Pressable
+                style={styles.addPlanBtn}
+                onPress={() => {
+                  setSelectedLpItem(null);
+                  setLpModalVisible(true);
+                }}
+              >
+                <Ionicons name="add" size={16} color="#fff" />
+                <Text style={styles.addPlanText}>Add Entry</Text>
+              </Pressable>
+            </View>
+
+            <LearningPlanTable
+              items={learningPlans}
+              onEditItem={(item) => {
+                setSelectedLpItem(item);
+                setLpModalVisible(true);
+              }}
+              onDeleteItem={handleDeleteLearningPlan}
+            />
           </View>
         ) : activeTab === "profile" ? (
           !knowledge ? (
@@ -641,21 +779,70 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
             </View>
           </View>
         )}
+        </View>
       </ScrollView>
+
+      <ChapterLearningPlanModal
+        visible={lpModalVisible}
+        initialItem={selectedLpItem}
+        loading={savingLp}
+        onClose={() => {
+          setLpModalVisible(false);
+          setSelectedLpItem(null);
+        }}
+        onSave={handleSaveLearningPlan}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
+  plannerSection: {
+    paddingHorizontal: 0,
+    marginTop: 20,
+    gap: 16,
+  },
+  plannerHeaderRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  plannerHeaderTitles: {
+    flex: 1,
+  },
+  plannerSub: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+  addPlanBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#0284C7",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 8,
+    gap: 6,
+  },
+  addPlanText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 13,
+  },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+  },
+  headerInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    maxWidth: 1280,
+    width: '100%',
+    alignSelf: 'center',
   },
   backBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   headerTitle: {
@@ -666,6 +853,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   scroll: { paddingBottom: 40 },
+  mainContainer: {
+    maxWidth: 1280,
+    width: '100%',
+    alignSelf: 'center',
+    paddingHorizontal: 20,
+  },
 
   // Hero Section
   hero: {
@@ -673,6 +866,11 @@ const styles = StyleSheet.create({
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+  },
+  heroInner: {
+    maxWidth: 1280,
+    width: '100%',
+    alignSelf: 'center',
     gap: 8,
   },
   heroKicker: {
@@ -720,12 +918,12 @@ const styles = StyleSheet.create({
   // Tab Selector
   tabContainer: {
     flexDirection: 'row',
-    marginHorizontal: 20,
     marginTop: 20,
     backgroundColor: colors.surfaceMuted,
     padding: 4,
     borderRadius: 14,
     gap: 4,
+    width: '100%',
   },
   tabButton: {
     flex: 1,
@@ -755,7 +953,7 @@ const styles = StyleSheet.create({
 
   // KB Content
   kbContent: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 0,
     marginTop: 20,
     gap: 16,
   },
@@ -800,7 +998,7 @@ const styles = StyleSheet.create({
 
   // Documents Tab
   docSection: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 0,
     marginTop: 20,
     gap: 16,
   },

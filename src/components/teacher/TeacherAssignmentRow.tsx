@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { colors } from "../../theme/colors";
@@ -11,52 +10,15 @@ type Props = {
   onViewPress: () => void;
 };
 
-// Helper function to dynamically color code the AI statuses
-function getStatusStyle(status: TeacherDashboardSubject["ai_status"]) {
-  switch (status) {
-    case "Completed":
-      return { bg: "#E8F7EE", text: "#127A40" }; // Mint Green
-    case "Processing":
-      return { bg: "#FFF4E0", text: "#92400E" }; // Soft Amber
-    case "Failed":
-      return { bg: "#FFF1F1", text: "#B42318" }; // Soft Red
-    case "No Recording":
-    default:
-      return { bg: "#F1F5F9", text: "#64748B" }; // Slate Gray
+function formatAverageScore(score: number | null | undefined) {
+  if (score === null || score === undefined) {
+    return "—";
   }
+
+  return score.toFixed(1);
 }
 
-export function TeacherAssignmentRow({ row, onPress, onViewPress}: Props) {
-  const badgeStyle = getStatusStyle(row.ai_status);
-
-  const statusColor = (() => {
-    switch (row.ai_status) {
-      case "Completed":
-        return {
-          bg: "#DCFCE7",
-          text: "#15803D",
-        };
-
-      case "Processing":
-        return {
-          bg: "#FEF3C7",
-          text: "#B45309",
-        };
-
-      case "Failed":
-        return {
-          bg: "#FEE2E2",
-          text: "#B91C1C",
-        };
-
-      default:
-        return {
-          bg: "#F3F4F6",
-          text: "#6B7280",
-        };
-    }
-  })();
-
+export function TeacherAssignmentRow({ row, onPress, onViewPress }: Props) {
   return (
     <Pressable style={styles.row} onPress={onPress}>
       {/* Class */}
@@ -114,31 +76,22 @@ export function TeacherAssignmentRow({ row, onPress, onViewPress}: Props) {
         <Text style={styles.cell}>{row.recording_count}</Text>
       </View>
 
-      {/* AI status */}
+      {/* Average score */}
       <View
         style={{
           flex: TABLE_COLUMNS.aiStatus,
           alignItems: "center",
         }}
       >
-        <View style={[styles.aiBadge, { backgroundColor: statusColor.bg }]}>
-          <Text style={[styles.aiText, { color: statusColor.text }]}>
-            {row.ai_status}
-          </Text>
-        </View>
+        <Text
+          style={[
+            styles.scoreText,
+            row.average_score == null && styles.scoreTextMuted,
+          ]}
+        >
+          {formatAverageScore(row.average_score)}
+        </Text>
       </View>
-
-      {/* View Action Container (Transformed to View so the whole row click catches seamlessly) */}
-      {/* <View
-        style={{
-          flex: TABLE_COLUMNS.action,
-          alignItems: "center",
-        }}
-      >
-        <View style={styles.viewButton}>
-          <Text style={styles.viewText}>View</Text>
-        </View>
-      </View> */}
 
       <View style={{ flex: TABLE_COLUMNS.action, alignItems: "center" }}>
         <Pressable
@@ -170,17 +123,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textPrimary,
   },
-  aiBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    minWidth: 95, // Keeps the badges perfectly uniform across status length variations
-  },
-  aiText: {
-    fontSize: 11,
+  scoreText: {
+    fontSize: 14,
     fontWeight: "700",
+    color: colors.textPrimary,
+  },
+  scoreTextMuted: {
+    fontWeight: "400",
+    color: colors.textMuted,
   },
   viewButton: {
     width: 60,

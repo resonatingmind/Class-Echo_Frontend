@@ -100,7 +100,7 @@ export type RootStackParamList = {
     chapterId: number;
     chapterName: string;
     subjectName: string;
-
+    subjectId?: number;
     openUpload?: boolean;
   };
 
@@ -108,6 +108,7 @@ export type RootStackParamList = {
     chapterId: number;
     chapterName: string;
     subjectName: string;
+    subjectId?: number;
     openUpload?: boolean;
   };
   TeacherTabs: undefined;

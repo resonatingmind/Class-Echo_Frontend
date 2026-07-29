@@ -209,7 +209,9 @@ try {
               <View style={{ flex: 1 }}>
                 <Text style={styles.subjectTitle}>{subject.name}</Text>
 
-                <Text style={styles.subjectClass}>{subject.class_name}</Text>
+                <Text style={styles.subjectClass}>
+                  {subject.class_name}{subject.section ? ` • Section ${subject.section}` : ""}
+                </Text>
               </View>
             </View>
 

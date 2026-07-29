@@ -77,6 +77,89 @@ const ci = StyleSheet.create({
   countText: { fontSize: 13, fontWeight: '800', color: colors.accent },
 });
 
+// ── Learning Plan Info Card ──────────────────────────────────────────────────
+
+export function LearningPlanInfoCard({ data }: { data: any }) {
+  if (!data || (!data.topic_name && !data.sub_topic)) return null;
+
+  return (
+    <View style={lpic.card}>
+      <View style={lpic.header}>
+        <View style={lpic.iconWrap}>
+          <Ionicons color="#0284C7" name="calendar-outline" size={16} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={lpic.title}>Selected Learning Plan (Micro Planner)</Text>
+          <Text style={lpic.subtitle}>
+            {data.topic_name} {data.sub_topic ? `• ${data.sub_topic}` : ""}
+          </Text>
+        </View>
+        {data.date ? (
+          <View style={lpic.dateBadge}>
+            <Text style={lpic.dateText}>{data.date}</Text>
+          </View>
+        ) : null}
+      </View>
+
+      <View style={lpic.body}>
+        {data.classwork_activities ? (
+          <View style={lpic.itemRow}>
+            <Text style={lpic.itemLabel}>Classwork & Activities:</Text>
+            <Text style={lpic.itemVal}>{data.classwork_activities}</Text>
+          </View>
+        ) : null}
+
+        {data.learning_outcomes ? (
+          <View style={lpic.itemRow}>
+            <Text style={lpic.itemLabel}>Target Outcomes:</Text>
+            <Text style={lpic.itemVal}>{data.learning_outcomes}</Text>
+          </View>
+        ) : null}
+
+        {data.assessment_task ? (
+          <View style={lpic.itemRow}>
+            <Text style={lpic.itemLabel}>Assessment / Extension:</Text>
+            <Text style={lpic.itemVal}>{data.assessment_task}</Text>
+          </View>
+        ) : null}
+      </View>
+    </View>
+  );
+}
+
+const lpic = StyleSheet.create({
+  card: {
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#0284C7" + "30",
+    backgroundColor: "#0284C7" + "08",
+    padding: 16,
+    gap: 12,
+  },
+  header: { flexDirection: "row", alignItems: "center", gap: 10 },
+  iconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: "#E0F2FE",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  title: { fontSize: 14, fontWeight: "800", color: "#0F172A" },
+  subtitle: { fontSize: 13, fontWeight: "600", color: "#0284C7" },
+  dateBadge: {
+    backgroundColor: "#E0F2FE",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  dateText: { fontSize: 12, fontWeight: "700", color: "#0369A1" },
+  body: { gap: 6, marginTop: 4 },
+  itemRow: { gap: 2 },
+  itemLabel: { fontSize: 12, fontWeight: "700", color: "#334155" },
+  itemVal: { fontSize: 13, color: "#475569", lineHeight: 18 },
+});
+
 // ── Curriculum Coverage Card ──────────────────────────────────────────────────
 
 export function CurriculumCoverageCard({ data }: { data: CurriculumCoverage }) {

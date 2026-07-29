@@ -181,7 +181,8 @@ export type RecordingWithReport = {
   error_reason: string | null;
   is_archived: boolean;
   uploaded_at: string;
-  processed_at: string | null;
+  learning_plan_id?: number | null;
+  learning_plan?: LearningPlanOut | null;
   report?: LLMReportOut | null;
 };
 
@@ -227,6 +228,7 @@ export type ChapterOut = {
   created_at: string;
   updated_at: string;
   document_count: number;
+  ai_status?: TeacherDashboardStatus | null;
 };
 
 export type ChapterCreatePayload = {
@@ -257,6 +259,30 @@ export type ChapterKnowledgeOut = {
   must_cover_topics: string[];
   common_misconceptions: string[];
   generated_at: string;
+};
+
+export type LearningPlanOut = {
+  id: number;
+  chapter_id: number;
+  date: string | null;
+  topic_name: string;
+  sub_topic: string;
+  classwork_activities: string | null;
+  assessment_task: string | null;
+  teaching_aids: string | null;
+  learning_outcomes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type LearningPlanCreatePayload = {
+  date?: string | null;
+  topic_name: string;
+  sub_topic: string;
+  classwork_activities?: string | null;
+  assessment_task?: string | null;
+  teaching_aids?: string | null;
+  learning_outcomes?: string | null;
 };
 
 export type SchoolDashboardOverview = {
@@ -441,6 +467,7 @@ export type ReplaceAssignmentResponse = {
 export type TeacherDashboardStatus =
   | "No Recording"
   | "Processing"
+  | "Pending"
   | "Completed"
   | "Failed";
 
@@ -453,6 +480,7 @@ export type TeacherDashboardSubject = {
   student_count: number;
   recording_count: number;
   ai_status: TeacherDashboardStatus;
+  average_score: number | null;
 };
 
 export type TeacherDashboardResponse = {

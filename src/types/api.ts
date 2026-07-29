@@ -10,6 +10,9 @@ export type SchoolAdminOut = {
   id: number;
   name: string;
   email: string;
+  status: string;
+  email_verified: boolean;
+  rejected_reason: string | null;
 };
 
 export type SchoolOut = {

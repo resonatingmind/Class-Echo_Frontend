@@ -67,36 +67,30 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   const signIn = useCallback(
     async (username: string, password: string) => {
-      setIsLoading(true);
-      try {
-        const response = await login(username, password);
-        let status = "active";
-        
-        if (response.role === "teacher") {
-          const me = await getTeacherMe(response.access_token);
-          status = me.status;
-        } else if (response.role === "school_admin") {
-          const me = await getSchoolAdminMe(response.access_token);
-          status = me.status;
-        }
-
-        const newSession = {
-          token: response.access_token,
-          role: response.role,
-          status,
-        };
-        await persistSession(newSession.token, newSession.role, newSession.status);
-        setSession(newSession);
-      } finally {
-        setIsLoading(false);
+      const response = await login(username, password);
+      let status = "active";
+      
+      if (response.role === "teacher") {
+        const me = await getTeacherMe(response.access_token);
+        status = me.status;
+      } else if (response.role === "school_admin") {
+        const me = await getSchoolAdminMe(response.access_token);
+        status = me.status;
       }
+
+      const newSession = {
+        token: response.access_token,
+        role: response.role,
+        status,
+      };
+      await persistSession(newSession.token, newSession.role, newSession.status);
+      setSession(newSession);
     },
     [persistSession],
   );
 
   const refreshStatus = useCallback(async () => {
     if (!session) return;
-    setIsLoading(true);
     try {
       let status = "active";
       if (session.role === "teacher") {
@@ -109,8 +103,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
       
       await persistSession(session.token, session.role, status);
       setSession(prev => prev ? { ...prev, status } : null);
-    } finally {
-      setIsLoading(false);
+    } catch {
+      // ignore check errors in background
     }
   }, [session, persistSession]);
 

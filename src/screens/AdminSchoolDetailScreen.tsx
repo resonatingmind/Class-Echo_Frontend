@@ -15,7 +15,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '../context/AuthContext';
-import { deleteAdminSchool, getAdminSchool, getAdminSchoolClasses, updateAdminSchool } from '../lib/api';
+import { deleteAdminSchool, getAdminSchool, getAdminSchoolClasses, updateAdminSchool, approveAdminSchool, rejectAdminSchool } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { ScreenHeader } from '../components/common/ScreenHeader';
 import { colors } from '../theme/colors';
@@ -138,6 +138,12 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Approval/Rejection Action States
+  const [actionLoading, setActionLoading] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
+  const [rejectError, setRejectError] = useState<string | null>(null);
+
   // Edit modal state
   const [showEdit, setShowEdit] = useState(false);
   const [editName, setEditName] = useState('');
@@ -192,6 +198,38 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
     }
   };
 
+
+  const handleApprove = async () => {
+    if (!session || !school) return;
+    setActionLoading(true);
+    try {
+      const updated = await approveAdminSchool(session.token, school.id);
+      setSchool(updated);
+      Alert.alert('Success', 'School registration has been approved successfully.');
+    } catch (e) {
+      Alert.alert('Error', e instanceof Error ? e.message : 'Could not approve school');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleReject = async () => {
+    if (!session || !school) return;
+    setActionLoading(true);
+    setRejectError(null);
+    try {
+      const updated = await rejectAdminSchool(session.token, school.id, rejectReason.trim() || undefined);
+      setSchool(updated);
+      setShowRejectModal(false);
+      setRejectReason('');
+      Alert.alert('Rejected', 'School registration request has been rejected.');
+    } catch (e) {
+      setRejectError(e instanceof Error ? e.message : 'Could not reject school');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const handleDelete = () => {
     if (!session || !school) return;
     Alert.alert(
@@ -231,6 +269,52 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
           </>
         }
       />
+
+
+      {/* Rejection Reason Modal */}
+      <Modal animationType="slide" transparent visible={showRejectModal} onRequestClose={() => setShowRejectModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalSheet}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Reject School Registration</Text>
+              <Pressable hitSlop={8} onPress={() => setShowRejectModal(false)}>
+                <Ionicons color={colors.textMuted} name="close" size={22} />
+              </Pressable>
+            </View>
+            <Text style={styles.inputLabel}>Reason for Rejection (optional)</Text>
+            <TextInput
+              autoCapitalize="sentences"
+              multiline
+              numberOfLines={3}
+              onChangeText={setRejectReason}
+              placeholder="e.g. Invalid school info, unverified school email domain"
+              placeholderTextColor={colors.textPlaceholder}
+              style={[styles.input, styles.inputMultiline]}
+              value={rejectReason}
+            />
+            {rejectError ? <Text style={styles.modalError}>{rejectError}</Text> : null}
+            <View style={{ flexDirection: 'row', gap: 12, marginTop: 4 }}>
+              <Pressable
+                onPress={() => setShowRejectModal(false)}
+                style={[styles.modalCancelBtn, { flex: 1 }]}
+              >
+                <Text style={styles.modalCancelBtnText}>Cancel</Text>
+              </Pressable>
+              <Pressable
+                disabled={actionLoading}
+                onPress={() => { void handleReject(); }}
+                style={[styles.modalSaveBtn, { flex: 1, backgroundColor: '#EF4444' }, actionLoading && { opacity: 0.6 }]}
+              >
+                {actionLoading ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={styles.modalSaveBtnText}>Confirm Reject</Text>
+                )}
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {/* Edit School Modal */}
       <Modal animationType="slide" transparent visible={showEdit} onRequestClose={() => setShowEdit(false)}>
@@ -296,6 +380,45 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
         >
           {/* Hero */}
           <SchoolHero school={school} />
+
+          {school.admin?.status === 'pending_approval' ? (
+            <View style={styles.approvalCard}>
+              <View style={styles.approvalHeader}>
+                <Ionicons color="#F59E0B" name="shield-checkmark-outline" size={20} />
+                <Text style={styles.approvalTitle}>Registration Pending Approval</Text>
+              </View>
+              <Text style={styles.approvalText}>
+                This school was self-registered and is awaiting authorization before it can access the system.
+              </Text>
+              <View style={styles.approvalActions}>
+                <Pressable
+                  onPress={handleApprove}
+                  disabled={actionLoading}
+                  style={[styles.approveBtn, actionLoading && { opacity: 0.6 }]}
+                >
+                  <Text style={styles.approveBtnText}>Approve</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => setShowRejectModal(true)}
+                  disabled={actionLoading}
+                  style={[styles.rejectBtn, actionLoading && { opacity: 0.6 }]}
+                >
+                  <Text style={styles.rejectBtnText}>Reject</Text>
+                </Pressable>
+              </View>
+            </View>
+          ) : school.admin?.status === 'rejected' ? (
+            <View style={[styles.approvalCard, styles.rejectedCard]}>
+              <View style={styles.approvalHeader}>
+                <Ionicons color="#EF4444" name="close-circle-outline" size={20} />
+                <Text style={[styles.approvalTitle, { color: '#EF4444' }]}>Registration Rejected</Text>
+              </View>
+              <Text style={styles.approvalText}>
+                This school registration has been rejected.
+                {school.admin.rejected_reason ? `\n\nReason: "${school.admin.rejected_reason}"` : ''}
+              </Text>
+            </View>
+          ) : null}
 
           {/* Admin Contact */}
           <AdminContact school={school} />
@@ -635,6 +758,81 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     lineHeight: 20,
+  },
+  approvalCard: {
+    backgroundColor: '#FFFBEB',
+    borderColor: '#FDE68A',
+    borderWidth: 1,
+    borderRadius: 16,
+    margin: 20,
+    padding: 16,
+    gap: 12,
+  },
+  rejectedCard: {
+    backgroundColor: '#FDF2F2',
+    borderColor: '#FDE8E8',
+  },
+  approvalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  approvalTitle: {
+    color: '#B45309',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  approvalText: {
+    color: colors.textSecondary,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  approvalActions: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 4,
+  },
+  approveBtn: {
+    backgroundColor: '#10B981',
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+  },
+  approveBtnText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  rejectBtn: {
+    backgroundColor: 'transparent',
+    borderColor: '#EF4444',
+    borderWidth: 1.5,
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rejectBtnText: {
+    color: '#EF4444',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  modalCancelBtn: {
+    borderColor: colors.border,
+    borderWidth: 1.5,
+    borderRadius: 14,
+    height: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalCancelBtnText: {
+    color: colors.textSecondary,
+    fontSize: 16,
+    fontWeight: '700',
   },
   modalOverlay: {
     flex: 1,

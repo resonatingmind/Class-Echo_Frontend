@@ -38,6 +38,36 @@ function SchoolCard({
     .toUpperCase();
 
   const hasAdmin = !!school.admin;
+  const status = school.admin?.status ?? 'needs_admin';
+
+  let badgeStyle = styles.badgeOrange;
+  let dotStyle = styles.dotOrange;
+  let textStyle = styles.statusOrange;
+  let statusText = 'Needs Admin';
+
+  if (hasAdmin) {
+    if (status === 'active') {
+      badgeStyle = styles.badgeGreen;
+      dotStyle = styles.dotGreen;
+      textStyle = styles.statusGreen;
+      statusText = 'Operational';
+    } else if (status === 'pending_approval') {
+      badgeStyle = styles.badgeBlue;
+      dotStyle = styles.dotBlue;
+      textStyle = styles.statusBlue;
+      statusText = 'Pending Approval';
+    } else if (status === 'rejected') {
+      badgeStyle = styles.badgeRed;
+      dotStyle = styles.dotRed;
+      textStyle = styles.statusRed;
+      statusText = 'Rejected';
+    } else if (status === 'suspended') {
+      badgeStyle = styles.badgeGray;
+      dotStyle = styles.dotGray;
+      textStyle = styles.statusGray;
+      statusText = 'Suspended';
+    }
+  }
 
   return (
     <Pressable onPress={onPress} style={styles.card}>
@@ -68,10 +98,10 @@ function SchoolCard({
             Admin: {hasAdmin ? school.admin!.name : '—'}
           </Text>
         </View>
-        <View style={[styles.statusBadge, hasAdmin ? styles.badgeGreen : styles.badgeOrange]}>
-          <View style={[styles.statusDot, hasAdmin ? styles.dotGreen : styles.dotOrange]} />
-          <Text style={[styles.statusText, hasAdmin ? styles.statusGreen : styles.statusOrange]}>
-            {hasAdmin ? 'Operational' : 'Needs Admin'}
+        <View style={[styles.statusBadge, badgeStyle]}>
+          <View style={[styles.statusDot, dotStyle]} />
+          <Text style={[styles.statusText, textStyle]}>
+            {statusText}
           </Text>
         </View>
       </View>
@@ -122,8 +152,9 @@ export function SchoolsScreen({ navigation }: Props) {
     return hay.includes(query.trim().toLowerCase());
   });
 
-  const operational = schools.filter((s) => s.admin).length;
-  const needsAdmin = schools.length - operational;
+  const operational = schools.filter((s) => s.admin && s.admin.status === 'active').length;
+  const pendingApproval = schools.filter((s) => s.admin && s.admin.status === 'pending_approval').length;
+  const needsAdmin = schools.filter((s) => !s.admin).length;
 
   return (
     <SafeAreaView edges={['top']} style={styles.safe}>
@@ -161,6 +192,14 @@ export function SchoolsScreen({ navigation }: Props) {
                 <View style={styles.dotGreen} />
                 <Text style={styles.statChipText}>{operational} Operational</Text>
               </View>
+              {pendingApproval > 0 ? (
+                <View style={[styles.statChip, styles.statChipInfo]}>
+                  <View style={styles.dotBlue} />
+                  <Text style={[styles.statChipText, styles.statChipTextInfo]}>
+                    {pendingApproval} Pending
+                  </Text>
+                </View>
+              ) : null}
               {needsAdmin > 0 ? (
                 <View style={[styles.statChip, styles.statChipWarn]}>
                   <View style={styles.dotOrange} />
@@ -462,6 +501,15 @@ const styles = StyleSheet.create({
   badgeOrange: {
     backgroundColor: '#FFF4E0',
   },
+  badgeBlue: {
+    backgroundColor: '#EAF4FF',
+  },
+  badgeRed: {
+    backgroundColor: '#FDF2F2',
+  },
+  badgeGray: {
+    backgroundColor: '#F3F4F6',
+  },
   statusDot: {
     width: 6,
     height: 6,
@@ -479,6 +527,24 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 3,
   },
+  dotBlue: {
+    backgroundColor: '#1D8EF5',
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  dotRed: {
+    backgroundColor: '#EF4444',
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  dotGray: {
+    backgroundColor: '#9CA3AF',
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
   statusText: {
     fontSize: 12,
     fontWeight: '600',
@@ -488,6 +554,21 @@ const styles = StyleSheet.create({
   },
   statusOrange: {
     color: '#92400E',
+  },
+  statusBlue: {
+    color: '#156FD6',
+  },
+  statusRed: {
+    color: '#EF4444',
+  },
+  statusGray: {
+    color: '#6B7280',
+  },
+  statChipInfo: {
+    backgroundColor: '#EAF4FF',
+  },
+  statChipTextInfo: {
+    color: '#156FD6',
   },
   // Register button
   registerBtn: {

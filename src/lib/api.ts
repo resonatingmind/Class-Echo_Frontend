@@ -1571,3 +1571,29 @@ export function getTimetableTemplateUrl() {
 export async function getTeacherTimetable(token: string) {
   return request<TimetableEntryOut[]>("/teacher/timetable", {}, token);
 }
+
+export async function approveAdminSchool(token: string, schoolId: number) {
+  return request<SchoolOut>(
+    `/admin/schools/${schoolId}/approve`,
+    { method: "POST" },
+    token,
+  );
+}
+
+export async function rejectAdminSchool(
+  token: string,
+  schoolId: number,
+  reason?: string,
+) {
+  return request<SchoolOut>(
+    `/admin/schools/${schoolId}/reject`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ reason }),
+    },
+    token,
+  );
+}

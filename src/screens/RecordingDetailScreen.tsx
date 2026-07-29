@@ -599,10 +599,10 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
         ) : (
           <View style={[styles.processingCard, status === 'failed' && styles.processingCardFailed]}>
             {status === 'processing' ? (
-              <ActivityIndicator color={colors.accent} size="small" />
+              <ActivityIndicator color={AppTheme.colors.primary} size="small" />
             ) : (
               <Ionicons
-                color={status === 'failed' ? '#B42318' : colors.textMuted}
+                color={status === 'failed' ? '#B42318' : AppTheme.colors.hint}
                 name={status === 'failed' ? 'alert-circle-outline' : 'time-outline'}
                 size={20}
               />

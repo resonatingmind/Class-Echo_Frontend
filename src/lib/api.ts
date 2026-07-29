@@ -753,6 +753,7 @@ export interface TeacherSubjectSummary {
   id: number;
   name: string;
   class_name: string;
+  section?: string;
   chapter_count: number;
   recording_count: number;
 }
@@ -788,11 +789,13 @@ export async function uploadRecording(
   transcription?: string,
   durationSeconds?: number,
   onProgress?: (pct: number) => void,
+  learningPlanId?: number,
 ): Promise<RecordingWithReport> {
   const form = new FormData();
   const normalizedType = normalizeMimeType(fileUri, mimeType);
   await appendFile(form, "file", fileUri, normalizedType, "recording");
   form.append("chapter_id", String(chapterId));
+  if (learningPlanId) form.append("learning_plan_id", String(learningPlanId));
   if (lectureTitle) form.append("lecture_title", lectureTitle);
   if (description) form.append("description", description);
   if (transcription) form.append("transcription", transcription);
@@ -1210,6 +1213,116 @@ export async function updateTeacherChapter(
 export async function deleteTeacherChapter(token: string, chapterId: number) {
   return request<void>(
     `/teacher/chapters/${chapterId}`,
+    {
+      method: "DELETE",
+    },
+    token,
+  );
+}
+
+// ── Teacher: Learning Plans (Micro Planner) ─────────────────────────────────
+
+export async function getTeacherLearningPlans(
+  token: string,
+  subjectId: number,
+  chapterId: number,
+) {
+  return request<LearningPlanOut[]>(
+    `/teacher/subjects/${subjectId}/chapters/${chapterId}/learning-plans`,
+    {},
+    token,
+  );
+}
+
+export async function createTeacherLearningPlan(
+  token: string,
+  subjectId: number,
+  chapterId: number,
+  payload: LearningPlanCreatePayload,
+) {
+  return request<LearningPlanOut>(
+    `/teacher/subjects/${subjectId}/chapters/${chapterId}/learning-plans`,
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+    token,
+  );
+}
+
+export async function updateTeacherLearningPlan(
+  token: string,
+  planId: number,
+  payload: Partial<LearningPlanCreatePayload>,
+) {
+  return request<LearningPlanOut>(
+    `/teacher/learning-plans/${planId}`,
+    {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    },
+    token,
+  );
+}
+
+export async function deleteTeacherLearningPlan(token: string, planId: number) {
+  return request<void>(
+    `/teacher/learning-plans/${planId}`,
+    {
+      method: "DELETE",
+    },
+    token,
+  );
+}
+
+// ── School Admin: Learning Plans (Micro Planner) ──────────────────────────────
+
+export async function getSchoolLearningPlans(
+  token: string,
+  subjectId: number,
+  chapterId: number,
+) {
+  return request<LearningPlanOut[]>(
+    `/school/subjects/${subjectId}/chapters/${chapterId}/learning-plans`,
+    {},
+    token,
+  );
+}
+
+export async function createSchoolLearningPlan(
+  token: string,
+  subjectId: number,
+  chapterId: number,
+  payload: LearningPlanCreatePayload,
+) {
+  return request<LearningPlanOut>(
+    `/school/subjects/${subjectId}/chapters/${chapterId}/learning-plans`,
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+    token,
+  );
+}
+
+export async function updateSchoolLearningPlan(
+  token: string,
+  planId: number,
+  payload: Partial<LearningPlanCreatePayload>,
+) {
+  return request<LearningPlanOut>(
+    `/school/learning-plans/${planId}`,
+    {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    },
+    token,
+  );
+}
+
+export async function deleteSchoolLearningPlan(token: string, planId: number) {
+  return request<void>(
+    `/school/learning-plans/${planId}`,
     {
       method: "DELETE",
     },

@@ -102,6 +102,7 @@ export function TeacherSubjectsScreen({ navigation }: Props) {
   const statusOptions: SelectionItem[] = [
     { id: "", label: "All Status" },
     { id: "Completed", label: "Completed" },
+    { id: "Pending", label: "Pending" },
     { id: "Processing", label: "Processing" },
     { id: "Failed", label: "Failed" },
     { id: "No Recording", label: "No Recording" },

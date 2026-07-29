@@ -350,6 +350,20 @@ export function SchoolAdminTeacherAnalyticsScreen({
                 <Text style={styles.infoText}>{teacherProfile?.email}</Text>
               </View>
 
+              {teacherProfile?.classes && teacherProfile.classes.length > 0 ? (
+                <View style={styles.infoRow}>
+                  <Ionicons
+                    name="easel-outline"
+                    size={18}
+                    color={colors.textSecondary}
+                  />
+
+                  <Text style={styles.infoText}>
+                    {teacherProfile.classes.join(", ")}
+                  </Text>
+                </View>
+              ) : null}
+
               <View style={styles.infoRow}>
                 <Ionicons
                   name="calendar-outline"

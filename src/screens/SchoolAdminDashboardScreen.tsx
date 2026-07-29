@@ -257,6 +257,32 @@ export function SchoolAdminDashboardScreen({ navigation }: Props) {
             <Text style={styles.quickSubtitle}>Manage</Text>
           </Pressable>
 
+          {/* <Pressable
+            style={styles.quickCard}
+            onPress={() =>
+              navigation.navigate("SchoolAdminTabs", {
+                screen: "SchoolAdminDashboard",
+              })
+            }
+          >
+            <Ionicons name="people-circle" size={34} color={colors.accent} />
+
+            <Text style={styles.quickTitle}>Students</Text>
+
+            <Text style={styles.quickSubtitle}>Browse</Text>
+          </Pressable> */}
+
+          <Pressable
+            style={styles.quickCard}
+            onPress={() => navigation.navigate("SchoolAdminPlanner")}
+          >
+            <Ionicons name="calendar-outline" size={34} color={colors.accent} />
+
+            <Text style={styles.quickTitle}>Planner</Text>
+
+            <Text style={styles.quickSubtitle}>Manage</Text>
+          </Pressable>
+
           <Pressable
             style={styles.quickCard}
             onPress={() => navigation.navigate("SchoolAdminTimetable")}

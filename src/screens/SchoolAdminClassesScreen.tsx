@@ -337,12 +337,12 @@ export function SchoolAdminClassesScreen({ navigation }: Props) {
             <Text style={styles.tabInactiveText}>Teachers</Text>
           </Pressable>
 
-          <Pressable
+          {/* <Pressable
             onPress={() => navigation.navigate("SchoolAdminPlanner")}
             style={styles.tabInactive}
           >
             <Text style={styles.tabInactiveText}>Planner</Text>
-          </Pressable>
+          </Pressable> */}
         </View>
 
         <Pressable onPress={() => setShowCreate(true)} style={styles.tabAddBtn}>

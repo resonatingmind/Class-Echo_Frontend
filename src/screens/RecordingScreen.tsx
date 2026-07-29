@@ -23,10 +23,12 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import * as DocumentPicker from 'expo-document-picker';
 import { AudioWaveform } from '../components/AudioWaveform';
 import { useAuth } from '../context/AuthContext';
 import { formatAudioTime, inferMimeTypeFromUri, normalizeMeteringValue } from '../lib/audio';
-import { uploadRecording } from '../lib/api';
+import { uploadRecording, getTeacherLearningPlans } from '../lib/api';
+import { LearningPlanOut } from '../types/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 
@@ -66,6 +68,17 @@ export function RecordingScreen({ navigation, route }: Props) {
   const [recordedUri, setRecordedUri] = useState<string | null>(null);
   const [recordedDuration, setRecordedDuration] = useState(0);
   const [meterBars, setMeterBars] = useState<number[]>([]);
+
+  const [learningPlans, setLearningPlans] = useState<LearningPlanOut[]>([]);
+  const [selectedLearningPlanId, setSelectedLearningPlanId] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    if (session && subjectId && chapterId) {
+      getTeacherLearningPlans(session.token, subjectId, chapterId)
+        .then(setLearningPlans)
+        .catch(() => setLearningPlans([]));
+    }
+  }, [session, subjectId, chapterId]);
 
   const [isDictatingEnabled, setIsDictatingEnabled] = useState(true);
   const [liveTranscript, setLiveTranscript] = useState('');
@@ -249,7 +262,34 @@ export function RecordingScreen({ navigation, route }: Props) {
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate("TeacherSubjects");
+      navigation.navigate("TeacherTabs" as any);
+    }
+  };
+
+  const pickAudioFile = async () => {
+    try {
+      const res = await DocumentPicker.getDocumentAsync({
+        type: ['audio/*'],
+        copyToCacheDirectory: true,
+      });
+
+      if (!res.canceled && res.assets && res.assets.length > 0) {
+        const file = res.assets[0];
+        setRecordedUri(file.uri);
+        setRecordedDuration(0);
+        if (file.name) {
+          const cleanName = file.name.replace(/\.[^/.]+$/, "");
+          setLectureTitle(cleanName);
+        }
+        try {
+          previewPlayer.replace(file.uri);
+        } catch {
+          // Preview fallback
+        }
+        setState('stopped');
+      }
+    } catch {
+      Alert.alert('Error', 'Could not select audio file.');
     }
   };
 
@@ -328,6 +368,7 @@ export function RecordingScreen({ navigation, route }: Props) {
         transcription.trim() || undefined,
         recordedDuration,
         setUploadProgress,
+        selectedLearningPlanId,
       );
       console.log('[recording] upload:success', {
         subjectId,
@@ -336,7 +377,7 @@ export function RecordingScreen({ navigation, route }: Props) {
       if (navigation.canGoBack()) {
         navigation.goBack();
       } else {
-        navigation.navigate("TeacherSubjects");
+        navigation.navigate("TeacherTabs" as any);
       };
     } catch (e) {
       console.error('[recording] upload:failure', {
@@ -361,7 +402,7 @@ export function RecordingScreen({ navigation, route }: Props) {
             if (navigation.canGoBack()) {
               navigation.goBack();
             } else {
-              navigation.navigate("TeacherSubjects");
+              navigation.navigate("TeacherTabs" as any);
             }
           }}
           style={styles.headerBack}
@@ -402,10 +443,17 @@ export function RecordingScreen({ navigation, route }: Props) {
               </Pressable>
             )}
 
-            <Pressable onPress={() => void startRecording()} style={styles.recordBtn}>
-              <Ionicons color="#fff" name="mic" size={22} />
-              <Text style={styles.recordBtnText}>Start Recording</Text>
-            </Pressable>
+            <View style={styles.actionChoiceRow}>
+              <Pressable onPress={() => void startRecording()} style={[styles.recordBtn, { flex: 1 }]}>
+                <Ionicons color="#fff" name="mic" size={22} />
+                <Text style={styles.recordBtnText}>Start Live Recording</Text>
+              </Pressable>
+
+              <Pressable onPress={() => void pickAudioFile()} style={styles.uploadChoiceBtn}>
+                <Ionicons color="#0284C7" name="cloud-upload-outline" size={22} />
+                <Text style={styles.uploadChoiceText}>Upload Audio File</Text>
+              </Pressable>
+            </View>
           </>
         ) : null}
 
@@ -526,6 +574,57 @@ export function RecordingScreen({ navigation, route }: Props) {
                 </Text>
               </View>
 
+              {learningPlans.length > 0 ? (
+                <View style={{ marginBottom: 14 }}>
+                  <Text style={styles.metaLabel}>MICRO PLANNER TOPIC / SUB-TOPIC</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 6, marginBottom: 4 }}>
+                    <View style={{ flexDirection: 'row', gap: 8 }}>
+                      <Pressable
+                        onPress={() => setSelectedLearningPlanId(undefined)}
+                        style={{
+                          paddingHorizontal: 12,
+                          paddingVertical: 8,
+                          borderRadius: 10,
+                          borderWidth: 1,
+                          borderColor: selectedLearningPlanId === undefined ? "#0284C7" : colors.border,
+                          backgroundColor: selectedLearningPlanId === undefined ? "#E0F2FE" : colors.surface,
+                        }}
+                      >
+                        <Text style={{ fontSize: 13, color: selectedLearningPlanId === undefined ? "#0369A1" : colors.textSecondary, fontWeight: '600' }}>
+                          None (General Chapter)
+                        </Text>
+                      </Pressable>
+                      {learningPlans.map((lp) => {
+                        const isSel = selectedLearningPlanId === lp.id;
+                        return (
+                          <Pressable
+                            key={lp.id}
+                            onPress={() => setSelectedLearningPlanId(lp.id)}
+                            style={{
+                              paddingHorizontal: 12,
+                              paddingVertical: 8,
+                              borderRadius: 10,
+                              borderWidth: 1,
+                              borderColor: isSel ? "#0284C7" : colors.border,
+                              backgroundColor: isSel ? "#E0F2FE" : colors.surface,
+                            }}
+                          >
+                            <Text style={{ fontSize: 13, color: isSel ? "#0369A1" : colors.textPrimary, fontWeight: '700' }}>
+                              {lp.sub_topic}
+                            </Text>
+                            {lp.topic_name ? (
+                              <Text style={{ fontSize: 11, color: isSel ? "#0284C7" : colors.textMuted }}>
+                                {lp.topic_name} {lp.date ? `(${lp.date})` : ''}
+                              </Text>
+                            ) : null}
+                          </Pressable>
+                        );
+                      })}
+                    </View>
+                  </ScrollView>
+                </View>
+              ) : null}
+
               <Text style={styles.metaLabel}>LECTURE TITLE *</Text>
               <TextInput
                 autoCapitalize="words"
@@ -615,16 +714,36 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     maxWidth: 320,
   },
+  actionChoiceRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 10,
+  },
   recordBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
+    gap: 8,
     backgroundColor: colors.accent,
     paddingVertical: 16,
+    paddingHorizontal: 12,
     borderRadius: 18,
   },
-  recordBtnText: { color: '#fff', fontSize: 16, fontWeight: '800' },
+  recordBtnText: { color: '#fff', fontSize: 15, fontWeight: '800' },
+  uploadChoiceBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#E0F2FE',
+    borderWidth: 1,
+    borderColor: '#BAE6FD',
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderRadius: 18,
+  },
+  uploadChoiceText: { color: '#0284C7', fontSize: 15, fontWeight: '800' },
   recordingTop: { alignItems: 'center', gap: 10, marginTop: 16 },
   liveRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   liveDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#E53935' },

@@ -55,18 +55,17 @@ export function ChapterEditorModal({
           <Text style={styles.title}>{title}</Text>
 
           <TextInput
-            placeholder="Chapter Name"
+            placeholder="Chapter Name (e.g. Coordinate Geometry)"
             value={name}
             onChangeText={setName}
             style={styles.input}
           />
 
           <TextInput
-            placeholder="Description (Optional)"
+            placeholder="Display Title (Optional, e.g. Intro & Distance Formula)"
             value={description}
             onChangeText={setDescription}
-            multiline
-            style={[styles.input, styles.description]}
+            style={styles.input}
           />
 
           <View style={styles.actions}>

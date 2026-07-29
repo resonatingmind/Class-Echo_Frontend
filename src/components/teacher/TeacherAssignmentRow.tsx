@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { colors } from "../../theme/colors";
@@ -11,24 +10,15 @@ type Props = {
   onViewPress: () => void;
 };
 
-// Helper function to dynamically color code the AI statuses
-function getStatusStyle(status: TeacherDashboardSubject["ai_status"]) {
-  switch (status) {
-    case "Completed":
-      return { bg: "#E8F7EE", text: "#127A40" }; // Mint Green
-    case "Processing":
-      return { bg: "#FFF4E0", text: "#92400E" }; // Soft Amber
-    case "Failed":
-      return { bg: "#FFF1F1", text: "#B42318" }; // Soft Red
-    case "No Recording":
-    default:
-      return { bg: "#F1F5F9", text: "#64748B" }; // Slate Gray
+function formatAverageScore(score: number | null | undefined) {
+  if (score === null || score === undefined) {
+    return "—";
   }
+
+  return score.toFixed(1);
 }
 
-export function TeacherAssignmentRow({ row, onPress, onViewPress}: Props) {
-  const badgeStyle = getStatusStyle(row.ai_status);
-
+export function TeacherAssignmentRow({ row, onPress, onViewPress }: Props) {
   const scoreColor = (() => {
     if (row.average_score === null || row.average_score === undefined) {
       return {
@@ -54,7 +44,6 @@ export function TeacherAssignmentRow({ row, onPress, onViewPress}: Props) {
       };
     }
   })();
-
   return (
     <Pressable style={styles.row} onPress={onPress}>
       {/* Class */}
@@ -121,24 +110,10 @@ export function TeacherAssignmentRow({ row, onPress, onViewPress}: Props) {
       >
         <View style={[styles.aiBadge, { backgroundColor: scoreColor.bg }]}>
           <Text style={[styles.aiText, { color: scoreColor.text }]}>
-            {row.average_score !== null && row.average_score !== undefined
-              ? row.average_score.toFixed(1)
-              : "—"}
+            {formatAverageScore(row.average_score)}
           </Text>
         </View>
       </View>
-
-      {/* View Action Container (Transformed to View so the whole row click catches seamlessly) */}
-      {/* <View
-        style={{
-          flex: TABLE_COLUMNS.action,
-          alignItems: "center",
-        }}
-      >
-        <View style={styles.viewButton}>
-          <Text style={styles.viewText}>View</Text>
-        </View>
-      </View> */}
 
       <View style={{ flex: TABLE_COLUMNS.action, alignItems: "center" }}>
         <Pressable
@@ -171,16 +146,22 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   aiBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    minWidth: 95, // Keeps the badges perfectly uniform across status length variations
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
   },
   aiText: {
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: "700",
+  },
+  scoreText: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: colors.textPrimary,
+  },
+  scoreTextMuted: {
+    fontWeight: "400",
+    color: colors.textMuted,
   },
   viewButton: {
     width: 60,

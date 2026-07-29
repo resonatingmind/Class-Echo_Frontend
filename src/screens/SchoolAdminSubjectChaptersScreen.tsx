@@ -20,12 +20,15 @@ import { useAuth } from '../context/AuthContext';
 import {
   createChapter,
   deleteChapter,
+  getChapterRecordings,
   getChapters,
+  getSchoolLearningPlans,
   updateChapter,
 } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
-import { ChapterOut } from '../types/api';
+import { ChapterOut, LearningPlanOut, RecordingWithReport } from '../types/api';
+import { ExpandedChapterDetailView } from '../components/ExpandedChapterDetailView';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SchoolAdminSubjectChapters'>;
 
@@ -126,6 +129,36 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
   const [description, setDescription] = useState('');
   const [modalError, setModalError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // Expanded Chapter Nested Sub-Table State
+  const [expandedChapterId, setExpandedChapterId] = useState<number | null>(null);
+  const [expandedRecordings, setExpandedRecordings] = useState<Record<number, any[]>>({});
+  const [expandedLps, setExpandedLps] = useState<Record<number, LearningPlanOut[]>>({});
+  const [loadingExpandedId, setLoadingExpandedId] = useState<number | null>(null);
+
+  const toggleExpandChapter = async (chapterId: number) => {
+    if (!session) return;
+    if (expandedChapterId === chapterId) {
+      setExpandedChapterId(null);
+      return;
+    }
+    setExpandedChapterId(chapterId);
+    if (!expandedRecordings[chapterId]) {
+      setLoadingExpandedId(chapterId);
+      try {
+        const [recs, lps] = await Promise.all([
+          getChapterRecordings(session.token, chapterId),
+          getSchoolLearningPlans(session.token, subjectId, chapterId),
+        ]);
+        setExpandedRecordings((prev) => ({ ...prev, [chapterId]: recs }));
+        setExpandedLps((prev) => ({ ...prev, [chapterId]: lps }));
+      } catch (e) {
+        console.warn("Failed to fetch expanded chapter details:", e);
+      } finally {
+        setLoadingExpandedId(null);
+      }
+    }
+  };
 
   const load = useCallback(
     async (silent = false) => {
@@ -312,61 +345,117 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                 year: 'numeric',
               });
 
+              const isExpanded = expandedChapterId === chapter.id;
+              const recs = expandedRecordings[chapter.id] || [];
+              const lps = expandedLps[chapter.id] || [];
+              const isExLoading = loadingExpandedId === chapter.id;
+
               return (
-                <Pressable
-                  key={chapter.id}
-                  onPress={() =>
-                    navigation.navigate('SchoolAdminChapterDetail', {
-                      chapterId: chapter.id,
-                      chapterName: chapter.name,
-                      subjectName,
-                    })
-                  }
-                  style={styles.chapterCard}
-                >
-                  <View style={styles.chapterCardHeader}>
-                    <View style={styles.chapterInfoWrap}>
-                      <Text style={styles.chapterName}>{chapter.name}</Text>
-                      {chapter.description ? (
-                        <Text style={styles.chapterDesc} numberOfLines={2}>
-                          {chapter.description}
-                        </Text>
-                      ) : (
-                        <Text style={[styles.chapterDesc, { fontStyle: 'italic' }]}>
-                          No description provided.
-                        </Text>
-                      )}
+                <View key={chapter.id} style={{ gap: 8 }}>
+                  <Pressable
+                    onPress={() =>
+                      navigation.navigate('SchoolAdminChapterDetail', {
+                        chapterId: chapter.id,
+                        chapterName: chapter.name,
+                        subjectName,
+                        subjectId,
+                      })
+                    }
+                    style={styles.chapterCard}
+                  >
+                    <View style={styles.chapterCardHeader}>
+                      <View style={styles.chapterInfoWrap}>
+                        <Text style={styles.chapterName}>{chapter.name}</Text>
+                        {chapter.description ? (
+                          <Text style={styles.chapterDesc} numberOfLines={2}>
+                            {chapter.description}
+                          </Text>
+                        ) : (
+                          <Text style={[styles.chapterDesc, { fontStyle: 'italic' }]}>
+                            No description provided.
+                          </Text>
+                        )}
+                      </View>
+                      <View style={styles.chapterActions}>
+                        <Pressable
+                          hitSlop={8}
+                          onPress={() => openEditModal(chapter)}
+                          style={styles.actionIconBtn}
+                        >
+                          <Ionicons color={colors.textSecondary} name="create-outline" size={18} />
+                        </Pressable>
+                        <Pressable
+                          hitSlop={8}
+                          onPress={() => handleDelete(chapter)}
+                          style={styles.actionIconBtn}
+                        >
+                          <Ionicons color="#B42318" name="trash-outline" size={18} />
+                        </Pressable>
+                      </View>
                     </View>
-                    <View style={styles.chapterActions}>
-                      <Pressable
-                        hitSlop={8}
-                        onPress={() => openEditModal(chapter)}
-                        style={styles.actionIconBtn}
-                      >
-                        <Ionicons color={colors.textSecondary} name="create-outline" size={18} />
-                      </Pressable>
-                      <Pressable
-                        hitSlop={8}
-                        onPress={() => handleDelete(chapter)}
-                        style={styles.actionIconBtn}
-                      >
-                        <Ionicons color="#B42318" name="trash-outline" size={18} />
-                      </Pressable>
-                    </View>
-                  </View>
 
-                  <View style={styles.chapterDivider} />
+                    <View style={styles.chapterDivider} />
 
-                  <View style={styles.chapterCardFooter}>
-                    <View style={styles.footerStat}>
-                      <Ionicons color={colors.textMuted} name="document-text-outline" size={14} />
-                      <Text style={styles.footerStatText}>
-                        {chapter.document_count ?? 0} { (chapter.document_count === 1) ? 'document' : 'documents' }
-                      </Text>
+                    <View style={styles.chapterCardFooter}>
+                      <View style={styles.footerStat}>
+                        <Ionicons color={colors.textMuted} name="document-text-outline" size={14} />
+                        <Text style={styles.footerStatText}>
+                          {chapter.document_count ?? 0} { (chapter.document_count === 1) ? 'document' : 'documents' }
+                        </Text>
+                      </View>
+
+                      <Pressable
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          gap: 4,
+                          paddingVertical: 4,
+                          paddingHorizontal: 10,
+                          borderRadius: 8,
+                          backgroundColor: isExpanded ? "#E0F2FE" : "#F1F5F9",
+                        }}
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          void toggleExpandChapter(chapter.id);
+                        }}
+                      >
+                        <Ionicons name={isExpanded ? "chevron-up" : "chevron-down"} size={16} color="#0284C7" />
+                        <Text style={{ fontSize: 12, fontWeight: "700", color: "#0284C7" }}>
+                          {isExpanded ? "Hide Lectures" : "View Lectures & Sub-Table"}
+                        </Text>
+                      </Pressable>
+
+                      <Text style={styles.footerDate}>Updated {lastUpdatedStr}</Text>
                     </View>
-                    <Text style={styles.footerDate}>Updated {lastUpdatedStr}</Text>
-                  </View>
-                </Pressable>
+                  </Pressable>
+
+                  {isExpanded ? (
+                    <ExpandedChapterDetailView
+                      chapterId={chapter.id}
+                      chapterName={chapter.name}
+                      subjectId={subjectId}
+                      subjectName={subjectName}
+                      recordings={recs}
+                      learningPlans={lps}
+                      loading={isExLoading}
+                      role="school_admin"
+                      onViewRecordingReport={(rec) => {
+                        navigation.navigate("RecordingDetail", {
+                          recording: rec,
+                          subjectName,
+                        });
+                      }}
+                      onOpenChapterDetail={() => {
+                        navigation.navigate("SchoolAdminChapterDetail", {
+                          chapterId: chapter.id,
+                          chapterName: chapter.name,
+                          subjectName,
+                          subjectId,
+                        });
+                      }}
+                    />
+                  ) : null}
+                </View>
               );
             })}
           </View>

@@ -14,6 +14,8 @@ export const CHAPTER_COLUMNS = {
 
 type Props = {
   chapters: PlannerChapter[];
+  subjectId?: number;
+  subjectName?: string;
 
   onOpenDocuments: (chapter: PlannerChapter) => void;
 
@@ -24,6 +26,8 @@ type Props = {
 
 export function PlannerChapterTable({
   chapters,
+  subjectId,
+  subjectName,
   onOpenDocuments,
   onAddDocument,
   onOpenRecordings,
@@ -64,6 +68,8 @@ export function PlannerChapterTable({
           <PlannerChapterRow
             key={chapter.id}
             chapter={chapter}
+            subjectId={subjectId}
+            subjectName={subjectName}
             isLast={index === chapters.length - 1}
             onOpenDocuments={() => onOpenDocuments(chapter)}
             onAddDocument={() => onAddDocument(chapter)}

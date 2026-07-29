@@ -21,6 +21,7 @@ import {
   CurriculumCoverageCard,
   LearningObjectivesCard,
   ReferenceAlignmentCard,
+  LearningPlanInfoCard,
 } from '../components/RAGReportSections';
 import { useAuth } from '../context/AuthContext';
 import { archiveTeacherRecording, deleteTeacherRecording, retryRecording, updateTeacherRecording } from '../lib/api';
@@ -571,6 +572,11 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
                 {/* Chapter info banner */}
                 {report.chapter_info ? (
                   <ChapterInfoBanner data={report.chapter_info} />
+                ) : null}
+
+                {/* Selected Learning Plan (Micro Planner) */}
+                {recording.learning_plan ? (
+                  <LearningPlanInfoCard data={recording.learning_plan} />
                 ) : null}
 
                 {/* Curriculum coverage */}

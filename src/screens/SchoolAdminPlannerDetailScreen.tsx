@@ -213,11 +213,14 @@ export function SchoolAdminPlannerDetailScreen() {
 
         <PlannerChapterTable
           chapters={detail.chapters}
+          subjectId={detail.subject_id}
+          subjectName={detail.subject_name}
           onOpenDocuments={(chapter) => {
             navigation.navigate("SchoolAdminChapterDetail", {
               chapterId: chapter.id,
               chapterName: chapter.name,
               subjectName: detail.subject_name,
+              subjectId: detail.subject_id,
             });
           }}
           onAddDocument={(chapter) => {
@@ -225,6 +228,7 @@ export function SchoolAdminPlannerDetailScreen() {
               chapterId: chapter.id,
               chapterName: chapter.name,
               subjectName: detail.subject_name,
+              subjectId: detail.subject_id,
               openUpload: true,
             });
           }}

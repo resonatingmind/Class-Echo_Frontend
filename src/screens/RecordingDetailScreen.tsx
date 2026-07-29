@@ -25,8 +25,8 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { archiveTeacherRecording, deleteTeacherRecording, retryRecording, updateTeacherRecording } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
-import { ScreenHeader } from '../components/common/ScreenHeader';
-import { colors } from '../theme/colors';
+import { AppTheme } from '../theme/AppTheme';
+import { AppLogo } from '../components/ui/AppLogo';
 import { DimensionScore, QuantitativeMetrics, RecordingStatus, ScoreBreakdown } from '../types/api';
 import { buildWaveformBars, formatAudioTime } from '../lib/audio';
 
@@ -54,7 +54,7 @@ const DIMENSIONS: {
 function scoreColor(score: number, max: number): string {
   const pct = score / max;
   if (pct >= 0.8) return '#127A40';
-  if (pct >= 0.6) return colors.accent;
+  if (pct >= 0.6) return AppTheme.colors.primary;
   if (pct >= 0.4) return '#92400E';
   return '#B42318';
 }
@@ -71,7 +71,7 @@ function statusStyle(status: RecordingStatus) {
   switch (status) {
     case 'completed':  return { bg: '#E8F7EE', text: '#127A40', label: 'Analysed' };
     case 'processing': return { bg: '#FFF4E0', text: '#92400E', label: 'Processing' };
-    case 'pending':    return { bg: colors.surfaceMuted, text: colors.textSecondary, label: 'Pending' };
+    case 'pending':    return { bg: AppTheme.colors.background, text: AppTheme.colors.textSecondary, label: 'Pending' };
     case 'failed':     return { bg: '#FFF1F1', text: '#B42318', label: 'Failed' };
   }
 }
@@ -101,7 +101,7 @@ const ring = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 2,
   },
   score: { fontSize: 30, fontWeight: '800' },
-  outOf: { fontSize: 12, fontWeight: '600', color: colors.textMuted, marginTop: 10 },
+  outOf: { fontSize: 12, fontWeight: '600', color: AppTheme.colors.textSecondary, marginTop: 10 },
   gradeBadge: {
     paddingHorizontal: 14, paddingVertical: 4, borderRadius: 999,
   },
@@ -118,7 +118,7 @@ function MetricsStrip({ q }: { q: QuantitativeMetrics }) {
     <View style={ms.wrap}>
       {items.map((item, i) => (
         <View key={item.label} style={[ms.cell, i < items.length - 1 && ms.cellBorder]}>
-          <Ionicons color={colors.accent} name={item.icon as any} size={16} />
+          <Ionicons color={AppTheme.colors.primary} name={item.icon as any} size={16} />
           <Text style={ms.value}>{item.value}</Text>
           <Text style={ms.label}>{item.label}</Text>
         </View>
@@ -130,13 +130,16 @@ function MetricsStrip({ q }: { q: QuantitativeMetrics }) {
 const ms = StyleSheet.create({
   wrap: {
     flexDirection: 'row',
-    borderRadius: 16, borderWidth: 1, borderColor: colors.border,
-    backgroundColor: colors.surfaceSoft, overflow: 'hidden',
+    borderRadius: AppTheme.radius.medium,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.background,
+    overflow: 'hidden',
   },
   cell: { flex: 1, alignItems: 'center', paddingVertical: 14, gap: 3 },
-  cellBorder: { borderRightWidth: 1, borderRightColor: colors.border },
-  value: { fontSize: 18, fontWeight: '800', color: colors.textPrimary },
-  label: { fontSize: 10, fontWeight: '700', color: colors.textMuted, letterSpacing: 0.8 },
+  cellBorder: { borderRightWidth: 1, borderRightColor: AppTheme.colors.border },
+  value: { fontSize: 18, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  label: { fontSize: 10, fontWeight: '700', color: AppTheme.colors.textSecondary, letterSpacing: 0.8 },
 });
 
 function LanguagePill({ text }: { text: string }) {
@@ -150,9 +153,9 @@ function LanguagePill({ text }: { text: string }) {
 const lp = StyleSheet.create({
   pill: {
     paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999,
-    backgroundColor: colors.accentSoft, borderWidth: 1, borderColor: colors.accent + '40',
+    backgroundColor: '#EAF4FF', borderWidth: 1, borderColor: AppTheme.colors.primary + '40',
   },
-  text: { fontSize: 12, fontWeight: '700', color: colors.accentDark },
+  text: { fontSize: 12, fontWeight: '700', color: '#156FD6' },
 });
 
 function DimensionCard({ dim, data }: { dim: typeof DIMENSIONS[0]; data: DimensionScore }) {
@@ -198,29 +201,33 @@ function DimensionCard({ dim, data }: { dim: typeof DIMENSIONS[0]; data: Dimensi
 
 const dc = StyleSheet.create({
   card: {
-    borderRadius: 16, borderWidth: 1, borderColor: colors.border,
-    backgroundColor: colors.surface, padding: 16, gap: 10,
+    borderRadius: AppTheme.radius.medium,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.surface,
+    padding: 16,
+    gap: 10,
   },
   header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   iconWrap: {
-    width: 32, height: 32, borderRadius: 10, backgroundColor: colors.surfaceSoft,
+    width: 32, height: 32, borderRadius: 10, backgroundColor: AppTheme.colors.background,
     alignItems: 'center', justifyContent: 'center',
   },
-  label: { flex: 1, fontSize: 14, fontWeight: '700', color: colors.textPrimary },
+  label: { flex: 1, fontSize: 14, fontWeight: '700', color: AppTheme.colors.textPrimary },
   scoreBadge: {
     paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, borderWidth: 1,
   },
   scoreText: { fontSize: 14, fontWeight: '800' },
   maxText: { fontSize: 11, fontWeight: '600' },
   barTrack: {
-    height: 6, borderRadius: 3, backgroundColor: colors.surfaceMuted, overflow: 'hidden',
+    height: 6, borderRadius: 3, backgroundColor: AppTheme.colors.background, overflow: 'hidden',
   },
   barFill: { height: 6, borderRadius: 3 },
-  finding: { fontSize: 13, lineHeight: 19, color: colors.textSecondary, fontStyle: 'italic' },
+  finding: { fontSize: 13, lineHeight: 19, color: AppTheme.colors.textSecondary, fontStyle: 'italic' },
   evidenceList: { gap: 5 },
   evidenceRow: { flexDirection: 'row', gap: 6 },
-  evidenceDot: { fontSize: 14, color: colors.textMuted, lineHeight: 20, marginTop: 1 },
-  evidenceText: { flex: 1, fontSize: 12, lineHeight: 18, color: colors.textMuted },
+  evidenceDot: { fontSize: 14, color: AppTheme.colors.textSecondary, lineHeight: 20, marginTop: 1 },
+  evidenceText: { flex: 1, fontSize: 12, lineHeight: 18, color: AppTheme.colors.textSecondary },
 });
 
 function BulletList({ items, color, title, icon }: {
@@ -249,7 +256,7 @@ const bl = StyleSheet.create({
   title: { fontSize: 13, fontWeight: '700' },
   row: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
   dot: { width: 5, height: 5, borderRadius: 3, marginTop: 7 },
-  text: { flex: 1, fontSize: 13, lineHeight: 20, color: colors.textSecondary },
+  text: { flex: 1, fontSize: 13, lineHeight: 20, color: AppTheme.colors.textSecondary },
 });
 
 // ── Main screen ───────────────────────────────────────────────────────────────
@@ -352,7 +359,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
               if (navigation.canGoBack()) {
                 navigation.goBack();
               } else {
-                navigation.navigate("TeacherSubjects");
+                navigation.navigate("TeacherTabs");
               }
             } catch (e) {
               Alert.alert('Archive failed', e instanceof Error ? e.message : 'Could not archive recording.');
@@ -380,7 +387,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
               if (navigation.canGoBack()) {
                 navigation.goBack();
               } else {
-                navigation.navigate("TeacherSubjects");
+                navigation.navigate("TeacherTabs");
               }
             } catch (e) {
               Alert.alert('Delete failed', e instanceof Error ? e.message : 'Could not delete recording.');
@@ -395,21 +402,33 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
   const report = recording.report;
 
   return (
-    <SafeAreaView edges={[]} style={styles.safe}>
-      <ScreenHeader
-        title={recording.lecture_title || recording.chapter_name || `Recording #${recording.id}`}
-        onBack={() => navigation.goBack()}
-        rightActions={
-          <Pressable onPress={() => setShowOptionsSheet(true)} style={styles.actionBtn}>
-            <Ionicons color={colors.textPrimary} name="ellipsis-horizontal" size={22} />
+    <SafeAreaView edges={['top', 'bottom']} style={styles.safe}>
+      {/* Global Header */}
+      <View style={styles.globalHeader}>
+        <View style={styles.headerLeft}>
+          <AppLogo showText={false} />
+        </View>
+        <Text style={styles.headerTitle}>
+          {session?.role === 'admin' ? 'Super Admin' : session?.role === 'school_admin' ? 'School Admin' : 'Teacher Portal'}
+        </Text>
+        <View style={styles.headerRight}>
+          <Pressable onPress={() => setShowOptionsSheet(true)} style={styles.iconBtn}>
+            <Ionicons color={AppTheme.colors.textPrimary} name="ellipsis-horizontal" size={22} />
           </Pressable>
-        }
-      />
+        </View>
+      </View>
 
+      <View style={styles.flex}>
+        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+          <View style={styles.centerContainer}>
+            <View style={styles.body}>
+              <Pressable onPress={() => navigation.goBack()} style={styles.backBtnRow}>
+                <Ionicons name="arrow-back" size={20} color={AppTheme.colors.textSecondary} />
+                <Text style={styles.backBtnText}>Back</Text>
+              </Pressable>
 
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        {/* Hero */}
-        <View style={styles.hero}>
+              {/* Hero */}
+              <View style={styles.hero}>
           <Text style={styles.subjectLabel}>{subjectName}{recording.chapter_name ? ` · ${recording.chapter_name}` : ''}</Text>
           <Text style={styles.heroTitle}>
             {recording.lecture_title || recording.chapter_name || `Recording #${recording.id}`}
@@ -444,10 +463,10 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
           <Pressable onPress={handleTogglePlay} style={styles.playerButton}>
             <View style={styles.playerIcon}>
               {!playerStatus.isLoaded || playerStatus.isBuffering ? (
-                <ActivityIndicator color={colors.accent} size="small" />
+                <ActivityIndicator color={AppTheme.colors.primary} size="small" />
               ) : (
                 <Ionicons
-                  color={colors.accent}
+                  color={AppTheme.colors.primary}
                   name={playerStatus.playing ? 'pause' : 'play'}
                   size={24}
                 />
@@ -469,7 +488,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
           <View style={styles.card}>
             <Text style={styles.sectionLabel}>LECTURE TRANSCRIPTION</Text>
             <ScrollView style={{ maxHeight: 200, marginTop: 8 }} nestedScrollEnabled>
-              <Text style={{ fontSize: 14, lineHeight: 22, color: colors.textSecondary }}>
+              <Text style={{ fontSize: 14, lineHeight: 22, color: AppTheme.colors.textSecondary }}>
                 {recording.transcription}
               </Text>
             </ScrollView>
@@ -536,7 +555,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
                   title="Top Strengths"
                 />
                 <BulletList
-                  color={colors.warning}
+                   color={AppTheme.colors.warning}
                   icon="arrow-up-circle-outline"
                   items={report.quantitative_metrics.priority_improvements}
                   title="Priority Improvements"
@@ -609,7 +628,10 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
             </View>
           </View>
         )}
-      </ScrollView>
+            </View>
+          </View>
+        </ScrollView>
+      </View>
 
       {/* Actions sheet */}
       <Modal animationType="fade" onRequestClose={() => setShowOptionsSheet(false)} transparent visible={showOptionsSheet}>
@@ -627,7 +649,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
               style={styles.sheetOption}
             >
               <View style={styles.sheetOptionIcon}>
-                <Ionicons color={colors.accent} name="create-outline" size={20} />
+                <Ionicons color={AppTheme.colors.primary} name="create-outline" size={20} />
               </View>
               <View style={styles.sheetOptionBody}>
                 <Text style={styles.sheetOptionTitle}>Edit Details</Text>
@@ -637,7 +659,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
 
             <Pressable onPress={() => void handleArchive()} style={styles.sheetOption}>
               <View style={styles.sheetOptionIcon}>
-                <Ionicons color={colors.warning} name="archive-outline" size={20} />
+                <Ionicons color={AppTheme.colors.warning} name="archive-outline" size={20} />
               </View>
               <View style={styles.sheetOptionBody}>
                 <Text style={styles.sheetOptionTitle}>Archive Lecture</Text>
@@ -671,7 +693,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
               autoCapitalize="words"
               onChangeText={setEditChapterName}
               placeholder="Enter chapter name"
-              placeholderTextColor={colors.textPlaceholder}
+              placeholderTextColor={AppTheme.colors.hint}
               style={[styles.input, { marginBottom: 8 }]}
               value={editChapterName}
             />
@@ -681,7 +703,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
               autoCapitalize="words"
               onChangeText={setEditLectureTitle}
               placeholder="Enter lecture title"
-              placeholderTextColor={colors.textPlaceholder}
+              placeholderTextColor={AppTheme.colors.hint}
               style={styles.input}
               value={editLectureTitle}
             />
@@ -693,7 +715,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
               numberOfLines={4}
               onChangeText={setEditDescription}
               placeholder="Optional summary or notes for this recording"
-              placeholderTextColor={colors.textPlaceholder}
+              placeholderTextColor={AppTheme.colors.hint}
               style={[styles.input, styles.descriptionInput]}
               value={editDescription}
             />
@@ -721,61 +743,155 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  actionBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  scroll: { paddingBottom: 40, gap: 16 },
-  hero: {
-    padding: 20, backgroundColor: colors.surface,
-    borderBottomWidth: 1, borderBottomColor: colors.border, gap: 8,
+  safe: { flex: 1, backgroundColor: AppTheme.colors.background },
+  flex: { flex: 1 },
+  globalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.m,
+    backgroundColor: AppTheme.colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: AppTheme.colors.border,
   },
-  subjectLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 1.1, color: colors.accent },
-  heroTitle: { fontSize: 28, fontWeight: '800', color: colors.textPrimary, letterSpacing: -0.6 },
-  heroDescription: { fontSize: 14, lineHeight: 22, color: colors.textSecondary },
+  headerLeft: {
+    width: 60,
+    alignItems: 'flex-start',
+  },
+  headerTitle: {
+    flex: 1,
+    textAlign: 'center',
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.heading3,
+  },
+  headerRight: {
+    flexDirection: 'row',
+    gap: AppTheme.spacing.s,
+    width: 60,
+    justifyContent: 'flex-end',
+  },
+  iconBtn: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  centerContainer: {
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.xl,
+  },
+  body: {
+    width: '100%',
+    maxWidth: 800,
+    gap: AppTheme.spacing.l,
+  },
+  backBtnRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    alignSelf: 'flex-start',
+    marginBottom: AppTheme.spacing.s,
+  },
+  backBtnText: {
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.body,
+    fontWeight: '600',
+  },
+  actionBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
+  scroll: { paddingBottom: 40 },
+  hero: {
+    padding: 24,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+    gap: AppTheme.spacing.s,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  subjectLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 1.1, color: AppTheme.colors.primary },
+  heroTitle: { fontSize: 28, fontWeight: '800', color: AppTheme.colors.textPrimary, letterSpacing: -0.6 },
+  heroDescription: { fontSize: 14, lineHeight: 22, color: AppTheme.colors.textSecondary },
   heroBadgeRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8 },
-  heroMeta: { fontSize: 13, color: colors.textMuted },
+  heroMeta: { fontSize: 13, color: AppTheme.colors.textSecondary },
   statusBadge: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999 },
   statusText: { fontSize: 12, fontWeight: '700' },
   card: {
-    marginHorizontal: 20, padding: 18, borderRadius: 20,
-    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, gap: 14,
+    padding: 24,
+    borderRadius: AppTheme.radius.large,
+    backgroundColor: AppTheme.colors.surface,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+    gap: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   cardHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
-  cardHeading: { fontSize: 17, fontWeight: '800', color: colors.textPrimary },
-  playerTime: { fontSize: 12, color: colors.textMuted, fontWeight: '600' },
+  cardHeading: { fontSize: 17, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  playerTime: { fontSize: 12, color: AppTheme.colors.textSecondary, fontWeight: '600' },
   playerButton: {
-    flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14,
-    borderRadius: 18, backgroundColor: colors.surfaceSoft,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    padding: 14,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.background,
   },
   playerIcon: {
-    width: 48, height: 48, borderRadius: 24, backgroundColor: colors.accentSoft,
-    alignItems: 'center', justifyContent: 'center',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#EAF4FF',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   playerTextWrap: { flex: 1, gap: 3 },
-  playerTitle: { fontSize: 15, fontWeight: '700', color: colors.textPrimary },
-  playerSubtitle: { fontSize: 13, color: colors.textSecondary },
+  playerTitle: { fontSize: 15, fontWeight: '700', color: AppTheme.colors.textPrimary },
+  playerSubtitle: { fontSize: 13, color: AppTheme.colors.textSecondary },
   waveformWrap: {
-    padding: 14, borderRadius: 18, borderWidth: 1,
-    borderColor: colors.border, backgroundColor: colors.surfaceSoft,
+    padding: 14,
+    borderRadius: AppTheme.radius.medium,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.background,
   },
   reportWrap: { gap: 16 },
   overallNotes: {
-    fontSize: 14, lineHeight: 22, color: colors.textSecondary,
+    fontSize: 14, lineHeight: 22, color: AppTheme.colors.textSecondary,
     textAlign: 'center', paddingHorizontal: 4,
   },
   sectionLabel: {
     fontSize: 11, fontWeight: '800', letterSpacing: 1.2,
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
   },
   langRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6 },
-  langPrefix: { fontSize: 12, color: colors.textMuted, fontWeight: '600' },
+  langPrefix: { fontSize: 12, color: AppTheme.colors.textSecondary, fontWeight: '600' },
   processingCard: {
-    marginHorizontal: 20, padding: 18, borderRadius: 20,
-    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
-    flexDirection: 'row', alignItems: 'flex-start', gap: 12,
+    padding: 24,
+    borderRadius: AppTheme.radius.large,
+    backgroundColor: AppTheme.colors.surface,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   processingCardFailed: { borderColor: '#FECACA', backgroundColor: '#FFF8F8' },
   processingBody: { flex: 1, gap: 12 },
-  processingText: { fontSize: 14, lineHeight: 20, color: colors.textSecondary },
+  processingText: { fontSize: 14, lineHeight: 20, color: AppTheme.colors.textSecondary },
   retryButton: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     alignSelf: 'flex-start', paddingHorizontal: 14, paddingVertical: 9,
@@ -788,9 +904,9 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   sheet: {
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
+    backgroundColor: AppTheme.colors.surface,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
     paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: 28,
@@ -802,39 +918,39 @@ const styles = StyleSheet.create({
     width: 42,
     height: 4,
     borderRadius: 999,
-    backgroundColor: colors.border,
+    backgroundColor: AppTheme.colors.border,
   },
-  sheetTitle: { fontSize: 20, fontWeight: '800', color: colors.textPrimary },
-  sheetSubtitle: { fontSize: 14, lineHeight: 20, color: colors.textSecondary },
+  sheetTitle: { fontSize: 20, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  sheetSubtitle: { fontSize: 14, lineHeight: 20, color: AppTheme.colors.textSecondary },
   sheetOption: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
     padding: 16,
-    borderRadius: 18,
-    backgroundColor: colors.surfaceSoft,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.background,
   },
   sheetOptionIcon: {
     width: 44,
     height: 44,
     borderRadius: 16,
-    backgroundColor: colors.accentSoft,
+    backgroundColor: '#EAF4FF',
     alignItems: 'center',
     justifyContent: 'center',
   },
   sheetOptionBody: { flex: 1, gap: 4 },
-  sheetOptionTitle: { fontSize: 15, fontWeight: '700', color: colors.textPrimary },
-  sheetOptionText: { fontSize: 13, lineHeight: 18, color: colors.textSecondary },
-  inputLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 0.8, color: colors.textMuted },
+  sheetOptionTitle: { fontSize: 15, fontWeight: '700', color: AppTheme.colors.textPrimary },
+  sheetOptionText: { fontSize: 13, lineHeight: 18, color: AppTheme.colors.textSecondary },
+  inputLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 0.8, color: AppTheme.colors.textSecondary },
   input: {
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 16,
-    backgroundColor: colors.surfaceSoft,
+    borderColor: AppTheme.colors.border,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.background,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   descriptionInput: { minHeight: 96, textAlignVertical: 'top' },
   modalActions: { flexDirection: 'row', gap: 12, marginTop: 6 },
@@ -843,12 +959,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 14,
-    borderRadius: 16,
+    borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
+    borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.surface,
   },
-  secondaryButtonText: { fontSize: 15, fontWeight: '700', color: colors.textSecondary },
+  secondaryButtonText: { fontSize: 15, fontWeight: '700', color: AppTheme.colors.textSecondary },
   primaryButton: {
     flex: 1,
     flexDirection: 'row',
@@ -856,8 +972,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     paddingVertical: 14,
-    borderRadius: 16,
-    backgroundColor: colors.accent,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primary,
   },
   primaryButtonText: { fontSize: 15, fontWeight: '800', color: '#fff' },
   buttonDisabled: { opacity: 0.55 },

@@ -16,16 +16,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../context/AuthContext';
 import {
   getSchoolSubjectRecordings,
-  getSchoolSubjectStudents,
 } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { ScreenHeader } from '../components/common/ScreenHeader';
 import { colors } from '../theme/colors';
-import { RecordingStatus, RecordingWithReport, StudentOut } from '../types/api';
+import { RecordingStatus, RecordingWithReport } from '../types/api';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SchoolAdminSubjectDetail'>;
-
-type DetailTab = 'recordings' | 'students';
 
 function statusStyle(status: RecordingStatus) {
   switch (status) {
@@ -92,38 +89,11 @@ function RecordingRow({
   );
 }
 
-function StudentRow({ student }: { student: StudentOut }) {
-  const initials = student.name
-    .split(' ')
-    .map((word) => word[0] ?? '')
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-
-  return (
-    <View style={styles.card}>
-      <View style={styles.studentAvatar}>
-        <Text style={styles.studentAvatarText}>{initials}</Text>
-      </View>
-      <View style={styles.cardContent}>
-        <Text numberOfLines={1} style={styles.cardTitle}>
-          {student.name}
-        </Text>
-        <Text numberOfLines={1} style={styles.cardMeta}>
-          {student.email}
-        </Text>
-      </View>
-    </View>
-  );
-}
-
 export function SchoolAdminSubjectDetailScreen({ navigation, route }: Props) {
   const { session } = useAuth();
   const { subjectId, subjectName } = route.params;
 
-  const [activeTab, setActiveTab] = useState<DetailTab>('recordings');
   const [recordings, setRecordings] = useState<RecordingWithReport[]>([]);
-  const [students, setStudents] = useState<StudentOut[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -134,12 +104,8 @@ export function SchoolAdminSubjectDetailScreen({ navigation, route }: Props) {
       if (!silent) setIsLoading(true);
       setError(null);
       try {
-        const [recordingData, studentData] = await Promise.all([
-          getSchoolSubjectRecordings(session.token, subjectId),
-          getSchoolSubjectStudents(session.token, subjectId),
-        ]);
+        const recordingData = await getSchoolSubjectRecordings(session.token, subjectId);
         setRecordings(recordingData);
-        setStudents(studentData);
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Could not load subject details');
       } finally {
@@ -200,25 +166,8 @@ export function SchoolAdminSubjectDetailScreen({ navigation, route }: Props) {
           <Text style={styles.heroKicker}>SUBJECT</Text>
           <Text style={styles.heroTitle}>{subjectName}</Text>
           <Text style={styles.heroBody}>
-            Review uploaded recordings and the students attached to this class.
+            Review uploaded recordings and their AI analyses.
           </Text>
-        </View>
-
-        <View style={styles.tabBar}>
-          {(['recordings', 'students'] as const).map((tab) => {
-            const isActive = tab === activeTab;
-            return (
-              <Pressable
-                key={tab}
-                onPress={() => setActiveTab(tab)}
-                style={[styles.tabButton, isActive && styles.tabButtonActive]}
-              >
-                <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
-                  {tab === 'recordings' ? 'Recordings' : 'Students'}
-                </Text>
-              </Pressable>
-            );
-          })}
         </View>
 
         {recordings.length > 0 ? (
@@ -253,46 +202,28 @@ export function SchoolAdminSubjectDetailScreen({ navigation, route }: Props) {
             <Text style={styles.emptyTitle}>Could not load subject details</Text>
             <Text style={styles.emptyBody}>{error}</Text>
           </View>
-        ) : activeTab === 'recordings' ? (
-          groupedRecordings.length === 0 ? (
-            <View style={styles.center}>
-              <Ionicons color={colors.textMuted} name="mic-outline" size={40} />
-              <Text style={styles.emptyTitle}>No recordings yet</Text>
-              <Text style={styles.emptyBody}>Teacher uploads for this subject will appear here.</Text>
-            </View>
-          ) : (
-            <View style={styles.sectionStack}>
-              {groupedRecordings.map((group) => (
-                <View key={group.chapter} style={styles.section}>
-                  <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionTitle}>{group.chapter}</Text>
-                    <Text style={styles.sectionCount}>{group.items.length}</Text>
-                  </View>
-                  {group.items.map((recording) => (
-                    <RecordingRow
-                      key={recording.id}
-                      recording={recording}
-                      onPress={() => navigation.navigate('RecordingDetail', { recording, subjectName })}
-                    />
-                  ))}
-                </View>
-              ))}
-            </View>
-          )
-        ) : students.length === 0 ? (
+        ) : groupedRecordings.length === 0 ? (
           <View style={styles.center}>
-            <Ionicons color={colors.textMuted} name="people-outline" size={40} />
-            <Text style={styles.emptyTitle}>No students enrolled</Text>
-            <Text style={styles.emptyBody}>Students in the class attached to this subject will appear here.</Text>
+            <Ionicons color={colors.textMuted} name="mic-outline" size={40} />
+            <Text style={styles.emptyTitle}>No recordings yet</Text>
+            <Text style={styles.emptyBody}>Teacher uploads for this subject will appear here.</Text>
           </View>
         ) : (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Class Roster</Text>
-              <Text style={styles.sectionCount}>{students.length}</Text>
-            </View>
-            {students.map((student) => (
-              <StudentRow key={student.id} student={student} />
+          <View style={styles.sectionStack}>
+            {groupedRecordings.map((group) => (
+              <View key={group.chapter} style={styles.section}>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>{group.chapter}</Text>
+                  <Text style={styles.sectionCount}>{group.items.length}</Text>
+                </View>
+                {group.items.map((recording) => (
+                  <RecordingRow
+                    key={recording.id}
+                    recording={recording}
+                    onPress={() => navigation.navigate('RecordingDetail', { recording, subjectName })}
+                  />
+                ))}
+              </View>
             ))}
           </View>
         )}

@@ -122,12 +122,6 @@ export function SchoolAdminDashboardScreen({ navigation }: Props) {
           </View>
 
           <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{overview?.total_students}</Text>
-
-            <Text style={styles.statLabel}>Students</Text>
-          </View>
-
-          <View style={styles.statCard}>
             <Text style={styles.statNumber}>{overview?.total_classes}</Text>
 
             <Text style={styles.statLabel}>Classes</Text>
@@ -261,21 +255,6 @@ export function SchoolAdminDashboardScreen({ navigation }: Props) {
             <Text style={styles.quickTitle}>Teachers</Text>
 
             <Text style={styles.quickSubtitle}>Manage</Text>
-          </Pressable>
-
-          <Pressable
-            style={styles.quickCard}
-            onPress={() =>
-              navigation.navigate("SchoolAdminTabs", {
-                screen: "SchoolAdminDashboard",
-              })
-            }
-          >
-            <Ionicons name="people-circle" size={34} color={colors.accent} />
-
-            <Text style={styles.quickTitle}>Students</Text>
-
-            <Text style={styles.quickSubtitle}>Browse</Text>
           </Pressable>
 
           <Pressable

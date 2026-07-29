@@ -16,13 +16,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../context/AuthContext';
 import { getAdminClass, getAdminClassSubjects } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
-import { colors } from '../theme/colors';
+import { AppTheme } from '../theme/AppTheme';
+import { AppLogo } from '../components/ui/AppLogo';
 import { ClassOut, SubjectOut } from '../types/api';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AdminClassDetail'>;
 
 const SUBJECT_COLORS = [
-  { bg: '#D1E4FF', text: colors.accentDark },
+  { bg: '#D1E4FF', text: AppTheme.colors.primary },
   { bg: '#E8F7EE', text: '#127A40' },
   { bg: '#FFF4E0', text: '#92400E' },
   { bg: '#F5F0FF', text: '#6B21A8' },
@@ -54,14 +55,14 @@ function SubjectCard({
             {subject.teacher ? `Teacher: ${subject.teacher.name}` : 'No teacher assigned'}
           </Text>
         </View>
-        <Ionicons color={colors.textMuted} name="chevron-forward" size={18} />
+        <Ionicons color={AppTheme.colors.textSecondary} name="chevron-forward" size={18} />
       </View>
     </Pressable>
   );
 }
 
 export function AdminClassDetailScreen({ navigation, route }: Props) {
-  const { session } = useAuth();
+  const { session, signOut } = useAuth();
   const { schoolId, classId, className, schoolName } = route.params;
 
   const [classDetail, setClassDetail] = useState<ClassOut | null>(null);
@@ -103,169 +104,210 @@ export function AdminClassDetailScreen({ navigation, route }: Props) {
   );
 
   return (
-    <SafeAreaView edges={['top']} style={styles.safe}>
-      <View style={styles.header}>
-        <Pressable onPress={() => 
-          navigation.goBack()
-          } style={styles.headerButton}>
-          <Ionicons color={colors.textPrimary} name="arrow-back" size={22} />
-        </Pressable>
-        <Text numberOfLines={1} style={styles.headerTitle}>
-          {classDetail?.name ?? className}
-        </Text>
-        <View style={styles.headerButton} />
+    <SafeAreaView edges={['top', 'bottom']} style={styles.safe}>
+      {/* Global Header */}
+      <View style={styles.globalHeader}>
+        <View style={styles.headerLeft}>
+           <AppLogo hideText size={32} />
+        </View>
+        <Text style={styles.headerTitle}>Super Admin</Text>
+        <View style={styles.headerRight}>
+          <Pressable onPress={signOut} style={styles.iconBtn}>
+            <Ionicons color={AppTheme.colors.textPrimary} name="log-out-outline" size={24} />
+          </Pressable>
+        </View>
       </View>
 
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        refreshControl={(
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={() => {
-              setRefreshing(true);
-              void load(true);
-            }}
-            tintColor={colors.accent}
-          />
-        )}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.hero}>
-          <Text style={styles.heroKicker}>CLASS OVERVIEW</Text>
-          <Text style={styles.heroTitle}>{classDetail?.name ?? className}</Text>
-          <Text style={styles.heroBody}>
-            Read-only academic view for {schoolName}. Open a subject to inspect recordings and students.
-          </Text>
-        </View>
+      <View style={styles.flex}>
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          refreshControl={(
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => {
+                setRefreshing(true);
+                void load(true);
+              }}
+              tintColor={AppTheme.colors.primary}
+            />
+          )}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.centerContainer}>
+            <View style={styles.body}>
+              <Pressable onPress={() => navigation.goBack()} style={styles.backBtnRow}>
+                <Ionicons name="arrow-back" size={20} color={AppTheme.colors.textSecondary} />
+                <Text style={styles.backBtnText}>Back</Text>
+              </Pressable>
 
-        <View style={styles.statsStrip}>
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>{subjects.length}</Text>
-            <Text style={styles.statLabel}>SUBJECTS</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>
-              {subjects.filter((subject) => subject.teacher_id != null).length}
-            </Text>
-            <Text style={styles.statLabel}>ASSIGNED</Text>
-          </View>
-        </View>
+              <View style={styles.titleRow}>
+                <View>
+                  <Text style={styles.breadcrumb}>CLASS OVERVIEW</Text>
+                  <Text style={styles.topTitle}>{classDetail?.name ?? className}</Text>
+                </View>
+              </View>
 
-        {isLoading ? (
-          <View style={styles.center}>
-            <ActivityIndicator color={colors.accent} size="large" />
-            <Text style={styles.emptyBody}>Loading class details…</Text>
-          </View>
-        ) : error ? (
-          <View style={styles.center}>
-            <Ionicons color={colors.textMuted} name="cloud-offline-outline" size={40} />
-            <Text style={styles.emptyTitle}>Could not load class details</Text>
-            <Text style={styles.emptyBody}>{error}</Text>
-          </View>
-        ) : subjects.length === 0 ? (
-          <View style={styles.center}>
-            <Ionicons color={colors.textMuted} name="library-outline" size={40} />
-            <Text style={styles.emptyTitle}>No subjects yet</Text>
-            <Text style={styles.emptyBody}>This class does not have any subjects attached yet.</Text>
-          </View>
-        ) : (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Subjects</Text>
-              <Text style={styles.sectionCount}>{subjects.length}</Text>
+              <View style={styles.hero}>
+                <Text style={styles.heroBody}>
+                  Read-only academic view for {schoolName}. Open a subject to inspect recordings and students.
+                </Text>
+              </View>
+
+              <View style={styles.statsStrip}>
+                <View style={styles.statItem}>
+                  <Text style={styles.statValue}>{subjects.length}</Text>
+                  <Text style={styles.statLabel}>SUBJECTS</Text>
+                </View>
+                <View style={styles.statDivider} />
+                <View style={styles.statItem}>
+                  <Text style={styles.statValue}>
+                    {subjects.filter((subject) => subject.teacher_id != null).length}
+                  </Text>
+                  <Text style={styles.statLabel}>ASSIGNED</Text>
+                </View>
+              </View>
+
+              {isLoading ? (
+                <View style={styles.center}>
+                  <ActivityIndicator color={AppTheme.colors.primary} size="large" />
+                  <Text style={styles.emptyBody}>Loading class details…</Text>
+                </View>
+              ) : error ? (
+                <View style={styles.center}>
+                  <Ionicons color={AppTheme.colors.textSecondary} name="cloud-offline-outline" size={40} />
+                  <Text style={styles.emptyTitle}>Could not load class details</Text>
+                  <Text style={styles.emptyBody}>{error}</Text>
+                </View>
+              ) : subjects.length === 0 ? (
+                <View style={styles.center}>
+                  <Ionicons color={AppTheme.colors.textSecondary} name="library-outline" size={40} />
+                  <Text style={styles.emptyTitle}>No subjects yet</Text>
+                  <Text style={styles.emptyBody}>This class does not have any subjects attached yet.</Text>
+                </View>
+              ) : (
+                <View style={styles.section}>
+                  <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionTitle}>Subjects</Text>
+                    <Text style={styles.sectionCount}>{subjects.length}</Text>
+                  </View>
+                  {subjects.map((subject, index) => (
+                    <SubjectCard
+                      key={subject.id}
+                      colorIdx={index}
+                      onPress={() => navigation.navigate('AdminSubjectDetail', {
+                        schoolId,
+                        subjectId: subject.id,
+                        subjectName: subject.name,
+                      })}
+                      subject={subject}
+                    />
+                  ))}
+                </View>
+              )}
             </View>
-            {subjects.map((subject, index) => (
-              <SubjectCard
-                key={subject.id}
-                colorIdx={index}
-                onPress={() => navigation.navigate('AdminSubjectDetail', {
-                  schoolId,
-                  subjectId: subject.id,
-                  subjectName: subject.name,
-                })}
-                subject={subject}
-              />
-            ))}
           </View>
-        )}
-      </ScrollView>
+        </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  header: {
+  safe: {
+    flex: 1,
+    backgroundColor: AppTheme.colors.background,
+  },
+  globalHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: colors.surface,
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.m,
+    backgroundColor: AppTheme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: AppTheme.colors.border,
   },
-  headerButton: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { flex: 1, textAlign: 'center', fontSize: 17, fontWeight: '700', color: colors.textPrimary },
-  scroll: { paddingBottom: 40, gap: 16 },
+  headerLeft: { width: 60, alignItems: 'flex-start' },
+  headerTitle: { flex: 1, textAlign: 'center', color: AppTheme.colors.textPrimary, ...AppTheme.typography.h3 },
+  headerRight: { flexDirection: 'row', gap: AppTheme.spacing.s, width: 60, justifyContent: 'flex-end' },
+  iconBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+  centerContainer: { flex: 1, alignItems: 'center', paddingHorizontal: AppTheme.spacing.l, paddingVertical: AppTheme.spacing.xl },
+  body: { width: '100%', maxWidth: 800, gap: AppTheme.spacing.l },
+  backBtnRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8, alignSelf: 'flex-start' },
+  backBtnText: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body, fontWeight: '600' },
+  titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 4 },
+  flex: { flex: 1 },
+  breadcrumb: {
+    color: AppTheme.colors.textSecondary,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+  topTitle: {
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.h1,
+    marginTop: 4,
+  },
+  scroll: {
+    flexGrow: 1,
+  },
   hero: {
-    padding: 20,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    padding: AppTheme.spacing.xl,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
     gap: 8,
   },
-  heroKicker: { fontSize: 11, fontWeight: '700', letterSpacing: 1.1, color: colors.accent },
-  heroTitle: { fontSize: 30, fontWeight: '800', color: colors.textPrimary, letterSpacing: -0.5 },
-  heroBody: { fontSize: 14, lineHeight: 20, color: colors.textSecondary },
+  heroBody: {
+    ...AppTheme.typography.body,
+    color: AppTheme.colors.textSecondary,
+  },
   statsStrip: {
     flexDirection: 'row',
-    marginHorizontal: 20,
-    marginTop: 16,
-    backgroundColor: colors.surface,
-    borderRadius: 16,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     overflow: 'hidden',
   },
   statItem: { flex: 1, alignItems: 'center', paddingVertical: 16, gap: 2 },
-  statValue: { fontSize: 22, fontWeight: '800', color: colors.textPrimary },
-  statLabel: { fontSize: 11, fontWeight: '700', color: colors.textMuted, letterSpacing: 0.8 },
-  statDivider: { width: 1, backgroundColor: colors.border },
-  center: { paddingHorizontal: 20, paddingVertical: 56, alignItems: 'center', gap: 10 },
-  emptyTitle: { fontSize: 18, fontWeight: '800', color: colors.textPrimary },
-  emptyBody: { textAlign: 'center', fontSize: 14, lineHeight: 20, color: colors.textSecondary },
-  section: { paddingHorizontal: 20, gap: 12 },
+  statValue: { fontSize: 22, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  statLabel: { fontSize: 11, fontWeight: '700', color: AppTheme.colors.textSecondary, letterSpacing: 0.8 },
+  statDivider: { width: 1, backgroundColor: AppTheme.colors.border },
+  center: { paddingVertical: 56, alignItems: 'center', gap: 10 },
+  emptyTitle: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.h3 },
+  emptyBody: { textAlign: 'center', ...AppTheme.typography.body, color: AppTheme.colors.textSecondary },
+  section: { gap: 12 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  sectionTitle: { flex: 1, fontSize: 18, fontWeight: '800', color: colors.textPrimary },
+  sectionTitle: { flex: 1, ...AppTheme.typography.h3, color: AppTheme.colors.textPrimary },
   sectionCount: {
     minWidth: 26,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 999,
+    borderRadius: AppTheme.radius.round,
     textAlign: 'center',
-    backgroundColor: colors.surfaceMuted,
-    color: colors.textMuted,
-    fontSize: 12,
+    backgroundColor: AppTheme.colors.background,
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.caption,
     fontWeight: '700',
   },
   subjectCard: {
     padding: 16,
-    borderRadius: 18,
+    borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
+    borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.surface,
   },
   subjectCardTop: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   subjectIcon: {
     width: 42,
     height: 42,
-    borderRadius: 14,
+    borderRadius: AppTheme.radius.medium,
     alignItems: 'center',
     justifyContent: 'center',
   },
   subjectIconText: { fontSize: 16, fontWeight: '800' },
   subjectInfo: { flex: 1, gap: 4 },
-  subjectName: { fontSize: 15, fontWeight: '700', color: colors.textPrimary },
-  subjectMeta: { fontSize: 13, color: colors.textSecondary },
+  subjectName: { ...AppTheme.typography.body, fontWeight: '700', color: AppTheme.colors.textPrimary },
+  subjectMeta: { ...AppTheme.typography.caption, color: AppTheme.colors.textSecondary },
 });

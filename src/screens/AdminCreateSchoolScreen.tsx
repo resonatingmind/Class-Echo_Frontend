@@ -17,7 +17,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../context/AuthContext';
 import { createAdminSchool } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
-import { colors } from '../theme/colors';
+import { AppTheme } from '../theme/AppTheme';
+import { AppLogo } from '../components/ui/AppLogo';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AdminCreateSchool'>;
 
@@ -70,7 +71,7 @@ function FormField({
           multiline={multiline}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor={colors.textPlaceholder}
+          placeholderTextColor={AppTheme.colors.textPlaceholder}
           secureTextEntry={secureTextEntry && !showPass}
           style={[styles.input, multiline && styles.inputMultiline]}
           textContentType={textContentType}
@@ -83,7 +84,7 @@ function FormField({
             style={styles.eyeBtn}
           >
             <Ionicons
-              color={colors.textMuted}
+              color={AppTheme.colors.textSecondary}
               name={showPass ? 'eye-off-outline' : 'eye-outline'}
               size={18}
             />
@@ -98,7 +99,7 @@ function FormField({
 }
 
 export function AdminCreateSchoolScreen({ navigation }: Props) {
-  const { session } = useAuth();
+  const { session, signOut } = useAuth();
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [adminName, setAdminName] = useState('');
@@ -135,32 +136,16 @@ export function AdminCreateSchoolScreen({ navigation }: Props) {
   };
 
   return (
-    <SafeAreaView edges={['top']} style={styles.safe}>
-      {/* Top bar */}
-      <View style={styles.topBar}>
-        <View style={styles.topLeft}>
-          <Ionicons color={colors.textMuted} name="grid-outline" size={12} />
-          <Text style={styles.breadcrumb}>DISTRICT MANAGEMENT</Text>
+    <SafeAreaView edges={['top', 'bottom']} style={styles.safe}>
+      {/* Global Header */}
+      <View style={styles.globalHeader}>
+        <View style={styles.headerLeft}>
+           <AppLogo hideText size={32} />
         </View>
-        <Text style={styles.topTitle}>Configuration</Text>
-        <View style={styles.topActions}>
-          <Pressable
-            disabled={isSubmitting}
-            onPress={() => navigation.goBack()}
-            style={styles.cancelBtn}
-          >
-            <Text style={styles.cancelText}>Cancel</Text>
-          </Pressable>
-          <Pressable
-            disabled={!isValid || isSubmitting}
-            onPress={handleCreate}
-            style={[styles.saveBtn, (!isValid || isSubmitting) && styles.saveBtnDisabled]}
-          >
-            {isSubmitting ? (
-              <ActivityIndicator color="#fff" size="small" />
-            ) : (
-              <Text style={styles.saveBtnText}>Save School</Text>
-            )}
+        <Text style={styles.headerTitle}>Super Admin</Text>
+        <View style={styles.headerRight}>
+          <Pressable onPress={signOut} style={styles.iconBtn}>
+            <Ionicons color={AppTheme.colors.textPrimary} name="log-out-outline" size={24} />
           </Pressable>
         </View>
       </View>
@@ -174,104 +159,131 @@ export function AdminCreateSchoolScreen({ navigation }: Props) {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {error ? (
-            <View style={styles.errorBox}>
-              <Ionicons color="#B42318" name="alert-circle-outline" size={16} />
-              <Text style={styles.errorText}>{error}</Text>
-            </View>
-          ) : null}
+          <View style={styles.centerContainer}>
+            <View style={styles.body}>
+              <Pressable onPress={() => navigation.goBack()} style={styles.backBtnRow}>
+                <Ionicons name="arrow-back" size={20} color={AppTheme.colors.textSecondary} />
+                <Text style={styles.backBtnText}>Back</Text>
+              </Pressable>
 
-          {/* School Details */}
-          <View style={styles.section}>
-            <SectionLabel>School Details</SectionLabel>
-            <View style={styles.sectionCard}>
-              <FormField
-                label="School Name"
-                onChangeText={setName}
-                placeholder="e.g. Oakridge Academy"
-                value={name}
-              />
-              <View style={styles.fieldDivider} />
-              <FormField
-                autoCapitalize="sentences"
-                label="Physical Address"
-                multiline
-                onChangeText={setAddress}
-                placeholder="Enter the full street address, city, and postal code..."
-                value={address}
-              />
-            </View>
-          </View>
+              <View style={styles.titleRow}>
+                <View>
+                  <Text style={styles.breadcrumb}>DISTRICT MANAGEMENT</Text>
+                  <Text style={styles.topTitle}>Configuration</Text>
+                </View>
+                <Pressable
+                  disabled={!isValid || isSubmitting}
+                  onPress={handleCreate}
+                  style={[styles.saveBtn, (!isValid || isSubmitting) && styles.saveBtnDisabled]}
+                >
+                  {isSubmitting ? (
+                    <ActivityIndicator color="#fff" size="small" />
+                  ) : (
+                    <Text style={styles.saveBtnText}>Save School</Text>
+                  )}
+                </Pressable>
+              </View>
 
-          {/* Initial School Admin */}
-          <View style={styles.section}>
-            <SectionLabel>Initial School Admin</SectionLabel>
-            <Text style={styles.sectionHint}>
-              These credentials will be sent to the school representative for first-time login.
-            </Text>
-            <View style={styles.sectionCard}>
-              <FormField
-                autoCapitalize="words"
-                label="Admin Full Name"
-                onChangeText={setAdminName}
-                placeholder="e.g. Dr. Elena Rodriguez"
-                value={adminName}
-              />
-              <View style={styles.fieldDivider} />
-              <FormField
-                autoCapitalize="none"
-                autoComplete="email"
-                keyboardType="email-address"
-                label="Admin Email"
-                onChangeText={setAdminEmail}
-                placeholder="admin@school.edu"
-                suffix={
-                  <Ionicons
-                    color={emailValid && adminEmail.length > 0 ? colors.success : colors.textMuted}
-                    name={emailValid && adminEmail.length > 0 ? 'checkmark-circle' : 'mail-outline'}
-                    size={18}
+              {error ? (
+                <View style={styles.errorBox}>
+                  <Ionicons color="#B42318" name="alert-circle-outline" size={16} />
+                  <Text style={styles.errorText}>{error}</Text>
+                </View>
+              ) : null}
+
+              {/* School Details */}
+              <View style={styles.section}>
+                <SectionLabel>School Details</SectionLabel>
+                <View style={styles.sectionCard}>
+                  <FormField
+                    label="School Name"
+                    onChangeText={setName}
+                    placeholder="e.g. Oakridge Academy"
+                    value={name}
                   />
-                }
-                textContentType="emailAddress"
-                value={adminEmail}
-              />
-              <View style={styles.fieldDivider} />
-              <FormField
-                hint="Minimum 6 characters. Admin should change this on first login."
-                label="Temporary Password"
-                onChangeText={setAdminPassword}
-                placeholder="Set a temporary password"
-                secureTextEntry
-                textContentType="newPassword"
-                value={adminPassword}
-              />
+                  <View style={styles.fieldDivider} />
+                  <FormField
+                    autoCapitalize="sentences"
+                    label="Physical Address"
+                    multiline
+                    onChangeText={setAddress}
+                    placeholder="Enter the full street address, city, and postal code..."
+                    value={address}
+                  />
+                </View>
+              </View>
+
+              {/* Initial School Admin */}
+              <View style={styles.section}>
+                <SectionLabel>Initial School Admin</SectionLabel>
+                <Text style={styles.sectionHint}>
+                  These credentials will be sent to the school representative for first-time login.
+                </Text>
+                <View style={styles.sectionCard}>
+                  <FormField
+                    autoCapitalize="words"
+                    label="Admin Full Name"
+                    onChangeText={setAdminName}
+                    placeholder="e.g. Dr. Elena Rodriguez"
+                    value={adminName}
+                  />
+                  <View style={styles.fieldDivider} />
+                  <FormField
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    keyboardType="email-address"
+                    label="Admin Email"
+                    onChangeText={setAdminEmail}
+                    placeholder="admin@school.edu"
+                    suffix={
+                      <Ionicons
+                        color={emailValid && adminEmail.length > 0 ? AppTheme.colors.success : AppTheme.colors.textSecondary}
+                        name={emailValid && adminEmail.length > 0 ? 'checkmark-circle' : 'mail-outline'}
+                        size={18}
+                      />
+                    }
+                    textContentType="emailAddress"
+                    value={adminEmail}
+                  />
+                  <View style={styles.fieldDivider} />
+                  <FormField
+                    hint="Minimum 6 characters. Admin should change this on first login."
+                    label="Temporary Password"
+                    onChangeText={setAdminPassword}
+                    placeholder="Set a temporary password"
+                    secureTextEntry
+                    textContentType="newPassword"
+                    value={adminPassword}
+                  />
+                </View>
+              </View>
+
+              {/* Password strength indicator */}
+              {adminPassword.length > 0 ? (
+                <View style={styles.strengthRow}>
+                  {[1, 2, 3].map((i) => (
+                    <View
+                      key={i}
+                      style={[
+                        styles.strengthBar,
+                        adminPassword.length >= i * 4 && styles.strengthBarFilled,
+                        adminPassword.length >= 12 && styles.strengthBarStrong,
+                      ]}
+                    />
+                  ))}
+                  <Text style={styles.strengthLabel}>
+                    {adminPassword.length < 6
+                      ? 'Too short'
+                      : adminPassword.length < 8
+                        ? 'Weak'
+                        : adminPassword.length < 12
+                          ? 'Good'
+                          : 'Strong'}
+                  </Text>
+                </View>
+              ) : null}
             </View>
           </View>
-
-          {/* Password strength indicator */}
-          {adminPassword.length > 0 ? (
-            <View style={styles.strengthRow}>
-              {[1, 2, 3].map((i) => (
-                <View
-                  key={i}
-                  style={[
-                    styles.strengthBar,
-                    adminPassword.length >= i * 4 && styles.strengthBarFilled,
-                    adminPassword.length >= 12 && styles.strengthBarStrong,
-                  ]}
-                />
-              ))}
-              <Text style={styles.strengthLabel}>
-                {adminPassword.length < 6
-                  ? 'Too short'
-                  : adminPassword.length < 8
-                    ? 'Weak'
-                    : adminPassword.length < 12
-                      ? 'Good'
-                      : 'Strong'}
-              </Text>
-            </View>
-          ) : null}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -281,88 +293,68 @@ export function AdminCreateSchoolScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: AppTheme.colors.background,
   },
-  flex: { flex: 1 },
-  topBar: {
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    gap: 6,
-  },
-  topLeft: {
+  globalHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.m,
+    backgroundColor: AppTheme.colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: AppTheme.colors.border,
   },
+  headerLeft: { width: 60, alignItems: 'flex-start' },
+  headerTitle: { flex: 1, textAlign: 'center', color: AppTheme.colors.textPrimary, ...AppTheme.typography.h3 },
+  headerRight: { flexDirection: 'row', gap: AppTheme.spacing.s, width: 60, justifyContent: 'flex-end' },
+  iconBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+  centerContainer: { flex: 1, alignItems: 'center', paddingHorizontal: AppTheme.spacing.l, paddingVertical: AppTheme.spacing.xl },
+  body: { width: '100%', maxWidth: 800, gap: AppTheme.spacing.l },
+  backBtnRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8, alignSelf: 'flex-start' },
+  backBtnText: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body, fontWeight: '600' },
+  titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 12 },
+  flex: { flex: 1 },
   breadcrumb: {
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 1,
   },
   topTitle: {
-    color: colors.textPrimary,
-    fontSize: 26,
-    fontWeight: '800',
-    letterSpacing: -0.5,
-  },
-  topActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginTop: 10,
-  },
-  cancelBtn: {
-    paddingHorizontal: 16,
-    paddingVertical: 9,
-    borderRadius: 10,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-  },
-  cancelText: {
-    color: colors.textSecondary,
-    fontSize: 14,
-    fontWeight: '600',
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.h1,
+    marginTop: 4,
   },
   saveBtn: {
-    flex: 1,
-    paddingVertical: 9,
-    borderRadius: 10,
-    backgroundColor: colors.accent,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 40,
   },
   saveBtnDisabled: {
     opacity: 0.45,
   },
   saveBtnText: {
     color: '#fff',
-    fontSize: 14,
-    fontWeight: '700',
+    ...AppTheme.typography.button,
   },
   scroll: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 48,
-    gap: 20,
+    flexGrow: 1,
   },
   errorBox: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     backgroundColor: '#FFF1F1',
     paddingHorizontal: 14,
     paddingVertical: 12,
   },
   errorText: {
     color: '#B42318',
-    fontSize: 13,
-    lineHeight: 18,
+    ...AppTheme.typography.body,
     flex: 1,
   },
   section: {
@@ -377,24 +369,22 @@ const styles = StyleSheet.create({
     width: 3,
     height: 18,
     borderRadius: 2,
-    backgroundColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
   },
   sectionLabelText: {
-    color: colors.textPrimary,
-    fontSize: 16,
-    fontWeight: '700',
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.h3,
   },
   sectionHint: {
-    color: colors.textSecondary,
-    fontSize: 13,
-    lineHeight: 18,
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.body,
     marginBottom: 2,
   },
   sectionCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     overflow: 'hidden',
   },
   field: {
@@ -403,14 +393,14 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   fieldLabel: {
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 0.8,
     textTransform: 'uppercase',
   },
   fieldHint: {
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
     fontSize: 12,
     lineHeight: 16,
   },
@@ -418,8 +408,8 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   input: {
-    color: colors.textPrimary,
-    fontSize: 15,
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.body,
     padding: 0,
     minHeight: 24,
   },
@@ -436,7 +426,7 @@ const styles = StyleSheet.create({
   },
   fieldDivider: {
     height: 1,
-    backgroundColor: colors.border,
+    backgroundColor: AppTheme.colors.border,
     marginHorizontal: 16,
   },
   strengthRow: {
@@ -449,16 +439,16 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.border,
+    backgroundColor: AppTheme.colors.border,
   },
   strengthBarFilled: {
-    backgroundColor: colors.warning,
+    backgroundColor: AppTheme.colors.warning,
   },
   strengthBarStrong: {
-    backgroundColor: colors.success,
+    backgroundColor: AppTheme.colors.success,
   },
   strengthLabel: {
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
     fontSize: 12,
     fontWeight: '600',
     width: 48,

@@ -17,8 +17,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../context/AuthContext';
 import { deleteAdminSchool, getAdminSchool, getAdminSchoolClasses, updateAdminSchool, approveAdminSchool, rejectAdminSchool } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
-import { ScreenHeader } from '../components/common/ScreenHeader';
-import { colors } from '../theme/colors';
+import { AppTheme } from '../theme/AppTheme';
+import { AppLogo } from '../components/ui/AppLogo';
 import { ClassOut, SchoolOut } from '../types/api';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AdminSchoolDetail'>;
@@ -41,7 +41,7 @@ function SchoolHero({ school }: { school: SchoolOut }) {
         <Text style={styles.heroName}>{school.name}</Text>
         {school.address ? (
           <View style={styles.heroAddrRow}>
-            <Ionicons color={colors.textMuted} name="location-outline" size={14} />
+            <Ionicons color={AppTheme.colors.textSecondary} name="location-outline" size={14} />
             <Text style={styles.heroAddr}>{school.address}</Text>
           </View>
         ) : null}
@@ -55,11 +55,11 @@ function AdminContact({ school }: { school: SchoolOut }) {
     return (
       <View style={styles.adminCard}>
         <View style={styles.adminCardHeader}>
-          <Ionicons color={colors.textMuted} name="person-circle-outline" size={20} />
+          <Ionicons color={AppTheme.colors.textSecondary} name="person-circle-outline" size={20} />
           <Text style={styles.adminCardTitle}>Admin Contact</Text>
         </View>
         <View style={styles.adminEmptyRow}>
-          <Ionicons color={colors.warning} name="warning-outline" size={16} />
+          <Ionicons color={AppTheme.colors.warning} name="warning-outline" size={16} />
           <Text style={styles.adminEmptyText}>No admin assigned to this school yet.</Text>
         </View>
         <Text style={styles.adminEmptyHint}>
@@ -72,7 +72,7 @@ function AdminContact({ school }: { school: SchoolOut }) {
   return (
     <View style={styles.adminCard}>
       <View style={styles.adminCardHeader}>
-        <Ionicons color={colors.accent} name="person-circle-outline" size={20} />
+        <Ionicons color={AppTheme.colors.primary} name="person-circle-outline" size={20} />
         <Text style={styles.adminCardTitle}>Admin Contact</Text>
       </View>
 
@@ -90,7 +90,7 @@ function AdminContact({ school }: { school: SchoolOut }) {
 
       <View style={styles.adminContactRow}>
         <View style={styles.adminContactItem}>
-          <Ionicons color={colors.textMuted} name="mail-outline" size={15} />
+          <Ionicons color={AppTheme.colors.textSecondary} name="mail-outline" size={15} />
           <Text style={styles.adminContactText} numberOfLines={1}>
             {school.admin.email}
           </Text>
@@ -109,14 +109,14 @@ function ClassRow({
   index: number;
   onPress: () => void;
 }) {
-  const colors_ = ['#D1E4FF', '#E8F7EE', '#FFF4E0', '#F5F0FF', '#FFE8EC'];
-  const textColors_ = ['#0061A3', '#127A40', '#92400E', '#6B21A8', '#9B1239'];
-  const colorIdx = index % colors_.length;
+  const bgColors = ['#D1E4FF', '#E8F7EE', '#FFF4E0', '#F5F0FF', '#FFE8EC'];
+  const textColors = ['#0061A3', '#127A40', '#92400E', '#6B21A8', '#9B1239'];
+  const colorIdx = index % bgColors.length;
 
   return (
     <Pressable onPress={onPress} style={styles.classRow}>
-      <View style={[styles.classTag, { backgroundColor: colors_[colorIdx] }]}>
-        <Text style={[styles.classTagText, { color: textColors_[colorIdx] }]}>
+      <View style={[styles.classTag, { backgroundColor: bgColors[colorIdx] }]}>
+        <Text style={[styles.classTagText, { color: textColors[colorIdx] }]}>
           {classItem.name.slice(0, 3).toUpperCase()}
         </Text>
       </View>
@@ -126,13 +126,13 @@ function ClassRow({
           Added {new Date(classItem.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
         </Text>
       </View>
-      <Ionicons color={colors.textMuted} name="chevron-forward" size={16} />
+      <Ionicons color={AppTheme.colors.textSecondary} name="chevron-forward" size={16} />
     </Pressable>
   );
 }
 
 export function AdminSchoolDetailScreen({ navigation, route }: Props) {
-  const { session } = useAuth();
+  const { session, signOut } = useAuth();
   const [school, setSchool] = useState<SchoolOut | null>(null);
   const [classes, setClasses] = useState<ClassOut[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -254,22 +254,19 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
   };
 
   return (
-    <SafeAreaView edges={[]} style={styles.safe}>
-      <ScreenHeader
-        title="School Profile"
-        onBack={() => navigation.goBack()}
-        rightActions={
-          <>
-            <Pressable onPress={openEdit} style={styles.iconBtn}>
-              <Ionicons color={colors.textPrimary} name="pencil-outline" size={20} />
-            </Pressable>
-            <Pressable onPress={handleDelete} style={styles.iconBtn}>
-              <Ionicons color="#EF4444" name="trash-outline" size={20} />
-            </Pressable>
-          </>
-        }
-      />
-
+    <SafeAreaView edges={['top', 'bottom']} style={styles.safe}>
+      {/* Global Header */}
+      <View style={styles.globalHeader}>
+        <View style={styles.headerLeft}>
+           <AppLogo hideText size={32} />
+        </View>
+        <Text style={styles.headerTitle}>Super Admin</Text>
+        <View style={styles.headerRight}>
+          <Pressable onPress={signOut} style={styles.iconBtn}>
+            <Ionicons color={AppTheme.colors.textPrimary} name="log-out-outline" size={24} />
+          </Pressable>
+        </View>
+      </View>
 
       {/* Rejection Reason Modal */}
       <Modal animationType="slide" transparent visible={showRejectModal} onRequestClose={() => setShowRejectModal(false)}>
@@ -278,7 +275,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Reject School Registration</Text>
               <Pressable hitSlop={8} onPress={() => setShowRejectModal(false)}>
-                <Ionicons color={colors.textMuted} name="close" size={22} />
+                <Ionicons color={AppTheme.colors.textSecondary} name="close" size={22} />
               </Pressable>
             </View>
             <Text style={styles.inputLabel}>Reason for Rejection (optional)</Text>
@@ -288,7 +285,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
               numberOfLines={3}
               onChangeText={setRejectReason}
               placeholder="e.g. Invalid school info, unverified school email domain"
-              placeholderTextColor={colors.textPlaceholder}
+              placeholderTextColor={AppTheme.colors.textPlaceholder}
               style={[styles.input, styles.inputMultiline]}
               value={rejectReason}
             />
@@ -303,7 +300,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
               <Pressable
                 disabled={actionLoading}
                 onPress={() => { void handleReject(); }}
-                style={[styles.modalSaveBtn, { flex: 1, backgroundColor: '#EF4444' }, actionLoading && { opacity: 0.6 }]}
+                style={[styles.modalSaveBtn, { flex: 1, backgroundColor: AppTheme.colors.error }, actionLoading && { opacity: 0.6 }]}
               >
                 {actionLoading ? (
                   <ActivityIndicator color="#fff" size="small" />
@@ -323,7 +320,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Edit School</Text>
               <Pressable hitSlop={8} onPress={() => setShowEdit(false)}>
-                <Ionicons color={colors.textMuted} name="close" size={22} />
+                <Ionicons color={AppTheme.colors.textSecondary} name="close" size={22} />
               </Pressable>
             </View>
             <Text style={styles.inputLabel}>School Name *</Text>
@@ -331,7 +328,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
               autoCapitalize="words"
               onChangeText={setEditName}
               placeholder="School name"
-              placeholderTextColor={colors.textPlaceholder}
+              placeholderTextColor={AppTheme.colors.textPlaceholder}
               style={styles.input}
               value={editName}
             />
@@ -342,7 +339,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
               numberOfLines={2}
               onChangeText={setEditAddress}
               placeholder="School address (optional)"
-              placeholderTextColor={colors.textPlaceholder}
+              placeholderTextColor={AppTheme.colors.textPlaceholder}
               style={[styles.input, styles.inputMultiline]}
               value={editAddress}
             />
@@ -362,113 +359,141 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
         </View>
       </Modal>
 
-      {isLoading ? (
-        <View style={styles.center}>
-          <ActivityIndicator color={colors.accent} size="large" />
-          <Text style={styles.loadingText}>Loading school profile…</Text>
-        </View>
-      ) : error ? (
-        <View style={styles.center}>
-          <Ionicons color={colors.textMuted} name="cloud-offline-outline" size={40} />
-          <Text style={styles.errorTitle}>Could not load school</Text>
-          <Text style={styles.errorBody}>{error}</Text>
-        </View>
-      ) : school ? (
+      <View style={styles.flex}>
         <ScrollView
           contentContainerStyle={styles.scroll}
           showsVerticalScrollIndicator={false}
         >
-          {/* Hero */}
-          <SchoolHero school={school} />
+          <View style={styles.centerContainer}>
+            <View style={styles.body}>
+              <Pressable onPress={() => navigation.goBack()} style={styles.backBtnRow}>
+                <Ionicons name="arrow-back" size={20} color={AppTheme.colors.textSecondary} />
+                <Text style={styles.backBtnText}>Back</Text>
+              </Pressable>
 
-          {school.admin?.status === 'pending_approval' ? (
-            <View style={styles.approvalCard}>
-              <View style={styles.approvalHeader}>
-                <Ionicons color="#F59E0B" name="shield-checkmark-outline" size={20} />
-                <Text style={styles.approvalTitle}>Registration Pending Approval</Text>
-              </View>
-              <Text style={styles.approvalText}>
-                This school was self-registered and is awaiting authorization before it can access the system.
-              </Text>
-              <View style={styles.approvalActions}>
-                <Pressable
-                  onPress={handleApprove}
-                  disabled={actionLoading}
-                  style={[styles.approveBtn, actionLoading && { opacity: 0.6 }]}
-                >
-                  <Text style={styles.approveBtnText}>Approve</Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => setShowRejectModal(true)}
-                  disabled={actionLoading}
-                  style={[styles.rejectBtn, actionLoading && { opacity: 0.6 }]}
-                >
-                  <Text style={styles.rejectBtnText}>Reject</Text>
-                </Pressable>
-              </View>
-            </View>
-          ) : school.admin?.status === 'rejected' ? (
-            <View style={[styles.approvalCard, styles.rejectedCard]}>
-              <View style={styles.approvalHeader}>
-                <Ionicons color="#EF4444" name="close-circle-outline" size={20} />
-                <Text style={[styles.approvalTitle, { color: '#EF4444' }]}>Registration Rejected</Text>
-              </View>
-              <Text style={styles.approvalText}>
-                This school registration has been rejected.
-                {school.admin.rejected_reason ? `\n\nReason: "${school.admin.rejected_reason}"` : ''}
-              </Text>
-            </View>
-          ) : null}
-
-          {/* Admin Contact */}
-          <AdminContact school={school} />
-
-          {/* Academic Units */}
-          <View style={styles.unitsSection}>
-            <View style={styles.unitsSectionHeader}>
-              <Text style={styles.unitsSectionTitle}>Academic Units</Text>
-              <Text style={styles.unitsSectionSub}>
-                {classes.length > 0
-                  ? `${classes.length} classes in this school`
-                  : 'No classes added yet'}
-              </Text>
-            </View>
-
-            {classes.length > 0 ? (
-              <View style={styles.classTable}>
-                {/* Table header */}
-                <View style={styles.tableHeader}>
-                  <Text style={[styles.tableHeaderText, { flex: 1 }]}>CLASS NAME</Text>
-                  <Text style={styles.tableHeaderText}>ADDED</Text>
+              <View style={styles.titleRow}>
+                <View>
+                  <Text style={styles.breadcrumb}>DISTRICT MANAGEMENT</Text>
+                  <Text style={styles.topTitle}>School Profile</Text>
                 </View>
+                <View style={styles.titleActions}>
+                  <Pressable onPress={openEdit} style={styles.actionBtn}>
+                    <Ionicons color={AppTheme.colors.textPrimary} name="pencil-outline" size={20} />
+                  </Pressable>
+                  <Pressable onPress={handleDelete} style={styles.actionBtn}>
+                    <Ionicons color={AppTheme.colors.error} name="trash-outline" size={20} />
+                  </Pressable>
+                </View>
+              </View>
 
-                {classes.map((classItem, idx) => (
-                  <View key={classItem.id}>
-                    {idx > 0 ? <View style={styles.rowDivider} /> : null}
-                    <ClassRow
-                      classItem={classItem}
-                      index={idx}
-                      onPress={() => navigation.navigate('AdminClassDetail', {
-                        schoolId: route.params.schoolId,
-                        classId: classItem.id,
-                        className: classItem.name,
-                        schoolName: school.name,
-                      })}
-                    />
+              {isLoading ? (
+                <View style={styles.center}>
+                  <ActivityIndicator color={AppTheme.colors.primary} size="large" />
+                  <Text style={styles.loadingText}>Loading school profile…</Text>
+                </View>
+              ) : error ? (
+                <View style={styles.center}>
+                  <Ionicons color={AppTheme.colors.textSecondary} name="cloud-offline-outline" size={40} />
+                  <Text style={styles.errorTitle}>Could not load school</Text>
+                  <Text style={styles.errorBody}>{error}</Text>
+                </View>
+              ) : school ? (
+                <>
+                  {/* Hero */}
+                  <SchoolHero school={school} />
+
+                  {school.admin?.status === 'pending_approval' ? (
+                    <View style={styles.approvalCard}>
+                      <View style={styles.approvalHeader}>
+                        <Ionicons color={AppTheme.colors.warning} name="shield-checkmark-outline" size={20} />
+                        <Text style={styles.approvalTitle}>Registration Pending Approval</Text>
+                      </View>
+                      <Text style={styles.approvalText}>
+                        This school was self-registered and is awaiting authorization before it can access the system.
+                      </Text>
+                      <View style={styles.approvalActions}>
+                        <Pressable
+                          onPress={handleApprove}
+                          disabled={actionLoading}
+                          style={[styles.approveBtn, actionLoading && { opacity: 0.6 }]}
+                        >
+                          <Text style={styles.approveBtnText}>Approve</Text>
+                        </Pressable>
+                        <Pressable
+                          onPress={() => setShowRejectModal(true)}
+                          disabled={actionLoading}
+                          style={[styles.rejectBtn, actionLoading && { opacity: 0.6 }]}
+                        >
+                          <Text style={styles.rejectBtnText}>Reject</Text>
+                        </Pressable>
+                      </View>
+                    </View>
+                  ) : school.admin?.status === 'rejected' ? (
+                    <View style={[styles.approvalCard, styles.rejectedCard]}>
+                      <View style={styles.approvalHeader}>
+                        <Ionicons color={AppTheme.colors.error} name="close-circle-outline" size={20} />
+                        <Text style={[styles.approvalTitle, { color: AppTheme.colors.error }]}>Registration Rejected</Text>
+                      </View>
+                      <Text style={styles.approvalText}>
+                        This school registration has been rejected.
+                        {school.admin.rejected_reason ? `\n\nReason: "${school.admin.rejected_reason}"` : ''}
+                      </Text>
+                    </View>
+                  ) : null}
+
+                  {/* Admin Contact */}
+                  <AdminContact school={school} />
+
+                  {/* Academic Units */}
+                  <View style={styles.unitsSection}>
+                    <View style={styles.unitsSectionHeader}>
+                      <Text style={styles.unitsSectionTitle}>Academic Units</Text>
+                      <Text style={styles.unitsSectionSub}>
+                        {classes.length > 0
+                          ? `${classes.length} classes in this school`
+                          : 'No classes added yet'}
+                      </Text>
+                    </View>
+
+                    {classes.length > 0 ? (
+                      <View style={styles.classTable}>
+                        {/* Table header */}
+                        <View style={styles.tableHeader}>
+                          <Text style={[styles.tableHeaderText, { flex: 1 }]}>CLASS NAME</Text>
+                          <Text style={styles.tableHeaderText}>ADDED</Text>
+                        </View>
+
+                        {classes.map((classItem, idx) => (
+                          <View key={classItem.id}>
+                            {idx > 0 ? <View style={styles.rowDivider} /> : null}
+                            <ClassRow
+                              classItem={classItem}
+                              index={idx}
+                              onPress={() => navigation.navigate('AdminClassDetail', {
+                                schoolId: route.params.schoolId,
+                                classId: classItem.id,
+                                className: classItem.name,
+                                schoolName: school.name,
+                              })}
+                            />
+                          </View>
+                        ))}
+                      </View>
+                    ) : (
+                      <View style={styles.emptyClasses}>
+                        <Ionicons color={AppTheme.colors.textSecondary} name="school-outline" size={32} />
+                        <Text style={styles.emptyClassesText}>
+                          No academic classes have been added to this school yet.
+                        </Text>
+                      </View>
+                    )}
                   </View>
-                ))}
-              </View>
-            ) : (
-              <View style={styles.emptyClasses}>
-                <Ionicons color={colors.textMuted} name="school-outline" size={32} />
-                <Text style={styles.emptyClassesText}>
-                  No academic classes have been added to this school yet.
-                </Text>
-              </View>
-            )}
+                </>
+              ) : null}
+            </View>
           </View>
         </ScrollView>
-      ) : null}
+      </View>
     </SafeAreaView>
   );
 }
@@ -476,14 +501,40 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: AppTheme.colors.background,
   },
-  iconBtn: {
-    width: 36,
-    height: 36,
+  globalHeader: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.m,
+    backgroundColor: AppTheme.colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: AppTheme.colors.border,
   },
+  headerLeft: { width: 60, alignItems: 'flex-start' },
+  headerTitle: { flex: 1, textAlign: 'center', color: AppTheme.colors.textPrimary, ...AppTheme.typography.h3 },
+  headerRight: { flexDirection: 'row', gap: AppTheme.spacing.s, width: 60, justifyContent: 'flex-end' },
+  iconBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+  centerContainer: { flex: 1, alignItems: 'center', paddingHorizontal: AppTheme.spacing.l, paddingVertical: AppTheme.spacing.xl },
+  body: { width: '100%', maxWidth: 800, gap: AppTheme.spacing.l },
+  backBtnRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8, alignSelf: 'flex-start' },
+  backBtnText: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body, fontWeight: '600' },
+  titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 12 },
+  flex: { flex: 1 },
+  breadcrumb: {
+    color: AppTheme.colors.textSecondary,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+  topTitle: {
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.h1,
+    marginTop: 4,
+  },
+  titleActions: { flexDirection: 'row', gap: 10 },
+  actionBtn: { width: 40, height: 40, borderRadius: AppTheme.radius.medium, backgroundColor: AppTheme.colors.surface, borderWidth: 1, borderColor: AppTheme.colors.border, alignItems: 'center', justifyContent: 'center' },
   center: {
     flex: 1,
     alignItems: 'center',
@@ -492,71 +543,60 @@ const styles = StyleSheet.create({
     padding: 40,
   },
   loadingText: {
-    color: colors.textSecondary,
-    fontSize: 14,
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.body,
   },
   errorTitle: {
-    color: colors.textPrimary,
-    fontSize: 16,
-    fontWeight: '700',
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.h3,
   },
   errorBody: {
-    color: colors.textSecondary,
-    fontSize: 14,
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.body,
     textAlign: 'center',
   },
   scroll: {
-    paddingBottom: 48,
-    gap: 0,
+    flexGrow: 1,
   },
-
   // Hero
   hero: {
-    backgroundColor: colors.surface,
-    padding: 24,
-    paddingBottom: 28,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    backgroundColor: AppTheme.colors.surface,
+    padding: AppTheme.spacing.xl,
+    borderRadius: AppTheme.radius.large,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
     alignItems: 'center',
     gap: 16,
   },
   heroIconWrap: {
     width: 88,
     height: 88,
-    borderRadius: 22,
-    backgroundColor: colors.accentSoft,
+    borderRadius: AppTheme.radius.large,
+    backgroundColor: AppTheme.colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 3,
-    borderColor: colors.surface,
-    shadowColor: colors.cardShadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 1,
-    shadowRadius: 12,
-    elevation: 6,
+    borderColor: AppTheme.colors.surface,
   },
   heroInitials: {
-    color: colors.accentDark,
-    fontSize: 30,
-    fontWeight: '800',
+    color: AppTheme.colors.primary,
+    ...AppTheme.typography.h1,
+    fontSize: 36,
   },
   heroTextWrap: {
     alignItems: 'center',
     gap: 6,
   },
   institutionalLabel: {
-    color: colors.accent,
+    color: AppTheme.colors.primary,
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1.5,
   },
   heroName: {
-    color: colors.textPrimary,
-    fontSize: 26,
-    fontWeight: '800',
-    letterSpacing: -0.5,
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.h2,
     textAlign: 'center',
-    lineHeight: 32,
   },
   heroAddrRow: {
     flexDirection: 'row',
@@ -565,20 +605,18 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   heroAddr: {
-    color: colors.textSecondary,
-    fontSize: 13,
-    lineHeight: 18,
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.body,
     textAlign: 'center',
     flex: 1,
   },
 
   // Admin contact
   adminCard: {
-    backgroundColor: colors.surface,
-    margin: 20,
-    borderRadius: 16,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     overflow: 'hidden',
   },
   adminCardHeader: {
@@ -587,12 +625,12 @@ const styles = StyleSheet.create({
     gap: 8,
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    backgroundColor: colors.surfaceMuted,
+    borderBottomColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.surface,
   },
   adminCardTitle: {
-    color: colors.textPrimary,
-    fontSize: 14,
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.body,
     fontWeight: '700',
   },
   adminProfile: {
@@ -601,18 +639,18 @@ const styles = StyleSheet.create({
     gap: 14,
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: AppTheme.colors.border,
   },
   adminAvatar: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
   adminAvatarText: {
-    color: colors.accentDark,
+    color: AppTheme.colors.primary,
     fontSize: 16,
     fontWeight: '800',
   },
@@ -621,13 +659,13 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   adminName: {
-    color: colors.textPrimary,
-    fontSize: 16,
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.body,
     fontWeight: '700',
   },
   adminRole: {
-    color: colors.textSecondary,
-    fontSize: 13,
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.caption,
   },
   adminContactRow: {
     padding: 16,
@@ -639,8 +677,8 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   adminContactText: {
-    color: colors.textSecondary,
-    fontSize: 14,
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.body,
     flex: 1,
   },
   adminEmptyRow: {
@@ -651,21 +689,19 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
   adminEmptyText: {
-    color: colors.textPrimary,
-    fontSize: 14,
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.body,
     fontWeight: '600',
   },
   adminEmptyHint: {
-    color: colors.textSecondary,
-    fontSize: 13,
-    lineHeight: 18,
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.caption,
     paddingHorizontal: 16,
     paddingBottom: 16,
   },
 
   // Academic Units
   unitsSection: {
-    margin: 20,
     gap: 12,
   },
   unitsSectionHeader: {
@@ -675,20 +711,18 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   unitsSectionTitle: {
-    color: colors.textPrimary,
-    fontSize: 18,
-    fontWeight: '800',
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.h3,
   },
   unitsSectionSub: {
-    color: colors.textMuted,
-    fontSize: 12,
-    fontWeight: '600',
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.caption,
   },
   classTable: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     overflow: 'hidden',
   },
   tableHeader: {
@@ -696,13 +730,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 10,
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: AppTheme.colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: AppTheme.colors.border,
     gap: 12,
   },
   tableHeaderText: {
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 0.8,
@@ -716,7 +750,7 @@ const styles = StyleSheet.create({
   },
   rowDivider: {
     height: 1,
-    backgroundColor: colors.border,
+    backgroundColor: AppTheme.colors.border,
     marginHorizontal: 16,
   },
   classTag: {
@@ -736,35 +770,33 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   className: {
-    color: colors.textPrimary,
-    fontSize: 15,
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.body,
     fontWeight: '700',
   },
   classDate: {
-    color: colors.textMuted,
-    fontSize: 12,
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.caption,
   },
   emptyClasses: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     alignItems: 'center',
     padding: 32,
     gap: 12,
   },
   emptyClassesText: {
-    color: colors.textSecondary,
-    fontSize: 14,
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.body,
     textAlign: 'center',
-    lineHeight: 20,
   },
   approvalCard: {
     backgroundColor: '#FFFBEB',
     borderColor: '#FDE68A',
     borderWidth: 1,
-    borderRadius: 16,
-    margin: 20,
+    borderRadius: AppTheme.radius.large,
     padding: 16,
     gap: 12,
   },
@@ -779,13 +811,12 @@ const styles = StyleSheet.create({
   },
   approvalTitle: {
     color: '#B45309',
-    fontSize: 15,
+    ...AppTheme.typography.body,
     fontWeight: '700',
   },
   approvalText: {
-    color: colors.textSecondary,
-    fontSize: 14,
-    lineHeight: 20,
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.body,
   },
   approvalActions: {
     flexDirection: 'row',
@@ -793,8 +824,8 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   approveBtn: {
-    backgroundColor: '#10B981',
-    borderRadius: 10,
+    backgroundColor: AppTheme.colors.success,
+    borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 16,
     paddingVertical: 10,
     alignItems: 'center',
@@ -803,77 +834,95 @@ const styles = StyleSheet.create({
   },
   approveBtnText: {
     color: '#fff',
-    fontSize: 14,
-    fontWeight: '700',
+    ...AppTheme.typography.button,
   },
   rejectBtn: {
-    backgroundColor: 'transparent',
-    borderColor: '#EF4444',
-    borderWidth: 1.5,
-    borderRadius: 10,
+    backgroundColor: AppTheme.colors.surface,
+    borderColor: AppTheme.colors.error,
+    borderWidth: 1,
+    borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 16,
     paddingVertical: 10,
     alignItems: 'center',
     justifyContent: 'center',
+    flex: 1,
   },
   rejectBtnText: {
-    color: '#EF4444',
-    fontSize: 14,
-    fontWeight: '700',
+    color: AppTheme.colors.error,
+    ...AppTheme.typography.button,
   },
-  modalCancelBtn: {
-    borderColor: colors.border,
-    borderWidth: 1.5,
-    borderRadius: 14,
-    height: 52,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalCancelBtnText: {
-    color: colors.textSecondary,
-    fontSize: 16,
-    fontWeight: '700',
-  },
+
+  // Modals
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
   modalSheet: {
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    width: '100%',
+    maxWidth: 400,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
     padding: 24,
-    paddingBottom: 40,
-    gap: 14,
+    gap: 12,
   },
   modalHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 4,
-  },
-  modalTitle: { fontSize: 18, fontWeight: '800', color: colors.textPrimary },
-  inputLabel: { fontSize: 12, fontWeight: '700', color: colors.textMuted, marginBottom: -8 },
-  input: {
-    backgroundColor: colors.background,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
-    color: colors.textPrimary,
-  },
-  inputMultiline: { height: 72, textAlignVertical: 'top' },
-  modalError: { color: '#EF4444', fontSize: 13, fontWeight: '600' },
-  modalSaveBtn: {
-    backgroundColor: colors.accent,
-    borderRadius: 14,
-    height: 52,
     alignItems: 'center',
-    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  modalTitle: {
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.h3,
+  },
+  inputLabel: {
+    color: AppTheme.colors.textSecondary,
+    fontSize: 12,
+    fontWeight: '700',
     marginTop: 4,
   },
-  modalSaveBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  input: {
+    backgroundColor: AppTheme.colors.background,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+    borderRadius: AppTheme.radius.medium,
+    padding: 12,
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.body,
+  },
+  inputMultiline: {
+    minHeight: 80,
+    textAlignVertical: 'top',
+  },
+  modalError: {
+    color: AppTheme.colors.error,
+    ...AppTheme.typography.caption,
+  },
+  modalSaveBtn: {
+    backgroundColor: AppTheme.colors.primary,
+    paddingVertical: 12,
+    borderRadius: AppTheme.radius.medium,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  modalSaveBtnText: {
+    color: '#fff',
+    ...AppTheme.typography.button,
+  },
+  modalCancelBtn: {
+    backgroundColor: AppTheme.colors.surface,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+    paddingVertical: 12,
+    borderRadius: AppTheme.radius.medium,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  modalCancelBtnText: {
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.button,
+  },
 });

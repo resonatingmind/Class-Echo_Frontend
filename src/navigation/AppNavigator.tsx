@@ -25,6 +25,7 @@ import { SchoolAdminChapterDetailScreen } from "../screens/SchoolAdminChapterDet
 import { TeacherChapterDetailScreen } from "../screens/TeacherChapterDetailScreen";
 import { SchoolAdminTeacherAnalyticsScreen } from "../screens/SchoolAdminTeacherAnalyticsScreen";
 import { SchoolAdminTimetableScreen } from "../screens/SchoolAdminTimetableScreen";
+import { SchoolAdminProfileScreen } from "../screens/SchoolAdminProfileScreen";
 
 // Auth screens
 import { LoginScreen } from "../screens/LoginScreen";
@@ -91,6 +92,7 @@ export type RootStackParamList = {
   SchoolAdminPlanner: undefined;
 
   SchoolAdminTimetable: undefined;
+  SchoolAdminProfile: undefined;
 
   SchoolAdminPlannerDetail: {
     subjectId: number;
@@ -258,6 +260,11 @@ export function AppNavigator() {
           <Stack.Screen
             name="SchoolAdminChapterDetail"
             component={SchoolAdminChapterDetailScreen}
+          />
+
+          <Stack.Screen
+            name="SchoolAdminProfile"
+            component={SchoolAdminProfileScreen}
           />
 
           <Stack.Screen

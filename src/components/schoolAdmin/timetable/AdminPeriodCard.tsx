@@ -32,14 +32,14 @@ export function AdminPeriodCard({ entry, onEdit, onDelete }: Props) {
         <View style={styles.metaRow}>
           {entry.teacher ? (
             <View style={styles.metaItem}>
-              <Ionicons name="person-outline" size={13} color={colors.textMuted} />
+              <Ionicons name="person-outline" size={13} color={AppTheme.colors.textSecondary} />
               <Text style={styles.metaText}>{entry.teacher.name}</Text>
             </View>
           ) : null}
 
           {entry.room ? (
             <View style={styles.metaItem}>
-              <Ionicons name="location-outline" size={13} color={colors.textMuted} />
+              <Ionicons name="location-outline" size={13} color={AppTheme.colors.textSecondary} />
               <Text style={styles.metaText}>Room {entry.room}</Text>
             </View>
           ) : null}
@@ -48,7 +48,7 @@ export function AdminPeriodCard({ entry, onEdit, onDelete }: Props) {
 
       <View style={styles.actions}>
         <Pressable style={styles.actionButton} onPress={() => onEdit(entry)} hitSlop={8}>
-          <Ionicons name="create-outline" size={18} color={colors.accentDark} />
+          <Ionicons name="create-outline" size={18} color={AppTheme.colors.primaryDark} />
         </Pressable>
         <Pressable
           style={[styles.actionButton, styles.deleteButton]}
@@ -66,11 +66,11 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
     alignItems: "stretch",
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     overflow: "hidden",
   },
 
@@ -78,13 +78,13 @@ const styles = StyleSheet.create({
     width: 52,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primarySoft,
   },
 
   periodBadgeText: {
     fontSize: 13,
     fontWeight: "800",
-    color: colors.accentDark,
+    color: AppTheme.colors.primaryDark,
   },
 
   body: {
@@ -105,13 +105,13 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   time: {
     fontSize: 12,
     fontWeight: "600",
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   metaRow: {
@@ -128,11 +128,11 @@ const styles = StyleSheet.create({
 
   metaText: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   metaMuted: {
-    color: colors.textPlaceholder,
+    color: AppTheme.colors.textPlaceholder,
   },
 
   actions: {
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingHorizontal: 12,
     borderLeftWidth: 1,
-    borderLeftColor: colors.border,
+    borderLeftColor: AppTheme.colors.border,
   },
 
   actionButton: {
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primarySoft,
   },
 
   deleteButton: {

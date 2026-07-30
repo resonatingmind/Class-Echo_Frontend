@@ -12,7 +12,7 @@ export function InfoState({ title, body, loading }: InfoStateProps) {
   return (
     <View style={styles.wrap}>
       {loading ? (
-        <ActivityIndicator color={colors.accentDark} />
+        <ActivityIndicator color={AppTheme.colors.primaryDark} />
       ) : (
         <View style={styles.dot} />
       )}
@@ -25,7 +25,7 @@ export function InfoState({ title, body, loading }: InfoStateProps) {
 const styles = StyleSheet.create({
   wrap: {
     borderRadius: 18,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     padding: 24,
     alignItems: 'center',
     gap: 10,
@@ -34,16 +34,16 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 999,
-    backgroundColor: colors.accentDark,
+    backgroundColor: AppTheme.colors.primaryDark,
   },
   title: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 16,
     fontWeight: '700',
     textAlign: 'center',
   },
   body: {
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
     textAlign: 'center',

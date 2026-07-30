@@ -26,7 +26,7 @@ import {
 } from "../lib/api";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { ScreenHeader } from "../components/common/ScreenHeader";
-import { colors } from "../theme/colors";
+import { AppTheme } from "../theme/AppTheme";
 import { TeacherOut } from "../types/api";
 
 type Props = NativeStackScreenProps<
@@ -89,7 +89,7 @@ try {
   if (loading) {
     return (
       <SafeAreaView style={styles.center}>
-        <ActivityIndicator size="large" color={colors.accent} />
+        <ActivityIndicator size="large" color={AppTheme.colors.primary} />
       </SafeAreaView>
     );
   }
@@ -247,7 +247,7 @@ try {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.profileCard}>
           <View style={styles.avatar}>
-            <Ionicons name="person" size={42} color={colors.accent} />
+            <Ionicons name="person" size={42} color={AppTheme.colors.primary} />
           </View>
 
           <View style={{ flex: 1 }}>
@@ -273,7 +273,7 @@ try {
 
         <View style={styles.infoGrid}>
           <View style={styles.infoCard}>
-            <Ionicons name="school-outline" size={24} color={colors.accent} />
+            <Ionicons name="school-outline" size={24} color={AppTheme.colors.primary} />
 
             <Text style={styles.infoValue}>{profile.classes.join(", ")}</Text>
 
@@ -281,7 +281,7 @@ try {
           </View>
 
           <View style={styles.infoCard}>
-            <Ionicons name="book-outline" size={24} color={colors.accent} />
+            <Ionicons name="book-outline" size={24} color={AppTheme.colors.primary} />
 
             <Text style={styles.infoValue}>
               {profile.statistics.total_subjects}
@@ -291,7 +291,7 @@ try {
           </View>
 
           <View style={styles.infoCard}>
-            <Ionicons name="calendar-outline" size={24} color={colors.accent} />
+            <Ionicons name="calendar-outline" size={24} color={AppTheme.colors.primary} />
 
             <Text style={styles.infoSmall}>
               {profile.assigned_at
@@ -303,7 +303,7 @@ try {
           </View>
 
           <View style={styles.infoCard}>
-            <Ionicons name="library-outline" size={24} color={colors.accent} />
+            <Ionicons name="library-outline" size={24} color={AppTheme.colors.primary} />
 
             <Text style={styles.infoValue}>
               {profile.statistics.total_recordings}
@@ -339,7 +339,7 @@ try {
         {profile.subjects.map((subject) => (
           <View key={subject.id} style={styles.subjectCard}>
             <View style={subjectHeaderStyle(subject)}>
-              <Ionicons name="book" size={24} color={colors.accent} />
+              <Ionicons name="book" size={24} color={AppTheme.colors.primary} />
 
               <View style={{ flex: 1 }}>
                 <Text style={styles.subjectTitle}>{subject.name}</Text>
@@ -447,7 +447,7 @@ function subjectHeaderStyle(subject: any) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: AppTheme.colors.background,
   },
 
   content: {
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 16,
     padding: 20,
     gap: 12,
@@ -475,24 +475,24 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 22,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   email: {
     fontSize: 15,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   sectionTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   actionButton: {
     height: 50,
-    borderRadius: 12,
-    backgroundColor: colors.accent,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primary,
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
@@ -507,7 +507,7 @@ const styles = StyleSheet.create({
 
   profileCard: {
     flexDirection: "row",
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 20,
     padding: 20,
     alignItems: "center",
@@ -549,7 +549,7 @@ const styles = StyleSheet.create({
 
   infoCard: {
     width: "48%",
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 16,
     padding: 18,
     alignItems: "center",
@@ -559,7 +559,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "700",
     marginTop: 10,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   infoSmall: {
@@ -570,7 +570,7 @@ const styles = StyleSheet.create({
 
   infoLabel: {
     marginTop: 8,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   statsGrid: {
@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
 
   statCard: {
     width: "48%",
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 16,
     padding: 20,
     alignItems: "center",
@@ -591,16 +591,16 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 28,
     fontWeight: "800",
-    color: colors.accent,
+    color: AppTheme.colors.primary,
   },
 
   statLabel: {
     marginTop: 8,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   subjectCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 16,
     padding: 18,
     marginBottom: 14,
@@ -618,7 +618,7 @@ const styles = StyleSheet.create({
   },
 
   subjectClass: {
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     marginTop: 3,
   },
 
@@ -630,6 +630,6 @@ const styles = StyleSheet.create({
 
   subjectMeta: {
     fontWeight: "600",
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 });

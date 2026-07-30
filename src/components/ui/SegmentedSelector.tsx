@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     top: 4,
     bottom: 4,
     left: 4,
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderRadius: AppTheme.radius.small,
     ...AppTheme.shadows.subtle,
   },
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   segmentText: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.label,
   },
   activeSegmentText: {

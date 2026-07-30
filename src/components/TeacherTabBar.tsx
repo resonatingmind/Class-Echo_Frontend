@@ -32,7 +32,7 @@ export function TeacherTabBar({ active, onTabPress }: Props) {
             style={styles.tab}
           >
             <Ionicons
-              color={isActive ? colors.accent : colors.navInactive}
+              color={isActive ? AppTheme.colors.primary : colors.navInactive}
               name={isActive ? tab.activeIcon : tab.icon}
               size={22}
             />
@@ -49,9 +49,9 @@ export function TeacherTabBar({ active, onTabPress }: Props) {
 const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: AppTheme.colors.border,
     paddingBottom: 8,
     paddingTop: 10,
   },
@@ -66,6 +66,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   labelActive: {
-    color: colors.accent,
+    color: AppTheme.colors.primary,
   },
 });

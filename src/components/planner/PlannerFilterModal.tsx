@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 
 type Props = {
   visible: boolean;
@@ -62,7 +62,7 @@ export function PlannerFilterModal({
                     <Ionicons
                       name="checkmark"
                       size={20}
-                      color={colors.accent}
+                      color={AppTheme.colors.primary}
                     />
                   )}
                 </Pressable>
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
 
     fontWeight: "700",
 
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
 
     paddingHorizontal: 20,
 
@@ -123,11 +123,11 @@ const styles = StyleSheet.create({
   itemText: {
     fontSize: 16,
 
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   activeText: {
-    color: colors.accent,
+    color: AppTheme.colors.primary,
 
     fontWeight: "700",
   },

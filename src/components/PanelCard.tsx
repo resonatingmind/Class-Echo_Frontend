@@ -70,17 +70,17 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   default: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     ...shadow.card,
   },
   elevated: {
-    backgroundColor: colors.surfaceElevated,
+    backgroundColor: AppTheme.colors.surfaceElevated,
     ...shadow.card,
   },
   outline: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
   },
   ghost: {
     backgroundColor: 'transparent',

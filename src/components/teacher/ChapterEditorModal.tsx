@@ -8,7 +8,7 @@ import {
   View,
 } from "react-native";
 
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 
 type Props = {
   visible: boolean;
@@ -113,13 +113,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700",
     marginBottom: 20,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   input: {
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 10,
+    borderColor: AppTheme.colors.border,
+    borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 14,
     paddingVertical: 12,
     marginBottom: 14,
@@ -143,8 +143,8 @@ const styles = StyleSheet.create({
   },
 
   saveButton: {
-    backgroundColor: colors.accent,
-    borderRadius: 10,
+    backgroundColor: AppTheme.colors.primary,
+    borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 22,
     paddingVertical: 12,
     marginLeft: 12,

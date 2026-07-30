@@ -18,7 +18,7 @@ import { AssignmentConflict } from "./AssignmentConflict";
 import { replaceAssignment } from "../../lib/api";
 import { QuickAssignmentResponse } from "../../types/api";
 
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 
 type Props = {
   visible: boolean;
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
 
     borderColor: "#CBD5E1",
 
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
 
     paddingHorizontal: 14,
 
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   },
 
   assign: {
-    backgroundColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
 
     marginLeft: 12,
 
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
 
     paddingVertical: 12,
 
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
   },
 
   assignText: {

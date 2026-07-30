@@ -42,7 +42,7 @@ function SchoolHero({ school }: { school: SchoolOut }) {
         <Text style={styles.heroName}>{school.name}</Text>
         {school.address ? (
           <View style={styles.heroAddrRow}>
-            <Ionicons color={AppTheme.colors.textSecondary} name="location-outline" size={14} />
+            <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="location-outline" size={14} />
             <Text style={styles.heroAddr}>{school.address}</Text>
           </View>
         ) : null}
@@ -56,7 +56,7 @@ function AdminContact({ school }: { school: SchoolOut }) {
     return (
       <View style={styles.adminCard}>
         <View style={styles.adminCardHeader}>
-          <Ionicons color={AppTheme.colors.textSecondary} name="person-circle-outline" size={20} />
+          <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="person-circle-outline" size={20} />
           <Text style={styles.adminCardTitle}>Admin Contact</Text>
         </View>
         <View style={styles.adminEmptyRow}>
@@ -91,7 +91,7 @@ function AdminContact({ school }: { school: SchoolOut }) {
 
       <View style={styles.adminContactRow}>
         <View style={styles.adminContactItem}>
-          <Ionicons color={AppTheme.colors.textSecondary} name="mail-outline" size={15} />
+          <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="mail-outline" size={15} />
           <Text style={styles.adminContactText} numberOfLines={1}>
             {school.admin.email}
           </Text>
@@ -127,7 +127,7 @@ function ClassRow({
           Added {new Date(classItem.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
         </Text>
       </View>
-      <Ionicons color={AppTheme.colors.textSecondary} name="chevron-forward" size={16} />
+      <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="chevron-forward" size={16} />
     </Pressable>
   );
 }
@@ -335,7 +335,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
         <Text style={styles.headerTitle}>Super Admin</Text>
         <View style={styles.headerRight}>
           <Pressable onPress={signOut} style={styles.iconBtn}>
-            <Ionicons color={AppTheme.colors.textPrimary} name="log-out-outline" size={24} />
+            <Ionicons color={AppTheme.AppTheme.colors.textPrimary} name="log-out-outline" size={24} />
           </Pressable>
         </View>
       </View>
@@ -347,7 +347,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Reject School Registration</Text>
               <Pressable hitSlop={8} onPress={() => setShowRejectModal(false)}>
-                <Ionicons color={AppTheme.colors.textSecondary} name="close" size={22} />
+                <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="close" size={22} />
               </Pressable>
             </View>
             <Text style={styles.inputLabel}>Reason for Rejection (optional)</Text>
@@ -357,7 +357,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
               numberOfLines={3}
               onChangeText={setRejectReason}
               placeholder="e.g. Invalid school info, unverified school email domain"
-              placeholderTextColor={AppTheme.colors.textPlaceholder}
+              placeholderTextColor={AppTheme.AppTheme.colors.textPlaceholder}
               style={[styles.input, styles.inputMultiline]}
               value={rejectReason}
             />
@@ -392,7 +392,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Edit School</Text>
               <Pressable hitSlop={8} onPress={() => setShowEdit(false)}>
-                <Ionicons color={AppTheme.colors.textSecondary} name="close" size={22} />
+                <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="close" size={22} />
               </Pressable>
             </View>
             <Text style={styles.inputLabel}>School Name *</Text>
@@ -400,7 +400,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
               autoCapitalize="words"
               onChangeText={setEditName}
               placeholder="School name"
-              placeholderTextColor={AppTheme.colors.textPlaceholder}
+              placeholderTextColor={AppTheme.AppTheme.colors.textPlaceholder}
               style={styles.input}
               value={editName}
             />
@@ -411,7 +411,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
               numberOfLines={2}
               onChangeText={setEditAddress}
               placeholder="School address (optional)"
-              placeholderTextColor={AppTheme.colors.textPlaceholder}
+              placeholderTextColor={AppTheme.AppTheme.colors.textPlaceholder}
               style={[styles.input, styles.inputMultiline]}
               value={editAddress}
             />
@@ -438,7 +438,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Delete School</Text>
               <Pressable hitSlop={8} onPress={() => setShowDeleteModal(false)}>
-                <Ionicons color={AppTheme.colors.textSecondary} name="close" size={22} />
+                <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="close" size={22} />
               </Pressable>
             </View>
             <Text style={styles.modalBodyText}>
@@ -449,7 +449,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
               secureTextEntry
               onChangeText={setDeletePassword}
               placeholder="••••••••"
-              placeholderTextColor={AppTheme.colors.textPlaceholder}
+              placeholderTextColor={AppTheme.AppTheme.colors.textPlaceholder}
               style={styles.input}
               value={deletePassword}
             />
@@ -485,7 +485,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
           <View style={styles.centerContainer}>
             <View style={styles.body}>
               <Pressable onPress={() => navigation.goBack()} style={styles.backBtnRow}>
-                <Ionicons name="arrow-back" size={20} color={AppTheme.colors.textSecondary} />
+                <Ionicons name="arrow-back" size={20} color={AppTheme.AppTheme.colors.textSecondary} />
                 <Text style={styles.backBtnText}>Back</Text>
               </Pressable>
 
@@ -502,7 +502,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
                       </Pressable>
                     ) : null}
                     <Pressable onPress={openEdit} style={styles.actionBtn}>
-                      <Ionicons color={AppTheme.colors.textPrimary} name="pencil-outline" size={20} />
+                      <Ionicons color={AppTheme.AppTheme.colors.textPrimary} name="pencil-outline" size={20} />
                     </Pressable>
                     <Pressable onPress={handleDelete} style={styles.actionBtn}>
                       <Ionicons color={AppTheme.colors.error} name="trash-outline" size={20} />
@@ -518,7 +518,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
                 </View>
               ) : error ? (
                 <View style={styles.center}>
-                  <Ionicons color={AppTheme.colors.textSecondary} name="cloud-offline-outline" size={40} />
+                  <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="cloud-offline-outline" size={40} />
                   <Text style={styles.errorTitle}>Could not load school</Text>
                   <Text style={styles.errorBody}>{error}</Text>
                 </View>
@@ -567,8 +567,8 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
                   ) : school.admin?.status === 'suspended' ? (
                     <View style={[styles.approvalCard, styles.suspendedCard]}>
                       <View style={styles.approvalHeader}>
-                        <Ionicons color={AppTheme.colors.textSecondary} name="ban-outline" size={20} />
-                        <Text style={[styles.approvalTitle, { color: AppTheme.colors.textSecondary }]}>Account Suspended</Text>
+                        <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="ban-outline" size={20} />
+                        <Text style={[styles.approvalTitle, { color: AppTheme.AppTheme.colors.textSecondary }]}>Account Suspended</Text>
                       </View>
                       <Text style={styles.approvalText}>
                         This school's administrator account has been suspended. The admin and staff will not be able to log in.
@@ -625,7 +625,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
                       </View>
                     ) : (
                       <View style={styles.emptyClasses}>
-                        <Ionicons color={AppTheme.colors.textSecondary} name="school-outline" size={24} />
+                        <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="school-outline" size={24} />
                         <Text style={styles.emptyClassesText}>
                           No academic classes have been added to this school yet.
                         </Text>
@@ -645,40 +645,40 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: AppTheme.colors.background,
+    backgroundColor: AppTheme.AppTheme.colors.background,
   },
   globalHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: AppTheme.spacing.l,
     paddingVertical: AppTheme.spacing.m,
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: AppTheme.colors.border,
+    borderBottomColor: AppTheme.AppTheme.colors.border,
   },
   headerLeft: { width: 60, alignItems: 'flex-start' },
-  headerTitle: { flex: 1, textAlign: 'center', color: AppTheme.colors.textPrimary, ...AppTheme.typography.h3 },
+  headerTitle: { flex: 1, textAlign: 'center', color: AppTheme.AppTheme.colors.textPrimary, ...AppTheme.typography.h3 },
   headerRight: { flexDirection: 'row', gap: AppTheme.spacing.s, width: 60, justifyContent: 'flex-end' },
   iconBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   centerContainer: { flex: 1, alignItems: 'center', paddingHorizontal: AppTheme.spacing.l, paddingVertical: AppTheme.spacing.xl },
   body: { width: '100%', maxWidth: 800, gap: AppTheme.spacing.l },
   backBtnRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8, alignSelf: 'flex-start' },
-  backBtnText: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body, fontWeight: '600' },
+  backBtnText: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.body, fontWeight: '600' },
   titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 12 },
   flex: { flex: 1 },
   breadcrumb: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 1,
   },
   topTitle: {
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.h1,
     marginTop: 4,
   },
   titleActions: { flexDirection: 'row', gap: 10 },
-  actionBtn: { width: 40, height: 40, borderRadius: AppTheme.radius.medium, backgroundColor: AppTheme.colors.surface, borderWidth: 1, borderColor: AppTheme.colors.border, alignItems: 'center', justifyContent: 'center' },
+  actionBtn: { width: 40, height: 40, borderRadius: AppTheme.radius.medium, backgroundColor: AppTheme.AppTheme.colors.surface, borderWidth: 1, borderColor: AppTheme.AppTheme.colors.border, alignItems: 'center', justifyContent: 'center' },
   center: {
     flex: 1,
     alignItems: 'center',
@@ -687,15 +687,15 @@ const styles = StyleSheet.create({
     padding: 40,
   },
   loadingText: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
   },
   errorTitle: {
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.h3,
   },
   errorBody: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
     textAlign: 'center',
   },
@@ -704,11 +704,11 @@ const styles = StyleSheet.create({
   },
   // Hero
   hero: {
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     padding: AppTheme.spacing.xl,
     borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
     alignItems: 'center',
     gap: 16,
     shadowColor: '#000',
@@ -725,7 +725,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 3,
-    borderColor: AppTheme.colors.surface,
+    borderColor: AppTheme.AppTheme.colors.surface,
   },
   heroInitials: {
     color: AppTheme.colors.primary,
@@ -743,7 +743,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
   },
   heroName: {
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.h2,
     textAlign: 'center',
   },
@@ -754,7 +754,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   heroAddr: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
     textAlign: 'center',
     flex: 1,
@@ -762,10 +762,10 @@ const styles = StyleSheet.create({
 
   // Admin contact
   adminCard: {
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -779,11 +779,11 @@ const styles = StyleSheet.create({
     gap: 8,
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: AppTheme.colors.border,
-    backgroundColor: AppTheme.colors.surface,
+    borderBottomColor: AppTheme.AppTheme.colors.border,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
   },
   adminCardTitle: {
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.body,
     fontWeight: '700',
   },
@@ -793,7 +793,7 @@ const styles = StyleSheet.create({
     gap: 14,
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: AppTheme.colors.border,
+    borderBottomColor: AppTheme.AppTheme.colors.border,
   },
   adminAvatar: {
     width: 48,
@@ -813,12 +813,12 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   adminName: {
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.body,
     fontWeight: '700',
   },
   adminRole: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.caption,
   },
   adminContactRow: {
@@ -831,7 +831,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   adminContactText: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
     flex: 1,
   },
@@ -843,12 +843,12 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
   adminEmptyText: {
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.body,
     fontWeight: '600',
   },
   adminEmptyHint: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.caption,
     paddingHorizontal: 16,
     paddingBottom: 16,
@@ -865,18 +865,18 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   unitsSectionTitle: {
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.h3,
   },
   unitsSectionSub: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.caption,
   },
   classTable: {
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -889,13 +889,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 10,
-    backgroundColor: AppTheme.colors.background,
+    backgroundColor: AppTheme.AppTheme.colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: AppTheme.colors.border,
+    borderBottomColor: AppTheme.AppTheme.colors.border,
     gap: 12,
   },
   tableHeaderText: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 0.8,
@@ -909,13 +909,13 @@ const styles = StyleSheet.create({
   },
   rowDivider: {
     height: 1,
-    backgroundColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.AppTheme.colors.border,
     marginHorizontal: 16,
   },
   classTag: {
     width: 40,
     height: 40,
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.medium,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -929,19 +929,19 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   className: {
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.body,
     fontWeight: '700',
   },
   classDate: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.caption,
   },
   emptyClasses: {
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
     alignItems: 'center',
     padding: 32,
     gap: 12,
@@ -952,7 +952,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   emptyClassesText: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
     textAlign: 'center',
   },
@@ -983,7 +983,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   approvalText: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
   },
   approvalActions: {
@@ -1005,7 +1005,7 @@ const styles = StyleSheet.create({
     ...AppTheme.typography.button,
   },
   rejectBtn: {
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderColor: AppTheme.colors.error,
     borderWidth: 1,
     borderRadius: AppTheme.radius.medium,
@@ -1031,7 +1031,7 @@ const styles = StyleSheet.create({
   modalSheet: {
     width: '100%',
     maxWidth: 400,
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     padding: 24,
     gap: 12,
@@ -1043,28 +1043,28 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   modalTitle: {
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.h3,
   },
   modalBodyText: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
     lineHeight: 18,
     marginBottom: 8,
   },
   inputLabel: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     fontSize: 12,
     fontWeight: '700',
     marginTop: 4,
   },
   input: {
-    backgroundColor: AppTheme.colors.background,
+    backgroundColor: AppTheme.AppTheme.colors.background,
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
     borderRadius: AppTheme.radius.medium,
     padding: 12,
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.body,
     // @ts-ignore
     outlineStyle: 'none',
@@ -1089,16 +1089,16 @@ const styles = StyleSheet.create({
     ...AppTheme.typography.button,
   },
   modalCancelBtn: {
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
     paddingVertical: 12,
     borderRadius: AppTheme.radius.medium,
     alignItems: 'center',
     marginTop: 8,
   },
   modalCancelBtnText: {
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.button,
   },
 });

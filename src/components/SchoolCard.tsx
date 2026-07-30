@@ -15,27 +15,27 @@ export function SchoolCard({ school }: SchoolCardProps) {
         <View style={[styles.badge, { backgroundColor: school.accent }]}>
           <Text style={styles.badgeText}>{school.initials}</Text>
         </View>
-        <MaterialIcons color={colors.textMuted} name="more-vert" size={18} />
+        <MaterialIcons color={AppTheme.colors.textSecondary} name="more-vert" size={18} />
       </View>
 
       <View style={styles.body}>
         <Text style={styles.name}>{school.name}</Text>
         <View style={styles.addressRow}>
-          <Ionicons color={colors.textMuted} name="location-outline" size={12} />
+          <Ionicons color={AppTheme.colors.textSecondary} name="location-outline" size={12} />
           <Text style={styles.address}>{school.address}</Text>
         </View>
       </View>
 
       <View style={styles.statsRow}>
         <View style={styles.statBlock}>
-          <Feather color={colors.accentDark} name="columns" size={14} />
+          <Feather color={AppTheme.colors.primaryDark} name="columns" size={14} />
           <View>
             <Text style={styles.statLabel}>Classes</Text>
             <Text style={styles.statValue}>{school.classes}</Text>
           </View>
         </View>
         <View style={styles.statBlock}>
-          <Ionicons color={colors.accentDark} name="school-outline" size={14} />
+          <Ionicons color={AppTheme.colors.primaryDark} name="school-outline" size={14} />
           <View>
             <Text style={styles.statLabel}>Students</Text>
             <Text style={styles.statValue}>{school.students}</Text>
@@ -48,8 +48,8 @@ export function SchoolCard({ school }: SchoolCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.medium,
     padding: 24,
     gap: 24,
   },
@@ -61,14 +61,14 @@ const styles = StyleSheet.create({
   badge: {
     width: 64,
     height: 64,
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: 'rgba(191, 199, 212, 0.15)',
   },
   badgeText: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 22,
     fontWeight: '800',
   },
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   name: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 20,
     fontWeight: '700',
     lineHeight: 28,
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   address: {
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
   },
@@ -105,13 +105,13 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   statLabel: {
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontSize: 12,
     fontWeight: '500',
     lineHeight: 16,
   },
   statValue: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 14,
     fontWeight: '700',
     lineHeight: 20,

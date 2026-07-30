@@ -24,7 +24,7 @@ import {
   getSchoolTeacherSubjects,
 } from "../lib/api";
 import { TeacherRecording, SubjectWithClassOut } from "../types/api";
-import { colors } from "../theme/colors";
+import { AppTheme } from "../theme/AppTheme";
 
 type Props = NativeStackScreenProps<
   RootStackParamList,
@@ -183,7 +183,7 @@ export function SchoolAdminTeacherRecordingsScreen({
   if (loading) {
     return (
       <SafeAreaView style={styles.center}>
-        <ActivityIndicator size="large" color={colors.accent} />
+        <ActivityIndicator size="large" color={AppTheme.colors.primary} />
       </SafeAreaView>
     );
   }
@@ -206,7 +206,7 @@ export function SchoolAdminTeacherRecordingsScreen({
             }
           }}
         >
-          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+          <Ionicons name="arrow-back" size={24} color={AppTheme.colors.textPrimary} />
         </Pressable>
 
         <Text style={styles.heading}>
@@ -237,7 +237,7 @@ export function SchoolAdminTeacherRecordingsScreen({
           </View>
         </View>
         <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color={colors.textSecondary} />
+          <Ionicons name="search" size={20} color={AppTheme.colors.textSecondary} />
 
           <TextInput
             placeholder="Search by lecture or chapter..."
@@ -256,7 +256,7 @@ export function SchoolAdminTeacherRecordingsScreen({
             setFilterVisible(true);
           }}
         >
-          <Ionicons name="options-outline" size={20} color={colors.accent} />
+          <Ionicons name="options-outline" size={20} color={AppTheme.colors.primary} />
 
           <Text style={styles.filterButtonText}>
             {activeFilterCount > 0
@@ -376,7 +376,7 @@ export function SchoolAdminTeacherRecordingsScreen({
         ))}
         {filteredRecordings.length === 0 && (
           <View style={styles.empty}>
-            <Ionicons name="search" size={40} color={colors.textSecondary} />
+            <Ionicons name="search" size={40} color={AppTheme.colors.textSecondary} />
 
             <Text style={styles.emptyText}>No recordings found</Text>
           </View>
@@ -395,7 +395,7 @@ export function SchoolAdminTeacherRecordingsScreen({
                 <Text style={styles.modalTitle}>Filters</Text>
 
                 <Pressable onPress={() => setFilterVisible(false)}>
-                  <Ionicons name="close" size={26} color={colors.textPrimary} />
+                  <Ionicons name="close" size={26} color={AppTheme.colors.textPrimary} />
                 </Pressable>
               </View>
 
@@ -416,7 +416,7 @@ export function SchoolAdminTeacherRecordingsScreen({
                         : "radio-button-off"
                     }
                     size={20}
-                    color={colors.accent}
+                    color={AppTheme.colors.primary}
                   />
 
                   <Text style={styles.optionText}>{status}</Text>
@@ -444,7 +444,7 @@ export function SchoolAdminTeacherRecordingsScreen({
                           : "radio-button-off"
                       }
                       size={20}
-                      color={colors.accent}
+                      color={AppTheme.colors.primary}
                     />
 
                     <Text style={styles.optionText}>{subject}</Text>
@@ -467,7 +467,7 @@ export function SchoolAdminTeacherRecordingsScreen({
                       tempSort === sort ? "radio-button-on" : "radio-button-off"
                     }
                     size={20}
-                    color={colors.accent}
+                    color={AppTheme.colors.primary}
                   />
 
                   <Text style={styles.optionText}>{sort}</Text>
@@ -511,7 +511,7 @@ export function SchoolAdminTeacherRecordingsScreen({
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: AppTheme.colors.background,
   },
 
   content: {
@@ -528,11 +528,11 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 28,
     fontWeight: "800",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 18,
     padding: 18,
   },
@@ -540,12 +540,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   chapter: {
     marginTop: 6,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   row: {
@@ -556,7 +556,7 @@ const styles = StyleSheet.create({
 
   date: {
     marginTop: 10,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontSize: 12,
   },
 
@@ -570,11 +570,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
   },
 
   filterText: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontWeight: "600",
   },
 
@@ -591,7 +591,7 @@ const styles = StyleSheet.create({
   },
 
   sortText: {
-    color: colors.accent,
+    color: AppTheme.colors.primary,
     fontWeight: "700",
   },
 
@@ -602,13 +602,13 @@ const styles = StyleSheet.create({
 
   emptyText: {
     marginTop: 12,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.surface,
-    borderRadius: 12,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 14,
   },
 
@@ -626,8 +626,8 @@ const styles = StyleSheet.create({
 
   statCard: {
     flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: 12,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.medium,
     padding: 12,
     alignItems: "center",
     marginHorizontal: 4,
@@ -636,7 +636,7 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 18,
     fontWeight: "700",
-    color: colors.accent,
+    color: AppTheme.colors.primary,
   },
   statusBadge: {
     paddingHorizontal: 10,
@@ -667,7 +667,7 @@ const styles = StyleSheet.create({
   },
 
   modalContent: {
-    backgroundColor: colors.background,
+    backgroundColor: AppTheme.colors.background,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -678,7 +678,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 24,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     marginBottom: 18,
   },
 
@@ -687,7 +687,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginTop: 18,
     marginBottom: 10,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   option: {
@@ -699,7 +699,7 @@ const styles = StyleSheet.create({
   optionText: {
     marginLeft: 12,
     fontSize: 15,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   buttonRow: {
@@ -711,8 +711,8 @@ const styles = StyleSheet.create({
   resetButton: {
     flex: 1,
     borderWidth: 1,
-    borderColor: colors.accent,
-    borderRadius: 12,
+    borderColor: AppTheme.colors.primary,
+    borderRadius: AppTheme.radius.medium,
     paddingVertical: 14,
     alignItems: "center",
     marginRight: 8,
@@ -720,15 +720,15 @@ const styles = StyleSheet.create({
 
   applyButton: {
     flex: 1,
-    backgroundColor: colors.accent,
-    borderRadius: 12,
+    backgroundColor: AppTheme.colors.primary,
+    borderRadius: AppTheme.radius.medium,
     paddingVertical: 14,
     alignItems: "center",
     marginLeft: 8,
   },
 
   resetText: {
-    color: colors.accent,
+    color: AppTheme.colors.primary,
     fontWeight: "700",
   },
 
@@ -741,15 +741,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: colors.surface,
-    borderRadius: 12,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.medium,
     paddingVertical: 14,
     marginTop: 12,
   },
 
   filterButtonText: {
     marginLeft: 8,
-    color: colors.accent,
+    color: AppTheme.colors.primary,
     fontWeight: "700",
     fontSize: 16,
   },
@@ -760,7 +760,7 @@ const styles = StyleSheet.create({
   },
 
   activeChip: {
-    backgroundColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -785,12 +785,12 @@ const styles = StyleSheet.create({
   },
   resultCount: {
     fontSize: 14,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontWeight: "500",
   },
   clearFilter: {
     fontSize: 14,
-    color: colors.accent,
+    color: AppTheme.colors.primary,
     fontWeight: "600",
   },
 });

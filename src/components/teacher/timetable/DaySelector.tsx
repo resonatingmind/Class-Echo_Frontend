@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   dayButton: {
     minWidth: 70,
     height: 42,
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#F3F4F6",
@@ -60,14 +60,14 @@ const styles = StyleSheet.create({
   },
 
   activeButton: {
-    backgroundColor: colors.accent,
-    borderColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
+    borderColor: AppTheme.colors.primary,
   },
 
   dayText: {
     fontSize: 14,
     fontWeight: "600",
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   activeText: {

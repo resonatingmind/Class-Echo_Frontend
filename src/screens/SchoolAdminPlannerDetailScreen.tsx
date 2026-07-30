@@ -3,7 +3,7 @@
 // import { SafeAreaView } from "react-native-safe-area-context";
 // import { useNavigation, useRoute } from "@react-navigation/native";
 
-// import { colors } from "../theme/colors";
+// import { AppTheme } from "../theme/AppTheme";
 // import { useAuth } from "../context/AuthContext";
 
 // import { PlannerSubjectDetail } from "../types/api";
@@ -106,7 +106,7 @@
 //   container: {
 //     flex: 1,
 
-//     backgroundColor: colors.background,
+//     backgroundColor: AppTheme.colors.background,
 //   },
 
 //   content: {
@@ -122,7 +122,7 @@
 
 //     alignItems: "center",
 
-//     backgroundColor: colors.background,
+//     backgroundColor: AppTheme.colors.background,
 //   },
 // });
 
@@ -132,7 +132,7 @@ import { ActivityIndicator, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-import { colors } from "../theme/colors";
+import { AppTheme } from "../theme/AppTheme";
 import { useAuth } from "../context/AuthContext";
 
 import { PlannerSubjectDetail } from "../types/api";
@@ -183,7 +183,7 @@ export function SchoolAdminPlannerDetailScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.center}>
-        <ActivityIndicator size="large" color={colors.accent} />
+        <ActivityIndicator size="large" color={AppTheme.colors.primary} />
       </SafeAreaView>
     );
   }
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
 
-    backgroundColor: colors.background,
+    backgroundColor: AppTheme.colors.background,
   },
 
   content: {
@@ -265,6 +265,6 @@ const styles = StyleSheet.create({
 
     alignItems: "center",
 
-    backgroundColor: colors.background,
+    backgroundColor: AppTheme.colors.background,
   },
 });

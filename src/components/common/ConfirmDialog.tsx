@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 
 type Props = {
   visible: boolean;
@@ -104,14 +104,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     marginBottom: 12,
   },
 
   message: {
     fontSize: 15,
     lineHeight: 22,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     marginBottom: 28,
   },
 
@@ -125,13 +125,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 12,
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.medium,
     backgroundColor: "#F3F4F6",
   },
 
   cancelText: {
     fontWeight: "600",
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   confirmButton: {
@@ -140,8 +140,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 24,
     paddingVertical: 12,
-    borderRadius: 10,
-    backgroundColor: colors.accent,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primary,
     minWidth: 110,
   },
 

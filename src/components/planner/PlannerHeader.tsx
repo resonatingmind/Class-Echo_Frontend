@@ -1,7 +1,7 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 
 type Props = {
   onCreatePress: () => void;
@@ -9,60 +9,45 @@ type Props = {
 
 export function PlannerHeader({ onCreatePress }: Props) {
   return (
-    <View style={styles.container}>
-      <View>
-        <Text style={styles.title}>Academic Planner</Text>
-
-        <Text style={styles.subtitle}>
-          Manage teaching assignments for the academic session.
-        </Text>
-      </View>
-
-      <Pressable style={styles.button} onPress={onCreatePress}>
-        <Ionicons name="add" size={18} color="#fff" />
-
-        <Text style={styles.buttonText}>Quick assignment</Text>
+    <View style={styles.pageHeading}>
+      <Text style={styles.pageTitle}>Academic Planner</Text>
+      <Text style={styles.pageSubtitle}>
+        Manage teaching assignments for the academic session.
+      </Text>
+      <Pressable style={styles.addBtn} onPress={onCreatePress}>
+        <Ionicons name="add" size={16} color="#fff" />
+        <Text style={styles.addText}>Quick assignment</Text>
       </Pressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 12,
-    marginBottom: 20,
+  pageHeading: {
+    gap: AppTheme.spacing.s,
+    marginBottom: AppTheme.spacing.m,
   },
-
-  title: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: colors.textPrimary,
+  pageTitle: {
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.heading1,
   },
-
-  subtitle: {
-    marginTop: 6,
-    fontSize: 15,
-    color: colors.textSecondary,
+  pageSubtitle: {
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.body,
   },
-
-  button: {
-    height: 48,
-    paddingHorizontal: 18,
-    borderRadius: 12,
-    backgroundColor: colors.accent,
-
+  addBtn: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
+    alignSelf: "flex-start",
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primary,
+    paddingHorizontal: AppTheme.spacing.m,
+    paddingVertical: AppTheme.spacing.s,
+    marginTop: AppTheme.spacing.xs,
   },
-
-  buttonText: {
+  addText: {
     color: "#fff",
-    fontSize: 15,
-    fontWeight: "700",
+    ...AppTheme.typography.button,
   },
 });

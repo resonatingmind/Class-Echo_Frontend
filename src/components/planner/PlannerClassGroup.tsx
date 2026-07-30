@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 
 import { PlannerItemOut } from "../../types/api";
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 import { PlannerSubjectRow } from "./PlannerSubjectRow";
 
 type Props = {
@@ -65,10 +65,10 @@ export function PlannerClassGroup({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: 14,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     overflow: "hidden",
     marginBottom: 12,
   },
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: AppTheme.colors.surfaceMuted,
   },
 
   headerLeft: {
@@ -92,12 +92,12 @@ const styles = StyleSheet.create({
   className: {
     fontSize: 15,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   section: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   badge: {

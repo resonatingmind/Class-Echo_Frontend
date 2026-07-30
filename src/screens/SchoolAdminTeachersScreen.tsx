@@ -16,11 +16,11 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { ScreenHeader } from "../components/common/ScreenHeader";
+import { AdminNavbar } from "../components/common/AdminNavbar";
 import { useAuth } from "../context/AuthContext";
 import { createSchoolAdminTeacher, getSchoolAdminTeachers } from "../lib/api";
 import { RootStackParamList } from "../navigation/AppNavigator";
-import { colors } from "../theme/colors";
+import { AppTheme } from "../theme/AppTheme";
 import { TeacherOut } from "../types/api";
 
 type Props = NativeStackScreenProps<RootStackParamList, "SchoolAdminTabs">;
@@ -103,7 +103,7 @@ function AddTeacherModal({
                 autoFocus
                 onChangeText={setName}
                 placeholder="Dr. Elena Rodriguez"
-                placeholderTextColor={colors.textPlaceholder}
+                placeholderTextColor={AppTheme.AppTheme.colors.textPlaceholder}
                 style={styles.input}
                 value={name}
               />
@@ -117,7 +117,7 @@ function AddTeacherModal({
                 keyboardType="email-address"
                 onChangeText={setEmail}
                 placeholder="teacher@school.edu"
-                placeholderTextColor={colors.textPlaceholder}
+                placeholderTextColor={AppTheme.AppTheme.colors.textPlaceholder}
                 style={styles.input}
                 textContentType="emailAddress"
                 value={email}
@@ -130,7 +130,7 @@ function AddTeacherModal({
                 <TextInput
                   onChangeText={setPassword}
                   placeholder="Min. 6 characters"
-                  placeholderTextColor={colors.textPlaceholder}
+                  placeholderTextColor={AppTheme.AppTheme.colors.textPlaceholder}
                   secureTextEntry={!showPass}
                   style={[styles.input, { paddingRight: 40 }]}
                   textContentType="newPassword"
@@ -142,7 +142,7 @@ function AddTeacherModal({
                   style={styles.eyeBtn}
                 >
                   <Ionicons
-                    color={colors.textMuted}
+                    color={AppTheme.AppTheme.colors.textSecondary}
                     name={showPass ? "eye-off-outline" : "eye-outline"}
                     size={18}
                   />
@@ -222,13 +222,13 @@ function TeacherCard({
           <Text style={styles.cardEmail}>{teacher.email}</Text>
         </View>
 
-        <Ionicons name="chevron-forward" size={22} color={colors.textMuted} />
+        <Ionicons name="chevron-forward" size={22} color={AppTheme.AppTheme.colors.textSecondary} />
       </View>
 
       <View style={styles.cardDivider} />
 
       <View style={styles.cardMeta}>
-        <Ionicons color={colors.textMuted} name="calendar-outline" size={13} />
+        <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="calendar-outline" size={13} />
 
         <Text style={styles.cardMetaText}>
           Joined{" "}
@@ -289,105 +289,111 @@ export function SchoolAdminTeachersScreen({ navigation }: Props) {
   
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>
-      <ScreenHeader title="Teachers" />
+      <AdminNavbar title="Teachers" />
 
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        refreshControl={
-          <RefreshControl
-            onRefresh={onRefresh}
-            refreshing={refreshing}
-            tintColor={colors.accent}
-          />
-        }
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Page heading */}
-        <View style={styles.pageHeading}>
-          <Text style={styles.pageTitle}>Teacher Directory</Text>
-          <Text style={styles.pageSubtitle}>
-            Manage faculty members and active teaching statuses.
-          </Text>
-          <Pressable
-            onPress={() => setShowAdd(true)}
-            style={styles.addTeacherBtn}
-          >
-            <Ionicons color="#fff" name="person-add" size={16} />
-            <Text style={styles.addTeacherText}>Add Teacher</Text>
-          </Pressable>
-        </View>
-
-        {/* Search */}
-        <View style={styles.searchBar}>
-          <Ionicons color={colors.textMuted} name="search-outline" size={16} />
-          <TextInput
-            onChangeText={setQuery}
-            placeholder="Search by name, email…"
-            placeholderTextColor={colors.textPlaceholder}
-            style={styles.searchInput}
-            value={query}
-          />
-          {query.length > 0 ? (
-            <Pressable hitSlop={8} onPress={() => setQuery("")}>
-              <Ionicons
-                color={colors.textMuted}
-                name="close-circle"
-                size={16}
-              />
-            </Pressable>
-          ) : null}
-        </View>
-
-        {isLoading ? (
-          <View style={styles.center}>
-            <ActivityIndicator color={colors.accent} size="large" />
-            <Text style={styles.loadingText}>Loading faculty…</Text>
-          </View>
-        ) : error ? (
-          <View style={styles.center}>
-            <Ionicons
-              color={colors.textMuted}
-              name="cloud-offline-outline"
-              size={40}
+      <View style={styles.flex}>
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          refreshControl={
+            <RefreshControl
+              onRefresh={onRefresh}
+              refreshing={refreshing}
+              tintColor={AppTheme.colors.primary}
             />
-            <Text style={styles.emptyTitle}>Could not load teachers</Text>
-            <Text style={styles.emptyBody}>{error}</Text>
-            <Pressable onPress={() => void load()} style={styles.retryBtn}>
-              <Text style={styles.retryText}>Retry</Text>
-            </Pressable>
+          }
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.centerContainer}>
+            <View style={styles.body}>
+              {/* Page heading */}
+              <View style={styles.pageHeading}>
+                <Text style={styles.pageTitle}>Teacher Directory</Text>
+                <Text style={styles.pageSubtitle}>
+                  Manage faculty members and active teaching statuses.
+                </Text>
+                <Pressable
+                  onPress={() => setShowAdd(true)}
+                  style={styles.addTeacherBtn}
+                >
+                  <Ionicons color="#fff" name="person-add" size={16} />
+                  <Text style={styles.addTeacherText}>Add Teacher</Text>
+                </Pressable>
+              </View>
+
+              {/* Search */}
+              <View style={styles.searchBar}>
+                <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="search-outline" size={16} />
+                <TextInput
+                  onChangeText={setQuery}
+                  placeholder="Search by name, email…"
+                  placeholderTextColor={AppTheme.AppTheme.colors.textPlaceholder}
+                  style={styles.searchInput}
+                  value={query}
+                />
+                {query.length > 0 ? (
+                  <Pressable hitSlop={8} onPress={() => setQuery("")}>
+                    <Ionicons
+                      color={AppTheme.AppTheme.colors.textSecondary}
+                      name="close-circle"
+                      size={16}
+                    />
+                  </Pressable>
+                ) : null}
+              </View>
+
+              {isLoading ? (
+                <View style={styles.center}>
+                  <ActivityIndicator color={AppTheme.colors.primary} size="large" />
+                  <Text style={styles.loadingText}>Loading faculty…</Text>
+                </View>
+              ) : error ? (
+                <View style={styles.center}>
+                  <Ionicons
+                    color={AppTheme.AppTheme.colors.textSecondary}
+                    name="cloud-offline-outline"
+                    size={40}
+                  />
+                  <Text style={styles.emptyTitle}>Could not load teachers</Text>
+                  <Text style={styles.emptyBody}>{error}</Text>
+                  <Pressable onPress={() => void load()} style={styles.retryBtn}>
+                    <Text style={styles.retryText}>Retry</Text>
+                  </Pressable>
+                </View>
+              ) : filtered.length === 0 ? (
+                <View style={styles.center}>
+                  <Ionicons
+                    color={AppTheme.AppTheme.colors.textSecondary}
+                    name="people-outline"
+                    size={44}
+                  />
+                  <Text style={styles.emptyTitle}>
+                    {query.trim() ? "No matching faculty" : "No teachers yet"}
+                  </Text>
+                  <Text style={styles.emptyBody}>
+                    {query.trim()
+                      ? "Try a different search."
+                      : "Add your first teacher to get started."}
+                  </Text>
+                </View>
+              ) : (
+                <View style={styles.list}>
+                  {filtered.map((teacher) => (
+                    <TeacherCard
+                      key={teacher.id}
+                      teacher={teacher}
+                      onPress={() =>
+                        navigation.navigate("SchoolAdminTeacherDetail", {
+                          teacherId: teacher.id,
+                        })
+                      }
+                    />
+                  ))}
+                </View>
+              )}
+            </View>
           </View>
-        ) : filtered.length === 0 ? (
-          <View style={styles.center}>
-            <Ionicons
-              color={colors.textMuted}
-              name="people-outline"
-              size={44}
-            />
-            <Text style={styles.emptyTitle}>
-              {query.trim() ? "No matching faculty" : "No teachers yet"}
-            </Text>
-            <Text style={styles.emptyBody}>
-              {query.trim()
-                ? "Try a different search."
-                : "Add your first teacher to get started."}
-            </Text>
-          </View>
-        ) : (
-          <View style={styles.list}>
-            {filtered.map((teacher) => (
-              <TeacherCard
-                key={teacher.id}
-                teacher={teacher}
-                onPress={() =>
-                  navigation.navigate("SchoolAdminTeacherDetail", {
-                    teacherId: teacher.id,
-                  })
-                }
-              />
-            ))}
-          </View>
-        )}
-      </ScrollView>
+        </ScrollView>
+      </View>
 
       <AddTeacherModal
         onClose={() => setShowAdd(false)}
@@ -399,109 +405,104 @@ export function SchoolAdminTeachersScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  scroll: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 32, gap: 20 },
-
-  pageHeading: { gap: 8 },
-  pageTitle: {
-    color: colors.textPrimary,
-    fontSize: 28,
-    fontWeight: "800",
-    letterSpacing: -0.5,
+  safe: { flex: 1, backgroundColor: AppTheme.AppTheme.colors.background },
+  flex: { flex: 1 },
+  scroll: { flexGrow: 1 },
+  centerContainer: {
+    flex: 1,
+    alignItems: "center",
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.xl,
   },
-  pageSubtitle: { color: colors.textSecondary, fontSize: 14, lineHeight: 20 },
+  body: {
+    width: "100%",
+    maxWidth: 800,
+    gap: AppTheme.spacing.l,
+  },
+  pageHeading: { gap: AppTheme.spacing.s, marginBottom: AppTheme.spacing.m },
+  pageTitle: {
+    color: AppTheme.AppTheme.colors.textPrimary,
+    ...AppTheme.typography.heading1,
+  },
+  pageSubtitle: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.body },
   addTeacherBtn: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
     alignSelf: "flex-start",
-    borderRadius: 12,
-    backgroundColor: colors.accent,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    marginTop: 4,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primary,
+    paddingHorizontal: AppTheme.spacing.m,
+    paddingVertical: AppTheme.spacing.s,
+    marginTop: AppTheme.spacing.xs,
   },
-  addTeacherText: { color: "#fff", fontSize: 14, fontWeight: "700" },
-
+  addTeacherText: { color: "#fff", ...AppTheme.typography.button },
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    backgroundColor: colors.surface,
-    borderRadius: 12,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.medium,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
     paddingHorizontal: 14,
     height: 48,
   },
-  searchInput: { flex: 1, color: colors.textPrimary, fontSize: 15, padding: 0 },
-
-  center: { alignItems: "center", paddingVertical: 48, gap: 10 },
-  loadingText: { color: colors.textSecondary, fontSize: 14 },
-  emptyTitle: { color: colors.textPrimary, fontSize: 16, fontWeight: "700" },
-  emptyBody: { color: colors.textSecondary, fontSize: 14, textAlign: "center" },
-  retryBtn: {
-    marginTop: 8,
-    borderRadius: 10,
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+  searchInput: { flex: 1, color: AppTheme.AppTheme.colors.textPrimary, ...AppTheme.typography.body, padding: 0, outlineStyle: 'none' as any },
+  center: {
+    alignItems: "center",
+    paddingVertical: AppTheme.spacing.huge,
+    gap: AppTheme.spacing.m,
   },
-  retryText: { color: colors.accentDark, fontWeight: "700", fontSize: 14 },
-  list: { gap: 14 },
+  loadingText: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.body },
+  emptyTitle: { color: AppTheme.AppTheme.colors.textPrimary, ...AppTheme.typography.heading3 },
+  emptyBody: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.body, textAlign: "center" },
+  retryBtn: {
+    marginTop: AppTheme.spacing.s,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primaryLight,
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.m,
+  },
+  retryText: { color: AppTheme.colors.primary, ...AppTheme.typography.button },
+  list: { gap: AppTheme.spacing.m },
 
   // Teacher Card
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
     overflow: "hidden",
   },
   cardTop: {
     flexDirection: "row",
     alignItems: "center",
     gap: 14,
-    padding: 16,
+    padding: AppTheme.spacing.l,
   },
   avatar: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primaryLight,
     alignItems: "center",
     justifyContent: "center",
   },
-  avatarText: { color: colors.accentDark, fontSize: 16, fontWeight: "800" },
+  avatarText: { color: AppTheme.colors.primary, ...AppTheme.typography.heading3 },
   avatarImage: { width: 48, height: 48, borderRadius: 24 },
   cardInfo: { flex: 1, gap: 3 },
-  cardName: { color: colors.textPrimary, fontSize: 16, fontWeight: "700" },
-  cardEmail: { color: colors.textSecondary, fontSize: 13 },
-  activeBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    borderRadius: 999,
-    backgroundColor: "#E8F7EE",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  activeDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "#22C55E",
-  },
-  activeBadgeText: { color: "#127A40", fontSize: 11, fontWeight: "700" },
-  cardDivider: { height: 1, backgroundColor: colors.border },
+  cardName: { color: AppTheme.AppTheme.colors.textPrimary, ...AppTheme.typography.heading3 },
+  cardEmail: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.body },
+  cardDivider: { height: 1, backgroundColor: AppTheme.AppTheme.colors.border },
   cardMeta: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    padding: 12,
-    paddingHorizontal: 16,
+    padding: AppTheme.spacing.m,
+    paddingHorizontal: AppTheme.spacing.l,
   },
-  cardMetaText: { color: colors.textMuted, fontSize: 12 },
+  cardMetaText: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.caption },
 
   // Modal
   modalOverlay: {
@@ -510,9 +511,9 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modalSheet: {
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
+    borderTopLeftRadius: AppTheme.radius.large,
+    borderTopRightRadius: AppTheme.radius.large,
     padding: 24,
     paddingBottom: 40,
     gap: 16,
@@ -521,33 +522,31 @@ const styles = StyleSheet.create({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.border,
+    backgroundColor: AppTheme.AppTheme.colors.border,
     alignSelf: "center",
     marginBottom: 8,
   },
-  modalTitle: { color: colors.textPrimary, fontSize: 20, fontWeight: "800" },
-  modalSubtitle: { color: colors.textSecondary, fontSize: 14, lineHeight: 20 },
+  modalTitle: { color: AppTheme.AppTheme.colors.textPrimary, ...AppTheme.typography.heading2 },
+  modalSubtitle: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.body },
   fields: {
-    backgroundColor: colors.background,
-    borderRadius: 14,
+    backgroundColor: AppTheme.AppTheme.colors.background,
+    borderRadius: AppTheme.radius.medium,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
     overflow: "hidden",
   },
   field: { padding: 14, gap: 6 },
   fieldLabel: {
-    color: colors.textMuted,
-    fontSize: 10,
-    fontWeight: "700",
-    letterSpacing: 0.8,
+    color: AppTheme.AppTheme.colors.textSecondary,
+    ...AppTheme.typography.caption,
     textTransform: "uppercase",
   },
   fieldDivider: {
     height: 1,
-    backgroundColor: colors.border,
+    backgroundColor: AppTheme.AppTheme.colors.border,
     marginHorizontal: 0,
   },
-  input: { color: colors.textPrimary, fontSize: 15, padding: 0, minHeight: 24 },
+  input: { color: AppTheme.AppTheme.colors.textPrimary, ...AppTheme.typography.body, padding: 0, minHeight: 24, outlineStyle: 'none' as any },
   passWrap: { position: "relative" },
   eyeBtn: {
     position: "absolute",
@@ -561,34 +560,33 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 6,
     backgroundColor: "#FFF1F1",
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
-  modalErrorText: { color: "#B42318", fontSize: 13, flex: 1 },
+  modalErrorText: { color: "#B42318", flex: 1, ...AppTheme.typography.body },
   modalActions: { flexDirection: "row", gap: 12, marginTop: 4 },
   modalCancelBtn: {
     flex: 1,
     height: 50,
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
     alignItems: "center",
     justifyContent: "center",
   },
   modalCancelText: {
-    color: colors.textSecondary,
-    fontWeight: "600",
-    fontSize: 15,
+    color: AppTheme.AppTheme.colors.textSecondary,
+    ...AppTheme.typography.button,
   },
   modalSubmitBtn: {
     flex: 1,
     height: 50,
-    borderRadius: 12,
-    backgroundColor: colors.accent,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },
   btnDisabled: { opacity: 0.45 },
-  modalSubmitText: { color: "#fff", fontWeight: "700", fontSize: 15 },
+  modalSubmitText: { color: "#fff", ...AppTheme.typography.button },
 });

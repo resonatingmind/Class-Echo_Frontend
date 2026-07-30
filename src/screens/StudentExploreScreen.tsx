@@ -62,11 +62,11 @@ export function StudentExploreScreen() {
         </View>
 
         <View style={styles.searchShell}>
-          <Feather color={colors.textMuted} name="search" size={16} />
+          <Feather color={AppTheme.colors.textSecondary} name="search" size={16} />
           <TextInput
             onChangeText={setSearch}
             placeholder="Search institutions"
-            placeholderTextColor={colors.textPlaceholder}
+            placeholderTextColor={AppTheme.colors.textPlaceholder}
             style={styles.searchInput}
             value={search}
           />
@@ -94,7 +94,7 @@ export function StudentExploreScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: colors.background },
+  safeArea: { flex: 1, backgroundColor: AppTheme.colors.background },
   content: { padding: 24, gap: 18, paddingBottom: 40 },
   topBar: {
     flexDirection: 'row',
@@ -102,33 +102,33 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   kicker: {
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
     fontSize: 12,
     fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
   title: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 30,
     fontWeight: '800',
     marginTop: 4,
   },
   signOut: {
-    borderRadius: 12,
-    backgroundColor: colors.surface,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.surface,
     paddingHorizontal: 14,
     paddingVertical: 12,
   },
   signOutText: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 13,
     fontWeight: '700',
   },
   searchShell: {
     minHeight: 52,
     borderRadius: 16,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
@@ -136,17 +136,17 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 16,
     padding: 0,
   },
   schoolName: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 18,
     fontWeight: '700',
   },
   schoolBody: {
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
     marginTop: 8,

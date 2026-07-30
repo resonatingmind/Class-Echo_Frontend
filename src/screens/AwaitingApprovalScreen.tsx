@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
 import { useAuth } from "../context/AuthContext";
-import { colors } from "../theme/colors";
+import { AppTheme } from "../theme/AppTheme";
 
 const STATUS_COPY: Record<string, { title: string; body: (reviewer: string) => string }> = {
   pending_approval: {
@@ -56,7 +56,7 @@ export function AwaitingApprovalScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.card}>
         <View style={styles.header}>
-          <Ionicons name="time-outline" size={48} color={colors.accent} style={styles.icon} />
+          <Ionicons name="time-outline" size={48} color={AppTheme.colors.primary} style={styles.icon} />
           <Text style={styles.title}>{copy.title}</Text>
           <Text style={styles.description}>{copy.body(reviewer)}</Text>
         </View>
@@ -90,7 +90,7 @@ export function AwaitingApprovalScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: AppTheme.colors.background,
     justifyContent: "center",
     alignItems: "center",
     padding: 24,
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   card: {
     width: "100%",
     maxWidth: 400,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 16,
     padding: 24,
     shadowColor: "#000",
@@ -117,13 +117,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     marginBottom: 8,
     textAlign: "center",
   },
   description: {
     fontSize: 16,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     textAlign: "center",
     lineHeight: 24,
   },
@@ -132,12 +132,12 @@ const styles = StyleSheet.create({
   },
   button: {
     paddingVertical: 14,
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     alignItems: "center",
     justifyContent: "center",
   },
   primaryButton: {
-    backgroundColor: colors.textPrimary,
+    backgroundColor: AppTheme.colors.textPrimary,
   },
   primaryButtonText: {
     color: "#fff",
@@ -150,10 +150,10 @@ const styles = StyleSheet.create({
   secondaryButton: {
     backgroundColor: "transparent",
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
   },
   secondaryButtonText: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 16,
     fontWeight: "600",
   },

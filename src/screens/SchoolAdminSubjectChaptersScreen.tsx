@@ -282,7 +282,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
         }}
         rightActions={
           <Pressable onPress={openCreateModal} hitSlop={8}>
-            <Ionicons color={colors.accent} name="add" size={24} />
+            <Ionicons color={AppTheme.colors.primary} name="add" size={24} />
           </Pressable>
         }
       />
@@ -296,7 +296,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
               void load(true);
             }}
             refreshing={refreshing}
-            tintColor={colors.accent}
+            tintColor={AppTheme.colors.primary}
           />
         }
         showsVerticalScrollIndicator={false}
@@ -312,18 +312,18 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
 
         {isLoading ? (
           <View style={styles.center}>
-            <ActivityIndicator color={colors.accent} size="large" />
+            <ActivityIndicator color={AppTheme.colors.primary} size="large" />
             <Text style={styles.loadingText}>Loading chapters…</Text>
           </View>
         ) : error ? (
           <View style={styles.center}>
-            <Ionicons color={colors.textMuted} name="cloud-offline-outline" size={40} />
+            <Ionicons color={AppTheme.colors.textSecondary} name="cloud-offline-outline" size={40} />
             <Text style={styles.emptyTitle}>Could not load chapters</Text>
             <Text style={styles.emptyBody}>{error}</Text>
           </View>
         ) : chapters.length === 0 ? (
           <View style={styles.center}>
-            <Ionicons color={colors.textMuted} name="journal-outline" size={40} />
+            <Ionicons color={AppTheme.colors.textSecondary} name="journal-outline" size={40} />
             <Text style={styles.emptyTitle}>No chapters yet</Text>
             <Text style={styles.emptyBody}>Create a chapter to begin adding curriculum materials.</Text>
             <Pressable onPress={openCreateModal} style={styles.createBtnInline}>
@@ -377,7 +377,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                           onPress={() => openEditModal(chapter)}
                           style={styles.actionIconBtn}
                         >
-                          <Ionicons color={colors.textSecondary} name="create-outline" size={18} />
+                          <Ionicons color={AppTheme.colors.textSecondary} name="create-outline" size={18} />
                         </Pressable>
                         <Pressable
                           hitSlop={8}
@@ -393,7 +393,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
 
                     <View style={styles.chapterCardFooter}>
                       <View style={styles.footerStat}>
-                        <Ionicons color={colors.textMuted} name="document-text-outline" size={14} />
+                        <Ionicons color={AppTheme.colors.textSecondary} name="document-text-outline" size={14} />
                         <Text style={styles.footerStatText}>
                           {chapter.document_count ?? 0} { (chapter.document_count === 1) ? 'document' : 'documents' }
                         </Text>
@@ -406,7 +406,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                           gap: 4,
                           paddingVertical: 4,
                           paddingHorizontal: 10,
-                          borderRadius: 8,
+                          borderRadius: AppTheme.radius.small,
                           backgroundColor: isExpanded ? "#E0F2FE" : "#F1F5F9",
                         }}
                         onPress={(e) => {
@@ -483,7 +483,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                 autoFocus
                 onChangeText={setName}
                 placeholder="e.g. Chemical Reactions, Trigonometry…"
-                placeholderTextColor={colors.textPlaceholder}
+                placeholderTextColor={AppTheme.colors.textPlaceholder}
                 style={[styles.modalInput, modalError ? { borderColor: '#B42318' } : {}]}
                 value={name}
               />
@@ -497,7 +497,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                 numberOfLines={3}
                 onChangeText={setDescription}
                 placeholder="Provide a brief summary of concepts covered..."
-                placeholderTextColor={colors.textPlaceholder}
+                placeholderTextColor={AppTheme.colors.textPlaceholder}
                 style={[styles.modalInput, styles.descriptionInput]}
                 value={description}
               />
@@ -536,32 +536,32 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
+  safe: { flex: 1, backgroundColor: AppTheme.colors.background },
   scroll: { paddingBottom: 40 },
 
   // Page heading
   pageHeading: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: AppTheme.colors.border,
     gap: 8,
     marginBottom: 20,
   },
   kicker: {
-    color: colors.accent,
+    color: AppTheme.colors.primary,
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1.2,
   },
   pageTitle: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 28,
     fontWeight: '800',
     letterSpacing: -0.5,
   },
   pageSubtitle: {
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
   },
@@ -569,10 +569,10 @@ const styles = StyleSheet.create({
   // Chapter List
   chapterList: { paddingHorizontal: 20, gap: 16 },
   chapterCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     padding: 16,
     gap: 12,
   },
@@ -585,11 +585,11 @@ const styles = StyleSheet.create({
   chapterName: {
     fontSize: 16,
     fontWeight: '700',
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   chapterDesc: {
     fontSize: 13,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     lineHeight: 18,
   },
   chapterActions: {
@@ -602,12 +602,12 @@ const styles = StyleSheet.create({
     height: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 8,
-    backgroundColor: colors.surfaceMuted,
+    borderRadius: AppTheme.radius.small,
+    backgroundColor: AppTheme.colors.surfaceMuted,
   },
   chapterDivider: {
     height: 1,
-    backgroundColor: colors.border,
+    backgroundColor: AppTheme.colors.border,
   },
   chapterCardFooter: {
     flexDirection: 'row',
@@ -622,26 +622,26 @@ const styles = StyleSheet.create({
   footerStatText: {
     fontSize: 12,
     fontWeight: '600',
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
   footerDate: {
     fontSize: 12,
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
   },
 
   // State Views
   center: { alignItems: 'center', padding: 40, gap: 12, marginTop: 40 },
-  loadingText: { color: colors.textSecondary, fontSize: 14 },
-  emptyTitle: { color: colors.textPrimary, fontSize: 18, fontWeight: '700' },
-  emptyBody: { color: colors.textSecondary, fontSize: 14, textAlign: 'center', lineHeight: 20, paddingHorizontal: 20 },
+  loadingText: { color: AppTheme.colors.textSecondary, fontSize: 14 },
+  emptyTitle: { color: AppTheme.colors.textPrimary, fontSize: 18, fontWeight: '700' },
+  emptyBody: { color: AppTheme.colors.textSecondary, fontSize: 14, textAlign: 'center', lineHeight: 20, paddingHorizontal: 20 },
   createBtnInline: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     marginTop: 8,
   },
   createBtnInlineText: { color: '#fff', fontWeight: '700', fontSize: 14 },
@@ -649,7 +649,7 @@ const styles = StyleSheet.create({
   // Modals
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   modalSheet: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -661,28 +661,28 @@ const styles = StyleSheet.create({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.border,
+    backgroundColor: AppTheme.colors.border,
     alignSelf: 'center',
     marginBottom: 8,
   },
-  modalTitle: { color: colors.textPrimary, fontSize: 20, fontWeight: '800' },
-  modalSubtitle: { color: colors.textSecondary, fontSize: 14, lineHeight: 20 },
+  modalTitle: { color: AppTheme.colors.textPrimary, fontSize: 20, fontWeight: '800' },
+  modalSubtitle: { color: AppTheme.colors.textSecondary, fontSize: 14, lineHeight: 20 },
   modalField: { gap: 8 },
   modalFieldLabel: {
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 0.8,
   },
   modalInput: {
     height: 52,
-    borderRadius: 12,
-    backgroundColor: colors.background,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.background,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     paddingHorizontal: 16,
     fontSize: 16,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   descriptionInput: {
     height: 90,
@@ -694,7 +694,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     backgroundColor: '#FFF1F1',
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
@@ -703,18 +703,18 @@ const styles = StyleSheet.create({
   modalCancelBtn: {
     flex: 1,
     height: 50,
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  modalCancelText: { color: colors.textSecondary, fontWeight: '600', fontSize: 15 },
+  modalCancelText: { color: AppTheme.colors.textSecondary, fontWeight: '600', fontSize: 15 },
   modalSubmitBtn: {
     flex: 1,
     height: 50,
-    borderRadius: 12,
-    backgroundColor: colors.accent,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -22,7 +22,7 @@ import { StudentProfileOut, SubjectOut } from '../types/api';
 type Props = NativeStackScreenProps<RootStackParamList, 'StudentHome'>;
 
 const CARD_COLORS = ['#E8F4FF', '#FFF4E0', '#E8F7EE', '#F4E8FF', '#FFE8E8'];
-const ACCENT_COLORS = [colors.accent, '#F59E0B', '#22C55E', '#9333EA', '#EF4444'];
+const ACCENT_COLORS = [AppTheme.colors.primary, '#F59E0B', '#22C55E', '#9333EA', '#EF4444'];
 
 export function StudentHomeScreen({ navigation }: Props) {
   const { session } = useAuth();
@@ -80,11 +80,11 @@ export function StudentHomeScreen({ navigation }: Props) {
 
       {isLoading ? (
         <View style={styles.center}>
-          <ActivityIndicator color={colors.accent} size="large" />
+          <ActivityIndicator color={AppTheme.colors.primary} size="large" />
         </View>
       ) : error ? (
         <View style={styles.center}>
-          <Ionicons color={colors.textMuted} name="alert-circle-outline" size={48} />
+          <Ionicons color={AppTheme.colors.textSecondary} name="alert-circle-outline" size={48} />
           <Text style={styles.errorTitle}>Couldn't load subjects</Text>
           <Text style={styles.errorBody}>{error}</Text>
         </View>
@@ -128,7 +128,7 @@ export function StudentHomeScreen({ navigation }: Props) {
                 <Text style={styles.cardTitle}>{item.name}</Text>
                 {item.teacher ? (
                   <View style={styles.cardFooter}>
-                    <Ionicons color={colors.textMuted} name="person-outline" size={13} />
+                    <Ionicons color={AppTheme.colors.textSecondary} name="person-outline" size={13} />
                     <Text style={styles.cardTeacher}>{item.teacher.name}</Text>
                   </View>
                 ) : (
@@ -140,7 +140,7 @@ export function StudentHomeScreen({ navigation }: Props) {
           }}
           ListEmptyComponent={
             <View style={styles.center}>
-              <Ionicons color={colors.textMuted} name="book-outline" size={48} />
+              <Ionicons color={AppTheme.colors.textSecondary} name="book-outline" size={48} />
               <Text style={styles.emptyTitle}>No subjects yet</Text>
               <Text style={styles.emptyBody}>
                 Your class doesn't have any subjects assigned yet.
@@ -161,7 +161,7 @@ export function StudentHomeScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
+  safe: { flex: 1, backgroundColor: AppTheme.colors.background },
 
   header: {
     flexDirection: 'row',
@@ -169,30 +169,30 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 14,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: AppTheme.colors.border,
   },
-  headerApp: { fontSize: 18, fontWeight: '800', color: colors.textPrimary },
-  headerSub: { fontSize: 12, color: colors.textMuted, fontWeight: '500' },
+  headerApp: { fontSize: 18, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  headerSub: { fontSize: 12, color: AppTheme.colors.textSecondary, fontWeight: '500' },
   avatar: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { fontSize: 14, fontWeight: '800', color: colors.accentDark },
+  avatarText: { fontSize: 14, fontWeight: '800', color: AppTheme.colors.primaryDark },
 
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, padding: 40 },
-  errorTitle: { fontSize: 18, fontWeight: '800', color: colors.textPrimary },
-  errorBody: { fontSize: 14, color: colors.textSecondary, textAlign: 'center' },
+  errorTitle: { fontSize: 18, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  errorBody: { fontSize: 14, color: AppTheme.colors.textSecondary, textAlign: 'center' },
 
   listContent: { padding: 20, gap: 14, flexGrow: 1 },
   listHeader: { marginBottom: 8, gap: 4 },
-  greeting: { fontSize: 22, fontWeight: '800', color: colors.textPrimary },
-  greetingSub: { fontSize: 14, color: colors.textSecondary },
+  greeting: { fontSize: 22, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  greetingSub: { fontSize: 14, color: AppTheme.colors.textSecondary },
 
   card: {
     borderRadius: 20,
@@ -205,16 +205,16 @@ const styles = StyleSheet.create({
   cardArrow: {
     width: 32,
     height: 32,
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.medium,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  cardTitle: { fontSize: 20, fontWeight: '800', color: colors.textPrimary, lineHeight: 26 },
+  cardTitle: { fontSize: 20, fontWeight: '800', color: AppTheme.colors.textPrimary, lineHeight: 26 },
   cardFooter: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  cardTeacher: { fontSize: 13, color: colors.textMuted },
-  cardUnassigned: { fontSize: 12, color: colors.textMuted, fontStyle: 'italic' },
+  cardTeacher: { fontSize: 13, color: AppTheme.colors.textSecondary },
+  cardUnassigned: { fontSize: 12, color: AppTheme.colors.textSecondary, fontStyle: 'italic' },
   cardAccentBar: { position: 'absolute', left: 0, top: 0, bottom: 0, width: 4 },
 
-  emptyTitle: { fontSize: 18, fontWeight: '800', color: colors.textPrimary },
-  emptyBody: { fontSize: 14, color: colors.textSecondary, textAlign: 'center' },
+  emptyTitle: { fontSize: 18, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  emptyBody: { fontSize: 14, color: AppTheme.colors.textSecondary, textAlign: 'center' },
 });

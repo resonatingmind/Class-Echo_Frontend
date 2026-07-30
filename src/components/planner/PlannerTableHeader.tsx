@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 
 export const PLANNER_COLUMNS = {
   class: 0.9,
@@ -47,17 +47,17 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: AppTheme.colors.surfaceMuted,
     paddingVertical: 12,
     paddingHorizontal: 14,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: AppTheme.colors.border,
   },
 
   text: {
     fontSize: 11,
     fontWeight: "700",
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
     textTransform: "uppercase",
     letterSpacing: 0.3,
   },

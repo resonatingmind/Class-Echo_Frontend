@@ -104,7 +104,7 @@ export function ImportTimetableModal({ visible, onClose, token, onImported }: Pr
               <View style={styles.headerRow}>
                 <Text style={styles.title}>Import Timetable</Text>
                 <Pressable onPress={handleClose} hitSlop={12}>
-                  <Ionicons name="close" size={24} color={colors.textSecondary} />
+                  <Ionicons name="close" size={24} color={AppTheme.colors.textSecondary} />
                 </Pressable>
               </View>
 
@@ -122,7 +122,7 @@ export function ImportTimetableModal({ visible, onClose, token, onImported }: Pr
                   onPress={() => Linking.openURL(getTimetableTemplateUrl())}
                   style={styles.templateLink}
                 >
-                  <Ionicons name="download-outline" size={16} color={colors.accentDark} />
+                  <Ionicons name="download-outline" size={16} color={AppTheme.colors.primaryDark} />
                   <Text style={styles.templateLinkText}>Download a blank template</Text>
                 </Pressable>
 
@@ -130,7 +130,7 @@ export function ImportTimetableModal({ visible, onClose, token, onImported }: Pr
                   <Ionicons
                     name={pickedName ? "document-text" : "cloud-upload-outline"}
                     size={22}
-                    color={colors.accentDark}
+                    color={AppTheme.colors.primaryDark}
                   />
                   <Text style={styles.pickButtonText} numberOfLines={1}>
                     {pickedName ?? "Choose an Excel file"}
@@ -148,8 +148,8 @@ export function ImportTimetableModal({ visible, onClose, token, onImported }: Pr
                   <Switch
                     value={replaceExisting}
                     onValueChange={setReplaceExisting}
-                    trackColor={{ false: colors.border, true: colors.accentSoft }}
-                    thumbColor={replaceExisting ? colors.accent : "#f4f3f4"}
+                    trackColor={{ false: AppTheme.colors.border, true: AppTheme.colors.primarySoft }}
+                    thumbColor={replaceExisting ? AppTheme.colors.primary : "#f4f3f4"}
                   />
                 </View>
 
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
   },
 
   sheet: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 20,
@@ -241,13 +241,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: "800",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   helpText: {
     fontSize: 13,
     lineHeight: 19,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     marginBottom: 12,
   },
 
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   templateLinkText: {
     fontSize: 13,
     fontWeight: "700",
-    color: colors.accentDark,
+    color: AppTheme.colors.primaryDark,
   },
 
   pickButton: {
@@ -271,17 +271,17 @@ const styles = StyleSheet.create({
     height: 54,
     borderWidth: 1.5,
     borderStyle: "dashed",
-    borderColor: colors.accentSoft,
-    borderRadius: 14,
+    borderColor: AppTheme.colors.primarySoft,
+    borderRadius: AppTheme.radius.large,
     paddingHorizontal: 16,
-    backgroundColor: colors.surfaceSoft,
+    backgroundColor: AppTheme.colors.surfaceSoft,
   },
 
   pickButtonText: {
     flex: 1,
     fontSize: 14,
     fontWeight: "600",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   switchRow: {
@@ -294,12 +294,12 @@ const styles = StyleSheet.create({
   switchLabel: {
     fontSize: 14,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   switchHint: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     marginTop: 2,
   },
 
@@ -311,8 +311,8 @@ const styles = StyleSheet.create({
 
   resultBox: {
     marginTop: 20,
-    backgroundColor: colors.surfaceMuted,
-    borderRadius: 14,
+    backgroundColor: AppTheme.colors.surfaceMuted,
+    borderRadius: AppTheme.radius.large,
     padding: 16,
   },
 
@@ -328,19 +328,19 @@ const styles = StyleSheet.create({
   resultNumber: {
     fontSize: 22,
     fontWeight: "800",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   resultLabel: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     marginTop: 2,
   },
 
   issuesBox: {
     marginTop: 14,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: AppTheme.colors.border,
     paddingTop: 12,
     gap: 4,
   },
@@ -348,21 +348,21 @@ const styles = StyleSheet.create({
   issuesTitle: {
     fontSize: 13,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     marginBottom: 4,
   },
 
   issueText: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     lineHeight: 17,
   },
 
   submitButton: {
     marginTop: 24,
     height: 52,
-    borderRadius: 14,
-    backgroundColor: colors.accent,
+    borderRadius: AppTheme.radius.large,
+    backgroundColor: AppTheme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },

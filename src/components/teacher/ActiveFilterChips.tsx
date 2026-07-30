@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 
 type Chip = {
   label: string;
@@ -30,7 +30,7 @@ export function ActiveFilterChips({ chips, onClearAll }: Props) {
           >
             <Text style={styles.text}>{chip.value}</Text>
 
-            <Ionicons name="close" size={14} color={colors.accent} />
+            <Ionicons name="close" size={14} color={AppTheme.colors.primary} />
           </Pressable>
         ))}
       </View>
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
   chip: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primarySoft,
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 20,
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   },
 
   text: {
-    color: colors.accentDark,
+    color: AppTheme.colors.primaryDark,
     fontWeight: "600",
   },
 

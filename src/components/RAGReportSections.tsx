@@ -13,7 +13,7 @@ import {
 
 function coverageColor(pct: number): string {
   if (pct >= 80) return '#127A40';
-  if (pct >= 60) return colors.accent;
+  if (pct >= 60) return AppTheme.colors.primary;
   if (pct >= 40) return '#92400E';
   return '#B42318';
 }
@@ -31,20 +31,20 @@ export function ChapterInfoBanner({ data }: { data: ChapterInfo }) {
     <View style={ci.card}>
       <View style={ci.header}>
         <View style={ci.iconWrap}>
-          <Ionicons color={colors.accent} name="book-outline" size={16} />
+          <Ionicons color={AppTheme.colors.primary} name="book-outline" size={16} />
         </View>
         <Text style={ci.title}>Chapter Reference</Text>
       </View>
       <View style={ci.body}>
         {data.chapter_name ? (
           <View style={ci.infoRow}>
-            <Ionicons color={colors.textMuted} name="bookmark-outline" size={14} />
+            <Ionicons color={AppTheme.colors.textSecondary} name="bookmark-outline" size={14} />
             <Text style={ci.label}>Chapter</Text>
             <Text style={ci.value} numberOfLines={1}>{data.chapter_name}</Text>
           </View>
         ) : null}
         <View style={ci.infoRow}>
-          <Ionicons color={colors.textMuted} name="document-text-outline" size={14} />
+          <Ionicons color={AppTheme.colors.textSecondary} name="document-text-outline" size={14} />
           <Text style={ci.label}>Reference Documents</Text>
           <View style={ci.countBadge}>
             <Text style={ci.countText}>{data.document_count}</Text>
@@ -57,24 +57,24 @@ export function ChapterInfoBanner({ data }: { data: ChapterInfo }) {
 
 const ci = StyleSheet.create({
   card: {
-    borderRadius: 16, borderWidth: 1, borderColor: colors.accent + '30',
-    backgroundColor: colors.accent + '08', padding: 16, gap: 12,
+    borderRadius: 16, borderWidth: 1, borderColor: AppTheme.colors.primary + '30',
+    backgroundColor: AppTheme.colors.primary + '08', padding: 16, gap: 12,
   },
   header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   iconWrap: {
-    width: 32, height: 32, borderRadius: 10, backgroundColor: colors.accentSoft,
+    width: 32, height: 32, borderRadius: AppTheme.radius.medium, backgroundColor: AppTheme.colors.primarySoft,
     alignItems: 'center', justifyContent: 'center',
   },
-  title: { fontSize: 14, fontWeight: '700', color: colors.textPrimary },
+  title: { fontSize: 14, fontWeight: '700', color: AppTheme.colors.textPrimary },
   body: { gap: 10 },
   infoRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  label: { flex: 1, fontSize: 13, color: colors.textSecondary, fontWeight: '600' },
-  value: { fontSize: 13, fontWeight: '700', color: colors.textPrimary, maxWidth: '50%' as any },
+  label: { flex: 1, fontSize: 13, color: AppTheme.colors.textSecondary, fontWeight: '600' },
+  value: { fontSize: 13, fontWeight: '700', color: AppTheme.colors.textPrimary, maxWidth: '50%' as any },
   countBadge: {
     paddingHorizontal: 10, paddingVertical: 3, borderRadius: 999,
-    backgroundColor: colors.accent + '18',
+    backgroundColor: AppTheme.colors.primary + '18',
   },
-  countText: { fontSize: 13, fontWeight: '800', color: colors.accent },
+  countText: { fontSize: 13, fontWeight: '800', color: AppTheme.colors.primary },
 });
 
 // ── Learning Plan Info Card ──────────────────────────────────────────────────
@@ -140,7 +140,7 @@ const lpic = StyleSheet.create({
   iconWrap: {
     width: 32,
     height: 32,
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.medium,
     backgroundColor: "#E0F2FE",
     alignItems: "center",
     justifyContent: "center",
@@ -233,24 +233,24 @@ export function CurriculumCoverageCard({ data }: { data: CurriculumCoverage }) {
 
 const cc = StyleSheet.create({
   card: {
-    borderRadius: 16, borderWidth: 1, borderColor: colors.border,
-    backgroundColor: colors.surface, padding: 16, gap: 14,
+    borderRadius: 16, borderWidth: 1, borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.surface, padding: 16, gap: 14,
   },
   header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   iconWrap: {
-    width: 32, height: 32, borderRadius: 10, backgroundColor: colors.surfaceSoft,
+    width: 32, height: 32, borderRadius: AppTheme.radius.medium, backgroundColor: AppTheme.colors.surfaceSoft,
     alignItems: 'center', justifyContent: 'center',
   },
-  title: { flex: 1, fontSize: 14, fontWeight: '700', color: colors.textPrimary },
+  title: { flex: 1, fontSize: 14, fontWeight: '700', color: AppTheme.colors.textPrimary },
   meterWrap: { gap: 6 },
   meterRow: { flexDirection: 'row', alignItems: 'baseline', gap: 6 },
   pctText: { fontSize: 28, fontWeight: '800' },
-  pctLabel: { fontSize: 13, color: colors.textMuted, fontWeight: '600' },
+  pctLabel: { fontSize: 13, color: AppTheme.colors.textSecondary, fontWeight: '600' },
   barTrack: {
-    height: 8, borderRadius: 4, backgroundColor: colors.surfaceMuted, overflow: 'hidden',
+    height: 8, borderRadius: 4, backgroundColor: AppTheme.colors.surfaceMuted, overflow: 'hidden',
   },
   barFill: { height: 8, borderRadius: 4 },
-  conceptCount: { fontSize: 11, color: colors.textMuted, fontWeight: '600', letterSpacing: 0.3 },
+  conceptCount: { fontSize: 11, color: AppTheme.colors.textSecondary, fontWeight: '600', letterSpacing: 0.3 },
   conceptSection: { gap: 8 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   sectionTitle: { fontSize: 12, fontWeight: '700' },
@@ -274,7 +274,7 @@ export function ReferenceAlignmentCard({ data }: { data: AccuracyAnalysis }) {
     <View style={ra.card}>
       <View style={ra.header}>
         <View style={ra.iconWrap}>
-          <Ionicons color={colors.accent} name="shield-checkmark-outline" size={16} />
+          <Ionicons color={AppTheme.colors.primary} name="shield-checkmark-outline" size={16} />
         </View>
         <Text style={ra.title}>Reference Alignment</Text>
       </View>
@@ -316,24 +316,24 @@ export function ReferenceAlignmentCard({ data }: { data: AccuracyAnalysis }) {
 
 const ra = StyleSheet.create({
   card: {
-    borderRadius: 16, borderWidth: 1, borderColor: colors.border,
-    backgroundColor: colors.surface, padding: 16, gap: 14,
+    borderRadius: 16, borderWidth: 1, borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.surface, padding: 16, gap: 14,
   },
   header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   iconWrap: {
-    width: 32, height: 32, borderRadius: 10, backgroundColor: colors.surfaceSoft,
+    width: 32, height: 32, borderRadius: AppTheme.radius.medium, backgroundColor: AppTheme.colors.surfaceSoft,
     alignItems: 'center', justifyContent: 'center',
   },
-  title: { flex: 1, fontSize: 14, fontWeight: '700', color: colors.textPrimary },
+  title: { flex: 1, fontSize: 14, fontWeight: '700', color: AppTheme.colors.textPrimary },
   section: { gap: 8 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   sectionTitle: { fontSize: 13, fontWeight: '700' },
   itemRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
   dot: { width: 5, height: 5, borderRadius: 3, marginTop: 7 },
-  itemText: { flex: 1, fontSize: 13, lineHeight: 20, color: colors.textSecondary },
+  itemText: { flex: 1, fontSize: 13, lineHeight: 20, color: AppTheme.colors.textSecondary },
   inaccuracyRow: {
     flexDirection: 'row', alignItems: 'flex-start', gap: 8,
-    padding: 10, borderRadius: 12, backgroundColor: '#FFF1F1',
+    padding: 10, borderRadius: AppTheme.radius.medium, backgroundColor: '#FFF1F1',
   },
   inaccuracyText: { flex: 1, fontSize: 13, lineHeight: 20, color: '#B42318' },
 });
@@ -397,15 +397,15 @@ export function LearningObjectivesCard({ data }: { data: LearningObjectiveStatus
 
 const lo = StyleSheet.create({
   card: {
-    borderRadius: 16, borderWidth: 1, borderColor: colors.border,
-    backgroundColor: colors.surface, padding: 16, gap: 12,
+    borderRadius: 16, borderWidth: 1, borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.surface, padding: 16, gap: 12,
   },
   header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   iconWrap: {
-    width: 32, height: 32, borderRadius: 10, backgroundColor: '#F3E8FF',
+    width: 32, height: 32, borderRadius: AppTheme.radius.medium, backgroundColor: '#F3E8FF',
     alignItems: 'center', justifyContent: 'center',
   },
-  title: { flex: 1, fontSize: 14, fontWeight: '700', color: colors.textPrimary },
+  title: { flex: 1, fontSize: 14, fontWeight: '700', color: AppTheme.colors.textPrimary },
   summaryRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   summaryPill: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
@@ -414,9 +414,9 @@ const lo = StyleSheet.create({
   summaryText: { fontSize: 12, fontWeight: '700' },
   objectiveRow: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
-    padding: 12, borderRadius: 12,
+    padding: 12, borderRadius: AppTheme.radius.medium,
   },
-  objectiveText: { flex: 1, fontSize: 13, lineHeight: 19, color: colors.textPrimary, fontWeight: '500' },
+  objectiveText: { flex: 1, fontSize: 13, lineHeight: 19, color: AppTheme.colors.textPrimary, fontWeight: '500' },
   statusBadge: {
     paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999, borderWidth: 1,
   },

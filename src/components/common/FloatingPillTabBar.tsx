@@ -93,7 +93,7 @@ export function FloatingPillTabBar({ tabs, activeIndex, onTabPress }: Props) {
               style={styles.tab}
             >
               <Ionicons
-                color={isActive ? colors.accent : colors.navInactive}
+                color={isActive ? AppTheme.colors.primary : colors.navInactive}
                 name={isActive ? tab.activeIcon : tab.icon}
                 size={22}
               />
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: (ROW_HEIGHT - PILL_HEIGHT) / 2,
     height: PILL_HEIGHT,
-    backgroundColor: colors.accentLight,
+    backgroundColor: AppTheme.colors.primaryLight,
     borderRadius: 999,
   },
   tab: {
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   labelActive: {
-    color: colors.accent,
+    color: AppTheme.colors.primary,
     opacity: 1,
   },
   labelInactive: {

@@ -23,13 +23,13 @@ const styles = StyleSheet.create({
   logoIcon: {
     width: 38,
     height: 38,
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     backgroundColor: AppTheme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },
   logoText: {
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.heading3,
   },
 });

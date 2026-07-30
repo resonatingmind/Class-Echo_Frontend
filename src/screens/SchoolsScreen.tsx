@@ -87,7 +87,7 @@ function SchoolCard({
                 {school.name}
               </Text>
               <View style={styles.addressRow}>
-                <Ionicons color={AppTheme.colors.textSecondary} name="location-outline" size={12} />
+                <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="location-outline" size={12} />
                 <Text style={styles.cardAddress} numberOfLines={1}>
                   {school.address ?? "Address not added"}
                 </Text>
@@ -96,7 +96,7 @@ function SchoolCard({
           </View>
         </Pressable>
         <Pressable onPress={onOptionsPress} hitSlop={12} style={styles.optionsBtn}>
-          <Ionicons color={AppTheme.colors.textSecondary} name="ellipsis-vertical" size={18} />
+          <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="ellipsis-vertical" size={18} />
         </Pressable>
       </View>
 
@@ -104,7 +104,7 @@ function SchoolCard({
         <View style={styles.cardDivider} />
         <View style={styles.cardMeta}>
           <View style={styles.metaItem}>
-            <Ionicons color={AppTheme.colors.textSecondary} name="grid-outline" size={14} />
+            <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="grid-outline" size={14} />
             <Text style={styles.metaText}>
               Admin: {hasAdmin ? school.admin!.name : "—"}
             </Text>
@@ -259,7 +259,7 @@ export function SchoolsScreen({ navigation }: Props) {
             <Ionicons color={AppTheme.colors.primary} name="add-circle" size={24} />
           </Pressable>
           <Pressable onPress={signOut} style={styles.iconBtn}>
-            <Ionicons color={AppTheme.colors.textPrimary} name="log-out-outline" size={24} />
+            <Ionicons color={AppTheme.AppTheme.colors.textPrimary} name="log-out-outline" size={24} />
           </Pressable>
         </View>
       </View>
@@ -307,17 +307,17 @@ export function SchoolsScreen({ navigation }: Props) {
 
               {/* Search */}
               <View style={styles.searchBar}>
-                <Feather color={AppTheme.colors.textSecondary} name="search" size={16} />
+                <Feather color={AppTheme.AppTheme.colors.textSecondary} name="search" size={16} />
                 <TextInput
                   onChangeText={setQuery}
                   placeholder="Search schools or admins..."
-                  placeholderTextColor={AppTheme.colors.textSecondary}
+                  placeholderTextColor={AppTheme.AppTheme.colors.textSecondary}
                   style={styles.searchInput}
                   value={query}
                 />
                 {query.length > 0 ? (
                   <Pressable onPress={() => setQuery("")} hitSlop={8}>
-                    <Ionicons color={AppTheme.colors.textSecondary} name="close-circle" size={16} />
+                    <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="close-circle" size={16} />
                   </Pressable>
                 ) : null}
               </View>
@@ -330,7 +330,7 @@ export function SchoolsScreen({ navigation }: Props) {
                 </View>
               ) : error ? (
                 <View style={styles.center}>
-                  <Ionicons color={AppTheme.colors.textSecondary} name="cloud-offline-outline" size={40} />
+                  <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="cloud-offline-outline" size={40} />
                   <Text style={styles.errorTitle}>Could not load schools</Text>
                   <Text style={styles.errorBody}>{error}</Text>
                   <Pressable onPress={() => void loadSchools()} style={styles.retryBtn}>
@@ -339,7 +339,7 @@ export function SchoolsScreen({ navigation }: Props) {
                 </View>
               ) : filtered.length === 0 ? (
                 <View style={styles.center}>
-                  <Ionicons color={AppTheme.colors.textSecondary} name="school-outline" size={40} />
+                  <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="school-outline" size={40} />
                   <Text style={styles.errorTitle}>
                     {query.trim() ? "No results found" : "No schools yet"}
                   </Text>
@@ -380,7 +380,7 @@ export function SchoolsScreen({ navigation }: Props) {
             <View style={styles.modalHeader}>
               <Text numberOfLines={1} style={styles.modalTitle}>{selectedSchoolOptions?.name}</Text>
               <Pressable hitSlop={8} onPress={() => setSelectedSchoolOptions(null)}>
-                <Ionicons color={AppTheme.colors.textSecondary} name="close" size={22} />
+                <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="close" size={22} />
               </Pressable>
             </View>
             
@@ -392,7 +392,7 @@ export function SchoolsScreen({ navigation }: Props) {
                 if (s) navigation.navigate("AdminSchoolDetail", { schoolId: s.id });
               }}
             >
-              <Ionicons name="eye-outline" size={18} color={AppTheme.colors.textPrimary} />
+              <Ionicons name="eye-outline" size={18} color={AppTheme.AppTheme.colors.textPrimary} />
               <Text style={styles.modalActionText}>View Details</Text>
             </Pressable>
 
@@ -441,7 +441,7 @@ export function SchoolsScreen({ navigation }: Props) {
             <View style={styles.modalHeader}>
               <Text numberOfLines={1} style={styles.modalTitle}>Delete School</Text>
               <Pressable hitSlop={8} onPress={() => setSelectedSchoolForDelete(null)}>
-                <Ionicons color={AppTheme.colors.textSecondary} name="close" size={22} />
+                <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="close" size={22} />
               </Pressable>
             </View>
             <Text style={styles.modalBodyText}>
@@ -452,7 +452,7 @@ export function SchoolsScreen({ navigation }: Props) {
               secureTextEntry
               onChangeText={setDeletePassword}
               placeholder="••••••••"
-              placeholderTextColor={AppTheme.colors.textPlaceholder}
+              placeholderTextColor={AppTheme.AppTheme.colors.textPlaceholder}
               style={[styles.input, { outlineStyle: "none" } as any]}
               value={deletePassword}
             />
@@ -486,7 +486,7 @@ export function SchoolsScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: AppTheme.colors.background,
+    backgroundColor: AppTheme.AppTheme.colors.background,
   },
   flex: { flex: 1 },
   scroll: {
@@ -508,9 +508,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: AppTheme.spacing.l,
     paddingVertical: AppTheme.spacing.m,
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: AppTheme.colors.border,
+    borderBottomColor: AppTheme.AppTheme.colors.border,
   },
   headerLeft: {
     width: 60,
@@ -519,8 +519,8 @@ const styles = StyleSheet.create({
   headerTitle: {
     flex: 1,
     textAlign: "center",
-    color: AppTheme.colors.textPrimary,
-    ...AppTheme.typography.h3,
+    color: AppTheme.AppTheme.colors.textPrimary,
+    ...AppTheme.typography.heading3,
   },
   headerRight: {
     flexDirection: "row",
@@ -539,11 +539,11 @@ const styles = StyleSheet.create({
     marginBottom: AppTheme.spacing.m,
   },
   pageTitle: {
-    color: AppTheme.colors.textPrimary,
-    ...AppTheme.typography.h1,
+    color: AppTheme.AppTheme.colors.textPrimary,
+    ...AppTheme.typography.heading1,
   },
   pageSubtitle: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
   },
   statsRow: {
@@ -576,16 +576,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: AppTheme.spacing.s,
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
     paddingHorizontal: AppTheme.spacing.m,
     height: 48,
   },
   searchInput: {
     flex: 1,
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.body,
     padding: 0,
     // @ts-ignore
@@ -600,15 +600,15 @@ const styles = StyleSheet.create({
     gap: AppTheme.spacing.m,
   },
   loadingText: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
   },
   errorTitle: {
-    color: AppTheme.colors.textPrimary,
-    ...AppTheme.typography.h3,
+    color: AppTheme.AppTheme.colors.textPrimary,
+    ...AppTheme.typography.heading3,
   },
   errorBody: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
     textAlign: "center",
   },
@@ -625,11 +625,11 @@ const styles = StyleSheet.create({
   },
   // School Card
   card: {
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
   },
   cardRow: {
     flexDirection: "row",
@@ -661,15 +661,15 @@ const styles = StyleSheet.create({
   },
   cardInitials: {
     color: AppTheme.colors.primary,
-    ...AppTheme.typography.h2,
+    ...AppTheme.typography.heading2,
   },
   cardBody: {
     flex: 1,
     gap: AppTheme.spacing.xs,
   },
   cardName: {
-    color: AppTheme.colors.textPrimary,
-    ...AppTheme.typography.h3,
+    color: AppTheme.AppTheme.colors.textPrimary,
+    ...AppTheme.typography.heading3,
   },
   addressRow: {
     flexDirection: "row",
@@ -677,13 +677,13 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   cardAddress: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.caption,
     flex: 1,
   },
   cardDivider: {
     height: 1,
-    backgroundColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.AppTheme.colors.border,
   },
   cardMeta: {
     flexDirection: "row",
@@ -698,7 +698,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   metaText: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.caption,
   },
   statusBadge: {
@@ -794,7 +794,7 @@ const styles = StyleSheet.create({
   modalSheet: {
     width: "100%",
     maxWidth: 400,
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     padding: 24,
     gap: 12,
@@ -806,7 +806,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   modalTitle: {
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.h3,
     flex: 1,
     marginRight: 8,
@@ -818,34 +818,34 @@ const styles = StyleSheet.create({
     paddingVertical: AppTheme.spacing.m,
     paddingHorizontal: AppTheme.spacing.l,
     borderRadius: AppTheme.radius.medium,
-    backgroundColor: AppTheme.colors.background,
+    backgroundColor: AppTheme.AppTheme.colors.background,
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
   },
   modalActionText: {
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.body,
     fontWeight: "600",
   },
   modalBodyText: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
     lineHeight: 18,
     marginBottom: 8,
   },
   inputLabel: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     fontSize: 12,
     fontWeight: "700",
     marginTop: 4,
   },
   input: {
-    backgroundColor: AppTheme.colors.background,
+    backgroundColor: AppTheme.AppTheme.colors.background,
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
     borderRadius: AppTheme.radius.medium,
     padding: 12,
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.body,
     // @ts-ignore
     outlineStyle: "none",
@@ -866,16 +866,16 @@ const styles = StyleSheet.create({
     ...AppTheme.typography.button,
   },
   modalCancelBtn: {
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
     paddingVertical: 12,
     borderRadius: AppTheme.radius.medium,
     alignItems: "center",
     marginTop: 8,
   },
   modalCancelBtnText: {
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.button,
   },
 });

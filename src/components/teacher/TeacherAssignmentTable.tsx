@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 
 import { TeacherDashboardSubject } from "../../types/api";
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 
 import { TeacherAssignmentRow } from "./TeacherAssignmentRow";
 import { TABLE_COLUMNS } from "./tableColumns";
@@ -114,6 +114,6 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 12,
     fontWeight: "700",
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 });

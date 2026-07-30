@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 
 type Props = {
   visible: boolean;
@@ -45,7 +45,7 @@ export function ChapterActionSheet({
                 <Ionicons
                   name="create-outline"
                   size={20}
-                  color={colors.accent}
+                  color={AppTheme.colors.primary}
                 />
 
                 <Text style={styles.itemText}>Edit Chapter</Text>
@@ -55,7 +55,7 @@ export function ChapterActionSheet({
                 <Ionicons
                   name="document-text-outline"
                   size={20}
-                  color={colors.accent}
+                  color={AppTheme.colors.primary}
                 />
 
                 <Text style={styles.itemText}>Reference Material</Text>
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     marginBottom: 18,
   },
 
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   itemText: {
     marginLeft: 14,
     fontSize: 16,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontWeight: "500",
   },
 
@@ -127,13 +127,13 @@ const styles = StyleSheet.create({
     height: 48,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     backgroundColor: "#F3F4F6",
   },
 
   cancelText: {
     fontWeight: "700",
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontSize: 15,
   },
 });

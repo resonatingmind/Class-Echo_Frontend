@@ -27,7 +27,7 @@ function BackButton({ onPress }: { onPress: () => void }) {
       onPress={onPress}
       style={styles.backBtn}
     >
-      <Ionicons color={colors.textPrimary} name="chevron-back" size={20} />
+      <Ionicons color={AppTheme.colors.textPrimary} name="chevron-back" size={20} />
     </TouchableOpacity>
   );
 }
@@ -122,21 +122,21 @@ const styles = StyleSheet.create({
   centeredTitle: {
     flex: 1,
     textAlign: 'center',
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   largeTitle: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     paddingBottom: 4,
   },
   subtitle: {
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     paddingBottom: 16,
   },
   backBtn: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: colors.surfaceSubtle,
+    backgroundColor: AppTheme.colors.surfaceSubtle,
     alignItems: 'center',
     justifyContent: 'center',
   },

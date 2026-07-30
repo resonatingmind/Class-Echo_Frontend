@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 import { LearningPlanOut } from "../../types/api";
 
 type Props = {
@@ -130,7 +130,7 @@ export function LearningPlanTable({
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
     borderWidth: 1,
     borderColor: "#1E293B",
     overflow: "hidden",
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     padding: 32,
     alignItems: "center",
     backgroundColor: "#F8FAFC",
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
     borderColor: "#E2E8F0",
     gap: 8,

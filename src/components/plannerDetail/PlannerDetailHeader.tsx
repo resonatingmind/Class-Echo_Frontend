@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 
 type Props = {
   subjectName: string;
@@ -30,7 +30,7 @@ export function PlannerDetailHeader({
   return (
     <>
       <Pressable onPress={onBack} style={styles.backButton}>
-        <Ionicons name="arrow-back" size={20} color={colors.accentDark} />
+        <Ionicons name="arrow-back" size={20} color={AppTheme.colors.primaryDark} />
 
         <Text style={styles.backText}>Academic Planner</Text>
       </Pressable>
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
 
   backText: {
     marginLeft: 6,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontSize: 13,
     fontWeight: "600",
   },
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   subject: {
     fontSize: 24,
     fontWeight: "800",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     marginBottom: 10,
   },
 
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   },
 
   pill: {
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: AppTheme.colors.surfaceMuted,
     borderRadius: 999,
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -99,6 +99,6 @@ const styles = StyleSheet.create({
   pillText: {
     fontSize: 12,
     fontWeight: "600",
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 });

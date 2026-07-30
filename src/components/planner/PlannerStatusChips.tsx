@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 
 type Props = {
   totalCount: number;
@@ -68,19 +68,19 @@ const styles = StyleSheet.create({
     height: 30,
     paddingHorizontal: 14,
     borderRadius: 999,
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: AppTheme.colors.surfaceMuted,
     justifyContent: "center",
     alignItems: "center",
   },
 
   chipActive: {
-    backgroundColor: colors.textPrimary,
+    backgroundColor: AppTheme.colors.textPrimary,
   },
 
   chipText: {
     fontSize: 12,
     fontWeight: "700",
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   chipTextActive: {

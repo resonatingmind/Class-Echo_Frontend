@@ -4,8 +4,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import { colors } from "../theme/colors";
+import { AppTheme } from "../theme/AppTheme";
 import { RootStackParamList } from "../navigation/AppNavigator";
+import { AdminNavbar } from "../components/common/AdminNavbar";
 import { PlannerHeader } from "../components/planner/PlannerHeader";
 import { PlannerFilters } from "../components/planner/PlannerFilters";
 import { PlannerStaffingSummary } from "../components/planner/PlannerStaffingSummary";
@@ -144,7 +145,10 @@ export function SchoolAdminPlannerScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
-      <View style={styles.headerContainer}>
+      <AdminNavbar title="Planner" />
+      <View style={styles.centerContainer}>
+        <View style={styles.body}>
+          <View style={styles.headerContainer}>
         <PlannerHeader onCreatePress={() => openQuickAssignment()} />
 
         <PlannerStaffingSummary
@@ -197,13 +201,13 @@ export function SchoolAdminPlannerScreen() {
         />
       </View>
 
-      <View style={styles.listContainer}>
-        {loading ? (
-          <ActivityIndicator
-            size="large"
-            color={colors.accent}
-            style={{ marginTop: 40 }}
-          />
+          <View style={styles.listContainer}>
+            {loading ? (
+              <ActivityIndicator
+                size="large"
+                color={AppTheme.colors.primary}
+                style={{ marginTop: 40 }}
+              />
         ) : sortedPlanner.length === 0 ? (
           <PlannerEmpty />
         ) : (
@@ -240,8 +244,10 @@ export function SchoolAdminPlannerScreen() {
                 />
               )}
             />
+              </View>
+            )}
           </View>
-        )}
+        </View>
       </View>
 
       <PlannerFilterModal
@@ -327,24 +333,33 @@ export function SchoolAdminPlannerScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: AppTheme.AppTheme.colors.background,
+  },
+  centerContainer: {
+    flex: 1,
+    alignItems: "center",
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingTop: AppTheme.spacing.xl,
+  },
+  body: {
+    flex: 1,
+    width: "100%",
+    maxWidth: 800,
   },
   headerContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
     paddingBottom: 4,
   },
   listContainer: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingBottom: AppTheme.spacing.xl,
   },
   tableCard: {
     flex: 1,
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 14,
+    borderColor: AppTheme.AppTheme.colors.border,
+    borderRadius: AppTheme.radius.large,
     overflow: "hidden",
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
   },
   listContent: {
     paddingBottom: 40,

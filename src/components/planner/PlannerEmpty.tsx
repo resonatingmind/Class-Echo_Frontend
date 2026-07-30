@@ -1,13 +1,13 @@
 import { View, Text, StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 
 export function PlannerEmpty() {
   return (
     <View style={styles.container}>
       <View style={styles.iconCircle}>
-        <Ionicons name="search-outline" size={42} color={colors.accent} />
+        <Ionicons name="search-outline" size={42} color={AppTheme.colors.primary} />
       </View>
 
       <Text style={styles.title}>No matching assignments</Text>
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   subtitle: {

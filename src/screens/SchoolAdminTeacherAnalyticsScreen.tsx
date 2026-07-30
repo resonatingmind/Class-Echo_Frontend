@@ -26,7 +26,7 @@ import {
   TeacherProfile,
   getTeacherProfile,
 } from "../lib/api";
-import { colors } from "../theme/colors";
+import { AppTheme } from "../theme/AppTheme";
 import { ScreenHeader } from "../components/common/ScreenHeader";
 
 type Props = NativeStackScreenProps<
@@ -76,7 +76,7 @@ function MetricCard({
     <View style={styles.metricCard}>
       <View style={styles.metricTopRow}>
         <View style={styles.metricIcon}>
-          <Ionicons name={icon} size={20} color={colors.accent} />
+          <Ionicons name={icon} size={20} color={AppTheme.colors.primary} />
         </View>
 
         <Text style={styles.metricValue}>{Math.round(value)}%</Text>
@@ -210,7 +210,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
   if (loading && !analytics) {
     return (
       <SafeAreaView style={styles.center}>
-        <ActivityIndicator size="large" color={colors.accent} />
+        <ActivityIndicator size="large" color={AppTheme.colors.primary} />
       </SafeAreaView>
     );
   }
@@ -331,7 +331,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
                 <Ionicons
                   name="mail-outline"
                   size={18}
-                  color={colors.textSecondary}
+                  color={AppTheme.colors.textSecondary}
                 />
 
                 <Text style={styles.infoText}>{teacherProfile?.email}</Text>
@@ -342,7 +342,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
                   <Ionicons
                     name="easel-outline"
                     size={18}
-                    color={colors.textSecondary}
+                    color={AppTheme.colors.textSecondary}
                   />
 
                   <Text style={styles.infoText}>
@@ -355,7 +355,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
                 <Ionicons
                   name="calendar-outline"
                   size={18}
-                  color={colors.textSecondary}
+                  color={AppTheme.colors.textSecondary}
                 />
 
                 <Text style={styles.infoText}>
@@ -505,7 +505,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
                 <Ionicons
                   name="search-outline"
                   size={20}
-                  color={colors.accent}
+                  color={AppTheme.colors.primary}
                 />
               </View>
 
@@ -522,13 +522,13 @@ export function SchoolAdminTeacherAnalyticsScreen({
             <Ionicons
               name="search-outline"
               size={22}
-              color={colors.textSecondary}
+              color={AppTheme.colors.textSecondary}
             />
 
             <TextInput
               style={styles.searchInput}
               placeholder="Search by lecture title, chapter or topic..."
-              placeholderTextColor={colors.textSecondary}
+              placeholderTextColor={AppTheme.colors.textSecondary}
               value={searchQuery}
               onChangeText={setSearchQuery}
             />
@@ -624,7 +624,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
               <Ionicons
                 name="calendar-outline"
                 size={20}
-                color={colors.textSecondary}
+                color={AppTheme.colors.textSecondary}
               />
             </Pressable>
 
@@ -639,7 +639,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
               <Ionicons
                 name="calendar-outline"
                 size={20}
-                color={colors.textSecondary}
+                color={AppTheme.colors.textSecondary}
               />
             </Pressable>
           </View>
@@ -650,7 +650,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
               <Ionicons
                 name="refresh-outline"
                 size={18}
-                color={colors.accent}
+                color={AppTheme.colors.primary}
               />
               <Text style={styles.resetText}>Reset</Text>
             </Pressable>
@@ -667,7 +667,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
 
         {/* Performance High/Low Summary Blocks */}
         <View style={styles.sectionHeader}>
-          <Ionicons name="bar-chart-outline" size={22} color={colors.accent} />
+          <Ionicons name="bar-chart-outline" size={22} color={AppTheme.colors.primary} />
 
           <Text style={styles.sectionTitle}>Teaching Summary</Text>
         </View>
@@ -739,7 +739,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
           <Ionicons
             name="stats-chart-outline"
             size={22}
-            color={colors.accent}
+            color={AppTheme.colors.primary}
           />
 
           <Text style={styles.sectionTitle}>Performance Metrics</Text>
@@ -833,7 +833,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
 
         {/* Breakdown by Subject */}
         <View style={styles.sectionHeader}>
-          <Ionicons name="book-outline" size={22} color={colors.accent} />
+          <Ionicons name="book-outline" size={22} color={AppTheme.colors.primary} />
 
           <Text style={styles.sectionTitle}>Performance by Subject</Text>
         </View>
@@ -845,7 +845,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
             //       <Ionicons
             //         name="book-outline"
             //         size={22}
-            //         color={colors.accent}
+            //         color={AppTheme.colors.primary}
             //       />
             //     </View>
 
@@ -878,7 +878,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
             //       <Ionicons
             //         name="videocam-outline"
             //         size={16}
-            //         color={colors.textSecondary}
+            //         color={AppTheme.colors.textSecondary}
             //       />
 
             //       <Text style={styles.subjectInfoText}>
@@ -890,7 +890,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
             //       <Ionicons
             //         name="library-outline"
             //         size={16}
-            //         color={colors.textSecondary}
+            //         color={AppTheme.colors.textSecondary}
             //       />
 
             //       <Text style={styles.subjectInfoText}>
@@ -907,7 +907,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
                     <Ionicons
                       name="book-outline"
                       size={20}
-                      color={colors.accent}
+                      color={AppTheme.colors.primary}
                     />
                   </View>
 
@@ -946,7 +946,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
                   <Ionicons
                     name="videocam-outline"
                     size={16}
-                    color={colors.textSecondary}
+                    color={AppTheme.colors.textSecondary}
                   />
 
                   <Text style={styles.subjectFooterText}>Recorded</Text>
@@ -975,7 +975,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
           <Ionicons
             name="trending-up-outline"
             size={22}
-            color={colors.accent}
+            color={AppTheme.colors.primary}
           />
 
           <Text style={styles.sectionTitle}>Monthly Trends</Text>
@@ -988,7 +988,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
                   <Ionicons
                     name="calendar-outline"
                     size={22}
-                    color={colors.accent}
+                    color={AppTheme.colors.primary}
                   />
                 </View>
 
@@ -1021,7 +1021,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
                   <Ionicons
                     name="videocam-outline"
                     size={16}
-                    color={colors.textSecondary}
+                    color={AppTheme.colors.textSecondary}
                   />
 
                   <Text style={styles.subjectInfoText}>
@@ -1043,7 +1043,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
                   <Ionicons
                     name="trending-up-outline"
                     size={20}
-                    color={colors.accent}
+                    color={AppTheme.colors.primary}
                   />
                 </View>
 
@@ -1072,7 +1072,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
 
         {/* Recent Classes Content Cards */}
         <View style={styles.sectionHeader}>
-          <Ionicons name="videocam-outline" size={22} color={colors.accent} />
+          <Ionicons name="videocam-outline" size={22} color={AppTheme.colors.primary} />
 
           <Text style={styles.sectionTitle}>Recent Lectures</Text>
         </View>
@@ -1087,7 +1087,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
               // >
               //   <View style={styles.lectureHeader}>
               //     <View style={styles.lectureIcon}>
-              //       <Ionicons name="videocam" size={22} color={colors.accent} />
+              //       <Ionicons name="videocam" size={22} color={AppTheme.colors.primary} />
               //     </View>
 
               //     <View style={{ flex: 1 }}>
@@ -1160,7 +1160,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
                       <Ionicons
                         name="videocam-outline"
                         size={20}
-                        color={colors.accent}
+                        color={AppTheme.colors.primary}
                       />
                     </View>
 
@@ -1206,7 +1206,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
                     <Ionicons
                       name="calendar-outline"
                       size={16}
-                      color={colors.textSecondary}
+                      color={AppTheme.colors.textSecondary}
                     />
 
                     <Text style={styles.metaText}>
@@ -1218,7 +1218,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
                     <Ionicons
                       name="time-outline"
                       size={16}
-                      color={colors.textSecondary}
+                      color={AppTheme.colors.textSecondary}
                     />
 
                     {/* <Text style={styles.metaText}>
@@ -1284,7 +1284,7 @@ const styles = StyleSheet.create({
   // Layout
   safe: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: AppTheme.colors.background,
   },
   content: {
     paddingHorizontal: 24,
@@ -1308,12 +1308,12 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 34,
     fontWeight: "800",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   heroSubtitle: {
     marginTop: 6,
     fontSize: 16,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
   analyticsProfile: {
     width: 220,
@@ -1331,7 +1331,7 @@ const styles = StyleSheet.create({
   profileName: {
     fontSize: 24,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   // KPI Cards
@@ -1344,12 +1344,12 @@ const styles = StyleSheet.create({
   kpiLabel: {
     marginTop: 6,
     fontSize: 14,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   // Filter Card
   filterCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 22,
     padding: 20,
     gap: 20,
@@ -1362,7 +1362,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: 20,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   searchContainer: {
     flexDirection: "row",
@@ -1378,7 +1378,7 @@ const styles = StyleSheet.create({
   //   flex: 1,
   //   marginLeft: 10,
   //   fontSize: 16,
-  //   color: colors.textPrimary,
+  //   color: AppTheme.colors.textPrimary,
   // },
   // dateRow: {
   //   flexDirection: "row",
@@ -1388,8 +1388,8 @@ const styles = StyleSheet.create({
   // dateInput: {
   //   width: "48%",
   //   height: 56,
-  //   backgroundColor: colors.surface,
-  //   borderRadius: 14,
+  //   backgroundColor: AppTheme.colors.surface,
+  //   borderRadius: AppTheme.radius.large,
   //   paddingHorizontal: 16,
   //   borderWidth: 1,
   //   borderColor: "#E5E7EB",
@@ -1415,7 +1415,7 @@ const styles = StyleSheet.create({
 
   //   borderWidth: 2,
 
-  //   borderColor: colors.accent,
+  //   borderColor: AppTheme.colors.primary,
 
   //   justifyContent: "center",
 
@@ -1434,7 +1434,7 @@ const styles = StyleSheet.create({
 
   //   alignItems: "center",
 
-  //   backgroundColor: colors.accent,
+  //   backgroundColor: AppTheme.colors.primary,
   // },
   // applyText: {
   //   color: "#fff",
@@ -1442,7 +1442,7 @@ const styles = StyleSheet.create({
   //   fontSize: 16,
   // },
   // resetText: {
-  //   color: colors.accent,
+  //   color: AppTheme.colors.primary,
   //   fontWeight: "700",
   //   fontSize: 16,
   // },
@@ -1455,7 +1455,7 @@ const styles = StyleSheet.create({
     rowGap: 16,
   },
   // searchCard: {
-  //   backgroundColor: colors.surface,
+  //   backgroundColor: AppTheme.colors.surface,
 
   //   borderRadius: 24,
 
@@ -1495,7 +1495,7 @@ const styles = StyleSheet.create({
 
   //   height: 42,
 
-  //   borderRadius: 12,
+  //   borderRadius: AppTheme.radius.medium,
 
   //   backgroundColor: "#EEF5FF",
 
@@ -1511,7 +1511,7 @@ const styles = StyleSheet.create({
 
   //   fontWeight: "800",
 
-  //   color: colors.textPrimary,
+  //   color: AppTheme.colors.textPrimary,
   // },
 
   advancedButton: {
@@ -1521,7 +1521,7 @@ const styles = StyleSheet.create({
 
     backgroundColor: "#EEF5FF",
 
-    borderRadius: 14,
+    borderRadius: AppTheme.radius.large,
 
     paddingHorizontal: 18,
 
@@ -1533,19 +1533,19 @@ const styles = StyleSheet.create({
 
     fontWeight: "700",
 
-    color: colors.accent,
+    color: AppTheme.colors.primary,
   },
 
   summaryLabel: {
     marginTop: 6,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   // Metrics
   sectionTitle: {
     fontSize: 22,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   // metricHeader: {
@@ -1556,14 +1556,14 @@ const styles = StyleSheet.create({
   progressBackground: {
     marginTop: 14,
     height: 8,
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
     backgroundColor: "#E5E7EB",
     overflow: "hidden",
   },
   progressFill: {
     height: 8,
-    borderRadius: 8,
-    backgroundColor: colors.accent,
+    borderRadius: AppTheme.radius.small,
+    backgroundColor: AppTheme.colors.primary,
   },
 
   // Subject
@@ -1571,12 +1571,12 @@ const styles = StyleSheet.create({
   //   flexDirection: "row",
   //   justifyContent: "space-between",
   //   alignItems: "center",
-  //   backgroundColor: colors.surface,
+  //   backgroundColor: AppTheme.colors.surface,
   //   borderRadius: 16,
   //   padding: 16,
   // },
   subjectAnalyticsCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 20,
     padding: 18,
   },
@@ -1596,16 +1596,16 @@ const styles = StyleSheet.create({
   // subjectName: {
   //   fontSize: 18,
   //   fontWeight: "700",
-  //   color: colors.textPrimary,
+  //   color: AppTheme.colors.textPrimary,
   // },
   subjectLectureCount: {
     marginTop: 4,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
   subjectScore: {
     fontSize: 28,
     fontWeight: "800",
-    color: colors.accent,
+    color: AppTheme.colors.primary,
   },
   subjectBottomRow: {
     flexDirection: "row",
@@ -1618,7 +1618,7 @@ const styles = StyleSheet.create({
   },
   subjectInfoText: {
     marginLeft: 6,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   // Lecture
@@ -1626,7 +1626,7 @@ const styles = StyleSheet.create({
     gap: 14,
   },
   modernLectureCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 20,
     padding: 18,
   },
@@ -1646,11 +1646,11 @@ const styles = StyleSheet.create({
   modernLectureTitle: {
     fontSize: 17,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   modernLectureSubtitle: {
     marginTop: 4,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
   // statusBadge: {
   //   paddingHorizontal: 12,
@@ -1669,12 +1669,12 @@ const styles = StyleSheet.create({
   },
   footerLabel: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
   footerValue: {
     marginTop: 4,
     fontWeight: "600",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   // scoreBadge: {
   //   backgroundColor: "#EEF5FF",
@@ -1685,13 +1685,13 @@ const styles = StyleSheet.create({
   scoreBadgeValue: {
     fontSize: 20,
     fontWeight: "800",
-    color: colors.accent,
+    color: AppTheme.colors.primary,
   },
 
   // Utility
   emptyText: {
     textAlign: "center",
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     paddingVertical: 24,
   },
   errorText: {
@@ -1705,7 +1705,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 24,
     padding: 20,
     borderWidth: 1,
@@ -1714,17 +1714,17 @@ const styles = StyleSheet.create({
   // lectureTitle: {
   //   fontSize: 17,
   //   fontWeight: "700",
-  //   color: colors.textPrimary,
+  //   color: AppTheme.colors.textPrimary,
   // },
   chapterText: {
     marginTop: 4,
     fontSize: 14,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
   scoreText: {
     fontSize: 22,
     fontWeight: "800",
-    color: colors.accent,
+    color: AppTheme.colors.primary,
   },
 
   heroDivider: {
@@ -1752,16 +1752,16 @@ const styles = StyleSheet.create({
   teacherStatValue: {
     fontSize: 22,
     fontWeight: "800",
-    color: colors.accent,
+    color: AppTheme.colors.primary,
   },
 
   teacherStatLabel: {
     marginTop: 4,
     fontSize: 13,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
   // monthCard: {
-  //   backgroundColor: colors.surface,
+  //   backgroundColor: AppTheme.colors.surface,
   //   borderRadius: 20,
   //   padding: 18,
   // },
@@ -1784,18 +1784,18 @@ const styles = StyleSheet.create({
   monthTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   monthSubtitle: {
     marginTop: 4,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   // monthScore: {
   //   fontSize: 28,
   //   fontWeight: "800",
-  //   color: colors.accent,
+  //   color: AppTheme.colors.primary,
   // },
 
   monthBottomRow: {
@@ -1807,10 +1807,10 @@ const styles = StyleSheet.create({
 
   monthAverage: {
     fontSize: 14,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
   analyticsHeroCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 24,
     padding: 24,
     flexDirection: "row",
@@ -1841,7 +1841,7 @@ const styles = StyleSheet.create({
     width: 110,
     height: 110,
     borderRadius: 55,
-    backgroundColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -1859,7 +1859,7 @@ const styles = StyleSheet.create({
   teacherName: {
     fontSize: 30,
     fontWeight: "800",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   teacherBadge: {
@@ -1887,7 +1887,7 @@ const styles = StyleSheet.create({
 
   infoText: {
     marginLeft: 10,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontSize: 16,
   },
 
@@ -1919,7 +1919,7 @@ const styles = StyleSheet.create({
 
     height: 48,
 
-    borderRadius: 14,
+    borderRadius: AppTheme.radius.large,
 
     justifyContent: "center",
 
@@ -1933,7 +1933,7 @@ const styles = StyleSheet.create({
 
     fontWeight: "800",
 
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   kpiTitle: {
@@ -1941,7 +1941,7 @@ const styles = StyleSheet.create({
 
     fontSize: 15,
 
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
 
     marginBottom: 16,
   },
@@ -2030,20 +2030,20 @@ const styles = StyleSheet.create({
   summaryValue: {
     fontSize: 30,
     fontWeight: "800",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   summaryTitle: {
     marginTop: 10,
     fontSize: 16,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   summarySubtitle: {
     marginTop: 6,
     fontSize: 13,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   // metricsGrid: {
@@ -2071,7 +2071,7 @@ const styles = StyleSheet.create({
   // metricIcon: {
   //   width: 42,
   //   height: 42,
-  //   borderRadius: 14,
+  //   borderRadius: AppTheme.radius.large,
   //   backgroundColor: "#EEF5FF",
   //   justifyContent: "center",
   //   alignItems: "center",
@@ -2081,30 +2081,30 @@ const styles = StyleSheet.create({
   //   marginTop: 18,
   //   fontSize: 15,
   //   fontWeight: "700",
-  //   color: colors.textPrimary,
+  //   color: AppTheme.colors.textPrimary,
   // },
 
   metricValue: {
     fontSize: 26,
     fontWeight: "800",
-    color: colors.accent,
+    color: AppTheme.colors.primary,
   },
 
   // metricProgressTrack: {
   //   marginTop: 16,
   //   height: 8,
   //   backgroundColor: "#E5E7EB",
-  //   borderRadius: 8,
+  //   borderRadius: AppTheme.radius.small,
   //   overflow: "hidden",
   // },
 
   // metricProgressFill: {
   //   height: "100%",
-  //   borderRadius: 8,
-  //   backgroundColor: colors.accent,
+  //   borderRadius: AppTheme.radius.small,
+  //   backgroundColor: AppTheme.colors.primary,
   // },
   searchCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 24,
     padding: 24,
     borderWidth: 1,
@@ -2125,7 +2125,7 @@ const styles = StyleSheet.create({
   searchHeaderIcon: {
     width: 42,
     height: 42,
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     backgroundColor: "#EEF5FF",
     justifyContent: "center",
     alignItems: "center",
@@ -2135,7 +2135,7 @@ const styles = StyleSheet.create({
   searchTitle: {
     fontSize: 24,
     fontWeight: "800",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   clearAllText: {
@@ -2193,11 +2193,11 @@ const styles = StyleSheet.create({
   },
 
   datePlaceholder: {
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   dateValue: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontWeight: "600",
   },
 
@@ -2212,7 +2212,7 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: colors.accent,
+    borderColor: AppTheme.colors.primary,
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
@@ -2220,7 +2220,7 @@ const styles = StyleSheet.create({
 
   resetText: {
     marginLeft: 8,
-    color: colors.accent,
+    color: AppTheme.colors.primary,
     fontWeight: "700",
   },
 
@@ -2228,7 +2228,7 @@ const styles = StyleSheet.create({
     width: "48%",
     height: 54,
     borderRadius: 16,
-    backgroundColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
@@ -2264,7 +2264,7 @@ const styles = StyleSheet.create({
   metricIcon: {
     width: 46,
     height: 46,
-    borderRadius: 14,
+    borderRadius: AppTheme.radius.large,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -2273,7 +2273,7 @@ const styles = StyleSheet.create({
     marginTop: 18,
     fontSize: 15,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   metricPercentage: {
@@ -2284,14 +2284,14 @@ const styles = StyleSheet.create({
   metricProgressTrack: {
     marginTop: 18,
     height: 8,
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
     backgroundColor: "#E5E7EB",
     overflow: "hidden",
   },
 
   metricProgressFill: {
     height: "100%",
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
   },
 
   subjectCard: {
@@ -2316,7 +2316,7 @@ const styles = StyleSheet.create({
   subjectIcon: {
     width: 46,
     height: 46,
-    borderRadius: 14,
+    borderRadius: AppTheme.radius.large,
     backgroundColor: "#EEF5FF",
     justifyContent: "center",
     alignItems: "center",
@@ -2326,24 +2326,24 @@ const styles = StyleSheet.create({
   subjectName: {
     fontSize: 18,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   subjectSubtitle: {
     marginTop: 4,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   subjectBadge: {
     backgroundColor: "#EEF5FF",
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 14,
     paddingVertical: 8,
   },
 
   subjectBadgeText: {
     fontWeight: "800",
-    color: colors.accent,
+    color: AppTheme.colors.primary,
     fontSize: 17,
   },
 
@@ -2351,13 +2351,13 @@ const styles = StyleSheet.create({
     marginTop: 18,
     height: 8,
     backgroundColor: "#E5E7EB",
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
     overflow: "hidden",
   },
 
   subjectProgressFill: {
     height: "100%",
-    backgroundColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
   },
 
   subjectFooter: {
@@ -2373,7 +2373,7 @@ const styles = StyleSheet.create({
 
   subjectFooterText: {
     marginLeft: 6,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontSize: 14,
   },
   monthGrid: {
@@ -2401,7 +2401,7 @@ const styles = StyleSheet.create({
   monthIcon: {
     width: 42,
     height: 42,
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     backgroundColor: "#EEF5FF",
     justifyContent: "center",
     alignItems: "center",
@@ -2411,32 +2411,32 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 18,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   monthLecture: {
     marginTop: 4,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   monthScore: {
     fontSize: 26,
     fontWeight: "800",
-    color: colors.accent,
+    color: AppTheme.colors.primary,
   },
 
   monthProgressBackground: {
     marginTop: 18,
     height: 8,
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
     backgroundColor: "#E5E7EB",
     overflow: "hidden",
   },
 
   monthProgressFill: {
     height: "100%",
-    borderRadius: 8,
-    backgroundColor: colors.accent,
+    borderRadius: AppTheme.radius.small,
+    backgroundColor: AppTheme.colors.primary,
   },
   lectureCard: {
     backgroundColor: "#fff",
@@ -2461,7 +2461,7 @@ const styles = StyleSheet.create({
   lectureIcon: {
     width: 48,
     height: 48,
-    borderRadius: 14,
+    borderRadius: AppTheme.radius.large,
     backgroundColor: "#EEF5FF",
     justifyContent: "center",
     alignItems: "center",
@@ -2471,17 +2471,17 @@ const styles = StyleSheet.create({
   lectureTitle: {
     fontSize: 17,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   lectureChapter: {
     marginTop: 4,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   scoreBadge: {
     backgroundColor: "#EEF5FF",
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 14,
     paddingVertical: 8,
   },
@@ -2489,20 +2489,20 @@ const styles = StyleSheet.create({
   scoreBadgeText: {
     fontSize: 18,
     fontWeight: "800",
-    color: colors.accent,
+    color: AppTheme.colors.primary,
   },
 
   lectureProgressTrack: {
     marginTop: 18,
     height: 8,
     backgroundColor: "#E5E7EB",
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
     overflow: "hidden",
   },
 
   lectureProgressFill: {
     height: "100%",
-    backgroundColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
   },
 
   lectureBottomRow: {
@@ -2519,12 +2519,12 @@ const styles = StyleSheet.create({
 
   metaText: {
     marginLeft: 6,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontSize: 14,
   },
 
   statusBadge: {
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 12,
     paddingVertical: 6,
   },

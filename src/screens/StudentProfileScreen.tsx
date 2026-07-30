@@ -116,7 +116,7 @@ export function StudentProfileScreen({ navigation }: Props) {
 
       {isLoading ? (
         <View style={styles.center}>
-          <ActivityIndicator color={colors.accent} size="large" />
+          <ActivityIndicator color={AppTheme.colors.primary} size="large" />
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -166,7 +166,7 @@ export function StudentProfileScreen({ navigation }: Props) {
                 autoCapitalize="words"
                 onChangeText={setDraftName}
                 placeholder="Full name"
-                placeholderTextColor={colors.textPlaceholder}
+                placeholderTextColor={AppTheme.colors.textPlaceholder}
                 style={styles.input}
                 value={draftName}
               />
@@ -183,7 +183,7 @@ export function StudentProfileScreen({ navigation }: Props) {
                 keyboardType="phone-pad"
                 onChangeText={setDraftMobile}
                 placeholder="Mobile number"
-                placeholderTextColor={colors.textPlaceholder}
+                placeholderTextColor={AppTheme.colors.textPlaceholder}
                 style={styles.input}
                 value={draftMobile}
               />
@@ -227,7 +227,7 @@ export function StudentProfileScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
+  safe: { flex: 1, backgroundColor: AppTheme.colors.background },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   scroll: { padding: 20, paddingBottom: 32, gap: 18 },
   hero: { alignItems: 'center', gap: 12 },
@@ -237,11 +237,11 @@ const styles = StyleSheet.create({
     width: 104,
     height: 104,
     borderRadius: 52,
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarFallbackText: { fontSize: 34, fontWeight: '800', color: colors.accentDark },
+  avatarFallbackText: { fontSize: 34, fontWeight: '800', color: AppTheme.colors.primaryDark },
   cameraBadge: {
     position: 'absolute',
     right: 2,
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -257,39 +257,39 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 999,
-    backgroundColor: colors.accentSoft,
-    color: colors.accentDark,
+    backgroundColor: AppTheme.colors.primarySoft,
+    color: AppTheme.colors.primaryDark,
     fontWeight: '700',
     overflow: 'hidden',
   },
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     padding: 20,
     gap: 10,
   },
   cardHeader: { flexDirection: 'row', alignItems: 'center' },
-  cardTitle: { flex: 1, fontSize: 18, fontWeight: '800', color: colors.textPrimary },
-  linkText: { color: colors.accentDark, fontSize: 14, fontWeight: '700' },
-  label: { fontSize: 11, letterSpacing: 1, color: colors.textMuted, fontWeight: '700', marginTop: 4 },
-  value: { fontSize: 16, color: colors.textPrimary, fontWeight: '600' },
+  cardTitle: { flex: 1, fontSize: 18, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  linkText: { color: AppTheme.colors.primaryDark, fontSize: 14, fontWeight: '700' },
+  label: { fontSize: 11, letterSpacing: 1, color: AppTheme.colors.textSecondary, fontWeight: '700', marginTop: 4 },
+  value: { fontSize: 16, color: AppTheme.colors.textPrimary, fontWeight: '600' },
   input: {
     minHeight: 48,
-    borderRadius: 14,
+    borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.background,
+    borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.background,
     paddingHorizontal: 14,
     fontSize: 15,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   primaryButton: {
     marginTop: 8,
     height: 50,
-    borderRadius: 14,
-    backgroundColor: colors.accent,
+    borderRadius: AppTheme.radius.large,
+    backgroundColor: AppTheme.colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

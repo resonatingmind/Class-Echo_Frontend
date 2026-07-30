@@ -67,7 +67,7 @@ export function AuthInput({
           onChangeText={onChangeText}
           onSubmitEditing={onSubmitEditing}
           placeholder={placeholder}
-          placeholderTextColor={colors.textPlaceholder}
+          placeholderTextColor={AppTheme.colors.textPlaceholder}
           returnKeyType={returnKeyType}
           secureTextEntry={shouldMask}
           style={styles.input}
@@ -80,7 +80,7 @@ export function AuthInput({
             onPress={() => setShowPassword((current) => !current)}
           >
             <Feather
-              color={colors.textSecondary}
+              color={AppTheme.colors.textSecondary}
               name={showPassword ? 'eye-off' : 'eye'}
               size={18}
             />
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   label: {
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontSize: 12,
     fontWeight: '600',
     letterSpacing: 1.2,
@@ -114,14 +114,14 @@ const styles = StyleSheet.create({
     textTransform: 'none',
   },
   link: {
-    color: colors.accentDark,
+    color: AppTheme.colors.primaryDark,
     fontSize: 12,
     fontWeight: '600',
   },
   inputShell: {
     minHeight: 56,
-    borderRadius: 8,
-    backgroundColor: colors.surface,
+    borderRadius: AppTheme.radius.small,
+    backgroundColor: AppTheme.colors.surface,
     borderWidth: 1,
     borderColor: 'rgba(191, 199, 212, 0.24)',
     flexDirection: 'row',
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 16,
     padding: 0,
   },

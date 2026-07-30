@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 import { TABLE_COLUMNS } from "./tableColumns";
 import { TeacherDashboardSubject } from "../../types/api";
 
@@ -134,21 +134,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#fff",
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     paddingVertical: 14,
     paddingHorizontal: 14,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
   },
   cell: {
     fontSize: 14,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   aiBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
   },
   aiText: {
     fontSize: 13,
@@ -157,22 +157,22 @@ const styles = StyleSheet.create({
   scoreText: {
     fontSize: 14,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   scoreTextMuted: {
     fontWeight: "400",
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
   },
   viewButton: {
     width: 60,
     height: 34,
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primarySoft,
   },
   viewText: {
-    color: colors.accentDark,
+    color: AppTheme.colors.primaryDark,
     fontSize: 13,
     fontWeight: "700",
   },

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 
 export function TeacherDashboardHeader() {
   return (
@@ -22,12 +22,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   subtitle: {
     marginTop: 6,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontSize: 15,
   },
 });

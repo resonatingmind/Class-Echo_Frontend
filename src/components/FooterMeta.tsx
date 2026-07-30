@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   copy: {
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
   },
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     gap: 32,
   },
   link: {
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
     flex: 1,

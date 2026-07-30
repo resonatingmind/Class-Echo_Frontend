@@ -14,8 +14,8 @@ type Props = {
 export const AudioWaveform = memo(function AudioWaveform({
   bars,
   progress = 0,
-  activeColor = colors.accent,
-  inactiveColor = colors.border,
+  activeColor = AppTheme.colors.primary,
+  inactiveColor = AppTheme.colors.border,
   height = 58,
 }: Props) {
   const safeProgress = Math.max(0, Math.min(1, progress));

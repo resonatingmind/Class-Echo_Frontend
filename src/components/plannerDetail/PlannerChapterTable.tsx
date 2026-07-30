@@ -1,7 +1,7 @@
 import { ScrollView, View, Text, StyleSheet } from "react-native";
 
 import { PlannerChapter } from "../../types/api";
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 import { PlannerChapterRow } from "./PlannerChapterRow";
 
 export const CHAPTER_COLUMNS = {
@@ -83,10 +83,10 @@ export function PlannerChapterTable({
 
 const styles = StyleSheet.create({
   table: {
-    backgroundColor: colors.surface,
-    borderRadius: 14,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     overflow: "hidden",
   },
 
@@ -94,14 +94,14 @@ const styles = StyleSheet.create({
     height: 44,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: AppTheme.colors.surfaceMuted,
     paddingHorizontal: 16,
   },
 
   heading: {
     fontSize: 11,
     fontWeight: "700",
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
     textTransform: "uppercase",
     letterSpacing: 0.3,
   },

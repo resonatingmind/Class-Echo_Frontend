@@ -17,7 +17,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../context/AuthContext";
 
 import { RootStackParamList } from "../navigation/AppNavigator";
-import { colors } from "../theme/colors";
+import { AppTheme } from "../theme/AppTheme";
 
 import { ChapterEditorModal } from "../components/teacher/ChapterEditorModal";
 import { ChapterActionSheet } from "../components/teacher/ChapterActionSheet";
@@ -197,7 +197,7 @@ const filteredChapters = chapters.filter((chapter) => {
             onPress={() => navigation.goBack()}
             style={styles.backButton}
           >
-            <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
+            <Ionicons name="arrow-back" size={22} color={AppTheme.colors.textPrimary} />
           </Pressable>
           <View style={styles.headerTextWrapper}>
             <Text style={styles.subject}>{subjectName}</Text>
@@ -558,7 +558,7 @@ const styles = StyleSheet.create({
     height: 48,
     borderWidth: 1,
     borderColor: "#E2E8F0",
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 16,
     backgroundColor: "#F8FAFC",
     fontSize: 15,
@@ -574,7 +574,7 @@ const styles = StyleSheet.create({
   filterButton: {
     paddingHorizontal: 16,
     height: 40,
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.medium,
     backgroundColor: "#F1F5F9",
     justifyContent: "center",
   },
@@ -585,11 +585,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#0284C7",
     paddingHorizontal: 16,
     height: 42,
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.medium,
   },
   addText: { color: "#fff", marginLeft: 6, fontWeight: "700", fontSize: 14 },
   tableWrapper: {
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
     borderColor: "#E2E8F0",
     overflow: "hidden",
@@ -624,7 +624,7 @@ const styles = StyleSheet.create({
   pdfButton: {
     minWidth: 64,
     height: 32,
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
@@ -634,7 +634,7 @@ const styles = StyleSheet.create({
   aiBadge: {
     paddingVertical: 4,
     paddingHorizontal: 10,
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     backgroundColor: "#F1F5F9",
     alignItems: "center",
   },
@@ -643,7 +643,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F1F5F9",
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
     borderWidth: 1,
     borderColor: "#E2E8F0",
   },

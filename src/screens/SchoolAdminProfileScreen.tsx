@@ -13,6 +13,7 @@ import {
   Text,
   TextInput,
   View,
+  useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -24,14 +25,15 @@ import {
   uploadSchoolLogo,
 } from "../lib/api";
 import { RootStackParamList } from "../navigation/AppNavigator";
-import { ScreenHeader } from "../components/common/ScreenHeader";
-import { colors } from "../theme/colors";
+import { AppTheme } from "../theme/AppTheme";
 import { SchoolAdminProfileOut } from "../types/api";
 
-type Props = NativeStackScreenProps<RootStackParamList, "SchoolAdminTabs">;
+type Props = NativeStackScreenProps<RootStackParamList, "SchoolAdminProfile">;
 
 export function SchoolAdminProfileScreen({ navigation }: Props) {
   const { session, signOut } = useAuth();
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
   const [profile, setProfile] = useState<SchoolAdminProfileOut | null>(null);
   const [draftName, setDraftName] = useState("");
   const [draftSchoolName, setDraftSchoolName] = useState("");
@@ -148,294 +150,383 @@ export function SchoolAdminProfileScreen({ navigation }: Props) {
     }
   };
 
-
   return (
-    <SafeAreaView edges={[]} style={styles.safe}>
-      <ScreenHeader title="My Profile" />
-
-      {isLoading ? (
-        <View style={styles.center}>
-          <ActivityIndicator color={colors.accent} size="large" />
-        </View>
-      ) : (
-        <ScrollView
-          contentContainerStyle={styles.scroll}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.hero}>
-            <Pressable
-              onPress={() => void handleAvatarUpload()}
-              style={styles.avatarWrap}
-            >
-              {profile?.profile_pic_url ? (
-                <Image
-                  source={{ uri: profile.profile_pic_url }}
-                  style={styles.avatarImage}
-                />
-              ) : (
-                <View style={styles.avatarFallback}>
-                  <Text style={styles.avatarFallbackText}>{initials}</Text>
-                </View>
-              )}
-              <View style={styles.cameraBadge}>
-                {avatarUploading ? (
-                  <ActivityIndicator color="#fff" size="small" />
-                ) : (
-                  <Ionicons color="#fff" name="camera" size={14} />
-                )}
-              </View>
-            </Pressable>
-            <Text style={styles.roleBadge}>School Administrator</Text>
-          </View>
-
-          <View style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Text style={styles.cardTitle}>Admin Details</Text>
-              {editing ? (
-                <Pressable
-                  onPress={() => {
-                    setEditing(false);
-                    setDraftName(profile?.name ?? "");
-                    setDraftSchoolName(profile?.school_name ?? "");
-                    setDraftSchoolAddress(profile?.school_address ?? "");
-                  }}
-                >
-                  <Text style={styles.linkText}>Cancel</Text>
-                </Pressable>
-              ) : (
-                <Pressable onPress={() => setEditing(true)}>
-                  <Text style={styles.linkText}>Edit</Text>
-                </Pressable>
-              )}
-            </View>
-
-            <Text style={styles.label}>NAME</Text>
-            {editing ? (
-              <TextInput
-                autoCapitalize="words"
-                onChangeText={setDraftName}
-                placeholder="Full name"
-                placeholderTextColor={colors.textPlaceholder}
-                style={styles.input}
-                value={draftName}
-              />
-            ) : (
-              <Text style={styles.value}>{profile?.name ?? "—"}</Text>
-            )}
-
-            <Text style={styles.label}>EMAIL</Text>
-            <Text style={styles.value}>{profile?.email ?? "—"}</Text>
-          </View>
-
-          <View style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Text style={styles.cardTitle}>School</Text>
-              <Pressable onPress={() => void handleLogoUpload()}>
-                <Text style={styles.linkText}>
-                  {logoUploading ? "Uploading…" : "Upload Logo"}
-                </Text>
-              </Pressable>
-            </View>
-
-            <View style={styles.logoRow}>
-              {profile?.school_logo_url ? (
-                <Image
-                  source={{ uri: profile.school_logo_url }}
-                  style={styles.logoImage}
-                />
-              ) : (
-                <View style={styles.logoFallback}>
-                  <Ionicons
-                    color={colors.textMuted}
-                    name="image-outline"
-                    size={20}
-                  />
-                </View>
-              )}
-              <View style={styles.logoInfo}>
-                <Text style={styles.subtleValue}>
-                  Tap the action above to change the school logo.
-                </Text>
-              </View>
-            </View>
-
-            <Text style={styles.label}>SCHOOL NAME</Text>
-            {editing ? (
-              <TextInput
-                autoCapitalize="words"
-                onChangeText={setDraftSchoolName}
-                placeholder="School name"
-                placeholderTextColor={colors.textPlaceholder}
-                style={styles.input}
-                value={draftSchoolName}
-              />
-            ) : (
-              <Text style={styles.value}>{profile?.school_name ?? "—"}</Text>
-            )}
-
-            <Text style={styles.label}>ADDRESS</Text>
-            {editing ? (
-              <TextInput
-                autoCapitalize="sentences"
-                multiline
-                numberOfLines={3}
-                onChangeText={setDraftSchoolAddress}
-                placeholder="School address"
-                placeholderTextColor={colors.textPlaceholder}
-                style={[styles.input, styles.addressInput]}
-                value={draftSchoolAddress}
-              />
-            ) : (
-              <Text style={styles.subtleValue}>
-                {profile?.school_address ?? "No address added"}
-              </Text>
-            )}
-
-            {editing ? (
-              <Pressable
-                disabled={
-                  saving || !draftName.trim() || !draftSchoolName.trim()
-                }
-                onPress={() => void handleSave()}
-                style={[
-                  styles.primaryButton,
-                  (saving || !draftName.trim() || !draftSchoolName.trim()) &&
-                    styles.buttonDisabled,
-                ]}
-              >
-                {saving ? (
-                  <ActivityIndicator color="#fff" size="small" />
-                ) : null}
-                <Text style={styles.primaryButtonText}>
-                  {saving ? "Saving…" : "Save Changes"}
-                </Text>
-              </Pressable>
-            ) : null}
-          </View>
-
-          <Pressable onPress={signOut} style={styles.signOutButton}>
-            <Ionicons color="#EF4444" name="log-out-outline" size={18} />
-            <Text style={styles.signOutText}>Sign Out</Text>
+    <SafeAreaView edges={["top", "bottom"]} style={styles.safe}>
+      {/* Header with Back Button */}
+      <View style={styles.header}>
+        <View style={styles.headerLeft}>
+          <Pressable onPress={() => navigation.goBack()} style={styles.iconBtn}>
+            <Ionicons color={AppTheme.AppTheme.colors.textPrimary} name="arrow-back" size={24} />
           </Pressable>
-        </ScrollView>
-      )}
+        </View>
+        <Text style={styles.headerTitle}>{isMobile ? "" : "My Profile"}</Text>
+        <View style={styles.headerRight}>
+           {/* Placeholder to balance the flex header */}
+        </View>
+      </View>
+
+      <View style={styles.flex}>
+        {isLoading ? (
+          <View style={[styles.centerContainer, { justifyContent: "center" }]}>
+            <ActivityIndicator color={AppTheme.colors.primary} size="large" />
+          </View>
+        ) : (
+          <ScrollView
+            contentContainerStyle={styles.scroll}
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.centerContainer}>
+              <View style={styles.body}>
+                {/* Page heading */}
+                <View style={styles.pageHeading}>
+                  <Text style={styles.pageTitle}>My Profile</Text>
+                  <Text style={styles.pageSubtitle}>
+                    Manage your account details and school information
+                  </Text>
+                </View>
+
+                <View style={styles.hero}>
+                  <Pressable
+                    onPress={() => void handleAvatarUpload()}
+                    style={styles.avatarWrap}
+                  >
+                    {profile?.profile_pic_url ? (
+                      <Image
+                        source={{ uri: profile.profile_pic_url }}
+                        style={styles.avatarImage}
+                      />
+                    ) : (
+                      <View style={styles.avatarFallback}>
+                        <Text style={styles.avatarFallbackText}>{initials}</Text>
+                      </View>
+                    )}
+                    <View style={styles.cameraBadge}>
+                      {avatarUploading ? (
+                        <ActivityIndicator color="#fff" size="small" />
+                      ) : (
+                        <Ionicons color="#fff" name="camera" size={14} />
+                      )}
+                    </View>
+                  </Pressable>
+                  <Text style={styles.roleBadge}>School Administrator</Text>
+                </View>
+
+                <View style={styles.card}>
+                  <View style={styles.cardHeader}>
+                    <Text style={styles.cardTitle}>Admin Details</Text>
+                    {editing ? (
+                      <Pressable
+                        onPress={() => {
+                          setEditing(false);
+                          setDraftName(profile?.name ?? "");
+                          setDraftSchoolName(profile?.school_name ?? "");
+                          setDraftSchoolAddress(profile?.school_address ?? "");
+                        }}
+                      >
+                        <Text style={styles.linkText}>Cancel</Text>
+                      </Pressable>
+                    ) : (
+                      <Pressable onPress={() => setEditing(true)}>
+                        <Text style={styles.linkText}>Edit</Text>
+                      </Pressable>
+                    )}
+                  </View>
+
+                  <Text style={styles.label}>NAME</Text>
+                  {editing ? (
+                    <TextInput
+                      autoCapitalize="words"
+                      onChangeText={setDraftName}
+                      placeholder="Full name"
+                      placeholderTextColor={AppTheme.colors.hint}
+                      style={styles.input}
+                      value={draftName}
+                      // @ts-ignore
+                      outlineStyle="none"
+                    />
+                  ) : (
+                    <Text style={styles.value}>{profile?.name ?? "—"}</Text>
+                  )}
+
+                  <Text style={styles.label}>EMAIL</Text>
+                  <Text style={styles.value}>{profile?.email ?? "—"}</Text>
+                </View>
+
+                <View style={styles.card}>
+                  <View style={styles.cardHeader}>
+                    <Text style={styles.cardTitle}>School</Text>
+                    <Pressable onPress={() => void handleLogoUpload()}>
+                      <Text style={styles.linkText}>
+                        {logoUploading ? "Uploading…" : "Upload Logo"}
+                      </Text>
+                    </Pressable>
+                  </View>
+
+                  <View style={styles.logoRow}>
+                    {profile?.school_logo_url ? (
+                      <Image
+                        source={{ uri: profile.school_logo_url }}
+                        style={styles.logoImage}
+                      />
+                    ) : (
+                      <View style={styles.logoFallback}>
+                        <Ionicons
+                          color={AppTheme.colors.hint}
+                          name="image-outline"
+                          size={24}
+                        />
+                      </View>
+                    )}
+                    <View style={styles.logoInfo}>
+                      <Text style={styles.subtleValue}>
+                        Tap the action above to change the school logo.
+                      </Text>
+                    </View>
+                  </View>
+
+                  <Text style={styles.label}>SCHOOL NAME</Text>
+                  {editing ? (
+                    <TextInput
+                      autoCapitalize="words"
+                      onChangeText={setDraftSchoolName}
+                      placeholder="School name"
+                      placeholderTextColor={AppTheme.colors.hint}
+                      style={styles.input}
+                      value={draftSchoolName}
+                      // @ts-ignore
+                      outlineStyle="none"
+                    />
+                  ) : (
+                    <Text style={styles.value}>{profile?.school_name ?? "—"}</Text>
+                  )}
+
+                  <Text style={styles.label}>ADDRESS</Text>
+                  {editing ? (
+                    <TextInput
+                      autoCapitalize="sentences"
+                      multiline
+                      numberOfLines={3}
+                      onChangeText={setDraftSchoolAddress}
+                      placeholder="School address"
+                      placeholderTextColor={AppTheme.colors.hint}
+                      style={[styles.input, styles.addressInput]}
+                      value={draftSchoolAddress}
+                      // @ts-ignore
+                      outlineStyle="none"
+                    />
+                  ) : (
+                    <Text style={styles.subtleValue}>
+                      {profile?.school_address ?? "No address added"}
+                    </Text>
+                  )}
+
+                  {editing ? (
+                    <Pressable
+                      disabled={
+                        saving || !draftName.trim() || !draftSchoolName.trim()
+                      }
+                      onPress={() => void handleSave()}
+                      style={[
+                        styles.primaryButton,
+                        (saving || !draftName.trim() || !draftSchoolName.trim()) &&
+                          styles.buttonDisabled,
+                      ]}
+                    >
+                      {saving ? (
+                        <ActivityIndicator color="#fff" size="small" />
+                      ) : null}
+                      <Text style={styles.primaryButtonText}>
+                        {saving ? "Saving…" : "Save Changes"}
+                      </Text>
+                    </Pressable>
+                  ) : null}
+                </View>
+
+                <Pressable onPress={signOut} style={styles.signOutButton}>
+                  <Ionicons color={AppTheme.colors.error} name="log-out-outline" size={20} />
+                  <Text style={styles.signOutText}>Sign Out</Text>
+                </Pressable>
+              </View>
+            </View>
+          </ScrollView>
+        )}
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  center: { flex: 1, alignItems: "center", justifyContent: "center" },
-  scroll: { padding: 20, paddingBottom: 32, gap: 18 },
-  hero: { alignItems: "center", gap: 12 },
+  safe: {
+    flex: 1,
+    backgroundColor: AppTheme.AppTheme.colors.background,
+  },
+  flex: { flex: 1 },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.m,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: AppTheme.AppTheme.colors.border,
+  },
+  headerLeft: {
+    width: 60,
+    alignItems: "flex-start",
+  },
+  headerTitle: {
+    flex: 1,
+    textAlign: "center",
+    color: AppTheme.AppTheme.colors.textPrimary,
+    ...AppTheme.typography.heading3,
+  },
+  headerRight: {
+    width: 60,
+  },
+  iconBtn: {
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  scroll: {
+    flexGrow: 1,
+  },
+  centerContainer: {
+    flex: 1,
+    alignItems: "center",
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.xl,
+  },
+  body: {
+    width: "100%",
+    maxWidth: 800,
+    gap: AppTheme.spacing.l,
+  },
+  pageHeading: {
+    gap: AppTheme.spacing.s,
+    marginBottom: AppTheme.spacing.xs,
+  },
+  pageTitle: {
+    color: AppTheme.AppTheme.colors.textPrimary,
+    ...AppTheme.typography.heading1,
+  },
+  pageSubtitle: {
+    color: AppTheme.AppTheme.colors.textSecondary,
+    ...AppTheme.typography.body,
+  },
+  hero: { alignItems: "center", gap: AppTheme.spacing.m, marginBottom: AppTheme.spacing.m },
   avatarWrap: { position: "relative" },
   avatarImage: { width: 104, height: 104, borderRadius: 52 },
   avatarFallback: {
     width: 104,
     height: 104,
     borderRadius: 52,
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primaryLight,
     alignItems: "center",
     justifyContent: "center",
   },
   avatarFallbackText: {
-    fontSize: 34,
-    fontWeight: "800",
-    color: colors.accentDark,
+    ...AppTheme.typography.display,
+    color: AppTheme.colors.primary,
   },
   cameraBadge: {
     position: "absolute",
     right: 2,
     bottom: 2,
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: colors.accent,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: AppTheme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 2,
+    borderColor: AppTheme.AppTheme.colors.surface,
   },
   roleBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: colors.accentSoft,
-    color: colors.accentDark,
+    paddingHorizontal: AppTheme.spacing.m,
+    paddingVertical: AppTheme.spacing.xs,
+    borderRadius: AppTheme.radius.pill,
+    backgroundColor: AppTheme.colors.primaryLight,
+    color: AppTheme.colors.primary,
+    ...AppTheme.typography.caption,
     fontWeight: "700",
     overflow: "hidden",
   },
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: colors.border,
-    padding: 20,
-    gap: 10,
+    borderColor: AppTheme.AppTheme.colors.border,
+    padding: AppTheme.spacing.xl,
+    gap: AppTheme.spacing.m,
   },
-  cardHeader: { flexDirection: "row", alignItems: "center" },
+  cardHeader: { flexDirection: "row", alignItems: "center", marginBottom: AppTheme.spacing.xs },
   cardTitle: {
     flex: 1,
-    fontSize: 18,
-    fontWeight: "800",
-    color: colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
+    ...AppTheme.typography.heading3,
   },
-  linkText: { color: colors.accentDark, fontSize: 14, fontWeight: "700" },
+  linkText: { color: AppTheme.colors.primary, ...AppTheme.typography.button, fontSize: 14 },
   label: {
-    fontSize: 11,
+    ...AppTheme.typography.caption,
     letterSpacing: 1,
-    color: colors.textMuted,
-    fontWeight: "700",
-    marginTop: 4,
+    color: AppTheme.AppTheme.colors.textSecondary,
+    marginTop: AppTheme.spacing.xs,
   },
-  value: { fontSize: 16, color: colors.textPrimary, fontWeight: "600" },
-  subtleValue: { fontSize: 13, color: colors.textSecondary, lineHeight: 18 },
+  value: { ...AppTheme.typography.bodyLarge, color: AppTheme.AppTheme.colors.textPrimary, fontWeight: "600" },
+  subtleValue: { ...AppTheme.typography.body, color: AppTheme.AppTheme.colors.textSecondary },
   input: {
     minHeight: 48,
-    borderRadius: 14,
+    borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.background,
-    paddingHorizontal: 14,
-    fontSize: 15,
-    color: colors.textPrimary,
+    borderColor: AppTheme.AppTheme.colors.border,
+    backgroundColor: AppTheme.AppTheme.colors.background,
+    paddingHorizontal: AppTheme.spacing.m,
+    ...AppTheme.typography.body,
+    color: AppTheme.AppTheme.colors.textPrimary,
   },
   addressInput: {
     minHeight: 92,
-    paddingVertical: 12,
+    paddingVertical: AppTheme.spacing.m,
     textAlignVertical: "top",
   },
   primaryButton: {
-    marginTop: 8,
+    marginTop: AppTheme.spacing.s,
     height: 50,
-    borderRadius: 14,
-    backgroundColor: colors.accent,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primary,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
+    gap: AppTheme.spacing.s,
   },
-  primaryButtonText: { color: "#fff", fontSize: 15, fontWeight: "700" },
+  primaryButtonText: { color: "#fff", ...AppTheme.typography.button },
   buttonDisabled: { opacity: 0.6 },
-  logoRow: { flexDirection: "row", alignItems: "center", gap: 12 },
-  logoImage: { width: 64, height: 64, borderRadius: 14 },
+  logoRow: { flexDirection: "row", alignItems: "center", gap: AppTheme.spacing.m },
+  logoImage: { width: 64, height: 64, borderRadius: AppTheme.radius.medium },
   logoFallback: {
     width: 64,
     height: 64,
-    borderRadius: 14,
-    backgroundColor: colors.surfaceMuted,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.AppTheme.colors.background,
+    borderWidth: 1,
+    borderColor: AppTheme.AppTheme.colors.border,
     alignItems: "center",
     justifyContent: "center",
   },
   logoInfo: { flex: 1, gap: 4 },
   signOutButton: {
     height: 52,
-    borderRadius: 16,
+    borderRadius: AppTheme.radius.large,
     borderWidth: 1,
     borderColor: "#FEE2E2",
     backgroundColor: "#FFF5F5",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
+    gap: AppTheme.spacing.s,
+    marginTop: AppTheme.spacing.m,
   },
-  signOutText: { color: "#EF4444", fontSize: 15, fontWeight: "700" },
+  signOutText: { color: AppTheme.colors.error, ...AppTheme.typography.button },
 });

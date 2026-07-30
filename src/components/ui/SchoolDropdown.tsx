@@ -85,9 +85,9 @@ const styles = StyleSheet.create({
     top: 76, 
     left: 0,
     right: 0,
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
     borderRadius: AppTheme.radius.medium,
     ...AppTheme.shadows.card,
     maxHeight: 200,
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: AppTheme.colors.divider,
   },
-  itemName: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.body, fontWeight: "500" },
-  itemSub: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.caption },
-  empty: { padding: AppTheme.spacing.m, color: AppTheme.colors.textSecondary, textAlign: "center" }
+  itemName: { color: AppTheme.AppTheme.colors.textPrimary, ...AppTheme.typography.body, fontWeight: "500" },
+  itemSub: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.caption },
+  empty: { padding: AppTheme.spacing.m, color: AppTheme.AppTheme.colors.textSecondary, textAlign: "center" }
 });

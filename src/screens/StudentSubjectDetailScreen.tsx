@@ -28,7 +28,7 @@ function statusStyle(status: RecordingStatus) {
     case 'processing':
       return { bg: '#FFF4E0', text: '#92400E', label: 'Processing' };
     case 'pending':
-      return { bg: colors.surfaceMuted, text: colors.textSecondary, label: 'Pending' };
+      return { bg: AppTheme.colors.surfaceMuted, text: AppTheme.colors.textSecondary, label: 'Pending' };
     case 'failed':
       return { bg: '#FFF1F1', text: '#B42318', label: 'Failed' };
   }
@@ -99,7 +99,7 @@ export function StudentSubjectDetailScreen({ navigation, route }: Props) {
             navigation.navigate("StudentHome");
           }
         }} style={styles.headerButton}>
-          <Ionicons color={colors.textPrimary} name="arrow-back" size={22} />
+          <Ionicons color={AppTheme.colors.textPrimary} name="arrow-back" size={22} />
         </Pressable>
         <Text numberOfLines={1} style={styles.headerTitle}>
           {subjectName}
@@ -116,7 +116,7 @@ export function StudentSubjectDetailScreen({ navigation, route }: Props) {
               setRefreshing(true);
               void load(true);
             }}
-            tintColor={colors.accent}
+            tintColor={AppTheme.colors.primary}
           />
         }
         showsVerticalScrollIndicator={false}
@@ -150,18 +150,18 @@ export function StudentSubjectDetailScreen({ navigation, route }: Props) {
 
         {isLoading ? (
           <View style={styles.center}>
-            <ActivityIndicator color={colors.accent} size="large" />
+            <ActivityIndicator color={AppTheme.colors.primary} size="large" />
             <Text style={styles.emptyBody}>Loading recordings…</Text>
           </View>
         ) : error ? (
           <View style={styles.center}>
-            <Ionicons color={colors.textMuted} name="cloud-offline-outline" size={40} />
+            <Ionicons color={AppTheme.colors.textSecondary} name="cloud-offline-outline" size={40} />
             <Text style={styles.emptyTitle}>Could not load recordings</Text>
             <Text style={styles.emptyBody}>{error}</Text>
           </View>
         ) : groupedRecordings.length === 0 ? (
           <View style={styles.center}>
-            <Ionicons color={colors.textMuted} name="mic-outline" size={40} />
+            <Ionicons color={AppTheme.colors.textSecondary} name="mic-outline" size={40} />
             <Text style={styles.emptyTitle}>No recordings yet</Text>
             <Text style={styles.emptyBody}>Your teacher has not uploaded recordings for this subject yet.</Text>
           </View>
@@ -182,7 +182,7 @@ export function StudentSubjectDetailScreen({ navigation, route }: Props) {
                       style={styles.card}
                     >
                       <View style={styles.cardIcon}>
-                        <Ionicons color={colors.accent} name="musical-note-outline" size={18} />
+                        <Ionicons color={AppTheme.colors.primary} name="musical-note-outline" size={18} />
                       </View>
                       <View style={styles.cardContent}>
                         <Text numberOfLines={1} style={styles.cardTitle}>
@@ -202,7 +202,7 @@ export function StudentSubjectDetailScreen({ navigation, route }: Props) {
                         <View style={[styles.statusBadge, { backgroundColor: s.bg }]}>
                           <Text style={[styles.statusText, { color: s.text }]}>{s.label}</Text>
                         </View>
-                        <Ionicons color={colors.textMuted} name="chevron-forward" size={16} />
+                        <Ionicons color={AppTheme.colors.textSecondary} name="chevron-forward" size={16} />
                       </View>
                     </Pressable>
                   );
@@ -217,15 +217,15 @@ export function StudentSubjectDetailScreen({ navigation, route }: Props) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
+  safe: { flex: 1, backgroundColor: AppTheme.colors.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: AppTheme.colors.border,
   },
   headerButton: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   headerTitle: {
@@ -233,45 +233,45 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 17,
     fontWeight: '700',
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   scroll: { paddingBottom: 40, gap: 16 },
   hero: {
     padding: 20,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: AppTheme.colors.border,
     gap: 8,
   },
-  heroKicker: { fontSize: 11, fontWeight: '700', letterSpacing: 1.1, color: colors.accent },
-  heroTitle: { fontSize: 30, fontWeight: '800', color: colors.textPrimary, letterSpacing: -0.5 },
-  heroBody: { fontSize: 14, lineHeight: 20, color: colors.textSecondary },
+  heroKicker: { fontSize: 11, fontWeight: '700', letterSpacing: 1.1, color: AppTheme.colors.primary },
+  heroTitle: { fontSize: 30, fontWeight: '800', color: AppTheme.colors.textPrimary, letterSpacing: -0.5 },
+  heroBody: { fontSize: 14, lineHeight: 20, color: AppTheme.colors.textSecondary },
   statsStrip: {
     flexDirection: 'row',
     marginHorizontal: 20,
     marginTop: 16,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     overflow: 'hidden',
   },
   statItem: { flex: 1, alignItems: 'center', paddingVertical: 16, gap: 2 },
-  statValue: { fontSize: 22, fontWeight: '800', color: colors.textPrimary },
-  statLabel: { fontSize: 11, fontWeight: '700', color: colors.textMuted, letterSpacing: 0.8 },
-  statDivider: { width: 1, backgroundColor: colors.border },
+  statValue: { fontSize: 22, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  statLabel: { fontSize: 11, fontWeight: '700', color: AppTheme.colors.textSecondary, letterSpacing: 0.8 },
+  statDivider: { width: 1, backgroundColor: AppTheme.colors.border },
   sectionStack: { paddingHorizontal: 20, gap: 16 },
   section: { gap: 12 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  sectionTitle: { flex: 1, fontSize: 18, fontWeight: '800', color: colors.textPrimary },
+  sectionTitle: { flex: 1, fontSize: 18, fontWeight: '800', color: AppTheme.colors.textPrimary },
   sectionCount: {
     minWidth: 28,
     textAlign: 'center',
     borderRadius: 999,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: colors.surfaceMuted,
-    color: colors.textSecondary,
+    backgroundColor: AppTheme.colors.surfaceMuted,
+    color: AppTheme.colors.textSecondary,
     fontSize: 12,
     fontWeight: '700',
   },
@@ -279,27 +279,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     padding: 14,
   },
   cardIcon: {
     width: 42,
     height: 42,
-    borderRadius: 12,
-    backgroundColor: colors.accentSoft,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cardContent: { flex: 1, gap: 4 },
-  cardTitle: { fontSize: 15, fontWeight: '700', color: colors.textPrimary },
-  cardMeta: { fontSize: 12, color: colors.textMuted },
+  cardTitle: { fontSize: 15, fontWeight: '700', color: AppTheme.colors.textPrimary },
+  cardMeta: { fontSize: 12, color: AppTheme.colors.textSecondary },
   cardRight: { alignItems: 'flex-end', gap: 8 },
   statusBadge: { borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5 },
   statusText: { fontSize: 11, fontWeight: '700' },
   center: { alignItems: 'center', padding: 40, gap: 10 },
-  emptyTitle: { fontSize: 18, fontWeight: '800', color: colors.textPrimary },
-  emptyBody: { fontSize: 14, lineHeight: 20, color: colors.textSecondary, textAlign: 'center' },
+  emptyTitle: { fontSize: 18, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  emptyBody: { fontSize: 14, lineHeight: 20, color: AppTheme.colors.textSecondary, textAlign: 'center' },
 });

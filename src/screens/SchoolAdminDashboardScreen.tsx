@@ -7,9 +7,11 @@ import {
   Pressable,
   Text,
   View,
+  useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { AdminNavbar } from "../components/common/AdminNavbar";
 import { useAuth } from "../context/AuthContext";
 import { getSchoolDashboardOverview, getTeacherRanking } from "../lib/api";
 import { SchoolDashboardOverview, TeacherRanking } from "../types/api";
@@ -23,7 +25,7 @@ import { AppLogo } from "../components/ui/AppLogo";
 type Props = NativeStackScreenProps<RootStackParamList, "SchoolAdminTabs">;
 
 export function SchoolAdminDashboardScreen({ navigation }: Props) {
-  const { session, signOut } = useAuth();
+  const { session } = useAuth();
   const [loading, setLoading] = useState(true);
   const [overview, setOverview] = useState<SchoolDashboardOverview | null>(null);
   const [ranking, setRanking] = useState<TeacherRanking | null>(null);
@@ -52,17 +54,7 @@ export function SchoolAdminDashboardScreen({ navigation }: Props) {
   return (
     <SafeAreaView edges={["top", "bottom"]} style={styles.safe}>
       {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-           <AppLogo hideText size={24} />
-        </View>
-        <Text style={styles.headerTitle}>School Admin</Text>
-        <View style={styles.headerRight}>
-          <Pressable onPress={signOut} style={styles.iconBtn}>
-            <Ionicons color={AppTheme.colors.textPrimary} name="log-out-outline" size={24} />
-          </Pressable>
-        </View>
-      </View>
+      <AdminNavbar title="School Admin" />
 
       <View style={styles.flex}>
         {loading ? (
@@ -113,49 +105,6 @@ export function SchoolAdminDashboardScreen({ navigation }: Props) {
                   </View>
                 </View>
 
-                {/* Quick Actions */}
-                <Text style={styles.sectionTitle}>Quick Actions</Text>
-                <View style={styles.quickGrid}>
-                  <Pressable
-                    style={styles.quickCard}
-                    onPress={() => navigation.navigate("SchoolAdminClasses" as any)}
-                  >
-                    <View style={styles.quickIconContainer}>
-                      <Ionicons name="school" size={24} color={AppTheme.colors.primary} />
-                    </View>
-                    <View style={styles.quickTextContainer}>
-                      <Text style={styles.quickTitle}>Classes</Text>
-                      <Text style={styles.quickSubtitle}>Manage</Text>
-                    </View>
-                  </Pressable>
-
-                  <Pressable
-                    style={styles.quickCard}
-                    onPress={() => navigation.navigate("SchoolAdminPlanner" as any)}
-                  >
-                    <View style={styles.quickIconContainer}>
-                      <Ionicons name="calendar-outline" size={24} color={AppTheme.colors.primary} />
-                    </View>
-                    <View style={styles.quickTextContainer}>
-                      <Text style={styles.quickTitle}>Planner</Text>
-                      <Text style={styles.quickSubtitle}>Manage</Text>
-                    </View>
-                  </Pressable>
-
-                  <Pressable
-                    style={styles.quickCard}
-                    onPress={() => navigation.navigate("SchoolAdminTimetable" as any)}
-                  >
-                    <View style={styles.quickIconContainer}>
-                      <Ionicons name="calendar" size={24} color={AppTheme.colors.primary} />
-                    </View>
-                    <View style={styles.quickTextContainer}>
-                      <Text style={styles.quickTitle}>Timetable</Text>
-                      <Text style={styles.quickSubtitle}>Manage</Text>
-                    </View>
-                  </Pressable>
-                </View>
-
                 {/* Top Teachers */}
                 {ranking && ranking.teachers.length > 0 && (
                   <>
@@ -201,7 +150,7 @@ export function SchoolAdminDashboardScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: AppTheme.colors.background,
+    backgroundColor: AppTheme.AppTheme.colors.background,
   },
   flex: { flex: 1 },
   scroll: {
@@ -218,52 +167,21 @@ const styles = StyleSheet.create({
     maxWidth: 800,
     gap: AppTheme.spacing.l,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: AppTheme.spacing.l,
-    paddingVertical: AppTheme.spacing.m,
-    backgroundColor: AppTheme.colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: AppTheme.colors.border,
-  },
-  headerLeft: {
-    width: 60,
-    alignItems: "flex-start",
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: "center",
-    color: AppTheme.colors.textPrimary,
-    ...AppTheme.typography.h3,
-  },
-  headerRight: {
-    flexDirection: "row",
-    gap: AppTheme.spacing.s,
-    width: 60,
-    justifyContent: "flex-end",
-  },
-  iconBtn: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   pageHeading: {
     gap: AppTheme.spacing.s,
     marginBottom: AppTheme.spacing.xs,
   },
   pageTitle: {
-    color: AppTheme.colors.textPrimary,
-    ...AppTheme.typography.h1,
+    color: AppTheme.AppTheme.colors.textPrimary,
+    ...AppTheme.typography.heading1,
   },
   pageSubtitle: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
   },
   sectionTitle: {
-    color: AppTheme.colors.textPrimary,
-    ...AppTheme.typography.h3,
+    color: AppTheme.AppTheme.colors.textPrimary,
+    ...AppTheme.typography.heading3,
     marginTop: AppTheme.spacing.s,
   },
   statsGrid: {
@@ -274,44 +192,44 @@ const styles = StyleSheet.create({
   statCard: {
     flex: 1,
     minWidth: 100,
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     paddingVertical: AppTheme.spacing.xl,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
   },
   statNumber: {
     color: AppTheme.colors.primary,
-    ...AppTheme.typography.h1,
+    ...AppTheme.typography.heading1,
   },
   statLabel: {
     marginTop: AppTheme.spacing.xs,
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
   },
   recordingCard: {
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     padding: AppTheme.spacing.xl,
     flexDirection: "row",
     justifyContent: "space-between",
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
   },
   recordTitle: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
   },
   recordValue: {
     marginTop: AppTheme.spacing.xs,
-    color: AppTheme.colors.textPrimary,
-    ...AppTheme.typography.h1,
+    color: AppTheme.AppTheme.colors.textPrimary,
+    ...AppTheme.typography.heading1,
   },
   pendingValue: {
     marginTop: AppTheme.spacing.xs,
     color: AppTheme.colors.error,
-    ...AppTheme.typography.h1,
+    ...AppTheme.typography.heading1,
   },
   quickGrid: {
     flexDirection: "row",
@@ -321,14 +239,14 @@ const styles = StyleSheet.create({
   quickCard: {
     flex: 1,
     minWidth: 150,
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     padding: AppTheme.spacing.l,
     flexDirection: "row",
     alignItems: "center",
     gap: AppTheme.spacing.m,
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
   },
   quickIconContainer: {
     width: 44,
@@ -342,22 +260,22 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   quickTitle: {
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.bodyLarge,
     fontWeight: "700",
   },
   quickSubtitle: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.caption,
   },
   list: {
     gap: AppTheme.spacing.m,
   },
   card: {
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
   },
   cardTop: {
     flexDirection: "row",
@@ -369,7 +287,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: AppTheme.radius.medium,
-    backgroundColor: AppTheme.colors.background,
+    backgroundColor: AppTheme.AppTheme.colors.background,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -381,11 +299,11 @@ const styles = StyleSheet.create({
     gap: AppTheme.spacing.xs,
   },
   cardName: {
-    color: AppTheme.colors.textPrimary,
-    ...AppTheme.typography.h3,
+    color: AppTheme.AppTheme.colors.textPrimary,
+    ...AppTheme.typography.heading3,
   },
   cardAddress: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
   },
   scoreContainer: {
@@ -393,6 +311,6 @@ const styles = StyleSheet.create({
   },
   teacherScore: {
     color: AppTheme.colors.primary,
-    ...AppTheme.typography.h2,
+    ...AppTheme.typography.heading2,
   },
 });

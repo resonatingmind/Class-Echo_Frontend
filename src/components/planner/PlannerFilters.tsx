@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 
 type Props = {
   search: string;
@@ -65,13 +65,13 @@ export function PlannerFilters({
   return (
     <>
       <View style={styles.searchContainer}>
-        <Ionicons name="search-outline" size={20} color={colors.textMuted} />
+        <Ionicons name="search-outline" size={20} color={AppTheme.colors.textSecondary} />
 
         <TextInput
           value={search}
           onChangeText={onSearchChange}
           placeholder="Search class, subject or teacher"
-          placeholderTextColor={colors.textPlaceholder}
+          placeholderTextColor={AppTheme.colors.textPlaceholder}
           style={styles.input}
         />
       </View>
@@ -84,7 +84,7 @@ export function PlannerFilters({
         <Ionicons
           name="filter-outline"
           size={16}
-          color={colors.textMuted}
+          color={AppTheme.colors.textSecondary}
           style={{ marginRight: 2 }}
         />
 
@@ -161,10 +161,10 @@ function FilterChip({ title, selected, onPress, onClear }: FilterChipProps) {
             onClear?.();
           }}
         >
-          <Ionicons name="close-circle" size={16} color={colors.accentDark} />
+          <Ionicons name="close-circle" size={16} color={AppTheme.colors.primaryDark} />
         </Pressable>
       ) : (
-        <Ionicons name="chevron-down" size={16} color={colors.textMuted} />
+        <Ionicons name="chevron-down" size={16} color={AppTheme.colors.textSecondary} />
       )}
     </Pressable>
   );
@@ -173,11 +173,11 @@ function FilterChip({ title, selected, onPress, onClear }: FilterChipProps) {
 const styles = StyleSheet.create({
   searchContainer: {
     height: 48,
-    borderRadius: 12,
-    backgroundColor: colors.surface,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.surface,
 
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
 
     flexDirection: "row",
     alignItems: "center",
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     marginLeft: 10,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 15,
   },
 
@@ -208,9 +208,9 @@ const styles = StyleSheet.create({
     borderRadius: 999,
 
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
 
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
 
     paddingHorizontal: 12,
 
@@ -220,17 +220,17 @@ const styles = StyleSheet.create({
   },
 
   filterSelected: {
-    borderColor: colors.accent,
-    backgroundColor: colors.accentSoft,
+    borderColor: AppTheme.colors.primary,
+    backgroundColor: AppTheme.colors.primarySoft,
   },
 
   filterText: {
     fontSize: 13,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontWeight: "600",
   },
   selectedText: {
-    color: colors.accentDark,
+    color: AppTheme.colors.primaryDark,
   },
 
   clearAll: {
@@ -242,6 +242,6 @@ const styles = StyleSheet.create({
   clearAllText: {
     fontSize: 13,
     fontWeight: "600",
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 });

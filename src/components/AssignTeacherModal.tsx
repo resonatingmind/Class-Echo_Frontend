@@ -77,7 +77,7 @@ export function AssignTeacherModal({
 
           {teachers.length === 0 ? (
             <View style={styles.noTeachersBox}>
-              <Ionicons color={colors.textMuted} name="people-outline" size={32} />
+              <Ionicons color={AppTheme.colors.textSecondary} name="people-outline" size={32} />
               <Text style={styles.noTeachersText}>
                 No teachers available. Add faculty from the Teachers tab first.
               </Text>
@@ -104,11 +104,11 @@ export function AssignTeacherModal({
                       <Text style={styles.teacherEmail}>{teacher.email}</Text>
                     </View>
                     {isAssigning ? (
-                      <ActivityIndicator color={colors.accent} size="small" />
+                      <ActivityIndicator color={AppTheme.colors.primary} size="small" />
                     ) : isCurrentTeacher ? (
-                      <Ionicons color={colors.accent} name="checkmark-circle" size={20} />
+                      <Ionicons color={AppTheme.colors.primary} name="checkmark-circle" size={20} />
                     ) : (
-                      <Ionicons color={colors.textMuted} name="chevron-forward" size={18} />
+                      <Ionicons color={AppTheme.colors.textSecondary} name="chevron-forward" size={18} />
                     )}
                   </Pressable>
                 );
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalSheet: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -140,18 +140,18 @@ const styles = StyleSheet.create({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.border,
+    backgroundColor: AppTheme.colors.border,
     alignSelf: 'center',
     marginBottom: 8,
   },
-  modalTitle: { color: colors.textPrimary, fontSize: 20, fontWeight: '800' },
-  modalSubtitle: { color: colors.textSecondary, fontSize: 14, lineHeight: 20 },
+  modalTitle: { color: AppTheme.colors.textPrimary, fontSize: 20, fontWeight: '800' },
+  modalSubtitle: { color: AppTheme.colors.textSecondary, fontSize: 14, lineHeight: 20 },
   modalError: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     backgroundColor: '#FFF1F1',
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
@@ -164,33 +164,33 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 4,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: AppTheme.colors.border,
   },
   teacherRowActive: {
-    backgroundColor: colors.accentSoft + '55',
-    borderRadius: 12,
+    backgroundColor: AppTheme.colors.primarySoft + '55',
+    borderRadius: AppTheme.radius.medium,
   },
   teacherAvatar: {
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: AppTheme.colors.surfaceMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  teacherAvatarActive: { backgroundColor: colors.accentSoft },
+  teacherAvatarActive: { backgroundColor: AppTheme.colors.primarySoft },
   teacherAvatarText: {
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontSize: 13,
     fontWeight: '800',
   },
-  teacherAvatarTextActive: { color: colors.accentDark },
+  teacherAvatarTextActive: { color: AppTheme.colors.primaryDark },
   teacherInfo: { flex: 1, gap: 2 },
-  teacherName: { color: colors.textPrimary, fontSize: 15, fontWeight: '700' },
-  teacherEmail: { color: colors.textMuted, fontSize: 12 },
+  teacherName: { color: AppTheme.colors.textPrimary, fontSize: 15, fontWeight: '700' },
+  teacherEmail: { color: AppTheme.colors.textSecondary, fontSize: 12 },
   noTeachersBox: { alignItems: 'center', padding: 24, gap: 10 },
   noTeachersText: {
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontSize: 14,
     textAlign: 'center',
     lineHeight: 20,

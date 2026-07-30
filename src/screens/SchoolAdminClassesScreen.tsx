@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { ScreenHeader } from "../components/common/ScreenHeader";
+import { AdminNavbar } from "../components/common/AdminNavbar";
 import { useAuth } from "../context/AuthContext";
 import {
   createSchoolAdminClass,
@@ -23,7 +23,7 @@ import {
   getSchoolAdminTeachers,
 } from "../lib/api";
 import { RootStackParamList } from "../navigation/AppNavigator";
-import { colors } from "../theme/colors";
+import { AppTheme } from "../theme/AppTheme";
 import { ClassOut } from "../types/api";
 
 
@@ -31,7 +31,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "SchoolAdminClasses">;
 
 // Cycling accent colors for class cards
 const CLASS_COLORS = [
-  { bg: "#D1E4FF", text: colors.accentDark },
+  { bg: "#D1E4FF", text: AppTheme.colors.primary },
   { bg: "#E8F7EE", text: "#127A40" },
   { bg: "#FFF4E0", text: "#92400E" },
   { bg: "#F5F0FF", text: "#6B21A8" },
@@ -72,7 +72,7 @@ function ClassCard({
           </Text>
         </View>
       </View>
-      <Ionicons color={colors.textMuted} name="chevron-forward" size={18} />
+      <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="chevron-forward" size={18} />
     </Pressable>
   );
 }
@@ -145,7 +145,7 @@ function CreateClassModal({
               onChangeText={setName}
               onSubmitEditing={handleCreate}
               placeholder="e.g. Class 10B"
-              placeholderTextColor={colors.textPlaceholder}
+              placeholderTextColor={AppTheme.AppTheme.colors.textPlaceholder}
               returnKeyType="done"
               style={styles.modalInput}
               value={name}
@@ -159,7 +159,7 @@ function CreateClassModal({
               value={section}
               onChangeText={setSection}
               placeholder="e.g. A"
-              placeholderTextColor={colors.textPlaceholder}
+              placeholderTextColor={AppTheme.AppTheme.colors.textPlaceholder}
               autoCapitalize="characters"
               maxLength={20}
               style={styles.modalInput}
@@ -236,93 +236,90 @@ export function SchoolAdminClassesScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>
-      <ScreenHeader
-        title="Classes"
-        onBack={() => {
-          if (navigation.canGoBack()) {
-            navigation.goBack();
-          } else {
-            navigation.navigate("SchoolAdminTabs", {
-              screen: "SchoolAdminDashboard",
-            });
+      <AdminNavbar title="Classes" />
+
+      <View style={styles.flex}>
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          refreshControl={
+            <RefreshControl
+              onRefresh={onRefresh}
+              refreshing={refreshing}
+              tintColor={AppTheme.colors.primary}
+            />
           }
-        }}
-        rightActions={
-          <Pressable onPress={() => setShowCreate(true)} style={styles.tabAddBtn}>
-            <Ionicons color="#fff" name="add" size={20} />
-          </Pressable>
-        }
-      />
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.centerContainer}>
+            <View style={styles.body}>
+              {/* Page heading */}
+              <View style={styles.pageHeading}>
+                <Text style={styles.pageTitle}>Academic Classes</Text>
+                <Text style={styles.pageSubtitle}>
+                  Managing {classes.length} active classroom
+                  {classes.length !== 1 ? "s" : ""} for the current session.
+                </Text>
+                <Pressable
+                  onPress={() => setShowCreate(true)}
+                  style={styles.addClassBtn}
+                >
+                  <Ionicons color="#fff" name="add" size={16} />
+                  <Text style={styles.addClassText}>Add Class</Text>
+                </Pressable>
+              </View>
 
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        refreshControl={
-          <RefreshControl
-            onRefresh={onRefresh}
-            refreshing={refreshing}
-            tintColor={colors.accent}
-          />
-        }
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Page heading */}
-        <View style={styles.pageHeading}>
-          <Text style={styles.pageTitle}>Academic Classes</Text>
-          <Text style={styles.pageSubtitle}>
-            Managing {classes.length} active classroom
-            {classes.length !== 1 ? "s" : ""} for the current session.
-          </Text>
-        </View>
-
-        {isLoading ? (
-          <View style={styles.center}>
-            <ActivityIndicator color={colors.accent} size="large" />
-            <Text style={styles.loadingText}>Loading classes…</Text>
+              {isLoading ? (
+                <View style={styles.center}>
+                  <ActivityIndicator color={AppTheme.colors.primary} size="large" />
+                  <Text style={styles.loadingText}>Loading classes…</Text>
+                </View>
+              ) : error ? (
+                <View style={styles.center}>
+                  <Ionicons
+                    color={AppTheme.AppTheme.colors.textSecondary}
+                    name="cloud-offline-outline"
+                    size={40}
+                  />
+                  <Text style={styles.emptyTitle}>Could not load classes</Text>
+                  <Text style={styles.emptyBody}>{error}</Text>
+                  <Pressable onPress={() => void load()} style={styles.retryBtn}>
+                    <Text style={styles.retryText}>Retry</Text>
+                  </Pressable>
+                </View>
+              ) : classes.length === 0 ? (
+                <View style={styles.center}>
+                  <Ionicons
+                    color={AppTheme.AppTheme.colors.textSecondary}
+                    name="school-outline"
+                    size={44}
+                  />
+                  <Text style={styles.emptyTitle}>No classes yet</Text>
+                  <Text style={styles.emptyBody}>
+                    Create your first class to start organizing subjects.
+                  </Text>
+                </View>
+              ) : (
+                <View style={styles.list}>
+                  {classes.map((cls, idx) => (
+                    <ClassCard
+                      key={cls.id}
+                      classItem={cls}
+                      colorIdx={idx}
+                      onPress={() =>
+                        navigation.navigate("SchoolAdminClassDetail", {
+                          classId: cls.id,
+                          className: cls.name,
+                          section: cls.section,
+                        })
+                      }
+                    />
+                  ))}
+                </View>
+              )}
+            </View>
           </View>
-        ) : error ? (
-          <View style={styles.center}>
-            <Ionicons
-              color={colors.textMuted}
-              name="cloud-offline-outline"
-              size={40}
-            />
-            <Text style={styles.emptyTitle}>Could not load classes</Text>
-            <Text style={styles.emptyBody}>{error}</Text>
-            <Pressable onPress={() => void load()} style={styles.retryBtn}>
-              <Text style={styles.retryText}>Retry</Text>
-            </Pressable>
-          </View>
-        ) : classes.length === 0 ? (
-          <View style={styles.center}>
-            <Ionicons
-              color={colors.textMuted}
-              name="school-outline"
-              size={44}
-            />
-            <Text style={styles.emptyTitle}>No classes yet</Text>
-            <Text style={styles.emptyBody}>
-              Create your first class to start organizing subjects.
-            </Text>
-          </View>
-        ) : (
-          <View style={styles.list}>
-            {classes.map((cls, idx) => (
-              <ClassCard
-                key={cls.id}
-                classItem={cls}
-                colorIdx={idx}
-                onPress={() =>
-                  navigation.navigate("SchoolAdminClassDetail", {
-                    classId: cls.id,
-                    className: cls.name,
-                    section: cls.section,
-                  })
-                }
-              />
-            ))}
-          </View>
-        )}
-      </ScrollView>
+        </ScrollView>
+      </View>
 
       <CreateClassModal
         onClose={() => setShowCreate(false)}
@@ -334,74 +331,83 @@ export function SchoolAdminClassesScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  tabAddBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.accent,
+  safe: { flex: 1, backgroundColor: AppTheme.AppTheme.colors.background },
+  flex: { flex: 1 },
+  scroll: { flexGrow: 1 },
+  centerContainer: {
+    flex: 1,
     alignItems: "center",
-    justifyContent: "center",
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.xl,
   },
-  scroll: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 32,
-    gap: 20,
+  body: {
+    width: "100%",
+    maxWidth: 800,
+    gap: AppTheme.spacing.l,
   },
-  pageHeading: { gap: 6 },
+  pageHeading: { gap: AppTheme.spacing.s, marginBottom: AppTheme.spacing.m },
   pageTitle: {
-    color: colors.textPrimary,
-    fontSize: 28,
-    fontWeight: "800",
-    letterSpacing: -0.5,
+    color: AppTheme.AppTheme.colors.textPrimary,
+    ...AppTheme.typography.heading1,
   },
-  pageSubtitle: { color: colors.textSecondary, fontSize: 14, lineHeight: 20 },
+  pageSubtitle: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.body },
+  addClassBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    alignSelf: "flex-start",
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primary,
+    paddingHorizontal: AppTheme.spacing.m,
+    paddingVertical: AppTheme.spacing.s,
+    marginTop: AppTheme.spacing.xs,
+  },
+  addClassText: { color: "#fff", ...AppTheme.typography.button },
   center: {
     alignItems: "center",
-    paddingVertical: 48,
-    gap: 10,
+    paddingVertical: AppTheme.spacing.huge,
+    gap: AppTheme.spacing.m,
   },
-  loadingText: { color: colors.textSecondary, fontSize: 14 },
-  emptyTitle: { color: colors.textPrimary, fontSize: 16, fontWeight: "700" },
-  emptyBody: { color: colors.textSecondary, fontSize: 14, textAlign: "center" },
+  loadingText: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.body },
+  emptyTitle: { color: AppTheme.AppTheme.colors.textPrimary, ...AppTheme.typography.heading3 },
+  emptyBody: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.body, textAlign: "center" },
   retryBtn: {
-    marginTop: 8,
-    borderRadius: 10,
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    marginTop: AppTheme.spacing.s,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primaryLight,
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.m,
   },
-  retryText: { color: colors.accentDark, fontWeight: "700", fontSize: 14 },
-  list: { gap: 12 },
+  retryText: { color: AppTheme.colors.primary, ...AppTheme.typography.button },
+  list: { gap: AppTheme.spacing.m },
   // Class Card
   card: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: colors.surface,
-    borderRadius: 16,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: colors.border,
-    padding: 16,
+    borderColor: AppTheme.AppTheme.colors.border,
+    padding: AppTheme.spacing.l,
   },
-  cardLeft: { flexDirection: "row", alignItems: "center", gap: 14, flex: 1 },
+  cardLeft: { flexDirection: "row", alignItems: "center", gap: AppTheme.spacing.m, flex: 1 },
   cardIcon: {
     width: 48,
     height: 48,
-    borderRadius: 14,
+    borderRadius: AppTheme.radius.medium,
     alignItems: "center",
     justifyContent: "center",
   },
-  cardIconText: { fontSize: 16, fontWeight: "800" },
+  cardIconText: { ...AppTheme.typography.heading3 },
   cardInfo: { flex: 1, gap: 4 },
-  cardName: { color: colors.textPrimary, fontSize: 16, fontWeight: "700" },
+  cardName: { color: AppTheme.AppTheme.colors.textPrimary, ...AppTheme.typography.heading3 },
   cardSection: {
-    color: colors.accent,
-    fontSize: 13,
+    color: AppTheme.colors.primary,
+    ...AppTheme.typography.body,
     fontWeight: "600",
   },
-  cardDate: { color: colors.textMuted, fontSize: 12 },
+  cardDate: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.caption },
   // Modal
   modalOverlay: {
     flex: 1,
@@ -409,9 +415,9 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modalSheet: {
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
+    borderTopLeftRadius: AppTheme.radius.large,
+    borderTopRightRadius: AppTheme.radius.large,
     padding: 24,
     paddingBottom: 40,
     gap: 16,
@@ -420,63 +426,60 @@ const styles = StyleSheet.create({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.border,
+    backgroundColor: AppTheme.AppTheme.colors.border,
     alignSelf: "center",
     marginBottom: 8,
   },
-  modalTitle: { color: colors.textPrimary, fontSize: 20, fontWeight: "800" },
-  modalSubtitle: { color: colors.textSecondary, fontSize: 14, lineHeight: 20 },
+  modalTitle: { color: AppTheme.AppTheme.colors.textPrimary, ...AppTheme.typography.heading2 },
+  modalSubtitle: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.body },
   modalField: { gap: 8 },
   modalFieldLabel: {
-    color: colors.textMuted,
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 0.8,
+    color: AppTheme.AppTheme.colors.textSecondary,
+    ...AppTheme.typography.caption,
     textTransform: "uppercase",
   },
   modalInput: {
     height: 52,
-    borderRadius: 12,
-    backgroundColor: colors.background,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.AppTheme.colors.background,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
     paddingHorizontal: 16,
-    fontSize: 16,
-    color: colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
+    ...AppTheme.typography.body,
   },
   modalError: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
     backgroundColor: "#FFF1F1",
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
-  modalErrorText: { color: "#B42318", fontSize: 13, flex: 1 },
+  modalErrorText: { color: "#B42318", flex: 1, ...AppTheme.typography.body },
   modalActions: { flexDirection: "row", gap: 12, marginTop: 4 },
   modalCancelBtn: {
     flex: 1,
     height: 50,
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
     alignItems: "center",
     justifyContent: "center",
   },
   modalCancelText: {
-    color: colors.textSecondary,
-    fontWeight: "600",
-    fontSize: 15,
+    color: AppTheme.AppTheme.colors.textSecondary,
+    ...AppTheme.typography.button,
   },
   modalSubmitBtn: {
     flex: 1,
     height: 50,
-    borderRadius: 12,
-    backgroundColor: colors.accent,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },
   btnDisabled: { opacity: 0.45 },
-  modalSubmitText: { color: "#fff", fontWeight: "700", fontSize: 15 },
+  modalSubmitText: { color: "#fff", ...AppTheme.typography.button },
 });

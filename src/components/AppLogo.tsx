@@ -37,11 +37,11 @@ const styles = StyleSheet.create({
   badge: {
     width: 40,
     height: 40,
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.accentDark,
-    shadowColor: colors.accentDark,
+    backgroundColor: AppTheme.colors.primaryDark,
+    shadowColor: AppTheme.colors.primaryDark,
     shadowOpacity: 0.18,
     shadowRadius: 12,
     shadowOffset: {
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '90deg' }],
   },
   wordmark: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 24,
     fontWeight: '700',
     letterSpacing: -0.6,

@@ -407,7 +407,7 @@ export function RecordingScreen({ navigation, route }: Props) {
           }}
           style={styles.headerBack}
         >
-          <Ionicons color={colors.textPrimary} name="arrow-back" size={22} />
+          <Ionicons color={AppTheme.colors.textPrimary} name="arrow-back" size={22} />
         </Pressable>
         <Text style={styles.headerTitle} numberOfLines={1}>{subjectName}</Text>
         <View style={styles.headerSpacer} />
@@ -418,7 +418,7 @@ export function RecordingScreen({ navigation, route }: Props) {
           <>
             <View style={styles.hero}>
               <View style={styles.micRing}>
-                <Ionicons color={colors.accent} name="mic" size={52} />
+                <Ionicons color={AppTheme.colors.primary} name="mic" size={52} />
               </View>
               <Text style={styles.idleTitle}>Start Classroom Recording</Text>
               <Text style={styles.idleSubtitle}>
@@ -434,7 +434,7 @@ export function RecordingScreen({ navigation, route }: Props) {
                 <Ionicons
                   name={isDictatingEnabled ? 'chatbubble-ellipses' : 'chatbubble-ellipses-outline'}
                   size={20}
-                  color={isDictatingEnabled ? colors.accent : colors.textMuted}
+                  color={isDictatingEnabled ? AppTheme.colors.primary : AppTheme.colors.textSecondary}
                 />
                 <Text style={styles.toggleLabel}>Enable Live Dictation (Web Speech API)</Text>
                 <View style={[styles.toggleOuter, isDictatingEnabled && styles.toggleOuterActive]}>
@@ -481,7 +481,7 @@ export function RecordingScreen({ navigation, route }: Props) {
             {isSpeechSupported && isDictatingEnabled && (
               <View style={styles.dictationCard}>
                 <View style={styles.dictationHeader}>
-                  <Ionicons name="chatbubble-ellipses" size={16} color={dictationError ? '#E53935' : colors.accent} />
+                  <Ionicons name="chatbubble-ellipses" size={16} color={dictationError ? '#E53935' : AppTheme.colors.primary} />
                   <Text style={styles.dictationTitle}>
                     {dictationError ? `Dictation Error: ${dictationError}` : 'Live Dictation Transcript'}
                   </Text>
@@ -508,7 +508,7 @@ export function RecordingScreen({ navigation, route }: Props) {
 
             <View style={styles.recordingActions}>
               <Pressable onPress={() => void cancelRecording()} style={styles.cancelBtn}>
-                <Ionicons color={colors.textSecondary} name="close" size={22} />
+                <Ionicons color={AppTheme.colors.textSecondary} name="close" size={22} />
                 <Text style={styles.cancelBtnText}>Discard</Text>
               </Pressable>
               <Pressable onPress={() => void stopRecording()} style={styles.stopBtn}>
@@ -539,10 +539,10 @@ export function RecordingScreen({ navigation, route }: Props) {
               <Pressable onPress={() => void togglePreview()} style={styles.previewButton}>
                 <View style={styles.previewIcon}>
                   {!previewStatus.isLoaded ? (
-                    <ActivityIndicator color={colors.accent} size="small" />
+                    <ActivityIndicator color={AppTheme.colors.primary} size="small" />
                   ) : (
                     <Ionicons
-                      color={colors.accent}
+                      color={AppTheme.colors.primary}
                       name={previewStatus.playing ? 'pause' : 'play'}
                       size={22}
                     />
@@ -564,12 +564,12 @@ export function RecordingScreen({ navigation, route }: Props) {
                 paddingHorizontal: 14,
                 paddingVertical: 12,
                 borderRadius: 16,
-                backgroundColor: colors.surfaceMuted,
+                backgroundColor: AppTheme.colors.surfaceMuted,
                 borderWidth: 1,
-                borderColor: colors.border,
+                borderColor: AppTheme.colors.border,
                 marginBottom: 12,
               }}>
-                <Text style={{ color: colors.textPrimary, fontSize: 15, fontWeight: '600' }}>
+                <Text style={{ color: AppTheme.colors.textPrimary, fontSize: 15, fontWeight: '600' }}>
                   {paramChapterName}
                 </Text>
               </View>
@@ -584,13 +584,13 @@ export function RecordingScreen({ navigation, route }: Props) {
                         style={{
                           paddingHorizontal: 12,
                           paddingVertical: 8,
-                          borderRadius: 10,
+                          borderRadius: AppTheme.radius.medium,
                           borderWidth: 1,
-                          borderColor: selectedLearningPlanId === undefined ? "#0284C7" : colors.border,
-                          backgroundColor: selectedLearningPlanId === undefined ? "#E0F2FE" : colors.surface,
+                          borderColor: selectedLearningPlanId === undefined ? "#0284C7" : AppTheme.colors.border,
+                          backgroundColor: selectedLearningPlanId === undefined ? "#E0F2FE" : AppTheme.colors.surface,
                         }}
                       >
-                        <Text style={{ fontSize: 13, color: selectedLearningPlanId === undefined ? "#0369A1" : colors.textSecondary, fontWeight: '600' }}>
+                        <Text style={{ fontSize: 13, color: selectedLearningPlanId === undefined ? "#0369A1" : AppTheme.colors.textSecondary, fontWeight: '600' }}>
                           None (General Chapter)
                         </Text>
                       </Pressable>
@@ -603,17 +603,17 @@ export function RecordingScreen({ navigation, route }: Props) {
                             style={{
                               paddingHorizontal: 12,
                               paddingVertical: 8,
-                              borderRadius: 10,
+                              borderRadius: AppTheme.radius.medium,
                               borderWidth: 1,
-                              borderColor: isSel ? "#0284C7" : colors.border,
-                              backgroundColor: isSel ? "#E0F2FE" : colors.surface,
+                              borderColor: isSel ? "#0284C7" : AppTheme.colors.border,
+                              backgroundColor: isSel ? "#E0F2FE" : AppTheme.colors.surface,
                             }}
                           >
-                            <Text style={{ fontSize: 13, color: isSel ? "#0369A1" : colors.textPrimary, fontWeight: '700' }}>
+                            <Text style={{ fontSize: 13, color: isSel ? "#0369A1" : AppTheme.colors.textPrimary, fontWeight: '700' }}>
                               {lp.sub_topic}
                             </Text>
                             {lp.topic_name ? (
-                              <Text style={{ fontSize: 11, color: isSel ? "#0284C7" : colors.textMuted }}>
+                              <Text style={{ fontSize: 11, color: isSel ? "#0284C7" : AppTheme.colors.textSecondary }}>
                                 {lp.topic_name} {lp.date ? `(${lp.date})` : ''}
                               </Text>
                             ) : null}
@@ -635,7 +635,7 @@ export function RecordingScreen({ navigation, route }: Props) {
                   }
                 }}
                 placeholder="Enter lecture title"
-                placeholderTextColor={colors.textPlaceholder}
+                placeholderTextColor={AppTheme.colors.textPlaceholder}
                 style={[styles.input, lectureTitleError && { borderColor: '#E53935' }]}
                 value={lectureTitle}
               />
@@ -652,7 +652,7 @@ export function RecordingScreen({ navigation, route }: Props) {
                 numberOfLines={4}
                 onChangeText={setDescription}
                 placeholder="Optional summary or notes for this class"
-                placeholderTextColor={colors.textPlaceholder}
+                placeholderTextColor={AppTheme.colors.textPlaceholder}
                 style={[styles.input, styles.descriptionInput]}
                 value={description}
               />
@@ -660,7 +660,7 @@ export function RecordingScreen({ navigation, route }: Props) {
 
             <View style={styles.footerActions}>
               <Pressable onPress={() => void reRecord()} style={styles.secondaryBtn}>
-                <Ionicons color={colors.textSecondary} name="refresh-outline" size={18} />
+                <Ionicons color={AppTheme.colors.textSecondary} name="refresh-outline" size={18} />
                 <Text style={styles.secondaryBtnText}>Record Again</Text>
               </Pressable>
               <Pressable
@@ -682,18 +682,18 @@ export function RecordingScreen({ navigation, route }: Props) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
+  safe: { flex: 1, backgroundColor: AppTheme.colors.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: AppTheme.colors.border,
   },
   headerBack: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { flex: 1, textAlign: 'center', fontSize: 17, fontWeight: '700', color: colors.textPrimary },
+  headerTitle: { flex: 1, textAlign: 'center', fontSize: 17, fontWeight: '700', color: AppTheme.colors.textPrimary },
   headerSpacer: { width: 36 },
   body: { flex: 1 },
   scrollBody: { padding: 20, gap: 18, paddingBottom: 40 },
@@ -702,15 +702,15 @@ const styles = StyleSheet.create({
     width: 132,
     height: 132,
     borderRadius: 66,
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  idleTitle: { fontSize: 30, fontWeight: '800', color: colors.textPrimary },
+  idleTitle: { fontSize: 30, fontWeight: '800', color: AppTheme.colors.textPrimary },
   idleSubtitle: {
     fontSize: 15,
     lineHeight: 22,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     textAlign: 'center',
     maxWidth: 320,
   },
@@ -724,7 +724,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
     paddingVertical: 16,
     paddingHorizontal: 12,
     borderRadius: 18,
@@ -748,7 +748,7 @@ const styles = StyleSheet.create({
   liveRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   liveDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#E53935' },
   liveLabel: { fontSize: 12, fontWeight: '800', letterSpacing: 1.2, color: '#E53935' },
-  timerText: { fontSize: 38, fontWeight: '800', color: colors.textPrimary },
+  timerText: { fontSize: 38, fontWeight: '800', color: AppTheme.colors.textPrimary },
   waveformCard: {
     flex: 1,
     justifyContent: 'center',
@@ -767,11 +767,11 @@ const styles = StyleSheet.create({
     gap: 8,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
+    borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.surface,
     paddingVertical: 16,
   },
-  cancelBtnText: { color: colors.textSecondary, fontSize: 15, fontWeight: '700' },
+  cancelBtnText: { color: AppTheme.colors.textSecondary, fontSize: 15, fontWeight: '700' },
   stopBtn: {
     flex: 1,
     flexDirection: 'row',
@@ -793,56 +793,56 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  doneTitle: { fontSize: 24, fontWeight: '800', color: colors.textPrimary },
-  doneDuration: { fontSize: 14, color: colors.textSecondary },
+  doneTitle: { fontSize: 24, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  doneDuration: { fontSize: 14, color: AppTheme.colors.textSecondary },
   previewCard: {
     padding: 16,
     borderRadius: 20,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     gap: 14,
   },
   previewHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
-  previewTitle: { fontSize: 16, fontWeight: '800', color: colors.textPrimary },
-  previewMeta: { fontSize: 12, color: colors.textMuted, fontWeight: '600' },
+  previewTitle: { fontSize: 16, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  previewMeta: { fontSize: 12, color: AppTheme.colors.textSecondary, fontWeight: '600' },
   previewButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
     padding: 14,
     borderRadius: 18,
-    backgroundColor: colors.surfaceSoft,
+    backgroundColor: AppTheme.colors.surfaceSoft,
   },
   previewIcon: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
   previewTextWrap: { flex: 1, gap: 3 },
-  previewTextTitle: { fontSize: 15, fontWeight: '700', color: colors.textPrimary },
-  previewTextBody: { fontSize: 13, lineHeight: 18, color: colors.textSecondary },
+  previewTextTitle: { fontSize: 15, fontWeight: '700', color: AppTheme.colors.textPrimary },
+  previewTextBody: { fontSize: 13, lineHeight: 18, color: AppTheme.colors.textSecondary },
   metaCard: {
     padding: 18,
     borderRadius: 20,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     gap: 10,
   },
-  metaLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 0.9, color: colors.textMuted },
+  metaLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 0.9, color: AppTheme.colors.textSecondary },
   input: {
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     borderRadius: 16,
-    backgroundColor: colors.surfaceSoft,
+    backgroundColor: AppTheme.colors.surfaceSoft,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   descriptionInput: { minHeight: 96, textAlignVertical: 'top' },
   footerActions: { flexDirection: 'row', gap: 12 },
@@ -853,12 +853,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     borderRadius: 18,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     paddingVertical: 15,
   },
-  secondaryBtnText: { fontSize: 15, fontWeight: '700', color: colors.textSecondary },
+  secondaryBtnText: { fontSize: 15, fontWeight: '700', color: AppTheme.colors.textSecondary },
   primaryBtn: {
     flex: 1,
     flexDirection: 'row',
@@ -866,7 +866,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     borderRadius: 18,
-    backgroundColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
     paddingVertical: 15,
   },
   primaryBtnText: { fontSize: 15, fontWeight: '800', color: '#fff' },
@@ -875,34 +875,34 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     padding: 16,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     marginBottom: 8,
   },
   toggleLabel: {
     flex: 1,
     fontSize: 14,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   toggleOuter: {
     width: 44,
     height: 24,
-    borderRadius: 12,
-    backgroundColor: colors.border,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.border,
     padding: 2,
     justifyContent: 'center',
   },
   toggleOuterActive: {
-    backgroundColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
   },
   toggleInner: {
     width: 20,
     height: 20,
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.medium,
     backgroundColor: '#fff',
     transform: [{ translateX: 0 }],
   },
@@ -910,10 +910,10 @@ const styles = StyleSheet.create({
     transform: [{ translateX: 20 }],
   },
   dictationCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     padding: 16,
     gap: 12,
     minHeight: 120,
@@ -924,14 +924,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: AppTheme.colors.border,
     paddingBottom: 8,
   },
   dictationTitle: {
     flex: 1,
     fontSize: 14,
     fontWeight: '700',
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   livePulse: {
     width: 8,
@@ -945,14 +945,14 @@ const styles = StyleSheet.create({
   dictationText: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   interimText: {
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
     fontStyle: 'italic',
   },
   placeholderText: {
-    color: colors.textPlaceholder,
+    color: AppTheme.colors.textPlaceholder,
     fontStyle: 'italic',
   },
   errorText: {
@@ -963,13 +963,13 @@ const styles = StyleSheet.create({
   progressTrack: {
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.border,
+    backgroundColor: AppTheme.colors.border,
     overflow: 'hidden',
     marginTop: 8,
   },
   progressFill: {
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
   },
 });

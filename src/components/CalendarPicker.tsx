@@ -3,7 +3,7 @@ import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { FilterSelector } from "./FilterSelector";
 import { Ionicons } from "@expo/vector-icons";
 
-import { colors } from "../theme/colors";
+import { AppTheme } from "../theme/AppTheme";
 
 type Props = {
   visible: boolean;
@@ -89,7 +89,7 @@ export function CalendarPicker({ visible, value, onClose, onSelect }: Props) {
               <Ionicons
                 name="chevron-back"
                 size={22}
-                color={colors.textPrimary}
+                color={AppTheme.colors.textPrimary}
               />
             </Pressable>
 
@@ -110,7 +110,7 @@ export function CalendarPicker({ visible, value, onClose, onSelect }: Props) {
                 <Ionicons
                   name="chevron-down"
                   size={16}
-                  color={colors.textPrimary}
+                  color={AppTheme.colors.textPrimary}
                 />
               </Pressable>
 
@@ -123,7 +123,7 @@ export function CalendarPicker({ visible, value, onClose, onSelect }: Props) {
                 <Ionicons
                   name="chevron-down"
                   size={16}
-                  color={colors.textPrimary}
+                  color={AppTheme.colors.textPrimary}
                 />
               </Pressable>
             </View>
@@ -136,7 +136,7 @@ export function CalendarPicker({ visible, value, onClose, onSelect }: Props) {
               <Ionicons
                 name="chevron-forward"
                 size={22}
-                color={colors.textPrimary}
+                color={AppTheme.colors.textPrimary}
               />
             </Pressable>
           </View>
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
   },
   card: {
     width: 340,
-    backgroundColor: colors.background,
+    backgroundColor: AppTheme.colors.background,
     borderRadius: 18,
     padding: 20,
   },
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   weekRow: {
     flexDirection: "row",
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     width: 40,
     textAlign: "center",
     fontWeight: "700",
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
   grid: {
     flexDirection: "row",
@@ -272,19 +272,19 @@ const styles = StyleSheet.create({
   },
   dayText: {
     fontSize: 16,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   cancel: {
     marginTop: 16,
     alignSelf: "flex-end",
   },
   cancelText: {
-    color: colors.accent,
+    color: AppTheme.colors.primary,
     fontWeight: "700",
     fontSize: 16,
   },
   selectedDay: {
-    backgroundColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
     borderRadius: 20,
   },
   selectedDayText: {
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
   },
   today: {
     borderWidth: 2,
-    borderColor: colors.accent,
+    borderColor: AppTheme.colors.primary,
     borderRadius: 20,
   },
   todayText: {
@@ -305,12 +305,12 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingHorizontal: 10,
     paddingVertical: 6,
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
     backgroundColor: "#F3F4F6",
   },
 
   dropdownText: {
     fontWeight: "600",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 });

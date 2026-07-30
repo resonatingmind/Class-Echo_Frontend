@@ -51,7 +51,7 @@ function statusStyle(status: string) {
   } else if (norm === 'processing') {
     return { bg: '#FFF4E0', text: '#92400E', label: 'Processing' };
   } else if (norm === 'pending') {
-    return { bg: colors.surfaceMuted, text: colors.textSecondary, label: 'Pending' };
+    return { bg: AppTheme.colors.surfaceMuted, text: AppTheme.colors.textSecondary, label: 'Pending' };
   } else {
     return { bg: '#FFF1F1', text: '#B42318', label: 'Failed' };
   }
@@ -321,14 +321,14 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
             }}
             style={styles.backBtn}
           >
-            <Ionicons color={colors.textPrimary} name="arrow-back" size={22} />
+            <Ionicons color={AppTheme.colors.textPrimary} name="arrow-back" size={22} />
           </Pressable>
           <Text style={styles.headerTitle} numberOfLines={1}>
             {chapterName}
           </Text>
           <Pressable onPress={() => void load(true)} style={styles.backBtn}>
             <Ionicons
-              color={colors.textSecondary}
+              color={AppTheme.colors.textSecondary}
               name="refresh-outline"
               size={22}
             />
@@ -345,7 +345,7 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
               void load(true);
             }}
             refreshing={refreshing}
-            tintColor={colors.accent}
+            tintColor={AppTheme.colors.primary}
           />
         }
         showsVerticalScrollIndicator={false}
@@ -366,7 +366,7 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
             <View style={styles.metaRow}>
               <View style={styles.metaBadge}>
                 <Ionicons
-                  color={colors.accentDark}
+                  color={AppTheme.colors.primaryDark}
                   name="document-text"
                   size={14}
                 />
@@ -400,7 +400,7 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
             >
               <Ionicons
                 color={
-                  activeTab === "planner" ? colors.accentDark : colors.textMuted
+                  activeTab === "planner" ? AppTheme.colors.primaryDark : AppTheme.colors.textSecondary
                 }
                 name="calendar-outline"
                 size={14}
@@ -423,7 +423,7 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
             >
               <Ionicons
                 color={
-                  activeTab === "profile" ? colors.accentDark : colors.textMuted
+                  activeTab === "profile" ? AppTheme.colors.primaryDark : AppTheme.colors.textSecondary
                 }
                 name="sparkles-outline"
                 size={14}
@@ -446,7 +446,7 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
             >
               <Ionicons
                 color={
-                  activeTab === "documents" ? colors.accentDark : colors.textMuted
+                  activeTab === "documents" ? AppTheme.colors.primaryDark : AppTheme.colors.textSecondary
                 }
                 name="document-text-outline"
                 size={14}
@@ -469,7 +469,7 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
             >
               <Ionicons
                 color={
-                  activeTab === "metadata" ? colors.accentDark : colors.textMuted
+                  activeTab === "metadata" ? AppTheme.colors.primaryDark : AppTheme.colors.textSecondary
                 }
                 name="information-circle-outline"
                 size={14}
@@ -488,13 +488,13 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
 
         {isLoading ? (
           <View style={styles.center}>
-            <ActivityIndicator color={colors.accent} size="large" />
+            <ActivityIndicator color={AppTheme.colors.primary} size="large" />
             <Text style={styles.loadingText}>Loading chapter...</Text>
           </View>
         ) : error ? (
           <View style={styles.center}>
             <Ionicons
-              color={colors.textMuted}
+              color={AppTheme.colors.textSecondary}
               name="cloud-offline-outline"
               size={40}
             />
@@ -536,7 +536,7 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
             <View style={styles.emptyKbContainer}>
               <View style={styles.emptyKbIconBox}>
                 <Ionicons
-                  color={colors.textMuted}
+                  color={AppTheme.colors.textSecondary}
                   name="analytics-outline"
                   size={32}
                 />
@@ -553,7 +553,7 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
               {/* Summary Card */}
               <View style={styles.card}>
                 <View style={styles.cardHeader}>
-                  <Ionicons color={colors.accent} name="book" size={18} />
+                  <Ionicons color={AppTheme.colors.primary} name="book" size={18} />
                   <Text style={styles.cardTitle}>Chapter Summary</Text>
                 </View>
                 <Text style={styles.cardBody}>{knowledge.chapter_summary}</Text>
@@ -563,13 +563,13 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
               {knowledge.learning_objectives?.length > 0 && (
                 <View style={styles.card}>
                   <View style={styles.cardHeader}>
-                    <Ionicons color={colors.accent} name="flag" size={18} />
+                    <Ionicons color={AppTheme.colors.primary} name="flag" size={18} />
                     <Text style={styles.cardTitle}>Learning Objectives</Text>
                   </View>
                   {knowledge.learning_objectives.map((obj, i) => (
                     <View key={i} style={styles.bulletRow}>
                       <Ionicons
-                        color={colors.accent}
+                        color={AppTheme.colors.primary}
                         name="checkmark-circle-outline"
                         size={16}
                         style={{ marginTop: 2 }}
@@ -584,13 +584,13 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
               {knowledge.key_concepts?.length > 0 && (
                 <View style={styles.card}>
                   <View style={styles.cardHeader}>
-                    <Ionicons color={colors.accent} name="bulb" size={18} />
+                    <Ionicons color={AppTheme.colors.primary} name="bulb" size={18} />
                     <Text style={styles.cardTitle}>Key Concepts</Text>
                   </View>
                   {knowledge.key_concepts.map((concept, i) => (
                     <View key={i} style={styles.bulletRow}>
                       <Ionicons
-                        color={colors.accent}
+                        color={AppTheme.colors.primary}
                         name="star-outline"
                         size={16}
                         style={{ marginTop: 2 }}
@@ -606,7 +606,7 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
                 <View style={styles.card}>
                   <View style={styles.cardHeader}>
                     <Ionicons
-                      color={colors.accent}
+                      color={AppTheme.colors.primary}
                       name="list-circle"
                       size={18}
                     />
@@ -617,7 +617,7 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
                   {knowledge.must_cover_topics.map((topic, i) => (
                     <View key={topic} style={styles.bulletRow}>
                       <Ionicons
-                        color={colors.accent}
+                        color={AppTheme.colors.primary}
                         name="checkbox-outline"
                         size={16}
                         style={{ marginTop: 2 }}
@@ -681,7 +681,7 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
             {documents.length === 0 ? (
               <View style={styles.emptyDocBox}>
                 <Ionicons
-                  color={colors.textMuted}
+                  color={AppTheme.colors.textSecondary}
                   name="document-attach-outline"
                   size={40}
                 />
@@ -707,7 +707,7 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
                     <View key={doc.id} style={styles.docCard}>
                       <View style={styles.docCardIconBox}>
                         <Ionicons
-                          color={colors.accent}
+                          color={AppTheme.colors.primary}
                           name={
                             doc.file_type.toLowerCase() === "pdf"
                               ? "document-outline"
@@ -797,7 +797,7 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
+  safe: { flex: 1, backgroundColor: AppTheme.colors.background },
   plannerSection: {
     paddingHorizontal: 0,
     marginTop: 20,
@@ -813,7 +813,7 @@ const styles = StyleSheet.create({
   },
   plannerSub: {
     fontSize: 13,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     marginTop: 2,
   },
   addPlanBtn: {
@@ -822,7 +822,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#0284C7",
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
     gap: 6,
   },
   addPlanText: {
@@ -833,9 +833,9 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: AppTheme.colors.border,
   },
   headerInner: {
     flexDirection: 'row',
@@ -848,7 +848,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     flex: 1,
     textAlign: 'center',
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 17,
     fontWeight: '700',
   },
@@ -862,10 +862,10 @@ const styles = StyleSheet.create({
 
   // Hero Section
   hero: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: AppTheme.colors.border,
   },
   heroInner: {
     maxWidth: 1280,
@@ -877,18 +877,18 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1.1,
-    color: colors.accent,
+    color: AppTheme.colors.primary,
   },
   heroTitle: {
     fontSize: 26,
     fontWeight: '800',
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     letterSpacing: -0.5,
   },
   heroDesc: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
   metaRow: {
     flexDirection: 'row',
@@ -900,28 +900,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primarySoft,
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
   },
   metaBadgeText: {
     fontSize: 12,
     fontWeight: '700',
-    color: colors.accentDark,
+    color: AppTheme.colors.primaryDark,
   },
   metaDate: {
     fontSize: 12,
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
   },
 
   // Tab Selector
   tabContainer: {
     flexDirection: 'row',
     marginTop: 20,
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: AppTheme.colors.surfaceMuted,
     padding: 4,
-    borderRadius: 14,
+    borderRadius: AppTheme.radius.large,
     gap: 4,
     width: '100%',
   },
@@ -932,10 +932,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     paddingVertical: 10,
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.medium,
   },
   tabButtonActive: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
@@ -945,10 +945,10 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: 12,
     fontWeight: '700',
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
   },
   tabTextActive: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   // KB Content
@@ -958,10 +958,10 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     padding: 16,
     gap: 12,
   },
@@ -977,12 +977,12 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 15,
     fontWeight: '800',
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   cardBody: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
   bulletRow: {
     flexDirection: 'row',
@@ -993,7 +993,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     lineHeight: 20,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   // Documents Tab
@@ -1010,16 +1010,16 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '800',
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   uploadBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.medium,
   },
   uploadBtnText: {
     color: '#fff',
@@ -1031,20 +1031,20 @@ const styles = StyleSheet.create({
     padding: 32,
     gap: 12,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     borderStyle: 'dashed',
     borderRadius: 16,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
   },
   emptyDocTitle: {
     fontSize: 16,
     fontWeight: '800',
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   emptyDocBody: {
     fontSize: 13,
     lineHeight: 18,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     textAlign: 'center',
     paddingHorizontal: 16,
   },
@@ -1054,9 +1054,9 @@ const styles = StyleSheet.create({
   docCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     borderRadius: 16,
     padding: 12,
     gap: 12,
@@ -1064,8 +1064,8 @@ const styles = StyleSheet.create({
   docCardIconBox: {
     width: 40,
     height: 40,
-    borderRadius: 10,
-    backgroundColor: colors.surfaceSoft,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.surfaceSoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1076,11 +1076,11 @@ const styles = StyleSheet.create({
   docCardTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   docCardMeta: {
     fontSize: 12,
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
   },
   docCardRight: {
     flexDirection: 'row',
@@ -1090,7 +1090,7 @@ const styles = StyleSheet.create({
   trashBtn: {
     width: 32,
     height: 32,
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
     backgroundColor: '#FFF1F1',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1098,7 +1098,7 @@ const styles = StyleSheet.create({
   statusBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
   },
   statusText: {
     fontSize: 11,
@@ -1109,10 +1109,10 @@ const styles = StyleSheet.create({
   metadataList: {
     paddingHorizontal: 20,
     marginTop: 20,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     overflow: 'hidden',
   },
   metaItem: {
@@ -1121,17 +1121,17 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: AppTheme.colors.border,
   },
   metaLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
   metaValue: {
     fontSize: 14,
     fontWeight: '700',
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   // KB Empty State
@@ -1145,27 +1145,27 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: AppTheme.colors.surfaceMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },
   emptyKbTitle: {
     fontSize: 16,
     fontWeight: '800',
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   emptyKbBody: {
     fontSize: 13,
     lineHeight: 18,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     textAlign: 'center',
     paddingHorizontal: 16,
   },
 
   // Shared States
   center: { alignItems: 'center', padding: 40, gap: 12, marginTop: 40 },
-  loadingText: { color: colors.textSecondary, fontSize: 14 },
-  emptyTitle: { color: colors.textPrimary, fontSize: 18, fontWeight: '700' },
-  emptyBody: { color: colors.textSecondary, fontSize: 14, textAlign: 'center', lineHeight: 20 },
+  loadingText: { color: AppTheme.colors.textSecondary, fontSize: 14 },
+  emptyTitle: { color: AppTheme.colors.textPrimary, fontSize: 18, fontWeight: '700' },
+  emptyBody: { color: AppTheme.colors.textSecondary, fontSize: 14, textAlign: 'center', lineHeight: 20 },
   btnDisabled: { opacity: 0.6 },
 });

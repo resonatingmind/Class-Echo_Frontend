@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 
 type Props = {
   staffed: number;
@@ -51,8 +51,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 14,
-    backgroundColor: colors.surfaceMuted,
-    borderRadius: 14,
+    backgroundColor: AppTheme.colors.surfaceMuted,
+    borderRadius: AppTheme.radius.large,
     paddingVertical: 14,
     paddingHorizontal: 16,
     marginBottom: 14,
@@ -60,21 +60,21 @@ const styles = StyleSheet.create({
 
   label: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   value: {
     marginTop: 2,
     fontSize: 15,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   track: {
     flex: 1,
     height: 8,
     borderRadius: 4,
-    backgroundColor: colors.border,
+    backgroundColor: AppTheme.colors.border,
     overflow: "hidden",
   },
 

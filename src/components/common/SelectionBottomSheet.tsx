@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 
 export type SelectionItem = {
   id: string;
@@ -93,7 +93,7 @@ export function SelectionBottomSheet({
                 <Text style={styles.itemText}>{item.label}</Text>
 
                 {selectedId === item.id && (
-                  <Ionicons name="checkmark" size={20} color={colors.accent} />
+                  <Ionicons name="checkmark" size={20} color={AppTheme.colors.primary} />
                 )}
               </Pressable>
             )}
@@ -128,14 +128,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700",
     marginBottom: 16,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   search: {
     height: 46,
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
+    borderColor: AppTheme.colors.border,
+    borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 16,
     marginBottom: 16,
     backgroundColor: "#fff",
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
 
   itemText: {
     fontSize: 15,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   empty: {
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   },
 
   emptyText: {
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontSize: 14,
   },
 });

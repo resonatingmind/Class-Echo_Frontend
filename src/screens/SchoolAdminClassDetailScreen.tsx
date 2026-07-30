@@ -31,7 +31,7 @@ import { SubjectOut, TeacherOut } from '../types/api';
 type Props = NativeStackScreenProps<RootStackParamList, 'SchoolAdminClassDetail'>;
 
 const SUBJECT_COLORS = [
-  { bg: '#D1E4FF', text: colors.accentDark },
+  { bg: '#D1E4FF', text: AppTheme.colors.primaryDark },
   { bg: '#E8F7EE', text: '#127A40' },
   { bg: '#FFF4E0', text: '#92400E' },
   { bg: '#F5F0FF', text: '#6B21A8' },
@@ -94,7 +94,7 @@ function AddSubjectModal({
               onChangeText={setName}
               onSubmitEditing={handleCreate}
               placeholder="e.g. Mathematics, Physics…"
-              placeholderTextColor={colors.textPlaceholder}
+              placeholderTextColor={AppTheme.colors.textPlaceholder}
               returnKeyType="done"
               style={styles.modalInput}
               value={name}
@@ -199,7 +199,7 @@ function SubjectCard({
         ) : (
           <View style={styles.unassignedChip}>
             <Ionicons
-              color={colors.textMuted}
+              color={AppTheme.colors.textSecondary}
               name="person-outline"
               size={13}
             />
@@ -213,7 +213,7 @@ function SubjectCard({
           }}
           style={styles.assignBtn}
         >
-          <Ionicons color={colors.accent} name="swap-horizontal" size={14} />
+          <Ionicons color={AppTheme.colors.primary} name="swap-horizontal" size={14} />
           <Text style={styles.assignBtnText}>
             {subject.teacher ? "Change" : "Assign"}
           </Text>
@@ -319,7 +319,7 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
         }}
         rightActions={
           <View style={styles.avatarCircle}>
-            <Ionicons color={colors.accent} name="person" size={16} />
+            <Ionicons color={AppTheme.colors.primary} name="person" size={16} />
           </View>
         }
       />
@@ -330,7 +330,7 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
           <RefreshControl
             onRefresh={onRefresh}
             refreshing={refreshing}
-            tintColor={colors.accent}
+            tintColor={AppTheme.colors.primary}
           />
         }
         showsVerticalScrollIndicator={false}
@@ -349,7 +349,7 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
               style={styles.editClassBtn}
             >
               <Ionicons
-                color={colors.textSecondary}
+                color={AppTheme.colors.textSecondary}
                 name="create-outline"
                 size={14}
               />
@@ -391,7 +391,7 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
           </View>
         </View>
         <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color={colors.textSecondary} />
+          <Ionicons name="search" size={20} color={AppTheme.colors.textSecondary} />
 
           <TextInput
             placeholder="Search subject..."
@@ -435,13 +435,13 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
 
           {isLoading ? (
             <View style={styles.center}>
-              <ActivityIndicator color={colors.accent} size="large" />
+              <ActivityIndicator color={AppTheme.colors.primary} size="large" />
               <Text style={styles.loadingText}>Loading subjects…</Text>
             </View>
           ) : error ? (
             <View style={styles.center}>
               <Ionicons
-                color={colors.textMuted}
+                color={AppTheme.colors.textSecondary}
                 name="cloud-offline-outline"
                 size={40}
               />
@@ -451,7 +451,7 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
           ) : subjects.length === 0 ? (
             <View style={styles.center}>
               <Ionicons
-                color={colors.textMuted}
+                color={AppTheme.colors.textSecondary}
                 name="book-outline"
                 size={40}
               />
@@ -520,7 +520,7 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
                 onChangeText={setEditClassName}
                 onSubmitEditing={handleEditClassSave}
                 placeholder="e.g. Class 10B"
-                placeholderTextColor={colors.textPlaceholder}
+                placeholderTextColor={AppTheme.colors.textPlaceholder}
                 returnKeyType="done"
                 style={styles.modalInput}
                 value={editClassName}
@@ -566,12 +566,12 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
+  safe: { flex: 1, backgroundColor: AppTheme.colors.background },
   avatarCircle: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primarySoft,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -579,20 +579,20 @@ const styles = StyleSheet.create({
 
   // Page heading
   pageHeading: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: AppTheme.colors.border,
     gap: 8,
   },
   academicLabel: {
-    color: colors.accent,
+    color: AppTheme.colors.primary,
     fontSize: 11,
     fontWeight: "700",
     letterSpacing: 1.2,
   },
   pageTitle: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 26,
     fontWeight: "800",
     letterSpacing: -0.5,
@@ -602,14 +602,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.medium,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     paddingHorizontal: 14,
     paddingVertical: 8,
   },
   editClassText: {
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontSize: 13,
     fontWeight: "600",
   },
@@ -617,8 +617,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    borderRadius: 10,
-    backgroundColor: colors.accent,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primary,
     paddingHorizontal: 14,
     paddingVertical: 8,
   },
@@ -628,24 +628,24 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: "row",
     gap: 1,
-    backgroundColor: colors.border,
+    backgroundColor: AppTheme.colors.border,
     marginBottom: 20,
   },
   statCard: {
     flex: 1,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     alignItems: "center",
     paddingVertical: 16,
     gap: 4,
   },
   statValue: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 24,
     fontWeight: "800",
   },
   statValueWarn: { color: colors.warning },
   statLabel: {
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
     fontSize: 10,
     fontWeight: "700",
     letterSpacing: 0.8,
@@ -653,15 +653,15 @@ const styles = StyleSheet.create({
 
   // Subjects section
   subjectsSection: { paddingHorizontal: 20, gap: 14 },
-  sectionTitle: { color: colors.textPrimary, fontSize: 18, fontWeight: "800" },
+  sectionTitle: { color: AppTheme.colors.textPrimary, fontSize: 18, fontWeight: "800" },
   subjectList: { gap: 14 },
 
   // Subject Card
   subjectCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     overflow: "hidden",
   },
   subjectCardTop: {
@@ -673,15 +673,15 @@ const styles = StyleSheet.create({
   subjectIcon: {
     width: 44,
     height: 44,
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     alignItems: "center",
     justifyContent: "center",
   },
   subjectIconText: { fontSize: 18, fontWeight: "800" },
   subjectInfo: { flex: 1, gap: 4 },
-  subjectName: { color: colors.textPrimary, fontSize: 16, fontWeight: "700" },
-  subjectMeta: { color: colors.textMuted, fontSize: 12 },
-  subjectCardDivider: { height: 1, backgroundColor: colors.border },
+  subjectName: { color: AppTheme.colors.textPrimary, fontSize: 16, fontWeight: "700" },
+  subjectMeta: { color: AppTheme.colors.textSecondary, fontSize: 12 },
+  subjectCardDivider: { height: 1, backgroundColor: AppTheme.colors.border },
   subjectTeacherRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -698,14 +698,14 @@ const styles = StyleSheet.create({
   miniAvatar: {
     width: 28,
     height: 28,
-    borderRadius: 14,
-    backgroundColor: colors.accentSoft,
+    borderRadius: AppTheme.radius.large,
+    backgroundColor: AppTheme.colors.primarySoft,
     alignItems: "center",
     justifyContent: "center",
   },
-  miniAvatarText: { color: colors.accentDark, fontSize: 10, fontWeight: "800" },
+  miniAvatarText: { color: AppTheme.colors.primaryDark, fontSize: 10, fontWeight: "800" },
   assignedTeacherText: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 13,
     fontWeight: "600",
     flex: 1,
@@ -716,25 +716,25 @@ const styles = StyleSheet.create({
     gap: 6,
     flex: 1,
   },
-  unassignedText: { color: colors.textMuted, fontSize: 13 },
+  unassignedText: { color: AppTheme.colors.textSecondary, fontSize: 13 },
   assignBtn: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
     borderWidth: 1.5,
-    borderColor: colors.accentSoft,
-    backgroundColor: colors.accentSoft,
+    borderColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primarySoft,
     paddingHorizontal: 10,
     paddingVertical: 6,
   },
-  assignBtnText: { color: colors.accent, fontSize: 12, fontWeight: "700" },
+  assignBtnText: { color: AppTheme.colors.primary, fontSize: 12, fontWeight: "700" },
 
   // Shared states
   center: { alignItems: "center", paddingVertical: 40, gap: 10 },
-  loadingText: { color: colors.textSecondary, fontSize: 14 },
-  emptyTitle: { color: colors.textPrimary, fontSize: 16, fontWeight: "700" },
-  emptyBody: { color: colors.textSecondary, fontSize: 14, textAlign: "center" },
+  loadingText: { color: AppTheme.colors.textSecondary, fontSize: 14 },
+  emptyTitle: { color: AppTheme.colors.textPrimary, fontSize: 16, fontWeight: "700" },
+  emptyBody: { color: AppTheme.colors.textSecondary, fontSize: 14, textAlign: "center" },
 
   // Modals
   modalOverlay: {
@@ -743,7 +743,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modalSheet: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -755,15 +755,15 @@ const styles = StyleSheet.create({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.border,
+    backgroundColor: AppTheme.colors.border,
     alignSelf: "center",
     marginBottom: 8,
   },
-  modalTitle: { color: colors.textPrimary, fontSize: 20, fontWeight: "800" },
-  modalSubtitle: { color: colors.textSecondary, fontSize: 14, lineHeight: 20 },
+  modalTitle: { color: AppTheme.colors.textPrimary, fontSize: 20, fontWeight: "800" },
+  modalSubtitle: { color: AppTheme.colors.textSecondary, fontSize: 14, lineHeight: 20 },
   modalField: { gap: 8 },
   modalFieldLabel: {
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
     fontSize: 11,
     fontWeight: "700",
     letterSpacing: 0.8,
@@ -771,20 +771,20 @@ const styles = StyleSheet.create({
   },
   modalInput: {
     height: 52,
-    borderRadius: 12,
-    backgroundColor: colors.background,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.background,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     paddingHorizontal: 16,
     fontSize: 16,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   modalError: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
     backgroundColor: "#FFF1F1",
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
@@ -793,22 +793,22 @@ const styles = StyleSheet.create({
   modalCancelBtn: {
     flex: 1,
     height: 50,
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     alignItems: "center",
     justifyContent: "center",
   },
   modalCancelText: {
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontWeight: "600",
     fontSize: 15,
   },
   modalSubmitBtn: {
     flex: 1,
     height: 50,
-    borderRadius: 12,
-    backgroundColor: colors.accent,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -817,10 +817,10 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     marginHorizontal: 20,
     marginBottom: 14,
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 14,
   },
 
@@ -839,18 +839,18 @@ const styles = StyleSheet.create({
   },
 
   filterChip: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
 
   filterChipActive: {
-    backgroundColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
   },
 
   filterText: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontWeight: "600",
   },
 
@@ -861,6 +861,6 @@ const styles = StyleSheet.create({
   assignmentDate: {
     marginTop: 2,
     fontSize: 11,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 });

@@ -13,9 +13,9 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
-import { ScreenHeader } from "../components/common/ScreenHeader";
+import { AdminNavbar } from "../components/common/AdminNavbar";
 import { RootStackParamList } from "../navigation/AppNavigator";
-import { colors } from "../theme/colors";
+import { AppTheme } from "../theme/AppTheme";
 import { useAuth } from "../context/AuthContext";
 
 import { DaySelector } from "../components/teacher/timetable/DaySelector";
@@ -344,7 +344,7 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
                 <Ionicons
                   name="pencil-outline"
                   size={11}
-                  color={colors.accentDark}
+                  color={AppTheme.colors.primaryDark}
                 />
               </Pressable>
               <Pressable
@@ -366,25 +366,29 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
   // ─── UI ──────────────────────────────────────────────────────────────────
   return (
     <SafeAreaView style={styles.container} edges={[]}>
-      <ScreenHeader
-        variant="large"
-        title="Timetable"
-        subtitle="Day-wise class schedule"
-        onBack={() => navigation.goBack()}
-        rightActions={
-          <Pressable
-            style={styles.importButton}
-            onPress={() => setShowImportModal(true)}
-          >
-            <Ionicons
-              name="cloud-upload-outline"
-              size={16}
-              color={colors.accentDark}
-            />
-            <Text style={styles.importButtonText}>Import</Text>
-          </Pressable>
-        }
-      />
+      <AdminNavbar title="Timetable" />
+
+      <View style={styles.flex}>
+        <View style={styles.centerContainer}>
+          <View style={styles.body}>
+            {/* Page Heading */}
+            <View style={styles.pageHeading}>
+        <View style={{ flex: 1, gap: 4 }}>
+          <Text style={styles.pageTitle}>Class Schedules</Text>
+          <Text style={styles.pageSubtitle}>Manage your weekly class timetables.</Text>
+        </View>
+        <Pressable
+          style={styles.importButton}
+          onPress={() => setShowImportModal(true)}
+        >
+          <Ionicons
+            name="cloud-upload-outline"
+            size={16}
+            color={AppTheme.colors.primaryDark}
+          />
+          <Text style={styles.importButtonText}>Import</Text>
+        </Pressable>
+      </View>
 
       {/* Day Selector */}
       <View style={styles.daySelectorWrap}>
@@ -394,7 +398,7 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
       {/* Body */}
       {loading ? (
         <View style={styles.centered}>
-          <ActivityIndicator color={colors.accentDark} size="large" />
+          <ActivityIndicator color={AppTheme.colors.primaryDark} size="large" />
         </View>
       ) : error ? (
         <View style={styles.padded}>
@@ -536,6 +540,9 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
           <View style={{ height: 100 }} />
         </ScrollView>
       )}
+          </View>
+        </View>
+      </View>
 
       {/* FAB */}
       {!loading && !error && classes.length > 0 && (
@@ -595,13 +602,36 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+  container: { flex: 1, backgroundColor: AppTheme.colors.background },
+  flex: { flex: 1 },
+  centerContainer: {
+    flex: 1,
+    alignItems: "center",
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.xl,
+  },
+  body: {
+    width: "100%",
+    maxWidth: 800,
+    gap: AppTheme.spacing.l,
+  },
+  pageHeading: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    paddingBottom: AppTheme.spacing.s,
+  },
+  pageTitle: {
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.heading1,
+  },
+  pageSubtitle: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body },
 
   importButton: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primarySoft,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 999,
@@ -609,18 +639,18 @@ const styles = StyleSheet.create({
   importButtonText: {
     fontSize: 13,
     fontWeight: "700",
-    color: colors.accentDark,
+    color: AppTheme.colors.primaryDark,
   },
 
-  daySelectorWrap: { paddingHorizontal: 20, marginBottom: 4 },
+  daySelectorWrap: { marginBottom: 4 },
   centered: { flex: 1, justifyContent: "center", alignItems: "center" },
-  padded: { padding: 20 },
+  padded: { paddingVertical: 20 },
 
   table: {
     borderWidth: 1,
     borderColor: BORDER_COLOR,
     margin: 12,
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.medium,
     overflow: "hidden",
   },
 
@@ -640,7 +670,7 @@ const styles = StyleSheet.create({
     right: 8,
     fontSize: 10,
     fontWeight: "700",
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
   cornerLabelBottom: {
     position: "absolute",
@@ -648,7 +678,7 @@ const styles = StyleSheet.create({
     left: 8,
     fontSize: 10,
     fontWeight: "700",
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
   cornerLine: {
     position: "absolute",
@@ -672,16 +702,16 @@ const styles = StyleSheet.create({
   headerPeriodNum: {
     fontSize: 12,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   headerPeriodTime: {
     marginTop: 3,
     fontSize: 10,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
   noPeriodText: {
     fontSize: 11,
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
     textAlign: "center",
   },
 
@@ -696,7 +726,7 @@ const styles = StyleSheet.create({
   gradeCellText: {
     fontSize: 11,
     fontWeight: "800",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     textAlign: "center",
     paddingHorizontal: 4,
   },
@@ -712,7 +742,7 @@ const styles = StyleSheet.create({
   sectionCellText: {
     fontSize: 13,
     fontWeight: "700",
-    color: colors.accentDark ?? colors.textPrimary,
+    color: AppTheme.colors.primaryDark ?? AppTheme.colors.textPrimary,
   },
 
   cell: {
@@ -731,14 +761,14 @@ const styles = StyleSheet.create({
   cellSubject: {
     fontSize: 12,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     textAlign: "center",
     lineHeight: 16,
   },
   cellTeacher: {
     marginTop: 2,
     fontSize: 10,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     textAlign: "center",
   },
   cellEmpty: { fontSize: 14, color: "#C5CDD6" },
@@ -764,11 +794,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
     paddingHorizontal: 18,
     height: 52,
     borderRadius: 26,
-    shadowColor: colors.accentDark,
+    shadowColor: AppTheme.colors.primaryDark,
     shadowOpacity: 0.25,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },

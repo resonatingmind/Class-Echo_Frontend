@@ -71,7 +71,7 @@ function FormField({
           multiline={multiline}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor={AppTheme.colors.textPlaceholder}
+          placeholderTextColor={AppTheme.AppTheme.colors.textPlaceholder}
           secureTextEntry={secureTextEntry && !showPass}
           style={[styles.input, multiline && styles.inputMultiline]}
           textContentType={textContentType}
@@ -84,7 +84,7 @@ function FormField({
             style={styles.eyeBtn}
           >
             <Ionicons
-              color={AppTheme.colors.textSecondary}
+              color={AppTheme.AppTheme.colors.textSecondary}
               name={showPass ? 'eye-off-outline' : 'eye-outline'}
               size={18}
             />
@@ -145,7 +145,7 @@ export function AdminCreateSchoolScreen({ navigation }: Props) {
         <Text style={styles.headerTitle}>Super Admin</Text>
         <View style={styles.headerRight}>
           <Pressable onPress={signOut} style={styles.iconBtn}>
-            <Ionicons color={AppTheme.colors.textPrimary} name="log-out-outline" size={24} />
+            <Ionicons color={AppTheme.AppTheme.colors.textPrimary} name="log-out-outline" size={24} />
           </Pressable>
         </View>
       </View>
@@ -162,7 +162,7 @@ export function AdminCreateSchoolScreen({ navigation }: Props) {
           <View style={styles.centerContainer}>
             <View style={styles.body}>
               <Pressable onPress={() => navigation.goBack()} style={styles.backBtnRow}>
-                <Ionicons name="arrow-back" size={20} color={AppTheme.colors.textSecondary} />
+                <Ionicons name="arrow-back" size={20} color={AppTheme.AppTheme.colors.textSecondary} />
                 <Text style={styles.backBtnText}>Back</Text>
               </Pressable>
 
@@ -237,7 +237,7 @@ export function AdminCreateSchoolScreen({ navigation }: Props) {
                     placeholder="admin@school.edu"
                     suffix={
                       <Ionicons
-                        color={emailValid && adminEmail.length > 0 ? AppTheme.colors.success : AppTheme.colors.textSecondary}
+                        color={emailValid && adminEmail.length > 0 ? AppTheme.colors.success : AppTheme.AppTheme.colors.textSecondary}
                         name={emailValid && adminEmail.length > 0 ? 'checkmark-circle' : 'mail-outline'}
                         size={18}
                       />
@@ -293,35 +293,35 @@ export function AdminCreateSchoolScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: AppTheme.colors.background,
+    backgroundColor: AppTheme.AppTheme.colors.background,
   },
   globalHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: AppTheme.spacing.l,
     paddingVertical: AppTheme.spacing.m,
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: AppTheme.colors.border,
+    borderBottomColor: AppTheme.AppTheme.colors.border,
   },
   headerLeft: { width: 60, alignItems: 'flex-start' },
-  headerTitle: { flex: 1, textAlign: 'center', color: AppTheme.colors.textPrimary, ...AppTheme.typography.h3 },
+  headerTitle: { flex: 1, textAlign: 'center', color: AppTheme.AppTheme.colors.textPrimary, ...AppTheme.typography.h3 },
   headerRight: { flexDirection: 'row', gap: AppTheme.spacing.s, width: 60, justifyContent: 'flex-end' },
   iconBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   centerContainer: { flex: 1, alignItems: 'center', paddingHorizontal: AppTheme.spacing.l, paddingVertical: AppTheme.spacing.xl },
   body: { width: '100%', maxWidth: 800, gap: AppTheme.spacing.l },
   backBtnRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8, alignSelf: 'flex-start' },
-  backBtnText: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body, fontWeight: '600' },
+  backBtnText: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.body, fontWeight: '600' },
   titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 12 },
   flex: { flex: 1 },
   breadcrumb: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 1,
   },
   topTitle: {
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.h1,
     marginTop: 4,
   },
@@ -372,19 +372,19 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.primary,
   },
   sectionLabelText: {
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.h3,
   },
   sectionHint: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
     marginBottom: 2,
   },
   sectionCard: {
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
     overflow: 'hidden',
   },
   field: {
@@ -393,14 +393,14 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   fieldLabel: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 0.8,
     textTransform: 'uppercase',
   },
   fieldHint: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     fontSize: 12,
     lineHeight: 16,
   },
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   input: {
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.body,
     padding: 0,
     minHeight: 24,
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
   },
   fieldDivider: {
     height: 1,
-    backgroundColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.AppTheme.colors.border,
     marginHorizontal: 16,
   },
   strengthRow: {
@@ -441,7 +441,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 4,
     borderRadius: 2,
-    backgroundColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.AppTheme.colors.border,
   },
   strengthBarFilled: {
     backgroundColor: AppTheme.colors.warning,
@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.success,
   },
   strengthLabel: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     fontSize: 12,
     fontWeight: '600',
     width: 48,

@@ -1,6 +1,6 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 
 type Props = {
   subjectName: string;
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
 
   card: {
     backgroundColor: "#F8FAFC",
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     padding: 16,
     borderWidth: 1,
     borderColor: "#E2E8F0",
@@ -128,10 +128,10 @@ const styles = StyleSheet.create({
   },
 
   replace: {
-    backgroundColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
     paddingHorizontal: 20,
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     marginLeft: 12,
   },
 

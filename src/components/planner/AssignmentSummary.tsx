@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 20,
     padding: 16,
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     backgroundColor: "#F8FAFC",
     borderWidth: 1,
     borderColor: "#E2E8F0",

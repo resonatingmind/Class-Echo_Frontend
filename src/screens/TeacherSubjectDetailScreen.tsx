@@ -45,7 +45,7 @@ function statusStyle(status: RecordingStatus) {
     case 'processing':
       return { bg: '#FFF4E0', text: '#92400E', label: 'Processing' };
     case 'pending':
-      return { bg: colors.surfaceMuted, text: colors.textSecondary, label: 'Pending' };
+      return { bg: AppTheme.colors.surfaceMuted, text: AppTheme.colors.textSecondary, label: 'Pending' };
     case 'failed':
       return { bg: '#FFF1F1', text: '#B42318', label: 'Failed' };
   }
@@ -68,10 +68,10 @@ function RecordingRow({
     <Pressable onPress={onPress} style={styles.card}>
       <View style={styles.cardIcon}>
         {recording.status === 'processing' ? (
-          <ActivityIndicator color={colors.accent} size="small" />
+          <ActivityIndicator color={AppTheme.colors.primary} size="small" />
         ) : (
           <Ionicons
-            color={recording.status === 'completed' ? colors.accent : colors.textMuted}
+            color={recording.status === 'completed' ? AppTheme.colors.primary : AppTheme.colors.textSecondary}
             name={recording.status === 'completed' ? 'document-text-outline' : 'mic-outline'}
             size={18}
           />
@@ -108,7 +108,7 @@ function RecordingRow({
             }
           </Pressable>
         ) : (
-          <Ionicons color={colors.textMuted} name="chevron-forward" size={16} />
+          <Ionicons color={AppTheme.colors.textSecondary} name="chevron-forward" size={16} />
         )}
       </View>
     </Pressable>
@@ -371,7 +371,7 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
             navigation.navigate("TeacherSubjects");
           }
         }} style={styles.headerButton}>
-          <Ionicons color={colors.textPrimary} name="arrow-back" size={22} />
+          <Ionicons color={AppTheme.colors.textPrimary} name="arrow-back" size={22} />
         </Pressable>
         <Text numberOfLines={1} style={styles.headerTitle}>
           {subjectName}
@@ -388,7 +388,7 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
               setRefreshing(true);
               void load(true);
             }}
-            tintColor={colors.accent}
+            tintColor={AppTheme.colors.primary}
           />
         )}
         showsVerticalScrollIndicator={false}
@@ -450,12 +450,12 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
 
         {isLoading ? (
           <View style={styles.center}>
-            <ActivityIndicator color={colors.accent} size="large" />
+            <ActivityIndicator color={AppTheme.colors.primary} size="large" />
             <Text style={styles.emptyBody}>Loading subject details…</Text>
           </View>
         ) : error ? (
           <View style={styles.center}>
-            <Ionicons color={colors.textMuted} name="cloud-offline-outline" size={40} />
+            <Ionicons color={AppTheme.colors.textSecondary} name="cloud-offline-outline" size={40} />
             <Text style={styles.emptyTitle}>Could not load subject details</Text>
             <Text style={styles.emptyBody}>{error}</Text>
           </View>
@@ -463,7 +463,7 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
           selectedChapter === null ? (
             chapters.length === 0 ? (
               <View style={styles.center}>
-                <Ionicons color={colors.textMuted} name="folder-open-outline" size={40} />
+                <Ionicons color={AppTheme.colors.textSecondary} name="folder-open-outline" size={40} />
                 <Text style={styles.emptyTitle}>No chapters yet</Text>
                 <Text style={styles.emptyBody}>Chapters will be shown here. Please contact your school administrator to add chapters for this subject.</Text>
               </View>
@@ -484,7 +484,7 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
                       style={styles.card}
                     >
                       <View style={styles.cardIcon}>
-                        <Ionicons color={colors.accent} name="folder-outline" size={20} />
+                        <Ionicons color={AppTheme.colors.primary} name="folder-outline" size={20} />
                       </View>
                       <View style={styles.cardContent}>
                         <Text numberOfLines={1} style={styles.cardTitle}>
@@ -493,11 +493,11 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
                         <Text numberOfLines={2} style={styles.cardMeta}>
                           {chapter.description || 'No description provided.'}
                         </Text>
-                        <Text style={[styles.cardMeta, { color: colors.accent, fontWeight: '600', marginTop: 4 }]}>
+                        <Text style={[styles.cardMeta, { color: AppTheme.colors.primary, fontWeight: '600', marginTop: 4 }]}>
                           {chapterRecordings.length} {chapterRecordings.length === 1 ? 'recording' : 'recordings'}
                         </Text>
                       </View>
-                      <Ionicons color={colors.textMuted} name="chevron-forward" size={16} />
+                      <Ionicons color={AppTheme.colors.textSecondary} name="chevron-forward" size={16} />
                     </Pressable>
                   );
                 })}
@@ -514,21 +514,21 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
                   marginBottom: 8,
                 }}
               >
-                <Ionicons color={colors.accent} name="arrow-back" size={18} />
-                <Text style={{ color: colors.accent, fontWeight: '700', fontSize: 15 }}>
+                <Ionicons color={AppTheme.colors.primary} name="arrow-back" size={18} />
+                <Text style={{ color: AppTheme.colors.primary, fontWeight: '700', fontSize: 15 }}>
                   Back to Chapters
                 </Text>
               </Pressable>
               
-              <View style={[styles.card, { backgroundColor: colors.accentSoft, borderColor: colors.accent, borderStyle: 'dashed' }]}>
-                <View style={[styles.cardIcon, { backgroundColor: colors.surface }]}>
-                  <Ionicons color={colors.accent} name="folder-open" size={20} />
+              <View style={[styles.card, { backgroundColor: AppTheme.colors.primarySoft, borderColor: AppTheme.colors.primary, borderStyle: 'dashed' }]}>
+                <View style={[styles.cardIcon, { backgroundColor: AppTheme.colors.surface }]}>
+                  <Ionicons color={AppTheme.colors.primary} name="folder-open" size={20} />
                 </View>
                 <View style={styles.cardContent}>
-                  <Text style={[styles.cardTitle, { color: colors.accentDark }]}>
+                  <Text style={[styles.cardTitle, { color: AppTheme.colors.primaryDark }]}>
                     {selectedChapter.name}
                   </Text>
-                  <Text style={[styles.cardMeta, { color: colors.textSecondary }]}>
+                  <Text style={[styles.cardMeta, { color: AppTheme.colors.textSecondary }]}>
                     {selectedChapter.description || 'No description provided.'}
                   </Text>
                 </View>
@@ -536,7 +536,7 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
 
               {filteredRecordings.length === 0 ? (
                 <View style={styles.center}>
-                  <Ionicons color={colors.textMuted} name="mic-outline" size={40} />
+                  <Ionicons color={AppTheme.colors.textSecondary} name="mic-outline" size={40} />
                   <Text style={styles.emptyTitle}>No recordings in this chapter</Text>
                   <Text style={styles.emptyBody}>Record or upload your first lesson for this chapter.</Text>
                 </View>
@@ -561,7 +561,7 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
           )
         ) : students.length === 0 ? (
           <View style={styles.center}>
-            <Ionicons color={colors.textMuted} name="people-outline" size={40} />
+            <Ionicons color={AppTheme.colors.textSecondary} name="people-outline" size={40} />
             <Text style={styles.emptyTitle}>No students enrolled</Text>
             <Text style={styles.emptyBody}>Students in this class will appear here.</Text>
           </View>
@@ -598,7 +598,7 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
               style={styles.sheetOption}
             >
               <View style={styles.sheetOptionIcon}>
-                <Ionicons color={colors.accent} name="mic-outline" size={20} />
+                <Ionicons color={AppTheme.colors.primary} name="mic-outline" size={20} />
               </View>
               <View style={styles.sheetOptionBody}>
                 <Text style={styles.sheetOptionTitle}>Record in App</Text>
@@ -608,7 +608,7 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
 
             <Pressable onPress={() => void handlePickFile()} style={styles.sheetOption}>
               <View style={styles.sheetOptionIcon}>
-                <Ionicons color={colors.accent} name="document-outline" size={20} />
+                <Ionicons color={AppTheme.colors.primary} name="document-outline" size={20} />
               </View>
               <View style={styles.sheetOptionBody}>
                 <Text style={styles.sheetOptionTitle}>Upload Audio File</Text>
@@ -636,10 +636,10 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
               <Pressable onPress={() => void handlePreviewToggle()} style={styles.previewButton}>
                 <View style={styles.previewIcon}>
                   {!previewStatus.isLoaded ? (
-                    <ActivityIndicator color={colors.accent} size="small" />
+                    <ActivityIndicator color={AppTheme.colors.primary} size="small" />
                   ) : (
                     <Ionicons
-                      color={colors.accent}
+                      color={AppTheme.colors.primary}
                       name={previewStatus.playing ? 'pause' : 'play'}
                       size={22}
                     />
@@ -658,12 +658,12 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
               paddingHorizontal: 14,
               paddingVertical: 12,
               borderRadius: 16,
-              backgroundColor: colors.surfaceMuted,
+              backgroundColor: AppTheme.colors.surfaceMuted,
               borderWidth: 1,
-              borderColor: colors.border,
+              borderColor: AppTheme.colors.border,
               marginBottom: 12,
             }}>
-              <Text style={{ color: colors.textPrimary, fontSize: 15, fontWeight: '600' }}>
+              <Text style={{ color: AppTheme.colors.textPrimary, fontSize: 15, fontWeight: '600' }}>
                 {selectedChapter?.name}
               </Text>
             </View>
@@ -678,7 +678,7 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
                 }
               }}
               placeholder="Enter lecture title"
-              placeholderTextColor={colors.textPlaceholder}
+              placeholderTextColor={AppTheme.colors.textPlaceholder}
               style={[styles.input, lectureTitleError && { borderColor: '#E53935' }]}
               value={lectureTitle}
             />
@@ -695,7 +695,7 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
               numberOfLines={4}
               onChangeText={setDescription}
               placeholder="Optional summary or notes for this recording"
-              placeholderTextColor={colors.textPlaceholder}
+              placeholderTextColor={AppTheme.colors.textPlaceholder}
               style={[styles.input, styles.descriptionInput]}
               value={description}
             />
@@ -723,41 +723,41 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
+  safe: { flex: 1, backgroundColor: AppTheme.colors.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: AppTheme.colors.border,
   },
   headerButton: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { flex: 1, textAlign: 'center', fontSize: 17, fontWeight: '700', color: colors.textPrimary },
+  headerTitle: { flex: 1, textAlign: 'center', fontSize: 17, fontWeight: '700', color: AppTheme.colors.textPrimary },
   scroll: { paddingBottom: 40, gap: 16 },
   hero: {
     padding: 20,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: AppTheme.colors.border,
     gap: 8,
   },
-  heroKicker: { fontSize: 11, fontWeight: '700', letterSpacing: 1.1, color: colors.accent },
-  heroTitle: { fontSize: 30, fontWeight: '800', color: colors.textPrimary, letterSpacing: -0.5 },
-  heroBody: { fontSize: 14, lineHeight: 20, color: colors.textSecondary },
+  heroKicker: { fontSize: 11, fontWeight: '700', letterSpacing: 1.1, color: AppTheme.colors.primary },
+  heroTitle: { fontSize: 30, fontWeight: '800', color: AppTheme.colors.textPrimary, letterSpacing: -0.5 },
+  heroBody: { fontSize: 14, lineHeight: 20, color: AppTheme.colors.textSecondary },
   tabBar: {
     flexDirection: 'row',
     marginHorizontal: 20,
     marginTop: 16,
     padding: 4,
     borderRadius: 18,
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: AppTheme.colors.surfaceMuted,
   },
-  tabButton: { flex: 1, paddingVertical: 10, borderRadius: 14, alignItems: 'center' },
-  tabButtonActive: { backgroundColor: colors.surface },
-  tabLabel: { fontSize: 14, fontWeight: '700', color: colors.textMuted },
-  tabLabelActive: { color: colors.textPrimary },
+  tabButton: { flex: 1, paddingVertical: 10, borderRadius: AppTheme.radius.large, alignItems: 'center' },
+  tabButtonActive: { backgroundColor: AppTheme.colors.surface },
+  tabLabel: { fontSize: 14, fontWeight: '700', color: AppTheme.colors.textSecondary },
+  tabLabelActive: { color: AppTheme.colors.textPrimary },
   actionRow: { paddingHorizontal: 20 },
   actionButton: {
     flexDirection: 'row',
@@ -766,37 +766,37 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 14,
     borderRadius: 18,
-    backgroundColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
   },
   actionButtonText: { color: '#fff', fontSize: 15, fontWeight: '800' },
   statsStrip: {
     flexDirection: 'row',
     marginHorizontal: 20,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     overflow: 'hidden',
   },
   statItem: { flex: 1, alignItems: 'center', paddingVertical: 16, gap: 2 },
-  statValue: { fontSize: 22, fontWeight: '800', color: colors.textPrimary },
-  statLabel: { fontSize: 11, fontWeight: '700', color: colors.textMuted, letterSpacing: 0.8 },
-  statDivider: { width: 1, backgroundColor: colors.border },
+  statValue: { fontSize: 22, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  statLabel: { fontSize: 11, fontWeight: '700', color: AppTheme.colors.textSecondary, letterSpacing: 0.8 },
+  statDivider: { width: 1, backgroundColor: AppTheme.colors.border },
   center: { paddingHorizontal: 20, paddingVertical: 56, alignItems: 'center', gap: 10 },
-  emptyTitle: { fontSize: 18, fontWeight: '800', color: colors.textPrimary },
-  emptyBody: { textAlign: 'center', fontSize: 14, lineHeight: 20, color: colors.textSecondary },
+  emptyTitle: { fontSize: 18, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  emptyBody: { textAlign: 'center', fontSize: 14, lineHeight: 20, color: AppTheme.colors.textSecondary },
   sectionStack: { paddingHorizontal: 20, gap: 16 },
   section: { paddingHorizontal: 20, gap: 12 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  sectionTitle: { flex: 1, fontSize: 18, fontWeight: '800', color: colors.textPrimary },
+  sectionTitle: { flex: 1, fontSize: 18, fontWeight: '800', color: AppTheme.colors.textPrimary },
   sectionCount: {
     minWidth: 26,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 999,
     textAlign: 'center',
-    backgroundColor: colors.surfaceMuted,
-    color: colors.textMuted,
+    backgroundColor: AppTheme.colors.surfaceMuted,
+    color: AppTheme.colors.textSecondary,
     fontSize: 12,
     fontWeight: '700',
   },
@@ -807,20 +807,20 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
+    borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.surface,
   },
   cardIcon: {
     width: 42,
     height: 42,
-    borderRadius: 14,
-    backgroundColor: colors.surfaceSoft,
+    borderRadius: AppTheme.radius.large,
+    backgroundColor: AppTheme.colors.surfaceSoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cardContent: { flex: 1, gap: 4 },
-  cardTitle: { fontSize: 15, fontWeight: '700', color: colors.textPrimary },
-  cardMeta: { fontSize: 13, color: colors.textSecondary },
+  cardTitle: { fontSize: 15, fontWeight: '700', color: AppTheme.colors.textPrimary },
+  cardMeta: { fontSize: 13, color: AppTheme.colors.textSecondary },
   cardRight: { alignItems: 'flex-end', gap: 8 },
   statusBadge: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999 },
   statusText: { fontSize: 11, fontWeight: '700' },
@@ -829,18 +829,18 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  studentAvatarText: { fontSize: 15, fontWeight: '800', color: colors.accentDark },
+  studentAvatarText: { fontSize: 15, fontWeight: '800', color: AppTheme.colors.primaryDark },
   sheetOverlay: {
     flex: 1,
     backgroundColor: 'rgba(26, 28, 28, 0.32)',
     justifyContent: 'flex-end',
   },
   sheet: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     paddingHorizontal: 20,
@@ -854,69 +854,69 @@ const styles = StyleSheet.create({
     width: 42,
     height: 4,
     borderRadius: 999,
-    backgroundColor: colors.border,
+    backgroundColor: AppTheme.colors.border,
   },
-  sheetTitle: { fontSize: 20, fontWeight: '800', color: colors.textPrimary },
-  sheetSubtitle: { fontSize: 14, lineHeight: 20, color: colors.textSecondary },
+  sheetTitle: { fontSize: 20, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  sheetSubtitle: { fontSize: 14, lineHeight: 20, color: AppTheme.colors.textSecondary },
   sheetOption: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
     padding: 16,
     borderRadius: 18,
-    backgroundColor: colors.surfaceSoft,
+    backgroundColor: AppTheme.colors.surfaceSoft,
   },
   sheetOptionIcon: {
     width: 44,
     height: 44,
     borderRadius: 16,
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
   sheetOptionBody: { flex: 1, gap: 4 },
-  sheetOptionTitle: { fontSize: 15, fontWeight: '700', color: colors.textPrimary },
-  sheetOptionText: { fontSize: 13, lineHeight: 18, color: colors.textSecondary },
+  sheetOptionTitle: { fontSize: 15, fontWeight: '700', color: AppTheme.colors.textPrimary },
+  sheetOptionText: { fontSize: 13, lineHeight: 18, color: AppTheme.colors.textSecondary },
   previewCard: {
     padding: 16,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surfaceSoft,
+    borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.surfaceSoft,
     gap: 12,
   },
   previewHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
-  previewTitle: { fontSize: 16, fontWeight: '800', color: colors.textPrimary },
-  previewMeta: { fontSize: 12, color: colors.textMuted, fontWeight: '600' },
+  previewTitle: { fontSize: 16, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  previewMeta: { fontSize: 12, color: AppTheme.colors.textSecondary, fontWeight: '600' },
   previewButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
     padding: 14,
     borderRadius: 18,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
   },
   previewIcon: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
   previewTextWrap: { flex: 1, gap: 3 },
-  previewTextTitle: { fontSize: 15, fontWeight: '700', color: colors.textPrimary },
-  previewTextBody: { fontSize: 13, lineHeight: 18, color: colors.textSecondary },
-  inputLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 0.8, color: colors.textMuted },
+  previewTextTitle: { fontSize: 15, fontWeight: '700', color: AppTheme.colors.textPrimary },
+  previewTextBody: { fontSize: 13, lineHeight: 18, color: AppTheme.colors.textSecondary },
+  inputLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 0.8, color: AppTheme.colors.textSecondary },
   input: {
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     borderRadius: 16,
-    backgroundColor: colors.surfaceSoft,
+    backgroundColor: AppTheme.colors.surfaceSoft,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   descriptionInput: { minHeight: 96, textAlignVertical: 'top' },
   modalActions: { flexDirection: 'row', gap: 12, marginTop: 6 },
@@ -927,10 +927,10 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
+    borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.surface,
   },
-  secondaryButtonText: { fontSize: 15, fontWeight: '700', color: colors.textSecondary },
+  secondaryButtonText: { fontSize: 15, fontWeight: '700', color: AppTheme.colors.textSecondary },
   primaryButton: {
     flex: 1,
     flexDirection: 'row',
@@ -939,20 +939,20 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 14,
     borderRadius: 16,
-    backgroundColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
   },
   primaryButtonText: { fontSize: 15, fontWeight: '800', color: '#fff' },
   buttonDisabled: { opacity: 0.55 },
   progressTrack: {
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.border,
+    backgroundColor: AppTheme.colors.border,
     overflow: 'hidden',
     marginTop: 8,
   },
   progressFill: {
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.accent,
+    backgroundColor: AppTheme.colors.primary,
   },
 });

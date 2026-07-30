@@ -4,7 +4,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 
 import { PlannerChapter, LearningPlanOut, RecordingWithReport } from "../../types/api";
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 import { CHAPTER_COLUMNS } from "./PlannerChapterTable";
 import { useAuth } from "../../context/AuthContext";
 import { getChapterRecordings, getSchoolLearningPlans, getSchoolSubjectRecordings } from "../../lib/api";
@@ -96,7 +96,7 @@ export function PlannerChapterRow({
             color="#0284C7"
           />
           <Text
-            style={[styles.chapterName, { flex: 1, color: isExpanded ? "#0284C7" : colors.textPrimary }]}
+            style={[styles.chapterName, { flex: 1, color: isExpanded ? "#0284C7" : AppTheme.colors.textPrimary }]}
             numberOfLines={2}
           >
             {chapter.name}
@@ -117,7 +117,7 @@ export function PlannerChapterRow({
             hitSlop={6}
             accessibilityLabel={`Add material to ${chapter.name}`}
           >
-            <Ionicons name="add" size={14} color={colors.accentDark} />
+            <Ionicons name="add" size={14} color={AppTheme.colors.primaryDark} />
           </Pressable>
         </View>
 
@@ -188,13 +188,13 @@ const styles = StyleSheet.create({
 
   rowDivider: {
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: AppTheme.colors.border,
   },
 
   chapterName: {
     fontSize: 13,
     fontWeight: "600",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     paddingRight: 12,
   },
 
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     height: 28,
     paddingHorizontal: 10,
     borderRadius: 999,
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: AppTheme.colors.surfaceMuted,
   },
 
   countChipText: {
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primarySoft,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -231,12 +231,12 @@ const styles = StyleSheet.create({
   scoreText: {
     fontSize: 13,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   scoreTextMuted: {
     fontWeight: "400",
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
   },
 
   statusPill: {

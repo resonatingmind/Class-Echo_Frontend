@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 
 type Props = {
   label: string;
@@ -18,7 +18,7 @@ export function TeacherFilterSelect({ label, value, onPress }: Props) {
         <Text style={styles.value}>{value || "All"}</Text>
       </View>
 
-      <Ionicons name="chevron-down" size={18} color={colors.textSecondary} />
+      <Ionicons name="chevron-down" size={18} color={AppTheme.colors.textSecondary} />
     </Pressable>
   );
 }
@@ -27,9 +27,9 @@ const styles = StyleSheet.create({
   container: {
     width: "48%",
     height: 56,
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     backgroundColor: "#fff",
     paddingHorizontal: 14,
     flexDirection: "row",
@@ -39,13 +39,13 @@ const styles = StyleSheet.create({
 
   label: {
     fontSize: 11,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     marginBottom: 2,
   },
 
   value: {
     fontSize: 15,
     fontWeight: "600",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 });

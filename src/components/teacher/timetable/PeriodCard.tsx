@@ -9,7 +9,7 @@ type Props = {
 };
 
 const ACCENTS = [
-  { bg: "#EAF3FF", border: "#CFE3FF", chip: colors.accentDark },
+  { bg: "#EAF3FF", border: "#CFE3FF", chip: AppTheme.colors.primaryDark },
   { bg: "#EAFBF1", border: "#CBEFDA", chip: "#127A40" },
   { bg: "#FFF6E8", border: "#FBE3B8", chip: "#92400E" },
   { bg: "#F6F0FF", border: "#E2D3FA", chip: "#6B21A8" },
@@ -49,7 +49,7 @@ export function PeriodCard({ period }: Props) {
             <Ionicons
               name="location-outline"
               size={14}
-              color={colors.textMuted}
+              color={AppTheme.colors.textSecondary}
             />
             <Text style={styles.room}>Room {period.room}</Text>
           </View>
@@ -62,7 +62,7 @@ export function PeriodCard({ period }: Props) {
 const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 16,
     marginBottom: 12,
     borderWidth: 1,
@@ -98,18 +98,18 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   time: {
     fontSize: 13,
     fontWeight: "600",
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   info: {
     fontSize: 13,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   roomRow: {
@@ -121,6 +121,6 @@ const styles = StyleSheet.create({
 
   room: {
     fontSize: 12,
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
   },
 });

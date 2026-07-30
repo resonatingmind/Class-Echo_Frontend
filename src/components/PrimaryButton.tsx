@@ -25,9 +25,9 @@ type PrimaryButtonProps = {
 };
 
 const VARIANT = {
-  primary:   { bg: colors.accent,       text: '#FFFFFF',     indicator: '#FFFFFF'     },
-  secondary: { bg: colors.accentLight,  text: colors.accent, indicator: colors.accent },
-  ghost:     { bg: 'transparent',       text: colors.accent, indicator: colors.accent },
+  primary:   { bg: AppTheme.colors.primary,       text: '#FFFFFF',     indicator: '#FFFFFF'     },
+  secondary: { bg: AppTheme.colors.primaryLight,  text: AppTheme.colors.primary, indicator: AppTheme.colors.primary },
+  ghost:     { bg: 'transparent',       text: AppTheme.colors.primary, indicator: AppTheme.colors.primary },
   danger:    { bg: '#FEE2E2',           text: '#DC2626',     indicator: '#DC2626'     },
 } as const;
 

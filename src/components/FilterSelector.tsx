@@ -1,7 +1,7 @@
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-import { colors } from "../theme/colors";
+import { AppTheme } from "../theme/AppTheme";
 
 export type FilterOption = {
   id?: number;
@@ -59,7 +59,7 @@ export function FilterSelector({
           <Ionicons
             name="chevron-down"
             size={18}
-            color={colors.textSecondary}
+            color={AppTheme.colors.textSecondary}
           />
         </View>
       </Pressable>
@@ -97,7 +97,7 @@ export function FilterSelector({
                     <Ionicons
                       name="checkmark"
                       size={20}
-                      color={colors.accent}
+                      color={AppTheme.colors.primary}
                     />
                   )}
                 </Pressable>
@@ -113,8 +113,8 @@ export function FilterSelector({
 const styles = StyleSheet.create({
   // selector: {
   //   width: "48%",
-  //   backgroundColor: colors.surface,
-  //   borderRadius: 14,
+  //   backgroundColor: AppTheme.colors.surface,
+  //   borderRadius: AppTheme.radius.large,
   //   padding: 14,
   //   borderWidth: 1,
   //   borderColor: "#E5E7EB",
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
 
   selector: {
     width: "100%",
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
 
   label: {
     fontSize: 13,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     marginBottom: 6,
   },
 
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontWeight: "600",
     fontSize: 15,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   overlay: {
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   },
 
   sheet: {
-    backgroundColor: colors.background,
+    backgroundColor: AppTheme.colors.background,
     borderTopLeftRadius: 22,
     borderTopRightRadius: 22,
     maxHeight: "70%",
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700",
     marginBottom: 18,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   option: {
@@ -181,6 +181,6 @@ const styles = StyleSheet.create({
 
   optionText: {
     fontSize: 16,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 });

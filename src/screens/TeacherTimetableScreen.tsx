@@ -19,7 +19,7 @@ import { useAuth } from "../context/AuthContext";
 import { getTeacherTimetable } from "../lib/api";
 import { TIMETABLE_DAYS, TimetableEntryOut } from "../types/api";
 import { ScreenHeader } from "../components/common/ScreenHeader";
-import { colors } from "../theme/colors";
+import { AppTheme } from "../theme/AppTheme";
 
 const WEEKDAYS = TIMETABLE_DAYS;
 const ALL_DAY_NAMES = [
@@ -92,7 +92,7 @@ export function TeacherTimetableScreen() {
         }
         rightActions={
           <View style={styles.viewOnlyPill}>
-            <Ionicons name="eye-outline" size={14} color={colors.accentDark} />
+            <Ionicons name="eye-outline" size={14} color={AppTheme.colors.primaryDark} />
             <Text style={styles.viewOnlyText}>View only</Text>
           </View>
         }
@@ -114,7 +114,7 @@ export function TeacherTimetableScreen() {
       >
         {loading ? (
           <View style={styles.loading}>
-            <ActivityIndicator color={colors.accentDark} />
+            <ActivityIndicator color={AppTheme.colors.primaryDark} />
           </View>
         ) : error ? (
           <InfoState title="Something went wrong" body={error} />
@@ -127,7 +127,7 @@ export function TeacherTimetableScreen() {
             <Ionicons
               name="calendar-clear-outline"
               size={30}
-              color={colors.textMuted}
+              color={AppTheme.colors.textSecondary}
             />
             <Text style={styles.emptyTitle}>No classes scheduled</Text>
             <Text style={styles.emptyText}>
@@ -143,14 +143,14 @@ export function TeacherTimetableScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: AppTheme.colors.background,
   },
 
   viewOnlyPill: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primarySoft,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   viewOnlyText: {
     fontSize: 12,
     fontWeight: "700",
-    color: colors.accentDark,
+    color: AppTheme.colors.primaryDark,
   },
 
   daySelectorWrap: {
@@ -187,12 +187,12 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 16,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   emptyText: {
     fontSize: 13,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     textAlign: "center",
   },
 });

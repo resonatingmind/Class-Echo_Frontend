@@ -56,14 +56,14 @@ const styles = StyleSheet.create({
     gap: AppTheme.spacing.s,
   },
   label: {
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.label,
   },
   inputContainer: {
     height: 48,
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
     borderRadius: AppTheme.radius.medium,
     flexDirection: "row",
     alignItems: "center",
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.bodyLarge,
     // @ts-ignore
     outlineStyle: 'none',

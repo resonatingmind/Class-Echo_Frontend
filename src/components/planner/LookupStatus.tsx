@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
 
     paddingHorizontal: 12,
 
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.medium,
   },
 
   success: {

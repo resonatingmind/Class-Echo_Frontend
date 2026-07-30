@@ -67,8 +67,8 @@ export function FormInput({
   const shellBorderColor = error
     ? '#DC2626'
     : focused
-    ? colors.accent
-    : colors.border;
+    ? AppTheme.colors.primary
+    : AppTheme.colors.border;
 
   const shellBorderWidth = focused ? 1.5 : 1;
 
@@ -91,7 +91,7 @@ export function FormInput({
       >
         {iconLeft ? (
           <Ionicons
-            color={focused ? colors.accent : colors.textMuted}
+            color={focused ? AppTheme.colors.primary : AppTheme.colors.textSecondary}
             name={iconLeft}
             size={16}
             style={styles.iconLeft}
@@ -109,7 +109,7 @@ export function FormInput({
           onFocus={() => setFocused(true)}
           onSubmitEditing={onSubmitEditing}
           placeholder={placeholder}
-          placeholderTextColor={colors.textPlaceholder}
+          placeholderTextColor={AppTheme.colors.textPlaceholder}
           returnKeyType={returnKeyType}
           secureTextEntry={secureTextEntry}
           style={[styles.input, { fontSize: s.fontSize }]}
@@ -120,7 +120,7 @@ export function FormInput({
         {iconRight ? (
           <Pressable hitSlop={10} onPress={onIconRightPress}>
             <Ionicons
-              color={colors.textMuted}
+              color={AppTheme.colors.textSecondary}
               name={iconRight}
               size={16}
             />
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   },
   shell: {
     borderRadius: radius.md,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     padding: 0,
   },
   error: {
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
   },
   hint: {
     fontSize: 12,
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
     paddingHorizontal: 2,
   },
 });

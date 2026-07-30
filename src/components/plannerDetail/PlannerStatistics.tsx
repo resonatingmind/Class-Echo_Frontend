@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 import { PlannerStatistics as PlannerStatisticsType } from "../../types/api";
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 
 type Props = {
   statistics: PlannerStatisticsType;
@@ -13,7 +13,7 @@ export function PlannerStatistics({ statistics }: Props) {
     <View style={styles.container}>
       <StatCard
         icon="book-outline"
-        color={colors.accentDark}
+        color={AppTheme.colors.primaryDark}
         value={statistics.total_chapters.toString()}
         title="Chapters"
       />
@@ -77,8 +77,8 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     flexBasis: "22%",
     minWidth: 130,
-    backgroundColor: colors.surfaceMuted,
-    borderRadius: 14,
+    backgroundColor: AppTheme.colors.surfaceMuted,
+    borderRadius: AppTheme.radius.large,
     paddingVertical: 12,
     paddingHorizontal: 14,
   },
@@ -87,12 +87,12 @@ const styles = StyleSheet.create({
     marginTop: 6,
     fontSize: 20,
     fontWeight: "800",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   title: {
     marginTop: 2,
     fontSize: 12,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 });

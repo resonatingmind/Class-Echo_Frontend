@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { PlannerItemOut } from "../../types/api";
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 import {
   getAvatarColors,
   getInitials,
@@ -73,13 +73,13 @@ export function PlannerTableRow({
             <View
               style={[
                 styles.avatar,
-                { backgroundColor: avatar?.bg ?? colors.accentSoft },
+                { backgroundColor: avatar?.bg ?? AppTheme.colors.primarySoft },
               ]}
             >
               <Text
                 style={[
                   styles.avatarText,
-                  { color: avatar?.text ?? colors.accentDark },
+                  { color: avatar?.text ?? AppTheme.colors.primaryDark },
                 ]}
               >
                 {getInitials(item.teacher_name)}
@@ -107,7 +107,7 @@ export function PlannerTableRow({
           hitSlop={8}
           accessibilityLabel={`View ${item.subject_name}`}
         >
-          <Ionicons name="eye-outline" size={16} color={colors.accentDark} />
+          <Ionicons name="eye-outline" size={16} color={AppTheme.colors.primaryDark} />
         </Pressable>
       </View>
     </View>
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 14,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: AppTheme.colors.border,
   },
 
   rowUnassigned: {
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
 
   cellText: {
     fontSize: 13,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     paddingRight: 6,
   },
 
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   avatar: {
     width: 20,
     height: 20,
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.medium,
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
 
   teacherName: {
     fontSize: 13,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     flexShrink: 1,
   },
 
@@ -195,8 +195,8 @@ const styles = StyleSheet.create({
   viewButton: {
     width: 28,
     height: 28,
-    borderRadius: 14,
-    backgroundColor: colors.accentSoft,
+    borderRadius: AppTheme.radius.large,
+    backgroundColor: AppTheme.colors.primarySoft,
     alignItems: "center",
     justifyContent: "center",
   },

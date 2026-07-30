@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderWidth: 1,
     borderColor: "#CBD5E1",
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 14,
     marginBottom: 14,
   },

@@ -30,7 +30,7 @@ export function AdminSchoolCard({ school, onPress }: AdminSchoolCardProps) {
             </Text>
           </View>
         </View>
-        <MaterialIcons color={colors.textMuted} name="chevron-right" size={20} />
+        <MaterialIcons color={AppTheme.colors.textSecondary} name="chevron-right" size={20} />
       </View>
 
       <View style={styles.metaRow}>
@@ -76,7 +76,7 @@ export function AdminSchoolCard({ school, onPress }: AdminSchoolCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 18,
     padding: 20,
     gap: 18,
@@ -97,12 +97,12 @@ const styles = StyleSheet.create({
     width: 54,
     height: 54,
     borderRadius: 16,
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
   badgeText: {
-    color: colors.accentDark,
+    color: AppTheme.colors.primaryDark,
     fontSize: 18,
     fontWeight: '800',
   },
@@ -111,13 +111,13 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   name: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 19,
     fontWeight: '800',
     lineHeight: 24,
   },
   address: {
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
   },
@@ -127,20 +127,20 @@ const styles = StyleSheet.create({
   },
   metaItem: {
     flex: 1,
-    borderRadius: 14,
-    backgroundColor: colors.surfaceMuted,
+    borderRadius: AppTheme.radius.large,
+    backgroundColor: AppTheme.colors.surfaceMuted,
     padding: 12,
     gap: 4,
   },
   metaLabel: {
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
     fontSize: 11,
     fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 0.8,
   },
   metaValue: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 14,
     fontWeight: '700',
     lineHeight: 18,
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF0D8',
   },
   pillNeutral: {
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: AppTheme.colors.surfaceMuted,
   },
   pillText: {
     fontSize: 12,
@@ -178,6 +178,6 @@ const styles = StyleSheet.create({
     color: '#A15C00',
   },
   pillTextNeutral: {
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 });

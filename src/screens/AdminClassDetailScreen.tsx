@@ -55,7 +55,7 @@ function SubjectCard({
             {subject.teacher ? `Teacher: ${subject.teacher.name}` : 'No teacher assigned'}
           </Text>
         </View>
-        <Ionicons color={AppTheme.colors.textSecondary} name="chevron-forward" size={18} />
+        <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="chevron-forward" size={18} />
       </View>
     </Pressable>
   );
@@ -113,7 +113,7 @@ export function AdminClassDetailScreen({ navigation, route }: Props) {
         <Text style={styles.headerTitle}>Super Admin</Text>
         <View style={styles.headerRight}>
           <Pressable onPress={signOut} style={styles.iconBtn}>
-            <Ionicons color={AppTheme.colors.textPrimary} name="log-out-outline" size={24} />
+            <Ionicons color={AppTheme.AppTheme.colors.textPrimary} name="log-out-outline" size={24} />
           </Pressable>
         </View>
       </View>
@@ -136,7 +136,7 @@ export function AdminClassDetailScreen({ navigation, route }: Props) {
           <View style={styles.centerContainer}>
             <View style={styles.body}>
               <Pressable onPress={() => navigation.goBack()} style={styles.backBtnRow}>
-                <Ionicons name="arrow-back" size={20} color={AppTheme.colors.textSecondary} />
+                <Ionicons name="arrow-back" size={20} color={AppTheme.AppTheme.colors.textSecondary} />
                 <Text style={styles.backBtnText}>Back</Text>
               </Pressable>
 
@@ -174,13 +174,13 @@ export function AdminClassDetailScreen({ navigation, route }: Props) {
                 </View>
               ) : error ? (
                 <View style={styles.center}>
-                  <Ionicons color={AppTheme.colors.textSecondary} name="cloud-offline-outline" size={40} />
+                  <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="cloud-offline-outline" size={40} />
                   <Text style={styles.emptyTitle}>Could not load class details</Text>
                   <Text style={styles.emptyBody}>{error}</Text>
                 </View>
               ) : subjects.length === 0 ? (
                 <View style={styles.center}>
-                  <Ionicons color={AppTheme.colors.textSecondary} name="library-outline" size={40} />
+                  <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="library-outline" size={40} />
                   <Text style={styles.emptyTitle}>No subjects yet</Text>
                   <Text style={styles.emptyBody}>This class does not have any subjects attached yet.</Text>
                 </View>
@@ -215,35 +215,35 @@ export function AdminClassDetailScreen({ navigation, route }: Props) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: AppTheme.colors.background,
+    backgroundColor: AppTheme.AppTheme.colors.background,
   },
   globalHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: AppTheme.spacing.l,
     paddingVertical: AppTheme.spacing.m,
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: AppTheme.colors.border,
+    borderBottomColor: AppTheme.AppTheme.colors.border,
   },
   headerLeft: { width: 60, alignItems: 'flex-start' },
-  headerTitle: { flex: 1, textAlign: 'center', color: AppTheme.colors.textPrimary, ...AppTheme.typography.h3 },
+  headerTitle: { flex: 1, textAlign: 'center', color: AppTheme.AppTheme.colors.textPrimary, ...AppTheme.typography.h3 },
   headerRight: { flexDirection: 'row', gap: AppTheme.spacing.s, width: 60, justifyContent: 'flex-end' },
   iconBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   centerContainer: { flex: 1, alignItems: 'center', paddingHorizontal: AppTheme.spacing.l, paddingVertical: AppTheme.spacing.xl },
   body: { width: '100%', maxWidth: 800, gap: AppTheme.spacing.l },
   backBtnRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8, alignSelf: 'flex-start' },
-  backBtnText: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body, fontWeight: '600' },
+  backBtnText: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.body, fontWeight: '600' },
   titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 4 },
   flex: { flex: 1 },
   breadcrumb: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 1,
   },
   topTitle: {
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.AppTheme.colors.textPrimary,
     ...AppTheme.typography.h1,
     marginTop: 4,
   },
@@ -252,42 +252,42 @@ const styles = StyleSheet.create({
   },
   hero: {
     padding: AppTheme.spacing.xl,
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
     gap: 8,
   },
   heroBody: {
     ...AppTheme.typography.body,
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
   },
   statsStrip: {
     flexDirection: 'row',
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
+    borderColor: AppTheme.AppTheme.colors.border,
     overflow: 'hidden',
   },
   statItem: { flex: 1, alignItems: 'center', paddingVertical: 16, gap: 2 },
-  statValue: { fontSize: 22, fontWeight: '800', color: AppTheme.colors.textPrimary },
-  statLabel: { fontSize: 11, fontWeight: '700', color: AppTheme.colors.textSecondary, letterSpacing: 0.8 },
-  statDivider: { width: 1, backgroundColor: AppTheme.colors.border },
+  statValue: { fontSize: 22, fontWeight: '800', color: AppTheme.AppTheme.colors.textPrimary },
+  statLabel: { fontSize: 11, fontWeight: '700', color: AppTheme.AppTheme.colors.textSecondary, letterSpacing: 0.8 },
+  statDivider: { width: 1, backgroundColor: AppTheme.AppTheme.colors.border },
   center: { paddingVertical: 56, alignItems: 'center', gap: 10 },
-  emptyTitle: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.h3 },
-  emptyBody: { textAlign: 'center', ...AppTheme.typography.body, color: AppTheme.colors.textSecondary },
+  emptyTitle: { color: AppTheme.AppTheme.colors.textPrimary, ...AppTheme.typography.h3 },
+  emptyBody: { textAlign: 'center', ...AppTheme.typography.body, color: AppTheme.AppTheme.colors.textSecondary },
   section: { gap: 12 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  sectionTitle: { flex: 1, ...AppTheme.typography.h3, color: AppTheme.colors.textPrimary },
+  sectionTitle: { flex: 1, ...AppTheme.typography.h3, color: AppTheme.AppTheme.colors.textPrimary },
   sectionCount: {
     minWidth: 26,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: AppTheme.radius.round,
     textAlign: 'center',
-    backgroundColor: AppTheme.colors.background,
-    color: AppTheme.colors.textSecondary,
+    backgroundColor: AppTheme.AppTheme.colors.background,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.caption,
     fontWeight: '700',
   },
@@ -295,8 +295,8 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
-    backgroundColor: AppTheme.colors.surface,
+    borderColor: AppTheme.AppTheme.colors.border,
+    backgroundColor: AppTheme.AppTheme.colors.surface,
   },
   subjectCardTop: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   subjectIcon: {
@@ -308,6 +308,6 @@ const styles = StyleSheet.create({
   },
   subjectIconText: { fontSize: 16, fontWeight: '800' },
   subjectInfo: { flex: 1, gap: 4 },
-  subjectName: { ...AppTheme.typography.body, fontWeight: '700', color: AppTheme.colors.textPrimary },
-  subjectMeta: { ...AppTheme.typography.caption, color: AppTheme.colors.textSecondary },
+  subjectName: { ...AppTheme.typography.body, fontWeight: '700', color: AppTheme.AppTheme.colors.textPrimary },
+  subjectMeta: { ...AppTheme.typography.caption, color: AppTheme.AppTheme.colors.textSecondary },
 });

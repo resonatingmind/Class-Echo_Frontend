@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { PlannerItemOut } from "../../types/api";
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 import { getAvatarColors, getInitials, getSubjectDotColor } from "./plannerUtils";
 
 type Props = {
@@ -41,7 +41,7 @@ export function PlannerSubjectRow({
           hitSlop={8}
           accessibilityLabel={`View ${item.subject_name}`}
         >
-          <Ionicons name="eye-outline" size={16} color={colors.accentDark} />
+          <Ionicons name="eye-outline" size={16} color={AppTheme.colors.primaryDark} />
         </Pressable>
       </View>
 
@@ -65,10 +65,10 @@ export function PlannerSubjectRow({
             <View
               style={[
                 styles.avatar,
-                { backgroundColor: avatar?.bg ?? colors.accentSoft },
+                { backgroundColor: avatar?.bg ?? AppTheme.colors.primarySoft },
               ]}
             >
-              <Text style={[styles.avatarText, { color: avatar?.text ?? colors.accentDark }]}>
+              <Text style={[styles.avatarText, { color: avatar?.text ?? AppTheme.colors.primaryDark }]}>
                 {getInitials(item.teacher_name)}
               </Text>
             </View>
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: AppTheme.colors.border,
     gap: 6,
   },
 
@@ -113,20 +113,20 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     fontWeight: "600",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   counts: {
     fontSize: 12,
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
     flexShrink: 0,
   },
 
   viewButton: {
     width: 28,
     height: 28,
-    borderRadius: 14,
-    backgroundColor: colors.accentSoft,
+    borderRadius: AppTheme.radius.large,
+    backgroundColor: AppTheme.colors.primarySoft,
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   assignButton: {
     height: 24,
     paddingHorizontal: 10,
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     backgroundColor: colors.warning,
     alignItems: "center",
     justifyContent: "center",
@@ -182,6 +182,6 @@ const styles = StyleSheet.create({
 
   teacherName: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 });

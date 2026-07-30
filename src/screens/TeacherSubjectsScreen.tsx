@@ -15,7 +15,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { RootStackParamList } from "../navigation/AppNavigator";
-import { colors } from "../theme/colors";
+import { AppTheme } from "../theme/AppTheme";
 
 import { TeacherDashboardSubject } from "../types/api";
 import { SubjectOut, TeacherOut } from "../types/api";
@@ -38,7 +38,7 @@ import { ActiveFilterChips } from "../components/teacher/ActiveFilterChips";
 type Props = NativeStackScreenProps<RootStackParamList, 'TeacherSubjects'>;
 
 const SUBJECT_COLORS = [
-  { bg: '#D1E4FF', text: colors.accentDark, border: '#A8C8FF' },
+  { bg: '#D1E4FF', text: AppTheme.colors.primaryDark, border: '#A8C8FF' },
   { bg: '#E8F7EE', text: '#127A40', border: '#A3D9B8' },
   { bg: '#FFF4E0', text: '#92400E', border: '#FBBF7A' },
   { bg: '#F5F0FF', text: '#6B21A8', border: '#D8C4F8' },
@@ -244,7 +244,7 @@ export function TeacherSubjectsScreen({ navigation }: Props) {
             onPress={() => navigation.navigate("TeacherProfile")}
             style={styles.avatarCircle}
           >
-            <Ionicons color={colors.accent} name="person" size={18} />
+            <Ionicons color={AppTheme.colors.primary} name="person" size={18} />
           </Pressable>
         </View>
       </View>
@@ -255,7 +255,7 @@ export function TeacherSubjectsScreen({ navigation }: Props) {
           <RefreshControl
             onRefresh={onRefresh}
             refreshing={refreshing}
-            tintColor={colors.accent}
+            tintColor={AppTheme.colors.primary}
           />
         }
         showsVerticalScrollIndicator={false}
@@ -275,13 +275,13 @@ export function TeacherSubjectsScreen({ navigation }: Props) {
 
         {isLoading ? (
           <View style={styles.center}>
-            <ActivityIndicator color={colors.accent} size="large" />
+            <ActivityIndicator color={AppTheme.colors.primary} size="large" />
             <Text style={styles.loadingText}>Loading your subjects…</Text>
           </View>
         ) : error ? (
           <View style={styles.center}>
             <Ionicons
-              color={colors.textMuted}
+              color={AppTheme.colors.textSecondary}
               name="cloud-offline-outline"
               size={40}
             />
@@ -293,7 +293,7 @@ export function TeacherSubjectsScreen({ navigation }: Props) {
           </View>
         ) : subjects.length === 0 ? (
           <View style={styles.center}>
-            <Ionicons color={colors.textMuted} name="book-outline" size={44} />
+            <Ionicons color={AppTheme.colors.textSecondary} name="book-outline" size={44} />
             <Text style={styles.emptyTitle}>No subjects assigned</Text>
             <Text style={styles.emptyBody}>
               Your school admin will assign subjects to you.
@@ -326,7 +326,7 @@ export function TeacherSubjectsScreen({ navigation }: Props) {
 
             {filteredRows.length === 0 ? (
               <View style={styles.emptyFilters}>
-                <Ionicons name="search" size={46} color={colors.textMuted} />
+                <Ionicons name="search" size={46} color={AppTheme.colors.textSecondary} />
 
                 <Text style={styles.emptyTitle}>No matching subjects</Text>
 
@@ -444,21 +444,21 @@ export function TeacherSubjectsScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
+  safe: { flex: 1, backgroundColor: AppTheme.colors.background },
   header: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 14,
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: AppTheme.colors.border,
   },
   headerLeft: { width: 40 },
   headerTitle: {
     flex: 1,
     textAlign: "center",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 17,
     fontWeight: "700",
   },
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primarySoft,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -482,43 +482,43 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: "700",
     letterSpacing: 1.2,
-    color: colors.accent,
+    color: AppTheme.colors.primary,
   },
   pageTitle: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 32,
     fontWeight: "800",
     letterSpacing: -0.75,
   },
-  pageSubtitle: { color: colors.textSecondary, fontSize: 15, lineHeight: 22 },
+  pageSubtitle: { color: AppTheme.colors.textSecondary, fontSize: 15, lineHeight: 22 },
   center: { alignItems: "center", paddingVertical: 56, gap: 10 },
-  loadingText: { color: colors.textSecondary, fontSize: 14 },
-  emptyTitle: { color: colors.textPrimary, fontSize: 16, fontWeight: "700" },
-  emptyBody: { color: colors.textSecondary, fontSize: 14, textAlign: "center" },
+  loadingText: { color: AppTheme.colors.textSecondary, fontSize: 14 },
+  emptyTitle: { color: AppTheme.colors.textPrimary, fontSize: 16, fontWeight: "700" },
+  emptyBody: { color: AppTheme.colors.textSecondary, fontSize: 14, textAlign: "center" },
   retryBtn: {
     marginTop: 8,
-    borderRadius: 10,
-    backgroundColor: colors.accentSoft,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primarySoft,
     paddingHorizontal: 20,
     paddingVertical: 10,
   },
-  retryText: { color: colors.accentDark, fontWeight: "700", fontSize: 14 },
+  retryText: { color: AppTheme.colors.primaryDark, fontWeight: "700", fontSize: 14 },
   list: { gap: 24 },
   classGroup: { gap: 14 },
   classGroupHeader: {
     fontSize: 11,
     fontWeight: "800",
     letterSpacing: 1.4,
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
     textTransform: "uppercase",
   },
 
   // Subject Card
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     overflow: "hidden",
     padding: 20,
     gap: 14,
@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   cardName: {
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     fontSize: 26,
     fontWeight: "800",
     letterSpacing: -0.5,
@@ -566,18 +566,18 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: colors.accentSoft,
+    backgroundColor: AppTheme.colors.primarySoft,
     alignItems: "center",
     justifyContent: "center",
   },
   cardFooterLabel: {
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
     fontSize: 10,
     fontWeight: "700",
     letterSpacing: 0.8,
   },
   cardTeacher: {
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     fontSize: 12,
     fontWeight: "600",
   },

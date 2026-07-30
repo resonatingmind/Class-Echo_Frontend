@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 import { LearningPlanOut, LearningPlanCreatePayload } from "../../types/api";
 
 type Props = {
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: "#CBD5E1",
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 14,
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
   cancelBtn: {
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
     backgroundColor: "#F1F5F9",
   },
   cancelText: {
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   saveBtn: {
     paddingHorizontal: 20,
     paddingVertical: 10,
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
     backgroundColor: "#0284C7",
   },
   disabledBtn: {

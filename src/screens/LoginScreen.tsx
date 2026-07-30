@@ -161,7 +161,7 @@ export function LoginScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: AppTheme.colors.background,
+    backgroundColor: AppTheme.AppTheme.colors.background,
   },
   flex: { flex: 1 },
   scroll: {
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   signupLabel: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
   },
   signupLink: {
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   footerText: {
-    color: AppTheme.colors.textSecondary,
+    color: AppTheme.AppTheme.colors.textSecondary,
     ...AppTheme.typography.caption,
     textAlign: "center",
   },

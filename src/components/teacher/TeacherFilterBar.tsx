@@ -1,6 +1,6 @@
 import { StyleSheet, TextInput, View } from "react-native";
 
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 
 type Props = {
   search: string;
@@ -28,8 +28,8 @@ const styles = StyleSheet.create({
   search: {
     backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
+    borderColor: AppTheme.colors.border,
+    borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 16,
     height: 48,
   },

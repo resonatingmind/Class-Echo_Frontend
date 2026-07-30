@@ -149,7 +149,7 @@ export function TimetableEntryModal({
                 </View>
 
                 <Pressable onPress={onClose} hitSlop={12}>
-                  <Ionicons name="close" size={24} color={colors.textSecondary} />
+                  <Ionicons name="close" size={24} color={AppTheme.colors.textSecondary} />
                 </Pressable>
               </View>
 
@@ -204,7 +204,7 @@ export function TimetableEntryModal({
                   >
                     {selectedSubjectName ?? "Choose from class subjects"}
                   </Text>
-                  <Ionicons name="chevron-down" size={18} color={colors.textMuted} />
+                  <Ionicons name="chevron-down" size={18} color={AppTheme.colors.textSecondary} />
                 </Pressable>
                 {subjects.length === 0 ? (
                   <Text style={styles.helperNote}>
@@ -225,7 +225,7 @@ export function TimetableEntryModal({
                   >
                     {selectedTeacherName ?? "Assign a teacher"}
                   </Text>
-                  <Ionicons name="chevron-down" size={18} color={colors.textMuted} />
+                  <Ionicons name="chevron-down" size={18} color={AppTheme.colors.textSecondary} />
                 </Pressable>
 
                 <Text style={styles.label}>Room (optional)</Text>
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   },
 
   sheet: {
-    backgroundColor: colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 20,
@@ -310,13 +310,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: "800",
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   subtitle: {
     marginTop: 2,
     fontSize: 13,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
 
   scroll: {
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     fontWeight: "700",
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     marginTop: 16,
     marginBottom: 6,
   },
@@ -343,21 +343,21 @@ const styles = StyleSheet.create({
   input: {
     height: 48,
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
+    borderColor: AppTheme.colors.border,
+    borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 14,
     fontSize: 15,
-    color: colors.textPrimary,
-    backgroundColor: colors.surfaceSoft,
+    color: AppTheme.colors.textPrimary,
+    backgroundColor: AppTheme.colors.surfaceSoft,
   },
 
   selectInput: {
     height: 48,
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
+    borderColor: AppTheme.colors.border,
+    borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 14,
-    backgroundColor: colors.surfaceSoft,
+    backgroundColor: AppTheme.colors.surfaceSoft,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -365,17 +365,17 @@ const styles = StyleSheet.create({
 
   selectInputText: {
     fontSize: 15,
-    color: colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
 
   placeholderText: {
-    color: colors.textPlaceholder,
+    color: AppTheme.colors.textPlaceholder,
   },
 
   helperNote: {
     marginTop: 6,
     fontSize: 12,
-    color: colors.textMuted,
+    color: AppTheme.colors.textSecondary,
   },
 
   errorText: {
@@ -387,8 +387,8 @@ const styles = StyleSheet.create({
   submitButton: {
     marginTop: 24,
     height: 52,
-    borderRadius: 14,
-    backgroundColor: colors.accent,
+    borderRadius: AppTheme.radius.large,
+    backgroundColor: AppTheme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },

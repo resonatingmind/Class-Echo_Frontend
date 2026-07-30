@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors } from "../theme/colors";
+import { AppTheme } from "../theme/AppTheme";
 import { LearningPlanOut, RecordingWithReport } from "../types/api";
 import { formatAudioTime } from "../lib/audio";
 
@@ -30,7 +30,7 @@ type Props = {
 function getScoreColor(score: number | undefined | null) {
   if (score == null) return "#64748B";
   if (score >= 80) return "#127A40";
-  if (score >= 60) return colors.accent;
+  if (score >= 60) return AppTheme.colors.primary;
   if (score >= 40) return "#92400E";
   return "#B42318";
 }
@@ -42,7 +42,7 @@ function getStatusStyle(status: string) {
   } else if (norm === "processing") {
     return { bg: "#FFF4E0", text: "#92400E", label: "Processing" };
   } else if (norm === "pending") {
-    return { bg: colors.surfaceMuted, text: colors.textSecondary, label: "Pending" };
+    return { bg: AppTheme.colors.surfaceMuted, text: AppTheme.colors.textSecondary, label: "Pending" };
   } else {
     return { bg: "#FFF1F1", text: "#B42318", label: "No Video" };
   }
@@ -372,7 +372,7 @@ export function ExpandedChapterDetailView({
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#F8FAFC",
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
     borderColor: "#CBD5E1",
     padding: 12,
@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
     backgroundColor: "#F8FAFC",
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
   },
   loadingText: {
     fontSize: 13,
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: 8,
+    borderRadius: AppTheme.radius.small,
     borderWidth: 1,
     borderColor: "#E2E8F0",
   },
@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
   emptyCard: {
     backgroundColor: "#FFFFFF",
     padding: 16,
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
     borderColor: "#E2E8F0",
     alignItems: "center",
@@ -502,7 +502,7 @@ const styles = StyleSheet.create({
   /* Sub-Table Styles */
   subTableWrapper: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
     borderColor: "#CBD5E1",
     overflow: "hidden",

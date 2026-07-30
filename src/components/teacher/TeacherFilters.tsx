@@ -1,6 +1,6 @@
 import { StyleSheet, TextInput, View } from "react-native";
 
-import { colors } from "../../theme/colors";
+import { AppTheme } from "../../theme/AppTheme";
 
 import { TeacherFilterSelect } from "./TeacherFilterSelect";
 
@@ -78,8 +78,8 @@ const styles = StyleSheet.create({
   search: {
     height: 48,
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
+    borderColor: AppTheme.colors.border,
+    borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 16,
     backgroundColor: "#fff",
     marginBottom: 14,
@@ -95,9 +95,9 @@ const styles = StyleSheet.create({
   filter: {
     width: "48%",
     height: 46,
-    borderRadius: 12,
+    borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: AppTheme.colors.border,
     backgroundColor: "#fff",
   },
 });

@@ -151,18 +151,7 @@ export function SchoolAdminProfileScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView edges={[]} style={styles.safe}>
-      <ScreenHeader
-        title="My Profile"
-        onBack={() => {
-          if (navigation.canGoBack()) {
-            navigation.goBack();
-          } else {
-            navigation.navigate("SchoolAdminTabs", {
-              screen: "SchoolAdminProfile",
-            });
-          }
-        }}
-      />
+      <ScreenHeader title="My Profile" />
 
       {isLoading ? (
         <View style={styles.center}>

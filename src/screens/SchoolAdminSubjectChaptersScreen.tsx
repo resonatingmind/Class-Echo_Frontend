@@ -29,6 +29,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 import { ChapterOut, LearningPlanOut, RecordingWithReport } from '../types/api';
 import { ExpandedChapterDetailView } from '../components/ExpandedChapterDetailView';
+import { ScreenHeader } from '../components/common/ScreenHeader';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SchoolAdminSubjectChapters'>;
 
@@ -270,27 +271,21 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
 
   return (
     <SafeAreaView edges={['top']} style={styles.safe}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Pressable onPress={() => {
+      <ScreenHeader
+        title={subjectName}
+        onBack={() => {
           if (navigation.canGoBack()) {
             navigation.goBack();
           } else {
-            navigation.navigate("SchoolAdminSubjectDetail", {
-              subjectId: route.params.subjectId,
-              subjectName: route.params.subjectName,
-            });
+            navigation.navigate("SchoolAdminClasses");
           }
-        }} style={styles.backBtn}>
-          <Ionicons color={colors.textPrimary} name="arrow-back" size={22} />
-        </Pressable>
-        <Text style={styles.headerTitle} numberOfLines={1}>
-          {subjectName}
-        </Text>
-        <Pressable onPress={openCreateModal} style={styles.headerAddBtn}>
-          <Ionicons color={colors.accent} name="add" size={24} />
-        </Pressable>
-      </View>
+        }}
+        rightActions={
+          <Pressable onPress={openCreateModal} hitSlop={8}>
+            <Ionicons color={colors.accent} name="add" size={24} />
+          </Pressable>
+        }
+      />
 
       <ScrollView
         contentContainerStyle={styles.scroll}
@@ -542,24 +537,6 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  backBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    color: colors.textPrimary,
-    fontSize: 17,
-    fontWeight: '700',
-  },
-  headerAddBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   scroll: { paddingBottom: 40 },
 
   // Page heading

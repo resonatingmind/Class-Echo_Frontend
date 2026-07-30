@@ -5,11 +5,13 @@ import { FloatingPillTabBar, FloatingTabItem } from "../components/common/Floati
 
 import { SchoolAdminDashboardScreen } from "../screens/SchoolAdminDashboardScreen";
 import { SchoolAdminTeachersScreen } from "../screens/SchoolAdminTeachersScreen";
+import { SchoolAdminStudentsScreen } from "../screens/SchoolAdminStudentsScreen";
 import { SchoolAdminProfileScreen } from "../screens/SchoolAdminProfileScreen";
 
 export type SchoolAdminTabParamList = {
   SchoolAdminDashboard: undefined;
   SchoolAdminTeachers: undefined;
+  SchoolAdminStudents: undefined;
   SchoolAdminProfile: undefined;
 };
 
@@ -18,6 +20,7 @@ const Tab = createBottomTabNavigator<SchoolAdminTabParamList>();
 const TABS: FloatingTabItem[] = [
   { key: "SchoolAdminDashboard", label: "Dashboard", icon: "grid-outline",          activeIcon: "grid"          },
   { key: "SchoolAdminTeachers",  label: "Teachers",  icon: "people-outline",        activeIcon: "people"        },
+  { key: "SchoolAdminStudents",  label: "Students",  icon: "school-outline",       activeIcon: "school"        },
   { key: "SchoolAdminProfile",   label: "Profile",   icon: "person-outline",        activeIcon: "person"        },
 ];
 
@@ -52,6 +55,7 @@ export function SchoolAdminTabNavigator() {
     >
       <Tab.Screen name="SchoolAdminDashboard" component={SchoolAdminDashboardScreen as any} options={{ title: "Dashboard" }} />
       <Tab.Screen name="SchoolAdminTeachers"  component={SchoolAdminTeachersScreen as any}  options={{ title: "Teachers"  }} />
+      <Tab.Screen name="SchoolAdminStudents"  component={SchoolAdminStudentsScreen as any}  options={{ title: "Students"  }} />
       <Tab.Screen name="SchoolAdminProfile"   component={SchoolAdminProfileScreen as any}   options={{ title: "Profile"   }} />
     </Tab.Navigator>
   );

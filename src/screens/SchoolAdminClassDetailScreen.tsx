@@ -17,7 +17,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '../context/AuthContext';
 import {
-  assignTeacherToSubject,
   createSubject,
   getClassSubjects,
   getSchoolAdminTeachers,
@@ -25,6 +24,7 @@ import {
 } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { ScreenHeader } from '../components/common/ScreenHeader';
+import { AssignTeacherModal } from '../components/AssignTeacherModal';
 import { colors } from '../theme/colors';
 import { SubjectOut, TeacherOut } from '../types/api';
 
@@ -124,105 +124,6 @@ function AddSubjectModal({
               )}
             </Pressable>
           </View>
-        </Pressable>
-      </Pressable>
-    </Modal>
-  );
-}
-
-// ── Assign Teacher Modal ──────────────────────────────────────────────────────
-
-function AssignTeacherModal({
-  visible,
-  subject,
-  teachers,
-  onClose,
-  onAssigned,
-}: {
-  visible: boolean;
-  subject: SubjectOut | null;
-  teachers: TeacherOut[];
-  onClose: () => void;
-  onAssigned: (updated: SubjectOut) => void;
-}) {
-  const { session } = useAuth();
-  const [assigningId, setAssigningId] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleAssign = async (teacherId: number) => {
-    if (!session || !subject || assigningId) return;
-    setAssigningId(teacherId);
-    setError(null);
-    try {
-      const updated = await assignTeacherToSubject(session.token, subject.id, teacherId);
-      onAssigned(updated);
-      onClose();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to assign teacher');
-    } finally {
-      setAssigningId(null);
-    }
-  };
-
-  return (
-    <Modal animationType="slide" onRequestClose={onClose} transparent visible={visible}>
-      <Pressable onPress={onClose} style={styles.modalOverlay}>
-        <Pressable style={styles.modalSheet}>
-          <View style={styles.modalHandle} />
-          <Text style={styles.modalTitle}>Assign Teacher</Text>
-          {subject ? (
-            <Text style={styles.modalSubtitle}>
-              Assign a faculty member to <Text style={{ fontWeight: '700' }}>{subject.name}</Text>.
-            </Text>
-          ) : null}
-
-          {error ? (
-            <View style={styles.modalError}>
-              <Ionicons color="#B42318" name="alert-circle-outline" size={14} />
-              <Text style={styles.modalErrorText}>{error}</Text>
-            </View>
-          ) : null}
-
-          {teachers.length === 0 ? (
-            <View style={styles.noTeachersBox}>
-              <Ionicons color={colors.textMuted} name="people-outline" size={32} />
-              <Text style={styles.noTeachersText}>
-                No teachers available. Add faculty from the Teachers tab first.
-              </Text>
-            </View>
-          ) : (
-            <ScrollView style={styles.teacherList} showsVerticalScrollIndicator={false}>
-              {teachers.map((teacher) => {
-                const isCurrentTeacher = subject?.teacher_id === teacher.id;
-                const isAssigning = assigningId === teacher.id;
-                const initials = teacher.name.split(' ').map((w) => w[0] ?? '').join('').toUpperCase().slice(0, 2);
-                return (
-                  <Pressable
-                    key={teacher.id}
-                    onPress={() => handleAssign(teacher.id)}
-                    style={[styles.teacherRow, isCurrentTeacher && styles.teacherRowActive]}
-                  >
-                    <View style={[styles.teacherAvatar, isCurrentTeacher && styles.teacherAvatarActive]}>
-                      <Text style={[styles.teacherAvatarText, isCurrentTeacher && styles.teacherAvatarTextActive]}>
-                        {initials}
-                      </Text>
-                    </View>
-                    <View style={styles.teacherInfo}>
-                      <Text style={styles.teacherName}>{teacher.name}</Text>
-                      <Text style={styles.teacherEmail}>{teacher.email}</Text>
-                    </View>
-                    {isAssigning ? (
-                      <ActivityIndicator color={colors.accent} size="small" />
-                    ) : isCurrentTeacher ? (
-                      <Ionicons color={colors.accent} name="checkmark-circle" size={20} />
-                    ) : (
-                      <Ionicons color={colors.textMuted} name="chevron-forward" size={18} />
-                    )}
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-          )}
         </Pressable>
       </Pressable>
     </Modal>
@@ -590,7 +491,9 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
       <AssignTeacherModal
         onAssigned={handleTeacherAssigned}
         onClose={() => setAssignTarget(null)}
-        subject={assignTarget}
+        subjectId={assignTarget?.id ?? null}
+        subjectName={assignTarget?.name ?? ''}
+        currentTeacherId={assignTarget?.teacher?.id ?? null}
         teachers={teachers}
         visible={assignTarget !== null}
       />
@@ -911,47 +814,6 @@ const styles = StyleSheet.create({
   },
   btnDisabled: { opacity: 0.45 },
   modalSubmitText: { color: "#fff", fontWeight: "700", fontSize: 15 },
-
-  // Teacher list in assign modal
-  teacherList: { maxHeight: 300 },
-  teacherRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-    paddingVertical: 12,
-    paddingHorizontal: 4,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  teacherRowActive: {
-    backgroundColor: colors.accentSoft + "55",
-    borderRadius: 12,
-  },
-  teacherAvatar: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: colors.surfaceMuted,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  teacherAvatarActive: { backgroundColor: colors.accentSoft },
-  teacherAvatarText: {
-    color: colors.textSecondary,
-    fontSize: 13,
-    fontWeight: "800",
-  },
-  teacherAvatarTextActive: { color: colors.accentDark },
-  teacherInfo: { flex: 1, gap: 2 },
-  teacherName: { color: colors.textPrimary, fontSize: 15, fontWeight: "700" },
-  teacherEmail: { color: colors.textMuted, fontSize: 12 },
-  noTeachersBox: { alignItems: "center", padding: 24, gap: 10 },
-  noTeachersText: {
-    color: colors.textSecondary,
-    fontSize: 14,
-    textAlign: "center",
-    lineHeight: 20,
-  },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",

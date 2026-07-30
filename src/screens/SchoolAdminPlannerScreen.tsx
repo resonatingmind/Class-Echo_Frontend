@@ -15,9 +15,10 @@ import { PlannerTableRow } from "../components/planner/PlannerTableRow";
 import { PlannerEmpty } from "../components/planner/PlannerEmpty";
 import { PlannerFilterModal } from "../components/planner/PlannerFilterModal";
 import { QuickAssignmentModal } from "../components/planner/QuickAssignmentModal";
+import { AssignTeacherModal } from "../components/AssignTeacherModal";
 
-import { PlannerItemOut } from "../types/api";
-import { getSchoolPlanner } from "../lib/api";
+import { PlannerItemOut, TeacherOut } from "../types/api";
+import { getSchoolPlanner, getSchoolAdminTeachers } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 
 type FilterType = "class" | "section" | "subject" | "teacher" | "year" | null;
@@ -28,7 +29,13 @@ export function SchoolAdminPlannerScreen() {
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [planner, setPlanner] = useState<PlannerItemOut[]>([]);
+  const [teachers, setTeachers] = useState<TeacherOut[]>([]);
   const [loading, setLoading] = useState(true);
+  const [assignTarget, setAssignTarget] = useState<{
+    subjectId: number;
+    subjectName: string;
+    teacherId: number | null;
+  } | null>(null);
 
   const [search, setSearch] = useState("");
   const [selectedClass, setSelectedClass] = useState<string | null>(null);
@@ -40,15 +47,13 @@ export function SchoolAdminPlannerScreen() {
 
   const [filterVisible, setFilterVisible] = useState(false);
   const [quickAssignmentVisible, setQuickAssignmentVisible] = useState(false);
-  const [prefill, setPrefill] = useState<{
-    className: string;
-    section: string;
-    subject: string;
-  } | null>(null);
   const [filterType, setFilterType] = useState<FilterType>(null);
 
   useEffect(() => {
     loadPlanner();
+    if (session?.token) {
+      getSchoolAdminTeachers(session.token).then(setTeachers).catch(() => {});
+    }
   }, [session]);
 
   async function loadPlanner() {
@@ -133,12 +138,7 @@ export function SchoolAdminPlannerScreen() {
     setSelectedYear(null);
   }
 
-  function openQuickAssignment(prefillValue?: {
-    className: string;
-    section: string;
-    subject: string;
-  }) {
-    setPrefill(prefillValue ?? null);
+  function openQuickAssignment() {
     setQuickAssignmentVisible(true);
   }
 
@@ -224,10 +224,10 @@ export function SchoolAdminPlannerScreen() {
                     })
                   }
                   onAssignTeacher={(assignItem) =>
-                    openQuickAssignment({
-                      className: assignItem.class_name,
-                      section: assignItem.section,
-                      subject: assignItem.subject_name,
+                    setAssignTarget({
+                      subjectId: assignItem.subject_id,
+                      subjectName: assignItem.subject_name,
+                      teacherId: assignItem.teacher_id,
                     })
                   }
                   onTeacherPress={(pressedItem) => {
@@ -306,7 +306,19 @@ export function SchoolAdminPlannerScreen() {
         onClose={() => setQuickAssignmentVisible(false)}
         token={session?.token ?? ""}
         onSuccess={loadPlanner}
-        initialAssignment={prefill}
+      />
+
+      <AssignTeacherModal
+        visible={assignTarget !== null}
+        subjectId={assignTarget?.subjectId ?? null}
+        subjectName={assignTarget?.subjectName ?? ""}
+        currentTeacherId={assignTarget?.teacherId ?? null}
+        teachers={teachers}
+        onClose={() => setAssignTarget(null)}
+        onAssigned={() => {
+          setAssignTarget(null);
+          void loadPlanner();
+        }}
       />
     </SafeAreaView>
   );

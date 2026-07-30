@@ -14,7 +14,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { SchoolAdminTabBar } from "../components/SchoolAdminTabBar";
 import { useAuth } from "../context/AuthContext";
 import {
   getSchoolAdminTeachers,
@@ -432,8 +431,6 @@ try {
           </Pressable>
         </View>
       </ScrollView>
-
-      <SchoolAdminTabBar active="dashboard" />
     </SafeAreaView>
   );
 }

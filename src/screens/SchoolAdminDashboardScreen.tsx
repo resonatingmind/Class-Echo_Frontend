@@ -11,53 +11,32 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useAuth } from "../context/AuthContext";
-import {
-  getSchoolAnalytics,
-  getSchoolDashboardOverview,
-  getTeacherRanking,
-} from "../lib/api";
-import {
-  SchoolAnalytics,
-  SchoolDashboardOverview,
-  TeacherRanking,
-} from "../types/api";
-import { colors } from "../theme/colors";
+import { getSchoolDashboardOverview, getTeacherRanking } from "../lib/api";
+import { SchoolDashboardOverview, TeacherRanking } from "../types/api";
+import { AppTheme } from "../theme/AppTheme";
 
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { Ionicons } from "@expo/vector-icons";
+import { AppLogo } from "../components/ui/AppLogo";
 
 type Props = NativeStackScreenProps<RootStackParamList, "SchoolAdminTabs">;
 
 export function SchoolAdminDashboardScreen({ navigation }: Props) {
-  const { session } = useAuth();
-
+  const { session, signOut } = useAuth();
   const [loading, setLoading] = useState(true);
-
-  const [overview, setOverview] = useState<SchoolDashboardOverview | null>(
-    null,
-  );
-
-  const [analytics, setAnalytics] = useState<SchoolAnalytics | null>(null);
-
+  const [overview, setOverview] = useState<SchoolDashboardOverview | null>(null);
   const [ranking, setRanking] = useState<TeacherRanking | null>(null);
-
-  // const [activity, setActivity] = useState<RecentActivity | null>(null);
 
   const load = useCallback(async () => {
     if (!session) return;
-
     setLoading(true);
-
     try {
-      const [overviewData, analyticsData, rankingData] = await Promise.all([
+      const [overviewData, rankingData] = await Promise.all([
         getSchoolDashboardOverview(session.token),
-        getSchoolAnalytics(session.token),
         getTeacherRanking(session.token),
       ]);
-
       setOverview(overviewData);
-      setAnalytics(analyticsData);
       setRanking(rankingData);
     } finally {
       setLoading(false);
@@ -70,338 +49,151 @@ export function SchoolAdminDashboardScreen({ navigation }: Props) {
     }, [load]),
   );
 
-  if (loading) {
-    return (
-      <SafeAreaView style={styles.center}>
-        <ActivityIndicator size="large" color={colors.accent} />
-      </SafeAreaView>
-    );
-  }
-
   return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.header}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => {
-              if (navigation.canGoBack()) {
-                navigation.goBack();
-              } else {
-                navigation.navigate("SchoolAdminTabs", {
-                  screen: "SchoolAdminDashboard",
-                });
-              }
-            }}
-          >
-            <Ionicons name="arrow-back" size={26} color={colors.textPrimary} />
-          </Pressable>
-
-          <View>
-            <Text style={styles.greeting}>Good Morning 👋</Text>
-
-            <Text style={styles.schoolName}>My School</Text>
-
-            <Text style={styles.adminName}>
-              Welcome back, School Administrator
-            </Text>
-          </View>
-
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>SA</Text>
-          </View>
+    <SafeAreaView edges={["top", "bottom"]} style={styles.safe}>
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={styles.headerLeft}>
+           <AppLogo hideText size={24} />
         </View>
-
-        <Text style={styles.sectionTitle}>School Overview</Text>
-
-        <View style={styles.statsGrid}>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{overview?.total_teachers}</Text>
-
-            <Text style={styles.statLabel}>Teachers</Text>
-          </View>
-
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{overview?.total_classes}</Text>
-
-            <Text style={styles.statLabel}>Classes</Text>
-          </View>
-
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{overview?.total_subjects}</Text>
-
-            <Text style={styles.statLabel}>Subjects</Text>
-          </View>
-        </View>
-
-        <View style={styles.recordingCard}>
-          <View>
-            <Text style={styles.recordTitle}>Total Recordings</Text>
-
-            <Text style={styles.recordValue}>{overview?.total_recordings}</Text>
-          </View>
-
-          <View>
-            <Text style={styles.recordTitle}>Pending Reports</Text>
-
-            <Text style={styles.pendingValue}>{overview?.pending_reports}</Text>
-          </View>
-        </View>
-
-        {/* <Text style={styles.sectionTitle}>AI Analytics</Text>
-
-        <View style={styles.analyticsGrid}>
-          <View style={styles.analyticsCard}>
-            <Text style={styles.analyticsLabel}>Overall Score</Text>
-
-            <Text style={styles.analyticsValue}>
-              {analytics?.overall_score ?? 0}%
-            </Text>
-
-            <View style={styles.progressBackground}>
-              <View
-                style={[
-                  styles.progressFill,
-                  {
-                    width: `${analytics?.overall_score ?? 0}%`,
-                  },
-                ]}
-              />
-            </View>
-          </View>
-
-          <View style={styles.analyticsCard}>
-            <Text style={styles.analyticsLabel}>Engagement</Text>
-
-            <Text style={styles.analyticsValue}>
-              {analytics?.engagement_score ?? 0}%
-            </Text>
-
-            <View style={styles.progressBackground}>
-              <View
-                style={[
-                  styles.progressFill,
-                  {
-                    width: `${analytics?.engagement_score ?? 0}%`,
-                  },
-                ]}
-              />
-            </View>
-          </View>
-
-          <View style={styles.analyticsCard}>
-            <Text style={styles.analyticsLabel}>Curriculum Coverage</Text>
-
-            <Text style={styles.analyticsValue}>
-              {analytics?.curriculum_coverage ?? 0}%
-            </Text>
-
-            <View style={styles.progressBackground}>
-              <View
-                style={[
-                  styles.progressFill,
-                  {
-                    width: `${analytics?.curriculum_coverage ?? 0}%`,
-                  },
-                ]}
-              />
-            </View>
-          </View>
-
-          <View style={styles.analyticsCard}>
-            <Text style={styles.analyticsLabel}>Accuracy</Text>
-
-            <Text style={styles.analyticsValue}>
-              {analytics?.accuracy_score ?? 0}%
-            </Text>
-
-            <View style={styles.progressBackground}>
-              <View
-                style={[
-                  styles.progressFill,
-                  {
-                    width: `${analytics?.accuracy_score ?? 0}%`,
-                  },
-                ]}
-              />
-            </View>
-          </View>
-        </View> */}
-
-        <Text style={styles.sectionTitle}>Quick Actions</Text>
-
-        <View style={styles.quickGrid}>
-          <Pressable
-            style={styles.quickCard}
-            onPress={() => navigation.navigate("SchoolAdminClasses")}
-          >
-            <Ionicons name="school" size={34} color={colors.accent} />
-
-            <Text style={styles.quickTitle}>Classes</Text>
-
-            <Text style={styles.quickSubtitle}>Manage</Text>
-          </Pressable>
-
-          <Pressable
-            style={styles.quickCard}
-            onPress={() =>
-              navigation.navigate("SchoolAdminTabs", {
-                screen: "SchoolAdminTeachers",
-              })
-            }
-          >
-            <Ionicons name="people" size={34} color={colors.accent} />
-
-            <Text style={styles.quickTitle}>Teachers</Text>
-
-            <Text style={styles.quickSubtitle}>Manage</Text>
-          </Pressable>
-
-          {/* <Pressable
-            style={styles.quickCard}
-            onPress={() =>
-              navigation.navigate("SchoolAdminTabs", {
-                screen: "SchoolAdminDashboard",
-              })
-            }
-          >
-            <Ionicons name="people-circle" size={34} color={colors.accent} />
-
-            <Text style={styles.quickTitle}>Students</Text>
-
-            <Text style={styles.quickSubtitle}>Browse</Text>
-          </Pressable> */}
-
-          <Pressable
-            style={styles.quickCard}
-            onPress={() => navigation.navigate("SchoolAdminPlanner")}
-          >
-            <Ionicons name="calendar-outline" size={34} color={colors.accent} />
-
-            <Text style={styles.quickTitle}>Planner</Text>
-
-            <Text style={styles.quickSubtitle}>Manage</Text>
-          </Pressable>
-
-          <Pressable
-            style={styles.quickCard}
-            onPress={() => navigation.navigate("SchoolAdminTimetable")}
-          >
-            <Ionicons name="calendar" size={34} color={colors.accent} />
-
-            <Text style={styles.quickTitle}>Timetable</Text>
-
-            <Text style={styles.quickSubtitle}>Manage</Text>
+        <Text style={styles.headerTitle}>School Admin</Text>
+        <View style={styles.headerRight}>
+          <Pressable onPress={signOut} style={styles.iconBtn}>
+            <Ionicons color={AppTheme.colors.textPrimary} name="log-out-outline" size={24} />
           </Pressable>
         </View>
+      </View>
 
-        {/* <View style={styles.quickActions}>
-          <Pressable
-            style={styles.actionCard}
-            onPress={() => navigation.navigate("SchoolAdminClasses")}
+      <View style={styles.flex}>
+        {loading ? (
+          <View style={[styles.centerContainer, { justifyContent: 'center' }]}>
+            <ActivityIndicator size="large" color={AppTheme.colors.primary} />
+          </View>
+        ) : (
+          <ScrollView
+            contentContainerStyle={styles.scroll}
+            showsVerticalScrollIndicator={false}
           >
-            <Ionicons name="school" size={28} color={colors.accent} />
-
-            <Text style={styles.actionTitle}>Manage Classes</Text>
-
-            <Text style={styles.actionSubtitle}>
-              View and manage all classes
-            </Text>
-          </Pressable>
-
-          <Pressable
-            style={styles.actionCard}
-            onPress={() =>
-              navigation.navigate("SchoolAdminTabs", {
-                screen: "SchoolAdminTeachers",
-              })
-            }
-          >
-            <Ionicons name="people" size={28} color={colors.accent} />
-
-            <Text style={styles.actionTitle}>Manage Teachers</Text>
-
-            <Text style={styles.actionSubtitle}>View teacher information</Text>
-          </Pressable>
-
-          <Pressable
-            style={styles.actionCard}
-            onPress={() =>
-              navigation.navigate("SchoolAdminTabs", {
-                screen: "SchoolAdminDashboard",
-              })
-            }
-          >
-            <Ionicons name="people-circle" size={28} color={colors.accent} />
-
-            <Text style={styles.actionTitle}>Manage Students</Text>
-
-            <Text style={styles.actionSubtitle}>Browse enrolled students</Text>
-          </Pressable>
-        </View> */}
-
-        <Text style={styles.sectionTitle}>Top Teachers</Text>
-
-        {ranking?.teachers.map((teacher, index) => {
-          const medal =
-            index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : "🏅";
-
-          return (
-            <View key={teacher.teacher_id} style={styles.teacherCard}>
-              <View style={styles.teacherLeft}>
-                <Text style={styles.teacherMedal}>{medal}</Text>
-
-                <View>
-                  <Text style={styles.teacherName}>{teacher.teacher_name}</Text>
-
-                  <Text style={styles.teacherLecture}>
-                    {teacher.total_lectures} Lectures
+            <View style={styles.centerContainer}>
+              <View style={styles.body}>
+                {/* Page heading */}
+                <View style={styles.pageHeading}>
+                  <Text style={styles.pageTitle}>Good Morning 👋</Text>
+                  <Text style={styles.pageSubtitle}>
+                    Welcome back, School Administrator
                   </Text>
                 </View>
-              </View>
 
-              <Text style={styles.teacherScore}>{teacher.overall_score}%</Text>
+                {/* Stats Grid */}
+                <Text style={styles.sectionTitle}>School Overview</Text>
+                <View style={styles.statsGrid}>
+                  <View style={styles.statCard}>
+                    <Text style={styles.statNumber}>{overview?.total_teachers}</Text>
+                    <Text style={styles.statLabel}>Teachers</Text>
+                  </View>
+                  <View style={styles.statCard}>
+                    <Text style={styles.statNumber}>{overview?.total_classes}</Text>
+                    <Text style={styles.statLabel}>Classes</Text>
+                  </View>
+                  <View style={styles.statCard}>
+                    <Text style={styles.statNumber}>{overview?.total_subjects}</Text>
+                    <Text style={styles.statLabel}>Subjects</Text>
+                  </View>
+                </View>
+
+                {/* Recordings & Reports */}
+                <View style={styles.recordingCard}>
+                  <View>
+                    <Text style={styles.recordTitle}>Total Recordings</Text>
+                    <Text style={styles.recordValue}>{overview?.total_recordings}</Text>
+                  </View>
+                  <View>
+                    <Text style={styles.recordTitle}>Pending Reports</Text>
+                    <Text style={styles.pendingValue}>{overview?.pending_reports}</Text>
+                  </View>
+                </View>
+
+                {/* Quick Actions */}
+                <Text style={styles.sectionTitle}>Quick Actions</Text>
+                <View style={styles.quickGrid}>
+                  <Pressable
+                    style={styles.quickCard}
+                    onPress={() => navigation.navigate("SchoolAdminClasses" as any)}
+                  >
+                    <View style={styles.quickIconContainer}>
+                      <Ionicons name="school" size={24} color={AppTheme.colors.primary} />
+                    </View>
+                    <View style={styles.quickTextContainer}>
+                      <Text style={styles.quickTitle}>Classes</Text>
+                      <Text style={styles.quickSubtitle}>Manage</Text>
+                    </View>
+                  </Pressable>
+
+                  <Pressable
+                    style={styles.quickCard}
+                    onPress={() => navigation.navigate("SchoolAdminPlanner" as any)}
+                  >
+                    <View style={styles.quickIconContainer}>
+                      <Ionicons name="calendar-outline" size={24} color={AppTheme.colors.primary} />
+                    </View>
+                    <View style={styles.quickTextContainer}>
+                      <Text style={styles.quickTitle}>Planner</Text>
+                      <Text style={styles.quickSubtitle}>Manage</Text>
+                    </View>
+                  </Pressable>
+
+                  <Pressable
+                    style={styles.quickCard}
+                    onPress={() => navigation.navigate("SchoolAdminTimetable" as any)}
+                  >
+                    <View style={styles.quickIconContainer}>
+                      <Ionicons name="calendar" size={24} color={AppTheme.colors.primary} />
+                    </View>
+                    <View style={styles.quickTextContainer}>
+                      <Text style={styles.quickTitle}>Timetable</Text>
+                      <Text style={styles.quickSubtitle}>Manage</Text>
+                    </View>
+                  </Pressable>
+                </View>
+
+                {/* Top Teachers */}
+                {ranking && ranking.teachers.length > 0 && (
+                  <>
+                    <Text style={styles.sectionTitle}>Top Teachers</Text>
+                    <View style={styles.list}>
+                      {ranking.teachers.map((teacher, index) => {
+                        const medal =
+                          index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : "🏅";
+
+                        return (
+                          <View key={teacher.teacher_id} style={styles.card}>
+                            <View style={styles.cardTop}>
+                              <View style={styles.cardIcon}>
+                                <Text style={styles.cardInitials}>{medal}</Text>
+                              </View>
+                              <View style={styles.cardBodyText}>
+                                <Text style={styles.cardName} numberOfLines={1}>
+                                  {teacher.teacher_name}
+                                </Text>
+                                <Text style={styles.cardAddress} numberOfLines={1}>
+                                  {teacher.total_lectures} Lectures
+                                </Text>
+                              </View>
+                              <View style={styles.scoreContainer}>
+                                <Text style={styles.teacherScore}>{teacher.overall_score}%</Text>
+                              </View>
+                            </View>
+                          </View>
+                        );
+                      })}
+                    </View>
+                  </>
+                )}
+              </View>
             </View>
-          );
-        })}
-
-        {/* <Text style={styles.sectionTitle}>Recent Activity</Text>
-
-        {activity?.activities.map((item) => (
-          <View key={item.recording_id} style={styles.activityCard}>
-            <View style={styles.activityHeader}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.activityTitle}>
-                  {item.lecture_title || "Untitled Lecture"}
-                </Text>
-
-                <Text style={styles.activityTeacher}>{item.teacher_name}</Text>
-              </View>
-
-              <View
-                style={[
-                  styles.statusBadge,
-                  item.status === "completed"
-                    ? styles.completedBadge
-                    : item.status === "processing"
-                      ? styles.processingBadge
-                      : item.status === "failed"
-                        ? styles.failedBadge
-                        : styles.pendingBadge,
-                ]}
-              >
-                <Text style={styles.statusText}>{item.status}</Text>
-              </View>
-            </View>
-
-            <Text style={styles.chapterText}>{item.chapter_name}</Text>
-
-            <Text style={styles.dateText}>
-              {new Date(item.uploaded_at).toLocaleDateString()}
-            </Text>
-          </View>
-        ))} */}
-      </ScrollView>
+          </ScrollView>
+        )}
+      </View>
     </SafeAreaView>
   );
 }
@@ -409,403 +201,198 @@ export function SchoolAdminDashboardScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: AppTheme.colors.background,
   },
-
-  content: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 40,
-    gap: 24,
+  flex: { flex: 1 },
+  scroll: {
+    flexGrow: 1,
   },
-
-  center: {
+  centerContainer: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.xl,
   },
-
+  body: {
+    width: "100%",
+    maxWidth: 800,
+    gap: AppTheme.spacing.l,
+  },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
-  },
-
-  greeting: {
-    fontSize: 18,
-    color: colors.textSecondary,
-  },
-
-  schoolName: {
-    fontSize: 30,
-    fontWeight: "800",
-    color: colors.textPrimary,
-    marginTop: 6,
-  },
-
-  adminName: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    marginTop: 6,
-  },
-
-  avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: colors.accent,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  avatarText: {
-    color: "#fff",
-    fontWeight: "800",
-    fontSize: 18,
-  },
-
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 20,
-
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-
-    elevation: 4,
-  },
-
-  title: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: colors.textPrimary,
-  },
-
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-
-  activity: {
-    paddingVertical: 8,
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.m,
+    backgroundColor: AppTheme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: AppTheme.colors.border,
   },
-
-  bold: {
-    fontWeight: "700",
+  headerLeft: {
+    width: 60,
+    alignItems: "flex-start",
   },
-
+  headerTitle: {
+    flex: 1,
+    textAlign: "center",
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.h3,
+  },
+  headerRight: {
+    flexDirection: "row",
+    gap: AppTheme.spacing.s,
+    width: 60,
+    justifyContent: "flex-end",
+  },
+  iconBtn: {
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  pageHeading: {
+    gap: AppTheme.spacing.s,
+    marginBottom: AppTheme.spacing.xs,
+  },
+  pageTitle: {
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.h1,
+  },
+  pageSubtitle: {
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.body,
+  },
   sectionTitle: {
-    fontSize: 24,
-    fontWeight: "800",
-    color: colors.textPrimary,
-    marginBottom: 12,
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.h3,
+    marginTop: AppTheme.spacing.s,
   },
-
   statsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
+    gap: AppTheme.spacing.m,
   },
-
   statCard: {
-    width: "48%",
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    paddingVertical: 26,
+    flex: 1,
+    minWidth: 100,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
+    paddingVertical: AppTheme.spacing.xl,
     alignItems: "center",
-    marginBottom: 14,
-
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
   },
-
   statNumber: {
-    fontSize: 32,
-    fontWeight: "800",
-    color: colors.accent,
+    color: AppTheme.colors.primary,
+    ...AppTheme.typography.h1,
   },
-
   statLabel: {
-    marginTop: 8,
-    fontSize: 15,
-    color: colors.textSecondary,
+    marginTop: AppTheme.spacing.xs,
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.body,
   },
-
   recordingCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 18,
-    padding: 22,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
+    padding: AppTheme.spacing.xl,
     flexDirection: "row",
     justifyContent: "space-between",
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
   },
-
   recordTitle: {
-    fontSize: 14,
-    color: colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.body,
   },
-
   recordValue: {
-    marginTop: 8,
-    fontSize: 28,
-    fontWeight: "800",
-    color: colors.textPrimary,
+    marginTop: AppTheme.spacing.xs,
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.h1,
   },
-
   pendingValue: {
-    marginTop: 8,
-    fontSize: 28,
-    fontWeight: "800",
-    color: "#E53935",
+    marginTop: AppTheme.spacing.xs,
+    color: AppTheme.colors.error,
+    ...AppTheme.typography.h1,
   },
-
-  analyticsGrid: {
-    gap: 16,
-  },
-
-  analyticsCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 18,
-    padding: 20,
-  },
-
-  analyticsLabel: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-
-  analyticsValue: {
-    marginTop: 6,
-    fontSize: 30,
-    fontWeight: "800",
-    color: colors.accent,
-  },
-
-  progressBackground: {
-    marginTop: 16,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#E8EDF4",
-    overflow: "hidden",
-  },
-
-  progressFill: {
-    height: "100%",
-    borderRadius: 5,
-    backgroundColor: colors.accent,
-  },
-
-  teacherCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 18,
-    marginBottom: 14,
-
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-
-    elevation: 3,
-  },
-
-  teacherLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  teacherMedal: {
-    fontSize: 28,
-    marginRight: 14,
-  },
-
-  teacherName: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: colors.textPrimary,
-  },
-
-  teacherLecture: {
-    marginTop: 4,
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
-
-  teacherScore: {
-    fontSize: 26,
-    fontWeight: "800",
-    color: colors.accent,
-  },
-
-  // quickActions: {
-  //   gap: 16,
-  // },
-
-  // actionCard: {
-  //   backgroundColor: colors.surface,
-  //   borderRadius: 20,
-  //   padding: 22,
-
-  //   shadowColor: "#000",
-  //   shadowOffset: {
-  //     width: 0,
-  //     height: 2,
-  //   },
-  //   shadowOpacity: 0.08,
-  //   shadowRadius: 8,
-
-  //   elevation: 3,
-  // },
-
-  // actionTitle: {
-  //   marginTop: 14,
-  //   fontSize: 18,
-  //   fontWeight: "700",
-  //   color: colors.textPrimary,
-  // },
-
-  // actionSubtitle: {
-  //   marginTop: 6,
-  //   color: colors.textSecondary,
-  //   fontSize: 14,
-  // },
-
   quickGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
+    gap: AppTheme.spacing.m,
   },
-
   quickCard: {
-    width: "48%",
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    paddingVertical: 28,
-    alignItems: "center",
-    marginBottom: 16,
-
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-
-  quickTitle: {
-    marginTop: 14,
-    fontSize: 18,
-    fontWeight: "700",
-    color: colors.textPrimary,
-  },
-
-  quickSubtitle: {
-    marginTop: 6,
-    color: colors.textSecondary,
-    fontSize: 14,
-  },
-
-  activityCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 18,
-    marginBottom: 14,
-
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-
-    elevation: 3,
-  },
-
-  activityHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-
-  activityTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: colors.textPrimary,
-  },
-
-  activityTeacher: {
-    marginTop: 4,
-    color: colors.textSecondary,
-  },
-
-  chapterText: {
-    marginTop: 10,
-    color: colors.textPrimary,
-  },
-
-  dateText: {
-    marginTop: 8,
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
-
-  statusBadge: {
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-
-  completedBadge: {
-    backgroundColor: "#DFF6E3",
-  },
-
-  processingBadge: {
-    backgroundColor: "#FFF4D6",
-  },
-
-  failedBadge: {
-    backgroundColor: "#FFE0E0",
-  },
-
-  pendingBadge: {
-    backgroundColor: "#ECECEC",
-  },
-
-  statusText: {
-    fontWeight: "700",
-    fontSize: 12,
-  },
-  backButton: {
-    marginRight: 14,
-    alignSelf: "flex-start",
-    marginTop: 6,
-  },
-
-  headerContent: {
     flex: 1,
+    minWidth: 150,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
+    padding: AppTheme.spacing.l,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: AppTheme.spacing.m,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+  },
+  quickIconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primaryLight,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  quickTextContainer: {
+    flex: 1,
+  },
+  quickTitle: {
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.bodyLarge,
+    fontWeight: "700",
+  },
+  quickSubtitle: {
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.caption,
+  },
+  list: {
+    gap: AppTheme.spacing.m,
+  },
+  card: {
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+  },
+  cardTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: AppTheme.spacing.m,
+    padding: AppTheme.spacing.l,
+  },
+  cardIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.background,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cardInitials: {
+    fontSize: 24,
+  },
+  cardBodyText: {
+    flex: 1,
+    gap: AppTheme.spacing.xs,
+  },
+  cardName: {
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.h3,
+  },
+  cardAddress: {
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.body,
+  },
+  scoreContainer: {
+    justifyContent: "center",
+  },
+  teacherScore: {
+    color: AppTheme.colors.primary,
+    ...AppTheme.typography.h2,
   },
 });

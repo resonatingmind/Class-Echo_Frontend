@@ -26,8 +26,8 @@ import {
   TeacherProfile,
   getTeacherProfile,
 } from "../lib/api";
-import { SchoolAdminTabBar } from "../components/SchoolAdminTabBar";
 import { colors } from "../theme/colors";
+import { ScreenHeader } from "../components/common/ScreenHeader";
 
 type Props = NativeStackScreenProps<
   RootStackParamList,
@@ -286,34 +286,21 @@ export function SchoolAdminTeacherAnalyticsScreen({
 
   return (
     <SafeAreaView style={styles.safe}>
+      <ScreenHeader
+        variant="large"
+        title="Teacher Analytics"
+        subtitle="Track performance, engagement & AI-powered teaching insights."
+        onBack={() => {
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          } else {
+            navigation.navigate("SchoolAdminTabs", {
+              screen: "SchoolAdminTeachers",
+            });
+          }
+        }}
+      />
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.header}>
-          <Pressable
-            onPress={() => {
-              navigation.goBack();
-            }}
-            style={styles.headerButton}
-          >
-            <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
-          </Pressable>
-
-          <View style={styles.headerCenter}>
-            <Text style={styles.pageTitle}>Teacher Analytics</Text>
-
-            <Text style={styles.pageSubtitle}>
-              Track performance, engagement & AI-powered teaching insights.
-            </Text>
-          </View>
-
-          <Pressable style={styles.headerButton}>
-            <Ionicons
-              name="calendar-outline"
-              size={22}
-              color={colors.textPrimary}
-            />
-          </Pressable>
-        </View>
-
         {/* HERO CARD (KEPT ABOVE THE FILTER CARD) */}
         <View style={styles.analyticsHeroCard}>
           {/* Left Side */}
@@ -1289,8 +1276,6 @@ export function SchoolAdminTeacherAnalyticsScreen({
           setEndDate(formatLocalDate(date));
         }}
       />
-
-      <SchoolAdminTabBar active="dashboard" />
     </SafeAreaView>
   );
 }
@@ -1823,48 +1808,6 @@ const styles = StyleSheet.create({
   monthAverage: {
     fontSize: 14,
     color: colors.textSecondary,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 24,
-  },
-
-  headerButton: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
-    backgroundColor: colors.surface,
-    justifyContent: "center",
-    alignItems: "center",
-
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    elevation: 3,
-  },
-
-  headerCenter: {
-    flex: 1,
-    marginHorizontal: 18,
-  },
-
-  pageTitle: {
-    fontSize: 32,
-    fontWeight: "800",
-    color: colors.textPrimary,
-  },
-
-  pageSubtitle: {
-    marginTop: 4,
-    fontSize: 15,
-    color: colors.textSecondary,
-    lineHeight: 22,
   },
   analyticsHeroCard: {
     backgroundColor: colors.surface,

@@ -39,6 +39,7 @@ import {
 } from '../types/api';
 import { LearningPlanTable } from "../components/teacher/LearningPlanTable";
 import { ChapterLearningPlanModal } from "../components/teacher/ChapterLearningPlanModal";
+import { ScreenHeader } from "../components/common/ScreenHeader";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SchoolAdminChapterDetail'>;
 
@@ -286,26 +287,21 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
 
   return (
     <SafeAreaView edges={['top']} style={styles.safe}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerInner}>
-          <Pressable onPress={() => {
+      <ScreenHeader
+        title={chapterName}
+        onBack={() => {
           if (navigation.canGoBack()) {
             navigation.goBack();
           } else {
             navigation.navigate("SchoolAdminClasses");
           }
-          }} style={styles.backBtn}>
-            <Ionicons color={colors.textPrimary} name="arrow-back" size={22} />
-          </Pressable>
-          <Text style={styles.headerTitle} numberOfLines={1}>
-            {chapterName}
-          </Text>
-          <Pressable onPress={() => void load(true)} style={styles.backBtn}>
+        }}
+        rightActions={
+          <Pressable onPress={() => void load(true)} hitSlop={8}>
             <Ionicons color={colors.textSecondary} name="refresh-outline" size={22} />
           </Pressable>
-        </View>
-      </View>
+        }
+      />
 
       <ScrollView
         contentContainerStyle={styles.scroll}
@@ -706,28 +702,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "700",
     fontSize: 13,
-  },
-  header: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  headerInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    maxWidth: 1280,
-    width: '100%',
-    alignSelf: 'center',
-  },
-  backBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    color: colors.textPrimary,
-    fontSize: 17,
-    fontWeight: '700',
   },
   scroll: { paddingBottom: 40 },
   mainContainer: {

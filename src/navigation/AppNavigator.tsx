@@ -20,7 +20,6 @@ import { SchoolAdminClassDetailScreen } from "../screens/SchoolAdminClassDetailS
 import { SchoolAdminClassesScreen } from "../screens/SchoolAdminClassesScreen";
 import { SchoolAdminPlannerScreen } from "../screens/SchoolAdminPlannerScreen";
 import { SchoolAdminTeacherDetailScreen } from "../screens/SchoolAdminTeacherDetailScreen";
-import { SchoolAdminSubjectDetailScreen } from "../screens/SchoolAdminSubjectDetailScreen";
 import { SchoolAdminSubjectChaptersScreen } from "../screens/SchoolAdminSubjectChaptersScreen";
 import { SchoolAdminChapterDetailScreen } from "../screens/SchoolAdminChapterDetailScreen";
 import { TeacherChapterDetailScreen } from "../screens/TeacherChapterDetailScreen";
@@ -96,7 +95,6 @@ export type RootStackParamList = {
   SchoolAdminPlannerDetail: {
     subjectId: number;
   };
-  SchoolAdminSubjectDetail: { subjectId: number; subjectName: string };
   SchoolAdminSubjectChapters: { subjectId: number; subjectName: string };
   SchoolAdminChapterDetail: {
     chapterId: number;
@@ -250,11 +248,6 @@ export function AppNavigator() {
           <Stack.Screen
             name="SchoolAdminTeacherRecordings"
             component={SchoolAdminTeacherRecordingsScreen}
-          />
-
-          <Stack.Screen
-            name="SchoolAdminSubjectDetail"
-            component={SchoolAdminSubjectDetailScreen}
           />
 
           <Stack.Screen

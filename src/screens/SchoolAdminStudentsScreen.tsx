@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { ScreenHeader } from "../components/common/ScreenHeader";
 import { useAuth } from "../context/AuthContext";
 import { getSchoolAdminStudents } from "../lib/api";
 import { RootStackParamList } from "../navigation/AppNavigator";
@@ -102,40 +103,7 @@ export function SchoolAdminStudentsScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <Pressable
-            onPress={() => {
-              if (navigation.canGoBack()) {
-                navigation.goBack();
-              } else {
-                navigation.navigate("SchoolAdminTabs", {
-                  screen: "SchoolAdminStudents",
-                });
-              }
-            }}
-            hitSlop={10}
-          >
-            <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
-          </Pressable>
-        </View>
-
-        <View style={styles.headerLeft} />
-        <Text style={styles.headerTitle}>EduAdmin</Text>
-        <View style={styles.headerRight}>
-          <Pressable
-            onPress={() =>
-              navigation.navigate("SchoolAdminTabs", {
-                screen: "SchoolAdminProfile",
-              })
-            }
-            style={styles.avatarCircle}
-          >
-            <Ionicons color={colors.accent} name="person" size={18} />
-          </Pressable>
-        </View>
-      </View>
+      <ScreenHeader title="Students" />
 
       {/* Search */}
       <View style={styles.searchWrap}>
@@ -259,32 +227,6 @@ export function SchoolAdminStudentsScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  headerLeft: { width: 40 },
-  headerTitle: {
-    flex: 1,
-    textAlign: "center",
-    color: colors.textPrimary,
-    fontSize: 17,
-    fontWeight: "700",
-  },
-  headerRight: { width: 40, alignItems: "flex-end" },
-  avatarCircle: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: colors.accentSoft,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   searchWrap: {
     paddingHorizontal: 20,
     paddingVertical: 12,

@@ -4,6 +4,8 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "@react-navigation/native";
 import {
   ActivityIndicator,
+  Alert,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -18,6 +20,10 @@ import {
   getSchoolAdminTeachers,
   getTeacherProfile,
   TeacherProfile,
+  approveSchoolAdminTeacher,
+  rejectSchoolAdminTeacher,
+  suspendSchoolAdminTeacher,
+  reactivateSchoolAdminTeacher,
 } from "../lib/api";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { ScreenHeader } from "../components/common/ScreenHeader";
@@ -97,6 +103,137 @@ try {
     );
   }
 
+  const getStatusDisplay = (status: string) => {
+    switch (status) {
+      case "active":
+        return {
+          text: "Active Teacher",
+          bgColor: "#ECFDF3",
+          textColor: "#16A34A",
+          icon: "checkmark-circle" as const,
+        };
+      case "pending_approval":
+        return {
+          text: "Pending Approval",
+          bgColor: "#FEF08A",
+          textColor: "#854D0E",
+          icon: "time-outline" as const,
+        };
+      case "invited":
+        return {
+          text: "Invited",
+          bgColor: "#F3F4F6",
+          textColor: "#374151",
+          icon: "mail-outline" as const,
+        };
+      case "suspended":
+        return {
+          text: "Suspended",
+          bgColor: "#FEE2E2",
+          textColor: "#991B1B",
+          icon: "ban-outline" as const,
+        };
+      case "rejected":
+        return {
+          text: "Declined",
+          bgColor: "#FEE2E2",
+          textColor: "#991B1B",
+          icon: "close-circle-outline" as const,
+        };
+      default:
+        return {
+          text: status,
+          bgColor: "#F3F4F6",
+          textColor: "#374151",
+          icon: "help-circle-outline" as const,
+        };
+    }
+  };
+
+  const handleApprove = async () => {
+    if (!session || !teacher) return;
+    try {
+      const updated = await approveSchoolAdminTeacher(session.token, teacher.id);
+      setTeacher(updated);
+      Alert.alert("Success", "Teacher request approved.");
+    } catch (e) {
+      Alert.alert("Error", e instanceof Error ? e.message : "Failed to approve.");
+    }
+  };
+
+  const handleReject = async () => {
+    if (!session || !teacher) return;
+    const action = () => {
+      let reason: string | null = null;
+      if (Platform.OS === "web") {
+        reason = window.prompt("Enter reason for declining:") || null;
+        if (reason === null) return; // Cancelled
+        void executeReject(reason);
+      } else {
+        Alert.prompt(
+          "Decline Request",
+          "Enter reason for declining this teacher registration request:",
+          [
+            { text: "Cancel", style: "cancel" },
+            {
+              text: "Decline",
+              style: "destructive",
+              onPress: (text) => void executeReject(text ?? ""),
+            },
+          ],
+          "plain-text"
+        );
+      }
+    };
+
+    const executeReject = async (reason: string) => {
+      try {
+        const updated = await rejectSchoolAdminTeacher(session.token, teacher.id, reason);
+        setTeacher(updated);
+        Alert.alert("Success", "Teacher request declined.");
+      } catch (e) {
+        Alert.alert("Error", e instanceof Error ? e.message : "Failed to decline.");
+      }
+    };
+
+    action();
+  };
+
+  const handleSuspend = async () => {
+    if (!session || !teacher) return;
+    Alert.alert(
+      "Suspend Account",
+      "Are you sure you want to suspend this teacher's account?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Suspend",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const updated = await suspendSchoolAdminTeacher(session.token, teacher.id);
+              setTeacher(updated);
+              Alert.alert("Success", "Teacher account suspended.");
+            } catch (e) {
+              Alert.alert("Error", e instanceof Error ? e.message : "Failed to suspend.");
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleReactivate = async () => {
+    if (!session || !teacher) return;
+    try {
+      const updated = await reactivateSchoolAdminTeacher(session.token, teacher.id);
+      setTeacher(updated);
+      Alert.alert("Success", "Teacher account reactivated.");
+    } catch (e) {
+      Alert.alert("Error", e instanceof Error ? e.message : "Failed to reactivate.");
+    }
+  };
+
   const handleBack = () => {
     if (navigation.canGoBack()) {
       navigation.goBack();
@@ -119,11 +256,17 @@ try {
 
             <Text style={styles.email}>{teacher.email}</Text>
 
-            <View style={styles.statusBadge}>
-              <Ionicons name="checkmark-circle" size={14} color="#16A34A" />
-
-              <Text style={styles.statusText}>Active Teacher</Text>
-            </View>
+            {(() => {
+              const display = getStatusDisplay(teacher.status ?? "active");
+              return (
+                <View style={[styles.statusBadge, { backgroundColor: display.bgColor }]}>
+                  <Ionicons name={display.icon} size={14} color={display.textColor} />
+                  <Text style={[styles.statusText, { color: display.textColor, marginLeft: 4 }]}>
+                    {display.text}
+                  </Text>
+                </View>
+              );
+            })()}
           </View>
         </View>
 
@@ -196,7 +339,7 @@ try {
 
         {profile.subjects.map((subject) => (
           <View key={subject.id} style={styles.subjectCard}>
-            <View style={styles.subjectHeader}>
+            <View style={subjectHeaderStyle(subject)}>
               <Ionicons name="book" size={24} color={colors.accent} />
 
               <View style={{ flex: 1 }}>
@@ -222,6 +365,45 @@ try {
 
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
+
+          {teacher.status === "pending_approval" && (
+            <View style={{ gap: 10, marginBottom: 6 }}>
+              <Pressable
+                style={[styles.actionButton, { backgroundColor: "#16A34A" }]}
+                onPress={handleApprove}
+              >
+                <Ionicons name="checkmark-circle" size={18} color="#fff" />
+                <Text style={styles.actionText}>Approve Request</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.actionButton, { backgroundColor: "#DC2626" }]}
+                onPress={handleReject}
+              >
+                <Ionicons name="close-circle" size={18} color="#fff" />
+                <Text style={styles.actionText}>Decline Request</Text>
+              </Pressable>
+            </View>
+          )}
+
+          {teacher.status === "active" && (
+            <Pressable
+              style={[styles.actionButton, { backgroundColor: "#DC2626", marginBottom: 6 }]}
+              onPress={handleSuspend}
+            >
+              <Ionicons name="ban" size={18} color="#fff" />
+              <Text style={styles.actionText}>Suspend Account</Text>
+            </Pressable>
+          )}
+
+          {teacher.status === "suspended" && (
+            <Pressable
+              style={[styles.actionButton, { backgroundColor: "#16A34A", marginBottom: 6 }]}
+              onPress={handleReactivate}
+            >
+              <Ionicons name="checkmark-circle" size={18} color="#fff" />
+              <Text style={styles.actionText}>Reactivate Account</Text>
+            </Pressable>
+          )}
 
           <Pressable
             style={styles.actionButton}
@@ -254,6 +436,15 @@ try {
       <SchoolAdminTabBar active="dashboard" />
     </SafeAreaView>
   );
+}
+
+// Inline helper for subject header style to prevent typescript/jsx issues
+function subjectHeaderStyle(subject: any) {
+  return {
+    flexDirection: "row" as const,
+    gap: 12,
+    alignItems: "center" as const,
+  };
 }
 
 const styles = StyleSheet.create({

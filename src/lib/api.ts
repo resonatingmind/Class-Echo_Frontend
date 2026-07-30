@@ -1598,6 +1598,45 @@ export async function getTeacherProfile(
   );
 }
 
+export async function approveSchoolAdminTeacher(token: string, teacherId: number) {
+  return request<TeacherOut>(
+    `/school/teachers/${teacherId}/approve`,
+    { method: "POST" },
+    token,
+  );
+}
+
+export async function rejectSchoolAdminTeacher(
+  token: string,
+  teacherId: number,
+  reason?: string,
+) {
+  return request<TeacherOut>(
+    `/school/teachers/${teacherId}/reject`,
+    {
+      method: "POST",
+      body: JSON.stringify({ reason }),
+    },
+    token,
+  );
+}
+
+export async function suspendSchoolAdminTeacher(token: string, teacherId: number) {
+  return request<TeacherOut>(
+    `/school/teachers/${teacherId}/suspend`,
+    { method: "POST" },
+    token,
+  );
+}
+
+export async function reactivateSchoolAdminTeacher(token: string, teacherId: number) {
+  return request<TeacherOut>(
+    `/school/teachers/${teacherId}/reactivate`,
+    { method: "POST" },
+    token,
+  );
+}
+
 export async function getSchoolRecordingDetail(
   token: string,
   recordingId: number,

@@ -12,8 +12,14 @@ export function PlannerHeader({ onCreatePress }: Props) {
     <View style={styles.pageHeading}>
       <View style={styles.titleRow}>
         <Text style={styles.pageTitle}>Academic Planner</Text>
-        <Pressable style={styles.addBtn} onPress={onCreatePress}>
-          <Ionicons name="add" size={14} color="#fff" />
+        <Pressable 
+          style={({ pressed }) => [
+            styles.addBtn,
+            pressed && { opacity: 0.8 }
+          ]} 
+          onPress={onCreatePress}
+        >
+          <Ionicons name="add" size={16} color="#fff" />
           <Text style={styles.addText}>Quick assignment</Text>
         </Pressable>
       </View>
@@ -52,8 +58,9 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     borderRadius: AppTheme.radius.medium,
     backgroundColor: AppTheme.colors.primary,
-    paddingHorizontal: AppTheme.spacing.m,
-    paddingVertical: AppTheme.spacing.s,
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: 10,
+    ...AppTheme.shadows.subtle,
   },
   addText: {
     color: "#fff",

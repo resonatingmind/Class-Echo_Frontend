@@ -81,13 +81,6 @@ export function PlannerFilters({
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.filterRow}
       >
-        <Ionicons
-          name="filter-outline"
-          size={16}
-          color={AppTheme.colors.textSecondary}
-          style={{ marginRight: 2 }}
-        />
-
         <FilterChip
           title={selectedClass ?? "Class"}
           selected={selectedClass != null}
@@ -164,7 +157,7 @@ function FilterChip({ title, selected, onPress, onClear }: FilterChipProps) {
           <Ionicons name="close-circle" size={16} color={AppTheme.colors.primaryDark} />
         </Pressable>
       ) : (
-        <Ionicons name="chevron-down" size={16} color={AppTheme.colors.textSecondary} />
+        <Ionicons name="chevron-down" size={14} color={AppTheme.colors.textSecondary} />
       )}
     </Pressable>
   );
@@ -176,8 +169,7 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
     backgroundColor: AppTheme.colors.surface,
 
-    borderWidth: 1,
-    borderColor: AppTheme.colors.border,
+    ...AppTheme.shadows.subtle,
 
     flexDirection: "row",
     alignItems: "center",
@@ -191,7 +183,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 10,
     color: AppTheme.colors.textPrimary,
-    fontSize: 15,
+    ...AppTheme.typography.bodyLarge,
   },
 
   filterRow: {
@@ -204,33 +196,30 @@ const styles = StyleSheet.create({
 
   filter: {
     height: 38,
-
     borderRadius: 999,
-
+    backgroundColor: AppTheme.colors.surface,
     borderWidth: 1,
     borderColor: AppTheme.colors.border,
-
-    backgroundColor: AppTheme.colors.surface,
-
     paddingHorizontal: 12,
-
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
   },
 
   filterSelected: {
-    borderColor: AppTheme.colors.primary,
     backgroundColor: AppTheme.colors.primaryLight,
+    borderColor: AppTheme.colors.primaryLight,
   },
 
   filterText: {
     fontSize: 13,
+    fontFamily: AppTheme.typography.family.medium,
     color: AppTheme.colors.textPrimary,
-    fontWeight: "600",
   },
+
   selectedText: {
     color: AppTheme.colors.primaryDark,
+    fontFamily: AppTheme.typography.family.semibold,
   },
 
   clearAll: {
@@ -240,9 +229,8 @@ const styles = StyleSheet.create({
   },
 
   clearAllText: {
-    fontSize: 13,
-    fontWeight: "600",
     color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.label,
   },
 });
 

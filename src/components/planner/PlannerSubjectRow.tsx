@@ -111,12 +111,13 @@ const styles = StyleSheet.create({
 
   subjectName: {
     flex: 1,
+    fontFamily: AppTheme.typography.family.semibold,
     fontSize: 14,
-    fontWeight: "600",
     color: AppTheme.colors.textPrimary,
   },
 
   counts: {
+    fontFamily: AppTheme.typography.family.regular,
     fontSize: 12,
     color: AppTheme.colors.textSecondary,
     flexShrink: 0,
@@ -140,9 +141,9 @@ const styles = StyleSheet.create({
   },
 
   unassignedText: {
+    fontFamily: AppTheme.typography.family.semibold,
     fontSize: 12,
     color: AppTheme.colors.warning,
-    fontWeight: "600",
     flex: 1,
   },
 
@@ -156,8 +157,8 @@ const styles = StyleSheet.create({
   },
 
   assignButtonText: {
+    fontFamily: AppTheme.typography.family.bold,
     fontSize: 11,
-    fontWeight: "700",
     color: "#412402",
   },
 
@@ -176,11 +177,12 @@ const styles = StyleSheet.create({
   },
 
   avatarText: {
+    fontFamily: AppTheme.typography.family.bold,
     fontSize: 9,
-    fontWeight: "700",
   },
 
   teacherName: {
+    fontFamily: AppTheme.typography.family.regular,
     fontSize: 12,
     color: AppTheme.colors.textSecondary,
   },

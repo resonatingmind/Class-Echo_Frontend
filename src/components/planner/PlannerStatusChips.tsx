@@ -68,7 +68,8 @@ const styles = StyleSheet.create({
     height: 30,
     paddingHorizontal: 14,
     borderRadius: 999,
-    backgroundColor: AppTheme.colors.surfaceMuted,
+    backgroundColor: AppTheme.colors.surface,
+    ...AppTheme.shadows.subtle,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -78,8 +79,8 @@ const styles = StyleSheet.create({
   },
 
   chipText: {
+    fontFamily: AppTheme.typography.family.bold,
     fontSize: 12,
-    fontWeight: "700",
     color: AppTheme.colors.textSecondary,
   },
 
@@ -95,13 +96,13 @@ const styles = StyleSheet.create({
   },
 
   warningChipActive: {
-    borderWidth: 1.5,
-    borderColor: AppTheme.colors.warning,
+    backgroundColor: "#FBE7C6",
+    ...AppTheme.shadows.subtle,
   },
 
   warningChipText: {
+    fontFamily: AppTheme.typography.family.bold,
     fontSize: 12,
-    fontWeight: "700",
     color: AppTheme.colors.warning,
   },
 });

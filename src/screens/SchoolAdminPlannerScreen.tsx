@@ -11,10 +11,9 @@ import { PlannerHeader } from "../components/planner/PlannerHeader";
 import { PlannerFilters } from "../components/planner/PlannerFilters";
 import { PlannerStaffingSummary } from "../components/planner/PlannerStaffingSummary";
 import { PlannerStatusChips } from "../components/planner/PlannerStatusChips";
-import { PlannerTableHeader } from "../components/planner/PlannerTableHeader";
 import { PlannerTableRow } from "../components/planner/PlannerTableRow";
 import { PlannerEmpty } from "../components/planner/PlannerEmpty";
-import { PlannerFilterModal } from "../components/planner/PlannerFilterModal";
+import { SelectionBottomSheet } from "../components/common/SelectionBottomSheet";
 import { QuickAssignmentModal } from "../components/planner/QuickAssignmentModal";
 import { AssignTeacherModal } from "../components/AssignTeacherModal";
 
@@ -71,21 +70,11 @@ export function SchoolAdminPlannerScreen() {
     }
   }
 
-  const classOptions = [
-    ...new Set(planner.map((item) => item.class_name)),
-  ].sort();
-  const sectionOptions = [
-    ...new Set(planner.map((item) => item.section)),
-  ].sort();
-  const subjectOptions = [
-    ...new Set(planner.map((item) => item.subject_name)),
-  ].sort();
-  const teacherOptions = [
-    ...new Set(planner.map((item) => item.teacher_name).filter(Boolean)),
-  ].sort() as string[];
-  const yearOptions = [
-    ...new Set(planner.map((item) => item.academic_year)),
-  ].sort();
+  const classOptions = [...new Set(planner.map((item) => item.class_name))].sort().map(c => ({ id: c, label: c }));
+  const sectionOptions = [...new Set(planner.map((item) => item.section))].sort().map(s => ({ id: s, label: `Section ${s}` }));
+  const subjectOptions = [...new Set(planner.map((item) => item.subject_name))].sort().map(s => ({ id: s, label: s }));
+  const teacherOptions = [...new Set(planner.map((item) => item.teacher_name).filter(Boolean))].sort().map(t => ({ id: t as string, label: t as string }));
+  const yearOptions = [...new Set(planner.map((item) => item.academic_year))].sort().map(y => ({ id: y, label: y }));
 
   const totalUnassigned = planner.filter((item) => !item.teacher_id).length;
 
@@ -149,57 +138,57 @@ export function SchoolAdminPlannerScreen() {
       <View style={styles.centerContainer}>
         <View style={styles.body}>
           <View style={styles.headerContainer}>
-        <PlannerHeader onCreatePress={() => openQuickAssignment()} />
+            <PlannerHeader onCreatePress={() => openQuickAssignment()} />
 
-        <PlannerStaffingSummary
-          staffed={planner.length - totalUnassigned}
-          total={planner.length}
-        />
+            <PlannerStaffingSummary
+              staffed={planner.length - totalUnassigned}
+              total={planner.length}
+            />
 
-        <PlannerStatusChips
-          totalCount={planner.length}
-          unassignedCount={totalUnassigned}
-          showOnlyUnassigned={showOnlyUnassigned}
-          onShowAll={() => setShowOnlyUnassigned(false)}
-          onShowUnassigned={() => setShowOnlyUnassigned(true)}
-        />
+            <PlannerStatusChips
+              totalCount={planner.length}
+              unassignedCount={totalUnassigned}
+              showOnlyUnassigned={showOnlyUnassigned}
+              onShowAll={() => setShowOnlyUnassigned(false)}
+              onShowUnassigned={() => setShowOnlyUnassigned(true)}
+            />
 
-        <PlannerFilters
-          search={search}
-          onSearchChange={setSearch}
-          selectedClass={selectedClass}
-          selectedSection={selectedSection}
-          selectedSubject={selectedSubject}
-          selectedTeacher={selectedTeacher}
-          selectedYear={selectedYear}
-          onClassPress={() => {
-            setFilterType("class");
-            setFilterVisible(true);
-          }}
-          onSectionPress={() => {
-            setFilterType("section");
-            setFilterVisible(true);
-          }}
-          onSubjectPress={() => {
-            setFilterType("subject");
-            setFilterVisible(true);
-          }}
-          onTeacherPress={() => {
-            setFilterType("teacher");
-            setFilterVisible(true);
-          }}
-          onYearPress={() => {
-            setFilterType("year");
-            setFilterVisible(true);
-          }}
-          onSelectedClassClear={() => setSelectedClass(null)}
-          onSelectedSectionClear={() => setSelectedSection(null)}
-          onSelectedSubjectClear={() => setSelectedSubject(null)}
-          onSelectedTeacherClear={() => setSelectedTeacher(null)}
-          onSelectedYearClear={() => setSelectedYear(null)}
-          onClearAll={clearAllFilters}
-        />
-      </View>
+            <PlannerFilters
+              search={search}
+              onSearchChange={setSearch}
+              selectedClass={selectedClass}
+              selectedSection={selectedSection}
+              selectedSubject={selectedSubject}
+              selectedTeacher={selectedTeacher}
+              selectedYear={selectedYear}
+              onClassPress={() => {
+                setFilterType("class");
+                setFilterVisible(true);
+              }}
+              onSectionPress={() => {
+                setFilterType("section");
+                setFilterVisible(true);
+              }}
+              onSubjectPress={() => {
+                setFilterType("subject");
+                setFilterVisible(true);
+              }}
+              onTeacherPress={() => {
+                setFilterType("teacher");
+                setFilterVisible(true);
+              }}
+              onYearPress={() => {
+                setFilterType("year");
+                setFilterVisible(true);
+              }}
+              onSelectedClassClear={() => setSelectedClass(null)}
+              onSelectedSectionClear={() => setSelectedSection(null)}
+              onSelectedSubjectClear={() => setSelectedSubject(null)}
+              onSelectedTeacherClear={() => setSelectedTeacher(null)}
+              onSelectedYearClear={() => setSelectedYear(null)}
+              onClearAll={clearAllFilters}
+            />
+          </View>
 
           <View style={styles.listContainer}>
             {loading ? (
@@ -208,62 +197,60 @@ export function SchoolAdminPlannerScreen() {
                 color={AppTheme.colors.primary}
                 style={{ marginTop: 40 }}
               />
-        ) : sortedPlanner.length === 0 ? (
-          <PlannerEmpty />
-        ) : (
-          <View style={styles.tableCard}>
-            <FlatList
-              data={sortedPlanner}
-              keyExtractor={(item) => String(item.subject_id)}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.listContent}
-              ListHeaderComponent={PlannerTableHeader}
-              stickyHeaderIndices={[0]}
-              renderItem={({ item }) => (
-                <PlannerTableRow
-                  item={item}
-                  onView={() =>
-                    navigation.navigate("SchoolAdminPlannerDetail", {
-                      subjectId: item.subject_id,
-                    })
-                  }
-                  onAssignTeacher={(assignItem) =>
-                    setAssignTarget({
-                      subjectId: assignItem.subject_id,
-                      subjectName: assignItem.subject_name,
-                      teacherId: assignItem.teacher_id,
-                    })
-                  }
-                  onTeacherPress={(pressedItem) => {
-                    if (!pressedItem.teacher_id) return;
+            ) : sortedPlanner.length === 0 ? (
+              <PlannerEmpty />
+            ) : (
+              <View style={styles.listContainerInner}>
+                <FlatList
+                  data={sortedPlanner}
+                  keyExtractor={(item) => String(item.subject_id)}
+                  showsVerticalScrollIndicator={false}
+                  contentContainerStyle={styles.listContent}
+                  renderItem={({ item }) => (
+                    <PlannerTableRow
+                      item={item}
+                      onView={() =>
+                        navigation.navigate("SchoolAdminPlannerDetail", {
+                          subjectId: item.subject_id,
+                        })
+                      }
+                      onAssignTeacher={(assignItem) =>
+                        setAssignTarget({
+                          subjectId: assignItem.subject_id,
+                          subjectName: assignItem.subject_name,
+                          teacherId: assignItem.teacher_id,
+                        })
+                      }
+                      onTeacherPress={(pressedItem) => {
+                        if (!pressedItem.teacher_id) return;
 
-                    navigation.navigate("SchoolAdminTeacherDetail", {
-                      teacherId: pressedItem.teacher_id,
-                    });
-                  }}
+                        navigation.navigate("SchoolAdminTeacherDetail", {
+                          teacherId: pressedItem.teacher_id,
+                        });
+                      }}
+                    />
+                  )}
                 />
-              )}
-            />
               </View>
             )}
           </View>
         </View>
       </View>
 
-      <PlannerFilterModal
+      <SelectionBottomSheet
         visible={filterVisible}
         title={
           filterType === "class"
-            ? "Class"
+            ? "Select Class"
             : filterType === "section"
-              ? "Section"
+              ? "Select Section"
               : filterType === "subject"
-                ? "Subject"
+                ? "Select Subject"
                 : filterType === "teacher"
-                  ? "Teacher"
-                  : "Academic Year"
+                  ? "Select Teacher"
+                  : "Select Academic Year"
         }
-        options={
+        items={
           filterType === "class"
             ? classOptions
             : filterType === "section"
@@ -274,8 +261,8 @@ export function SchoolAdminPlannerScreen() {
                   ? teacherOptions
                   : yearOptions
         }
-        selected={
-          filterType === "class"
+        selectedId={
+          (filterType === "class"
             ? selectedClass
             : filterType === "section"
               ? selectedSection
@@ -283,25 +270,25 @@ export function SchoolAdminPlannerScreen() {
                 ? selectedSubject
                 : filterType === "teacher"
                   ? selectedTeacher
-                  : selectedYear
+                  : selectedYear) ?? undefined
         }
         onClose={() => setFilterVisible(false)}
-        onSelect={(value) => {
+        onSelect={(item) => {
           switch (filterType) {
             case "class":
-              setSelectedClass(value);
+              setSelectedClass(item.id);
               break;
             case "section":
-              setSelectedSection(value);
+              setSelectedSection(item.id);
               break;
             case "subject":
-              setSelectedSubject(value);
+              setSelectedSubject(item.id);
               break;
             case "teacher":
-              setSelectedTeacher(value);
+              setSelectedTeacher(item.id);
               break;
             case "year":
-              setSelectedYear(value);
+              setSelectedYear(item.id);
               break;
           }
         }}
@@ -351,15 +338,10 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    paddingBottom: AppTheme.spacing.xl,
   },
-  tableCard: {
+  listContainerInner: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: AppTheme.colors.border,
-    borderRadius: AppTheme.radius.large,
-    overflow: "hidden",
-    backgroundColor: AppTheme.colors.surface,
+    marginTop: 8,
   },
   listContent: {
     paddingBottom: 40,

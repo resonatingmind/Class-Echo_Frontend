@@ -28,7 +28,7 @@ export function PlannerStaffingSummary({ staffed, total }: Props) {
             styles.fill,
             {
               width: `${percent}%`,
-              backgroundColor: isComplete ? AppTheme.colors.success : AppTheme.colors.warning,
+              backgroundColor: isComplete ? AppTheme.colors.success : AppTheme.colors.primary,
             },
           ]}
         />
@@ -37,7 +37,7 @@ export function PlannerStaffingSummary({ staffed, total }: Props) {
       <Text
         style={[
           styles.percent,
-          { color: isComplete ? AppTheme.colors.success : AppTheme.colors.warning },
+          { color: isComplete ? AppTheme.colors.success : AppTheme.colors.primary },
         ]}
       >
         {percent}%
@@ -51,7 +51,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 14,
-    backgroundColor: AppTheme.colors.surfaceMuted,
+    backgroundColor: AppTheme.colors.surface,
+    ...AppTheme.shadows.subtle,
     borderRadius: AppTheme.radius.large,
     paddingVertical: 14,
     paddingHorizontal: 16,
@@ -59,33 +60,34 @@ const styles = StyleSheet.create({
   },
 
   label: {
+    fontFamily: AppTheme.typography.family.regular,
     fontSize: 12,
     color: AppTheme.colors.textSecondary,
   },
 
   value: {
     marginTop: 2,
+    fontFamily: AppTheme.typography.family.bold,
     fontSize: 15,
-    fontWeight: "700",
     color: AppTheme.colors.textPrimary,
   },
 
   track: {
     flex: 1,
-    height: 8,
-    borderRadius: 4,
+    height: 12,
+    borderRadius: 6,
     backgroundColor: AppTheme.colors.border,
     overflow: "hidden",
   },
 
   fill: {
     height: "100%",
-    borderRadius: 4,
+    borderRadius: 6,
   },
 
   percent: {
+    fontFamily: AppTheme.typography.family.bold,
     fontSize: 16,
-    fontWeight: "700",
     flexShrink: 0,
     minWidth: 40,
     textAlign: "right",

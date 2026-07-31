@@ -8,7 +8,6 @@ import {
   getInitials,
   getSubjectDotColor,
 } from "./plannerUtils";
-import { PLANNER_COLUMNS } from "./PlannerTableHeader";
 
 type Props = {
   item: PlannerItemOut;
@@ -28,177 +27,216 @@ export function PlannerTableRow({
   const avatar = item.teacher_name ? getAvatarColors(item.teacher_name) : null;
 
   return (
-    <View style={[styles.row, isUnassigned && styles.rowUnassigned]}>
-      <Text
-        style={[styles.cellText, { flex: PLANNER_COLUMNS.class }]}
-        numberOfLines={1}
-      >
-        {item.class_name}
-      </Text>
-
-      <Text
-        style={[styles.cellText, { flex: PLANNER_COLUMNS.section }]}
-        numberOfLines={1}
-      >
-        {item.section}
-      </Text>
-
-      <View style={[styles.subjectCell, { flex: PLANNER_COLUMNS.subject }]}>
-        <View style={[styles.dot, { backgroundColor: dotColor }]} />
-        <Text style={styles.cellText} numberOfLines={1}>
-          {item.subject_name}
-        </Text>
+    <Pressable
+      style={({ pressed }) => [
+        styles.card,
+        isUnassigned && styles.cardUnassigned,
+        pressed && styles.cardPressed
+      ]}
+      onPress={onView}
+    >
+      <View style={styles.header}>
+        <View style={styles.titleRow}>
+          <View style={[styles.dot, { backgroundColor: dotColor }]} />
+          <Text style={styles.subjectName} numberOfLines={1}>
+            {item.subject_name}
+          </Text>
+        </View>
+        <Ionicons name="chevron-forward" size={18} color={AppTheme.colors.textPlaceholder} />
       </View>
 
-      <View style={{ flex: PLANNER_COLUMNS.teacher }}>
-        {isUnassigned ? (
-          <Pressable
-            style={styles.assignPill}
-            onPress={() => onAssignTeacher(item)}
-          >
-            <Ionicons
-              name="alert-circle-outline"
-              size={12}
-              color={AppTheme.colors.warning}
-            />
-            <Text style={styles.assignPillText} numberOfLines={1}>
-              Assign teacher
-            </Text>
-          </Pressable>
-        ) : (
-          <Pressable
-            style={styles.teacherCell}
-            onPress={() => onTeacherPress(item)}
-          >
-            <View
-              style={[
-                styles.avatar,
-                { backgroundColor: avatar?.bg ?? AppTheme.colors.primaryLight },
+      <Text style={styles.classSection}>
+        {item.class_name} • Section {item.section}
+      </Text>
+
+      <View style={styles.divider} />
+
+      <View style={styles.footer}>
+        <View style={styles.teacherSection}>
+          {isUnassigned ? (
+            <Pressable
+              style={({ pressed }) => [
+                styles.assignButton,
+                pressed && { opacity: 0.7 }
               ]}
+              onPress={(e) => {
+                e.stopPropagation();
+                onAssignTeacher(item);
+              }}
             >
-              <Text
+              <Ionicons
+                name="alert-circle-outline"
+                size={14}
+                color={AppTheme.colors.warning}
+              />
+              <Text style={styles.assignText}>Needs Teacher</Text>
+            </Pressable>
+          ) : (
+            <Pressable
+              style={({ pressed }) => [
+                styles.teacherBadge,
+                pressed && { opacity: 0.7 }
+              ]}
+              onPress={(e) => {
+                e.stopPropagation();
+                onTeacherPress(item);
+              }}
+            >
+              <View
                 style={[
-                  styles.avatarText,
-                  { color: avatar?.text ?? AppTheme.colors.primaryDark },
+                  styles.avatar,
+                  { backgroundColor: avatar?.bg ?? AppTheme.colors.primaryLight },
                 ]}
               >
-                {getInitials(item.teacher_name)}
+                <Text
+                  style={[
+                    styles.avatarText,
+                    { color: avatar?.text ?? AppTheme.colors.primaryDark },
+                  ]}
+                >
+                  {getInitials(item.teacher_name)}
+                </Text>
+              </View>
+              <Text style={styles.teacherName} numberOfLines={1}>
+                {item.teacher_name}
               </Text>
-            </View>
-            <Text style={styles.teacherName} numberOfLines={1}>
-              {item.teacher_name}
-            </Text>
-          </Pressable>
-        )}
+            </Pressable>
+          )}
+        </View>
+
+        <View style={styles.metrics}>
+          <View style={styles.metricItem}>
+            <Ionicons name="document-text-outline" size={12} color={AppTheme.colors.textSecondary} />
+            <Text style={styles.metricText}>{item.chapter_count}</Text>
+          </View>
+          <View style={styles.metricItem}>
+            <Ionicons name="videocam-outline" size={12} color={AppTheme.colors.textSecondary} />
+            <Text style={styles.metricText}>{item.recording_count}</Text>
+          </View>
+        </View>
       </View>
-
-      <Text style={[styles.cellText, { flex: PLANNER_COLUMNS.chapters }]}>
-        {item.chapter_count}
-      </Text>
-
-      <Text style={[styles.cellText, { flex: PLANNER_COLUMNS.recordings }]}>
-        {item.recording_count}
-      </Text>
-
-      <View style={{ flex: PLANNER_COLUMNS.action, alignItems: "flex-end" }}>
-        <Pressable
-          style={styles.viewButton}
-          onPress={onView}
-          hitSlop={8}
-          accessibilityLabel={`View ${item.subject_name}`}
-        >
-          <Ionicons name="eye-outline" size={16} color={AppTheme.colors.primaryDark} />
-        </Pressable>
-      </View>
-    </View>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  row: {
+  card: {
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+    ...AppTheme.shadows.subtle,
+  },
+  cardUnassigned: {
+    borderColor: "#FBE7C6",
+    backgroundColor: "#FFFCF8",
+  },
+  cardPressed: {
+    opacity: 0.9,
+    backgroundColor: AppTheme.colors.surfaceSoft,
+  },
+  header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: AppTheme.colors.border,
+    justifyContent: "space-between",
+    marginBottom: 4,
   },
-
-  rowUnassigned: {
-    backgroundColor: "#FDF3E3",
-  },
-
-  cellText: {
-    fontSize: 13,
-    color: AppTheme.colors.textPrimary,
-    paddingRight: 6,
-  },
-
-  subjectCell: {
+  titleRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    paddingRight: 6,
+    flex: 1,
+    paddingRight: 16,
   },
-
   dot: {
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-    flexShrink: 0,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
-
-  teacherCell: {
+  subjectName: {
+    fontFamily: AppTheme.typography.family.semibold,
+    fontSize: 16,
+    color: AppTheme.colors.textPrimary,
+  },
+  classSection: {
+    fontFamily: AppTheme.typography.family.regular,
+    fontSize: 14,
+    color: AppTheme.colors.textSecondary,
+    marginBottom: 12,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: AppTheme.colors.divider,
+    marginBottom: 12,
+  },
+  footer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
-    paddingRight: 6,
+    justifyContent: "space-between",
   },
-
-  avatar: {
-    width: 20,
-    height: 20,
-    borderRadius: AppTheme.radius.medium,
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
+  teacherSection: {
+    flex: 1,
+    paddingRight: 12,
   },
-
-  avatarText: {
-    fontSize: 9,
-    fontWeight: "700",
-  },
-
-  teacherName: {
-    fontSize: 13,
-    color: AppTheme.colors.textPrimary,
-    flexShrink: 1,
-  },
-
-  assignPill: {
+  assignButton: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
     alignSelf: "flex-start",
-    paddingHorizontal: 8,
-    height: 24,
-    borderRadius: 999,
-    backgroundColor: "#FBE7C6",
+    backgroundColor: "#FDF3E3",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: AppTheme.radius.medium,
+    borderWidth: 1,
+    borderColor: "#FBE7C6",
   },
-
-  assignPillText: {
-    fontSize: 11,
-    fontWeight: "700",
+  assignText: {
+    fontFamily: AppTheme.typography.family.semibold,
+    fontSize: 12,
     color: AppTheme.colors.warning,
   },
-
-  viewButton: {
-    width: 28,
-    height: 28,
-    borderRadius: AppTheme.radius.large,
-    backgroundColor: AppTheme.colors.primaryLight,
+  teacherBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  avatar: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
+  },
+  avatarText: {
+    fontFamily: AppTheme.typography.family.bold,
+    fontSize: 10,
+  },
+  teacherName: {
+    fontFamily: AppTheme.typography.family.medium,
+    fontSize: 13,
+    color: AppTheme.colors.textPrimary,
+    flexShrink: 1,
+  },
+  metrics: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  metricItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: AppTheme.colors.surfaceMuted,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: AppTheme.radius.small,
+  },
+  metricText: {
+    fontFamily: AppTheme.typography.family.medium,
+    fontSize: 12,
+    color: AppTheme.colors.textSecondary,
   },
 });
 

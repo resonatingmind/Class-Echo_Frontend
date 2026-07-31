@@ -26,8 +26,8 @@ type Props = {
   onTabPress: (index: number) => void;
 };
 
-const ROW_HEIGHT = 48;
-const PILL_HEIGHT = 40;
+const ROW_HEIGHT = 56;
+const PILL_HEIGHT = 48;
 const PILL_MARGIN = 6;
 
 export function FloatingPillTabBar({ tabs, activeIndex, onTabPress }: Props) {
@@ -97,6 +97,7 @@ export function FloatingPillTabBar({ tabs, activeIndex, onTabPress }: Props) {
                 color={isActive ? AppTheme.colors.primary : colors.navInactive}
                 name={isActive ? tab.activeIcon : tab.icon}
                 size={22}
+                style={{ marginBottom: 6 }}
               />
               <Text
                 style={[
@@ -119,7 +120,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    paddingHorizontal: 12,
     paddingTop: 10,
     shadowColor: '#000',
     shadowOpacity: 0.10,
@@ -143,7 +143,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 3,
     zIndex: 1,
   },
   label: {

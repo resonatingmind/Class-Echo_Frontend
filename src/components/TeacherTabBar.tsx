@@ -36,6 +36,7 @@ export function TeacherTabBar({ active, onTabPress }: Props) {
               color={isActive ? AppTheme.colors.primary : colors.navInactive}
               name={isActive ? tab.activeIcon : tab.icon}
               size={22}
+              style={{ marginBottom: 4 }}
             />
             <Text style={[styles.label, isActive && styles.labelActive]}>
               {tab.label}
@@ -59,7 +60,6 @@ const styles = StyleSheet.create({
   tab: {
     flex: 1,
     alignItems: 'center',
-    gap: 4,
   },
   label: {
     color: colors.navInactive,

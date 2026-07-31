@@ -125,14 +125,13 @@ function CreateClassModal({
 
   return (
     <Modal
-      animationType="slide"
+      animationType="fade"
       onRequestClose={handleClose}
       transparent
       visible={visible}
     >
       <Pressable onPress={handleClose} style={styles.modalOverlay}>
-        <Pressable style={styles.modalSheet}>
-          <View style={styles.modalHandle} />
+        <Pressable style={styles.modalCard}>
           <Text style={styles.modalTitle}>Create New Class</Text>
           <Text style={styles.modalSubtitle}>
             Add a class to your school. You can assign subjects and teachers
@@ -409,24 +408,20 @@ const styles = StyleSheet.create({
   // Modal
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
   },
-  modalSheet: {
+  modalCard: {
     backgroundColor: AppTheme.colors.surface,
-    borderTopLeftRadius: AppTheme.radius.large,
-    borderTopRightRadius: AppTheme.radius.large,
+    borderRadius: AppTheme.radius.large,
     padding: 24,
-    paddingBottom: 40,
+    width: "100%",
+    maxWidth: 500,
     gap: 16,
-  },
-  modalHandle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: AppTheme.colors.border,
-    alignSelf: "center",
-    marginBottom: 8,
+    maxHeight: "90%",
+    ...AppTheme.shadows.medium,
   },
   modalTitle: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.heading2 },
   modalSubtitle: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body },

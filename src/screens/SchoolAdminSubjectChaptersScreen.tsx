@@ -468,14 +468,13 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
 
       {/* Create/Edit Modal */}
       <Modal
-        animationType="slide"
+        animationType="fade"
         onRequestClose={() => setModalVisible(false)}
         transparent
         visible={modalVisible}
       >
         <Pressable onPress={() => setModalVisible(false)} style={styles.modalOverlay}>
-          <Pressable style={styles.modalSheet}>
-            <View style={styles.modalHandle} />
+          <Pressable style={styles.modalCard}>
             <Text style={styles.modalTitle}>
               {editingChapter ? 'Edit Chapter' : 'Create Chapter'}
             </Text>
@@ -680,23 +679,22 @@ const styles = StyleSheet.create({
   createBtnInlineText: { color: '#fff', ...AppTheme.typography.body, fontWeight: '700' },
 
   // Modals
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
-  modalSheet: {
-    backgroundColor: AppTheme.colors.surface,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    padding: 24,
-    paddingBottom: 40,
-    gap: 16,
-    maxHeight: '80%',
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
   },
-  modalHandle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: AppTheme.colors.border,
-    alignSelf: 'center',
-    marginBottom: 8,
+  modalCard: {
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
+    padding: 24,
+    width: "100%",
+    maxWidth: 500,
+    gap: 16,
+    maxHeight: "90%",
+    ...AppTheme.shadows.medium,
   },
   modalTitle: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.heading3 },
   modalSubtitle: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body },

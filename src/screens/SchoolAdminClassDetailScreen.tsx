@@ -24,7 +24,9 @@ import {
   updateSchoolAdminClass,
 } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
-import { ScreenHeader } from '../components/common/ScreenHeader';
+import { AdminNavbar } from '../components/common/AdminNavbar';
+import { SelectDropdown } from '../components/ui/SelectDropdown';
+import { CLASS_NAME_OPTIONS, SECTION_OPTIONS } from '../constants';
 import { AssignTeacherModal } from '../components/AssignTeacherModal';
 import { colors } from '../theme/colors';
 import { SubjectOut, TeacherOut } from '../types/api';
@@ -228,7 +230,7 @@ function SubjectCard({
 
 export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
   const { session } = useAuth();
-  const { classId, className } = route.params;
+  const { classId, className, section } = route.params;
 
   const [subjects, setSubjects] = useState<SubjectOut[]>([]);
   const [teachers, setTeachers] = useState<TeacherOut[]>([]);
@@ -239,6 +241,7 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
   const [assignTarget, setAssignTarget] = useState<SubjectOut | null>(null);
   const [showEditClass, setShowEditClass] = useState(false);
   const [editClassName, setEditClassName] = useState(className);
+  const [editClassSection, setEditClassSection] = useState(section || "");
   const [editingClass, setEditingClass] = useState(false);
   const [editClassError, setEditClassError] = useState<string | null>(null);
 
@@ -275,14 +278,20 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
   const onRefresh = () => { setRefreshing(true); void load(true); };
 
   const handleEditClassSave = async () => {
-    if (!session || !editClassName.trim() || editingClass) return;
+    if (!session || !editClassName.trim() || !editClassSection.trim() || editingClass) return;
     setEditingClass(true);
     setEditClassError(null);
     try {
-      await updateSchoolAdminClass(session.token, classId, { name: editClassName.trim() });
+      await updateSchoolAdminClass(session.token, classId, { 
+        name: editClassName.trim(),
+        section: editClassSection.trim()
+      });
       await load(true);
       setShowEditClass(false);
-      navigation.setParams({ className: editClassName.trim() } as never);
+      navigation.setParams({ 
+        className: editClassName.trim(),
+        section: editClassSection.trim() 
+      } as never);
     } catch (e) {
       setEditClassError(e instanceof Error ? e.message : 'Failed to update class');
     } finally {
@@ -311,18 +320,13 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
   });
 
   return (
-    <SafeAreaView edges={[]} style={styles.safe}>
-      <ScreenHeader
-        title={className}
+    <SafeAreaView edges={["top", "bottom"]} style={styles.safe}>
+      <AdminNavbar
+        title={`${className} ${section || ""}`}
         onBack={() => {
           if (navigation.canGoBack()) navigation.goBack();
           else navigation.navigate("SchoolAdminClasses");
         }}
-        rightActions={
-          <View style={styles.avatarCircle}>
-            <Ionicons color={AppTheme.colors.primary} name="person" size={16} />
-          </View>
-        }
       />
 
       <ScrollView
@@ -336,14 +340,17 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
         }
         showsVerticalScrollIndicator={false}
       >
-        {/* Page heading */}
-        <View style={styles.pageHeading}>
+        <View style={styles.centerContainer}>
+          <View style={styles.body}>
+            {/* Page heading */}
+            <View style={styles.pageHeading}>
           <Text style={styles.academicLabel}>CURRENT SESSION</Text>
           <Text style={styles.pageTitle}>Curriculum Overview</Text>
           <View style={styles.headingActions}>
             <Pressable
               onPress={() => {
                 setEditClassName(className);
+                setEditClassSection(section || "");
                 setEditClassError(null);
                 setShowEditClass(true);
               }}
@@ -367,30 +374,30 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
         </View>
 
         {/* Stats strip */}
-        <View style={styles.statsRow}>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>{subjects.length}</Text>
-            <Text style={styles.statLabel}>SUBJECTS</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>
-              {subjects.filter((s) => s.teacher_id !== null).length}
-            </Text>
-            <Text style={styles.statLabel}>ASSIGNED</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text
-              style={[
-                styles.statValue,
-                subjects.filter((s) => !s.teacher_id).length > 0 &&
-                  styles.statValueWarn,
-              ]}
-            >
-              {subjects.filter((s) => !s.teacher_id).length}
-            </Text>
-            <Text style={styles.statLabel}>UNASSIGNED</Text>
-          </View>
-        </View>
+            <View style={styles.statsGrid}>
+              <View style={styles.statCard}>
+                <Text style={styles.statNumber}>{subjects.length}</Text>
+                <Text style={styles.statLabel}>Subjects</Text>
+              </View>
+              <View style={styles.statCard}>
+                <Text style={styles.statNumber}>
+                  {subjects.filter((s) => s.teacher_id !== null).length}
+                </Text>
+                <Text style={styles.statLabel}>Assigned</Text>
+              </View>
+              <View style={styles.statCard}>
+                <Text
+                  style={[
+                    styles.statNumber,
+                    subjects.filter((s) => !s.teacher_id).length > 0 &&
+                      styles.statNumberWarn,
+                  ]}
+                >
+                  {subjects.filter((s) => !s.teacher_id).length}
+                </Text>
+                <Text style={styles.statLabel}>Unassigned</Text>
+              </View>
+            </View>
         <View style={styles.searchContainer}>
           <Ionicons name="search" size={20} color={AppTheme.colors.textSecondary} />
 
@@ -479,6 +486,8 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
               ))}
             </View>
           )}
+          </View>
+          </View>
         </View>
       </ScrollView>
 
@@ -513,20 +522,20 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
           <Pressable style={styles.modalSheet}>
             <View style={styles.modalHandle} />
             <Text style={styles.modalTitle}>Edit Class</Text>
-            <View style={styles.modalField}>
-              <Text style={styles.modalFieldLabel}>CLASS NAME</Text>
-              <TextInput
-                autoCapitalize="words"
-                autoFocus
-                onChangeText={setEditClassName}
-                onSubmitEditing={handleEditClassSave}
-                placeholder="e.g. Class 10B"
-                placeholderTextColor={AppTheme.colors.textPlaceholder}
-                returnKeyType="done"
-                style={styles.modalInput}
-                value={editClassName}
-              />
-            </View>
+            <SelectDropdown
+              label="CLASS NAME"
+              placeholder="Select a class"
+              options={CLASS_NAME_OPTIONS}
+              value={editClassName}
+              onChange={setEditClassName}
+            />
+            <SelectDropdown
+              label="SECTION"
+              placeholder="Select a section"
+              options={SECTION_OPTIONS}
+              value={editClassSection}
+              onChange={setEditClassSection}
+            />
             {editClassError ? (
               <View style={styles.modalError}>
                 <Ionicons
@@ -545,11 +554,11 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </Pressable>
               <Pressable
-                disabled={!editClassName.trim() || editingClass}
+                disabled={!editClassName.trim() || !editClassSection.trim() || editingClass}
                 onPress={handleEditClassSave}
                 style={[
                   styles.modalSubmitBtn,
-                  (!editClassName.trim() || editingClass) && styles.btnDisabled,
+                  (!editClassName.trim() || !editClassSection.trim() || editingClass) && styles.btnDisabled,
                 ]}
               >
                 {editingClass ? (
@@ -576,27 +585,33 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  scroll: { paddingBottom: 48, gap: 0 },
+  scroll: { flexGrow: 1 },
+  centerContainer: {
+    flex: 1,
+    alignItems: "center",
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.xl,
+  },
+  body: {
+    width: "100%",
+    maxWidth: 800,
+    gap: AppTheme.spacing.l,
+  },
 
   // Page heading
   pageHeading: {
-    backgroundColor: AppTheme.colors.surface,
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: AppTheme.colors.border,
-    gap: 8,
+    gap: AppTheme.spacing.s,
+    marginBottom: AppTheme.spacing.xs,
   },
   academicLabel: {
     color: AppTheme.colors.primary,
-    fontSize: 11,
+    ...AppTheme.typography.caption,
     fontWeight: "700",
     letterSpacing: 1.2,
   },
   pageTitle: {
     color: AppTheme.colors.textPrimary,
-    fontSize: 26,
-    fontWeight: "800",
-    letterSpacing: -0.5,
+    ...AppTheme.typography.heading1,
   },
   headingActions: { flexDirection: "row", gap: 10, marginTop: 4 },
   editClassBtn: {
@@ -611,7 +626,7 @@ const styles = StyleSheet.create({
   },
   editClassText: {
     color: AppTheme.colors.textSecondary,
-    fontSize: 13,
+    ...AppTheme.typography.body,
     fontWeight: "600",
   },
   addSubjectBtn: {
@@ -623,38 +638,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
   },
-  addSubjectText: { color: "#fff", fontSize: 13, fontWeight: "700" },
+  addSubjectText: { color: "#fff", ...AppTheme.typography.body, fontWeight: "700" },
 
   // Stats
-  statsRow: {
+  statsGrid: {
     flexDirection: "row",
-    gap: 1,
-    backgroundColor: AppTheme.colors.border,
-    marginBottom: 20,
+    gap: AppTheme.spacing.m,
   },
   statCard: {
     flex: 1,
     backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
+    padding: AppTheme.spacing.xl,
     alignItems: "center",
-    paddingVertical: 16,
-    gap: 4,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
   },
-  statValue: {
-    color: AppTheme.colors.textPrimary,
-    fontSize: 24,
-    fontWeight: "800",
-  },
-  statValueWarn: { color: colors.warning },
-  statLabel: {
-    color: AppTheme.colors.textSecondary,
-    fontSize: 10,
-    fontWeight: "700",
-    letterSpacing: 0.8,
-  },
+  statNumber: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.display },
+  statNumberWarn: { color: AppTheme.colors.warning },
+  statLabel: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body, marginTop: AppTheme.spacing.xs },
 
   // Subjects section
-  subjectsSection: { paddingHorizontal: 20, gap: 14 },
-  sectionTitle: { color: AppTheme.colors.textPrimary, fontSize: 18, fontWeight: "800" },
+  subjectsSection: { gap: 14 },
+  sectionTitle: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.heading3, marginTop: AppTheme.spacing.s },
   subjectList: { gap: 14 },
 
   // Subject Card
@@ -678,10 +684,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  subjectIconText: { fontSize: 18, fontWeight: "800" },
+  subjectIconText: { ...AppTheme.typography.heading3 },
   subjectInfo: { flex: 1, gap: 4 },
-  subjectName: { color: AppTheme.colors.textPrimary, fontSize: 16, fontWeight: "700" },
-  subjectMeta: { color: AppTheme.colors.textSecondary, fontSize: 12 },
+  subjectName: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.bodyLarge, fontWeight: "700" },
+  subjectMeta: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.caption },
   subjectCardDivider: { height: 1, backgroundColor: AppTheme.colors.border },
   subjectTeacherRow: {
     flexDirection: "row",
@@ -704,10 +710,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  miniAvatarText: { color: AppTheme.colors.primaryDark, fontSize: 10, fontWeight: "800" },
+  miniAvatarText: { color: AppTheme.colors.primaryDark, ...AppTheme.typography.caption, fontSize: 10, fontWeight: "800" },
   assignedTeacherText: {
     color: AppTheme.colors.textPrimary,
-    fontSize: 13,
+    ...AppTheme.typography.body,
     fontWeight: "600",
     flex: 1,
   },
@@ -717,7 +723,7 @@ const styles = StyleSheet.create({
     gap: 6,
     flex: 1,
   },
-  unassignedText: { color: AppTheme.colors.textSecondary, fontSize: 13 },
+  unassignedText: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body },
   assignBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -729,13 +735,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
   },
-  assignBtnText: { color: AppTheme.colors.primary, fontSize: 12, fontWeight: "700" },
+  assignBtnText: { color: AppTheme.colors.primary, ...AppTheme.typography.caption, fontWeight: "700" },
 
   // Shared states
   center: { alignItems: "center", paddingVertical: 40, gap: 10 },
-  loadingText: { color: AppTheme.colors.textSecondary, fontSize: 14 },
-  emptyTitle: { color: AppTheme.colors.textPrimary, fontSize: 16, fontWeight: "700" },
-  emptyBody: { color: AppTheme.colors.textSecondary, fontSize: 14, textAlign: "center" },
+  loadingText: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body },
+  emptyTitle: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.bodyLarge, fontWeight: "700" },
+  emptyBody: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body, textAlign: "center" },
 
   // Modals
   modalOverlay: {
@@ -760,12 +766,12 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginBottom: 8,
   },
-  modalTitle: { color: AppTheme.colors.textPrimary, fontSize: 20, fontWeight: "800" },
-  modalSubtitle: { color: AppTheme.colors.textSecondary, fontSize: 14, lineHeight: 20 },
+  modalTitle: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.heading3 },
+  modalSubtitle: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body },
   modalField: { gap: 8 },
   modalFieldLabel: {
     color: AppTheme.colors.textSecondary,
-    fontSize: 11,
+    ...AppTheme.typography.caption,
     fontWeight: "700",
     letterSpacing: 0.8,
     textTransform: "uppercase",
@@ -777,7 +783,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: AppTheme.colors.border,
     paddingHorizontal: 16,
-    fontSize: 16,
+    ...AppTheme.typography.bodyLarge,
     color: AppTheme.colors.textPrimary,
   },
   modalError: {
@@ -789,7 +795,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
-  modalErrorText: { color: "#B42318", fontSize: 13, flex: 1 },
+  modalErrorText: { color: "#B42318", ...AppTheme.typography.body, flex: 1 },
   modalActions: { flexDirection: "row", gap: 12, marginTop: 4 },
   modalCancelBtn: {
     flex: 1,
@@ -802,8 +808,7 @@ const styles = StyleSheet.create({
   },
   modalCancelText: {
     color: AppTheme.colors.textSecondary,
-    fontWeight: "600",
-    fontSize: 15,
+    ...AppTheme.typography.button,
   },
   modalSubmitBtn: {
     flex: 1,
@@ -814,7 +819,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   btnDisabled: { opacity: 0.45 },
-  modalSubmitText: { color: "#fff", fontWeight: "700", fontSize: 15 },
+  modalSubmitText: { color: "#fff", ...AppTheme.typography.button },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -829,7 +834,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     paddingHorizontal: 10,
-    fontSize: 16,
+    ...AppTheme.typography.bodyLarge,
   },
 
   filterRow: {
@@ -852,6 +857,7 @@ const styles = StyleSheet.create({
 
   filterText: {
     color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.body,
     fontWeight: "600",
   },
 

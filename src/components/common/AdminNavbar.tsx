@@ -8,9 +8,10 @@ import { AppTheme } from "../../theme/AppTheme";
 type Props = {
   title: string;
   rightActions?: React.ReactNode;
+  onBack?: () => void;
 };
 
-export function AdminNavbar({ title, rightActions }: Props) {
+export function AdminNavbar({ title, rightActions, onBack }: Props) {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
   const navigation = useNavigation();
@@ -18,7 +19,13 @@ export function AdminNavbar({ title, rightActions }: Props) {
   return (
     <View style={styles.header}>
       <View style={styles.headerLeft}>
-         <AppLogo showText={false} />
+        {onBack ? (
+          <Pressable onPress={onBack} style={styles.backBtn}>
+            <Ionicons color={AppTheme.colors.textPrimary} name="chevron-back" size={24} />
+          </Pressable>
+        ) : (
+          <AppLogo showText={false} />
+        )}
       </View>
       <Text style={styles.headerTitle} numberOfLines={1}>{isMobile ? "" : title}</Text>
       <View style={styles.headerRight}>
@@ -63,6 +70,9 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: "center",
     justifyContent: "center",
+  },
+  backBtn: {
+    padding: AppTheme.spacing.xs,
   },
 });
 

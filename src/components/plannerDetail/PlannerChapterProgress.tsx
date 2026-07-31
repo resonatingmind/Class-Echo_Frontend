@@ -57,6 +57,7 @@ const styles = StyleSheet.create({
 
   label: {
     fontSize: 12,
+    fontFamily: AppTheme.typography.family.medium,
     color: AppTheme.colors.textSecondary,
     flexShrink: 0,
   },
@@ -76,7 +77,7 @@ const styles = StyleSheet.create({
 
   percent: {
     fontSize: 13,
-    fontWeight: "700",
+    fontFamily: AppTheme.typography.family.bold,
     flexShrink: 0,
     minWidth: 36,
     textAlign: "right",

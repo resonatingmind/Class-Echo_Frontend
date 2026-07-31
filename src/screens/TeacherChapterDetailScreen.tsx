@@ -38,8 +38,9 @@ import {
   LearningPlanOut,
   LearningPlanCreatePayload,
 } from '../types/api';
-import { LearningPlanTable } from "../components/teacher/LearningPlanTable";
+import { LearningPlanList } from "../components/teacher/LearningPlanList";
 import { ChapterLearningPlanModal } from "../components/teacher/ChapterLearningPlanModal";
+import { AdminNavbar } from "../components/common/AdminNavbar";
 
 type Props = NativeStackScreenProps<RootStackParamList, "TeacherChapterDetail">;
 
@@ -312,30 +313,16 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
     : "";
 
   return (
-    <SafeAreaView edges={["top"]} style={styles.safe}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerInner}>
-          <Pressable
-            onPress={() => {
-              navigation.goBack();
-            }}
-            style={styles.backBtn}
-          >
-            <Ionicons color={AppTheme.colors.textPrimary} name="arrow-back" size={22} />
+    <SafeAreaView edges={["top", "bottom"]} style={styles.safe}>
+      <AdminNavbar
+        title={chapterName}
+        onBack={() => navigation.goBack()}
+        rightActions={
+          <Pressable onPress={() => void load(true)} hitSlop={8}>
+            <Ionicons color={AppTheme.colors.textSecondary} name="refresh-outline" size={22} />
           </Pressable>
-          <Text style={styles.headerTitle} numberOfLines={1}>
-            {chapterName}
-          </Text>
-          <Pressable onPress={() => void load(true)} style={styles.backBtn}>
-            <Ionicons
-              color={AppTheme.colors.textSecondary}
-              name="refresh-outline"
-              size={22}
-            />
-          </Pressable>
-        </View>
-      </View>
+        }
+      />
 
       <ScrollView
         contentContainerStyle={styles.scroll}
@@ -351,435 +338,434 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
         }
         showsVerticalScrollIndicator={false}
       >
-        {/* Hero Area */}
-        <View style={styles.hero}>
-          <View style={styles.heroInner}>
-            <Text style={styles.heroKicker}>{subjectName.toUpperCase()}</Text>
-            <Text style={styles.heroTitle}>{chapterName}</Text>
-            {chapter?.description ? (
-              <Text style={styles.heroDesc}>{chapter.description}</Text>
-            ) : (
-              <Text style={[styles.heroDesc, { fontStyle: "italic" }]}>
-                No description added for this chapter.
-              </Text>
-            )}
-
-            <View style={styles.metaRow}>
-              <View style={styles.metaBadge}>
-                <Ionicons
-                  color={AppTheme.colors.primaryDark}
-                  name="document-text"
-                  size={14}
-                />
-                <Text style={styles.metaBadgeText}>
-                  {chapter?.document_count ?? 0} reference files
+        <View style={styles.centerContainer}>
+          <View style={styles.body}>
+            {/* Hero Area */}
+            <View style={styles.hero}>
+              <Text style={styles.heroKicker}>{subjectName.toUpperCase()}</Text>
+              <Text style={styles.heroTitle}>{chapterName}</Text>
+              {chapter?.description ? (
+                <Text style={styles.heroDesc}>{chapter.description}</Text>
+              ) : (
+                <Text style={[styles.heroDesc, { fontStyle: "italic" }]}>
+                  No description added for this chapter.
                 </Text>
-              </View>
-              {chapter && (
-                <Text style={styles.metaDate}>Last updated: {formattedDate}</Text>
-              )}
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.mainContainer}>
-
-        {/* Tab Selector - Full Width */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={{ width: "100%" }}
-          contentContainerStyle={{ width: "100%", minWidth: "100%" }}
-        >
-          <View style={styles.tabContainer}>
-            <Pressable
-              onPress={() => setActiveTab("planner")}
-              style={[
-                styles.tabButton,
-                activeTab === "planner" && styles.tabButtonActive,
-              ]}
-            >
-              <Ionicons
-                color={
-                  activeTab === "planner" ? AppTheme.colors.primaryDark : AppTheme.colors.textSecondary
-                }
-                name="calendar-outline"
-                size={14}
-              />
-              <Text
-                style={[
-                  styles.tabText,
-                  activeTab === "planner" && styles.tabTextActive,
-                ]}
-              >
-                Micro Planner
-              </Text>
-            </Pressable>
-            <Pressable
-              onPress={() => setActiveTab("profile")}
-              style={[
-                styles.tabButton,
-                activeTab === "profile" && styles.tabButtonActive,
-              ]}
-            >
-              <Ionicons
-                color={
-                  activeTab === "profile" ? AppTheme.colors.primaryDark : AppTheme.colors.textSecondary
-                }
-                name="sparkles-outline"
-                size={14}
-              />
-              <Text
-                style={[
-                  styles.tabText,
-                  activeTab === "profile" && styles.tabTextActive,
-                ]}
-              >
-                Knowledge Profile
-              </Text>
-            </Pressable>
-            <Pressable
-              onPress={() => setActiveTab("documents")}
-              style={[
-                styles.tabButton,
-                activeTab === "documents" && styles.tabButtonActive,
-              ]}
-            >
-              <Ionicons
-                color={
-                  activeTab === "documents" ? AppTheme.colors.primaryDark : AppTheme.colors.textSecondary
-                }
-                name="document-text-outline"
-                size={14}
-              />
-              <Text
-                style={[
-                  styles.tabText,
-                  activeTab === "documents" && styles.tabTextActive,
-                ]}
-              >
-                Documents
-              </Text>
-            </Pressable>
-            <Pressable
-              onPress={() => setActiveTab("metadata")}
-              style={[
-                styles.tabButton,
-                activeTab === "metadata" && styles.tabButtonActive,
-              ]}
-            >
-              <Ionicons
-                color={
-                  activeTab === "metadata" ? AppTheme.colors.primaryDark : AppTheme.colors.textSecondary
-                }
-                name="information-circle-outline"
-                size={14}
-              />
-              <Text
-                style={[
-                  styles.tabText,
-                  activeTab === "metadata" && styles.tabTextActive,
-                ]}
-              >
-                Details
-              </Text>
-            </Pressable>
-          </View>
-        </ScrollView>
-
-        {isLoading ? (
-          <View style={styles.center}>
-            <ActivityIndicator color={AppTheme.colors.primary} size="large" />
-            <Text style={styles.loadingText}>Loading chapter...</Text>
-          </View>
-        ) : error ? (
-          <View style={styles.center}>
-            <Ionicons
-              color={AppTheme.colors.textSecondary}
-              name="cloud-offline-outline"
-              size={40}
-            />
-            <Text style={styles.emptyTitle}>Could not load details</Text>
-            <Text style={styles.emptyBody}>{error}</Text>
-          </View>
-        ) : activeTab === "planner" ? (
-          <View style={styles.plannerSection}>
-            <View style={styles.plannerHeaderRow}>
-              <View style={styles.plannerHeaderTitles}>
-                <Text style={styles.sectionTitle}>MICRO PLANNER</Text>
-                <Text style={styles.plannerSub}>
-                  Subject: {subjectName} • Chapter: {chapterName}
-                </Text>
-              </View>
-              <Pressable
-                style={styles.addPlanBtn}
-                onPress={() => {
-                  setSelectedLpItem(null);
-                  setLpModalVisible(true);
-                }}
-              >
-                <Ionicons name="add" size={16} color="#fff" />
-                <Text style={styles.addPlanText}>Add Entry</Text>
-              </Pressable>
-            </View>
-
-            <LearningPlanTable
-              items={learningPlans}
-              onEditItem={(item) => {
-                setSelectedLpItem(item);
-                setLpModalVisible(true);
-              }}
-              onDeleteItem={handleDeleteLearningPlan}
-            />
-          </View>
-        ) : activeTab === "profile" ? (
-          !knowledge ? (
-            <View style={styles.emptyKbContainer}>
-              <View style={styles.emptyKbIconBox}>
-                <Ionicons
-                  color={AppTheme.colors.textSecondary}
-                  name="analytics-outline"
-                  size={32}
-                />
-              </View>
-              <Text style={styles.emptyKbTitle}>No Knowledge Profile Yet</Text>
-              <Text style={styles.emptyKbBody}>
-                Upload reference documents (PDF, DOCX, PPTX, or TXT) to
-                automatically construct a structured chapter knowledge profile
-                using AI.
-              </Text>
-            </View>
-          ) : (
-            <View style={styles.kbContent}>
-              {/* Summary Card */}
-              <View style={styles.card}>
-                <View style={styles.cardHeader}>
-                  <Ionicons color={AppTheme.colors.primary} name="book" size={18} />
-                  <Text style={styles.cardTitle}>Chapter Summary</Text>
-                </View>
-                <Text style={styles.cardBody}>{knowledge.chapter_summary}</Text>
-              </View>
-
-              {/* Learning Objectives */}
-              {knowledge.learning_objectives?.length > 0 && (
-                <View style={styles.card}>
-                  <View style={styles.cardHeader}>
-                    <Ionicons color={AppTheme.colors.primary} name="flag" size={18} />
-                    <Text style={styles.cardTitle}>Learning Objectives</Text>
-                  </View>
-                  {knowledge.learning_objectives.map((obj, i) => (
-                    <View key={i} style={styles.bulletRow}>
-                      <Ionicons
-                        color={AppTheme.colors.primary}
-                        name="checkmark-circle-outline"
-                        size={16}
-                        style={{ marginTop: 2 }}
-                      />
-                      <Text style={styles.bulletText}>{obj}</Text>
-                    </View>
-                  ))}
-                </View>
               )}
 
-              {/* Key Concepts */}
-              {knowledge.key_concepts?.length > 0 && (
-                <View style={styles.card}>
-                  <View style={styles.cardHeader}>
-                    <Ionicons color={AppTheme.colors.primary} name="bulb" size={18} />
-                    <Text style={styles.cardTitle}>Key Concepts</Text>
-                  </View>
-                  {knowledge.key_concepts.map((concept, i) => (
-                    <View key={i} style={styles.bulletRow}>
-                      <Ionicons
-                        color={AppTheme.colors.primary}
-                        name="star-outline"
-                        size={16}
-                        style={{ marginTop: 2 }}
-                      />
-                      <Text style={styles.bulletText}>{concept}</Text>
-                    </View>
-                  ))}
-                </View>
-              )}
-
-              {/* Must-Cover Topics */}
-              {knowledge.must_cover_topics?.length > 0 && (
-                <View style={styles.card}>
-                  <View style={styles.cardHeader}>
-                    <Ionicons
-                      color={AppTheme.colors.primary}
-                      name="list-circle"
-                      size={18}
-                    />
-                    <Text style={styles.cardTitle}>
-                      Must-Cover Syllabus Topics
-                    </Text>
-                  </View>
-                  {knowledge.must_cover_topics.map((topic, i) => (
-                    <View key={topic} style={styles.bulletRow}>
-                      <Ionicons
-                        color={AppTheme.colors.primary}
-                        name="checkbox-outline"
-                        size={16}
-                        style={{ marginTop: 2 }}
-                      />
-                      <Text style={styles.bulletText}>{topic}</Text>
-                    </View>
-                  ))}
-                </View>
-              )}
-
-              {/* Common Misconceptions */}
-              {knowledge.common_misconceptions?.length > 0 && (
-                <View style={[styles.card, styles.warningCard]}>
-                  <View style={styles.cardHeader}>
-                    <Ionicons color="#B42318" name="alert-circle" size={18} />
-                    <Text style={[styles.cardTitle, { color: "#B42318" }]}>
-                      Common Misconceptions
-                    </Text>
-                  </View>
-                  {knowledge.common_misconceptions.map((mis, i) => (
-                    <View key={i} style={styles.bulletRow}>
-                      <Ionicons
-                        color="#B42318"
-                        name="close-circle-outline"
-                        size={16}
-                        style={{ marginTop: 2 }}
-                      />
-                      <Text style={[styles.bulletText, { color: "#7A1C1C" }]}>
-                        {mis}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              )}
-            </View>
-          )
-        ) : activeTab === "documents" ? (
-          <View style={styles.docSection}>
-            <View style={styles.docHeaderRow}>
-              <Text style={styles.sectionTitle}>Reference Documents</Text>
-              <Pressable
-                disabled={uploading}
-                onPress={handlePickDocument}
-                style={[styles.uploadBtn, uploading && styles.btnDisabled]}
-              >
-                {uploading ? (
-                  <ActivityIndicator color="#fff" size="small" />
-                ) : (
+              <View style={styles.metaRow}>
+                <View style={styles.metaBadge}>
                   <Ionicons
-                    color="#fff"
-                    name="cloud-upload-outline"
-                    size={16}
+                    color={AppTheme.colors.primaryDark}
+                    name="document-text"
+                    size={14}
                   />
+                  <Text style={styles.metaBadgeText}>
+                    {chapter?.document_count ?? 0} reference files
+                  </Text>
+                </View>
+                {chapter && (
+                  <Text style={styles.metaDate}>Last updated: {formattedDate}</Text>
                 )}
-                <Text style={styles.uploadBtnText}>
-                  {uploading ? `${uploadProgress}%` : "Upload file"}
-                </Text>
-              </Pressable>
+              </View>
             </View>
 
-            {documents.length === 0 ? (
-              <View style={styles.emptyDocBox}>
+            {/* Tab Selector - Full Width */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={{ width: "100%" }}
+              contentContainerStyle={{ width: "100%", minWidth: "100%" }}
+            >
+              <View style={styles.tabContainer}>
+                <Pressable
+                  onPress={() => setActiveTab("planner")}
+                  style={[
+                    styles.tabButton,
+                    activeTab === "planner" && styles.tabButtonActive,
+                  ]}
+                >
+                  <Ionicons
+                    color={
+                      activeTab === "planner" ? AppTheme.colors.primaryDark : AppTheme.colors.textSecondary
+                    }
+                    name="calendar-outline"
+                    size={14}
+                  />
+                  <Text
+                    style={[
+                      styles.tabText,
+                      activeTab === "planner" && styles.tabTextActive,
+                    ]}
+                  >
+                    Micro Planner
+                  </Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => setActiveTab("profile")}
+                  style={[
+                    styles.tabButton,
+                    activeTab === "profile" && styles.tabButtonActive,
+                  ]}
+                >
+                  <Ionicons
+                    color={
+                      activeTab === "profile" ? AppTheme.colors.primaryDark : AppTheme.colors.textSecondary
+                    }
+                    name="sparkles-outline"
+                    size={14}
+                  />
+                  <Text
+                    style={[
+                      styles.tabText,
+                      activeTab === "profile" && styles.tabTextActive,
+                    ]}
+                  >
+                    Knowledge Profile
+                  </Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => setActiveTab("documents")}
+                  style={[
+                    styles.tabButton,
+                    activeTab === "documents" && styles.tabButtonActive,
+                  ]}
+                >
+                  <Ionicons
+                    color={
+                      activeTab === "documents" ? AppTheme.colors.primaryDark : AppTheme.colors.textSecondary
+                    }
+                    name="document-text-outline"
+                    size={14}
+                  />
+                  <Text
+                    style={[
+                      styles.tabText,
+                      activeTab === "documents" && styles.tabTextActive,
+                    ]}
+                  >
+                    Documents
+                  </Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => setActiveTab("metadata")}
+                  style={[
+                    styles.tabButton,
+                    activeTab === "metadata" && styles.tabButtonActive,
+                  ]}
+                >
+                  <Ionicons
+                    color={
+                      activeTab === "metadata" ? AppTheme.colors.primaryDark : AppTheme.colors.textSecondary
+                    }
+                    name="information-circle-outline"
+                    size={14}
+                  />
+                  <Text
+                    style={[
+                      styles.tabText,
+                      activeTab === "metadata" && styles.tabTextActive,
+                    ]}
+                  >
+                    Details
+                  </Text>
+                </Pressable>
+              </View>
+            </ScrollView>
+
+            {isLoading ? (
+              <View style={styles.center}>
+                <ActivityIndicator color={AppTheme.colors.primary} size="large" />
+                <Text style={styles.loadingText}>Loading chapter...</Text>
+              </View>
+            ) : error ? (
+              <View style={styles.center}>
                 <Ionicons
                   color={AppTheme.colors.textSecondary}
-                  name="document-attach-outline"
+                  name="cloud-offline-outline"
                   size={40}
                 />
-                <Text style={styles.emptyDocTitle}>No reference files</Text>
-                <Text style={styles.emptyDocBody}>
-                  Upload reading materials, syllabi, or lesson plans (PDF, DOCX,
-                  PPTX, TXT) to generate a knowledge profile.
-                </Text>
+                <Text style={styles.emptyTitle}>Could not load details</Text>
+                <Text style={styles.emptyBody}>{error}</Text>
               </View>
-            ) : (
-              <View style={styles.docList}>
-                {documents.map((doc) => {
-                  const s = statusStyle(doc.processing_status);
-                  const uploadDate = new Date(
-                    doc.uploaded_at,
-                  ).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  });
+            ) : activeTab === "planner" ? (
+              <View style={styles.plannerSection}>
+                <View style={styles.plannerHeaderRow}>
+                  <View style={styles.plannerHeaderTitles}>
+                    <Text style={styles.sectionTitle}>MICRO PLANNER</Text>
+                    <Text style={styles.plannerSub}>
+                      Subject: {subjectName} • Chapter: {chapterName}
+                    </Text>
+                  </View>
+                  <Pressable
+                    style={styles.addPlanBtn}
+                    onPress={() => {
+                      setSelectedLpItem(null);
+                      setLpModalVisible(true);
+                    }}
+                  >
+                    <Ionicons name="add" size={16} color="#fff" />
+                    <Text style={styles.addPlanText}>Add Entry</Text>
+                  </Pressable>
+                </View>
 
-                  return (
-                    <View key={doc.id} style={styles.docCard}>
-                      <View style={styles.docCardIconBox}>
+                <LearningPlanList
+                  items={learningPlans}
+                  onEditItem={(item) => {
+                    setSelectedLpItem(item);
+                    setLpModalVisible(true);
+                  }}
+                  onDeleteItem={handleDeleteLearningPlan}
+                />
+              </View>
+            ) : activeTab === "profile" ? (
+              !knowledge ? (
+                <View style={styles.emptyKbContainer}>
+                  <View style={styles.emptyKbIconBox}>
+                    <Ionicons
+                      color={AppTheme.colors.textSecondary}
+                      name="analytics-outline"
+                      size={32}
+                    />
+                  </View>
+                  <Text style={styles.emptyKbTitle}>No Knowledge Profile Yet</Text>
+                  <Text style={styles.emptyKbBody}>
+                    Upload reference documents (PDF, DOCX, PPTX, or TXT) to
+                    automatically construct a structured chapter knowledge profile
+                    using AI.
+                  </Text>
+                </View>
+              ) : (
+                <View style={styles.kbContent}>
+                  {/* Summary Card */}
+                  <View style={styles.card}>
+                    <View style={styles.cardHeader}>
+                      <Ionicons color={AppTheme.colors.primary} name="book" size={18} />
+                      <Text style={styles.cardTitle}>Chapter Summary</Text>
+                    </View>
+                    <Text style={styles.cardBody}>{knowledge.chapter_summary}</Text>
+                  </View>
+
+                  {/* Learning Objectives */}
+                  {knowledge.learning_objectives?.length > 0 && (
+                    <View style={styles.card}>
+                      <View style={styles.cardHeader}>
+                        <Ionicons color={AppTheme.colors.primary} name="flag" size={18} />
+                        <Text style={styles.cardTitle}>Learning Objectives</Text>
+                      </View>
+                      {knowledge.learning_objectives.map((obj, i) => (
+                        <View key={i} style={styles.bulletRow}>
+                          <Ionicons
+                            color={AppTheme.colors.primary}
+                            name="checkmark-circle-outline"
+                            size={16}
+                            style={{ marginTop: 2 }}
+                          />
+                          <Text style={styles.bulletText}>{obj}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+
+                  {/* Key Concepts */}
+                  {knowledge.key_concepts?.length > 0 && (
+                    <View style={styles.card}>
+                      <View style={styles.cardHeader}>
+                        <Ionicons color={AppTheme.colors.primary} name="bulb" size={18} />
+                        <Text style={styles.cardTitle}>Key Concepts</Text>
+                      </View>
+                      {knowledge.key_concepts.map((concept, i) => (
+                        <View key={i} style={styles.bulletRow}>
+                          <Ionicons
+                            color={AppTheme.colors.primary}
+                            name="star-outline"
+                            size={16}
+                            style={{ marginTop: 2 }}
+                          />
+                          <Text style={styles.bulletText}>{concept}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+
+                  {/* Must-Cover Topics */}
+                  {knowledge.must_cover_topics?.length > 0 && (
+                    <View style={styles.card}>
+                      <View style={styles.cardHeader}>
                         <Ionicons
                           color={AppTheme.colors.primary}
-                          name={
-                            doc.file_type.toLowerCase() === "pdf"
-                              ? "document-outline"
-                              : "document-text-outline"
-                          }
-                          size={20}
+                          name="list-circle"
+                          size={18}
                         />
-                      </View>
-                      <View style={styles.docCardContent}>
-                        <Text numberOfLines={1} style={styles.docCardTitle}>
-                          {doc.file_name}
-                        </Text>
-                        <Text style={styles.docCardMeta}>
-                          {doc.file_type} · {uploadDate}
+                        <Text style={styles.cardTitle}>
+                          Must-Cover Syllabus Topics
                         </Text>
                       </View>
-                      <View style={styles.docCardRight}>
-                        <View
-                          style={[
-                            styles.statusBadge,
-                            { backgroundColor: s.bg },
-                          ]}
-                        >
-                          <Text style={[styles.statusText, { color: s.text }]}>
-                            {s.label}
-                          </Text>
+                      {knowledge.must_cover_topics.map((topic, i) => (
+                        <View key={topic} style={styles.bulletRow}>
+                          <Ionicons
+                            color={AppTheme.colors.primary}
+                            name="checkbox-outline"
+                            size={16}
+                            style={{ marginTop: 2 }}
+                          />
+                          <Text style={styles.bulletText}>{topic}</Text>
                         </View>
-                        <Pressable
-                          hitSlop={8}
-                          onPress={() => handleDeleteDocument(doc)}
-                          style={styles.trashBtn}
-                        >
+                      ))}
+                    </View>
+                  )}
+
+                  {/* Common Misconceptions */}
+                  {knowledge.common_misconceptions?.length > 0 && (
+                    <View style={[styles.card, styles.warningCard]}>
+                      <View style={styles.cardHeader}>
+                        <Ionicons color="#B42318" name="alert-circle" size={18} />
+                        <Text style={[styles.cardTitle, { color: "#B42318" }]}>
+                          Common Misconceptions
+                        </Text>
+                      </View>
+                      {knowledge.common_misconceptions.map((mis, i) => (
+                        <View key={i} style={styles.bulletRow}>
                           <Ionicons
                             color="#B42318"
-                            name="trash-outline"
+                            name="close-circle-outline"
                             size={16}
+                            style={{ marginTop: 2 }}
                           />
-                        </Pressable>
-                      </View>
+                          <Text style={[styles.bulletText, { color: "#7A1C1C" }]}>
+                            {mis}
+                          </Text>
+                        </View>
+                      ))}
                     </View>
-                  );
-                })}
+                  )}
+                </View>
+              )
+            ) : activeTab === "documents" ? (
+              <View style={styles.docSection}>
+                <View style={styles.docHeaderRow}>
+                  <Text style={styles.sectionTitle}>Reference Documents</Text>
+                  <Pressable
+                    disabled={uploading}
+                    onPress={handlePickDocument}
+                    style={[styles.uploadBtn, uploading && styles.btnDisabled]}
+                  >
+                    {uploading ? (
+                      <ActivityIndicator color="#fff" size="small" />
+                    ) : (
+                      <Ionicons
+                        color="#fff"
+                        name="cloud-upload-outline"
+                        size={16}
+                      />
+                    )}
+                    <Text style={styles.uploadBtnText}>
+                      {uploading ? `${uploadProgress}%` : "Upload file"}
+                    </Text>
+                  </Pressable>
+                </View>
+
+                {documents.length === 0 ? (
+                  <View style={styles.emptyDocBox}>
+                    <Ionicons
+                      color={AppTheme.colors.textSecondary}
+                      name="document-attach-outline"
+                      size={40}
+                    />
+                    <Text style={styles.emptyDocTitle}>No reference files</Text>
+                    <Text style={styles.emptyDocBody}>
+                      Upload reading materials, syllabi, or lesson plans (PDF, DOCX,
+                      PPTX, TXT) to generate a knowledge profile.
+                    </Text>
+                  </View>
+                ) : (
+                  <View style={styles.docList}>
+                    {documents.map((doc) => {
+                      const s = statusStyle(doc.processing_status);
+                      const uploadDate = new Date(
+                        doc.uploaded_at,
+                      ).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      });
+
+                      return (
+                        <View key={doc.id} style={styles.docCard}>
+                          <View style={styles.docCardIconBox}>
+                            <Ionicons
+                              color={AppTheme.colors.primary}
+                              name={
+                                doc.file_type.toLowerCase() === "pdf"
+                                  ? "document-outline"
+                                  : "document-text-outline"
+                              }
+                              size={20}
+                            />
+                          </View>
+                          <View style={styles.docCardContent}>
+                            <Text numberOfLines={1} style={styles.docCardTitle}>
+                              {doc.file_name}
+                            </Text>
+                            <Text style={styles.docCardMeta}>
+                              {doc.file_type} · {uploadDate}
+                            </Text>
+                          </View>
+                          <View style={styles.docCardRight}>
+                            <View
+                              style={[
+                                styles.statusBadge,
+                                { backgroundColor: s.bg },
+                              ]}
+                            >
+                              <Text style={[styles.statusText, { color: s.text }]}>
+                                {s.label}
+                              </Text>
+                            </View>
+                            <Pressable
+                              hitSlop={8}
+                              onPress={() => handleDeleteDocument(doc)}
+                              style={styles.trashBtn}
+                            >
+                              <Ionicons
+                                color="#B42318"
+                                name="trash-outline"
+                                size={16}
+                              />
+                            </Pressable>
+                          </View>
+                        </View>
+                      );
+                    })}
+                  </View>
+                )}
+              </View>
+            ) : (
+              <View style={styles.metadataList}>
+                <View style={styles.metaItem}>
+                  <Text style={styles.metaLabel}>Chapter ID</Text>
+                  <Text style={styles.metaValue}>#{chapterId}</Text>
+                </View>
+                <View style={styles.metaItem}>
+                  <Text style={styles.metaLabel}>Subject Name</Text>
+                  <Text style={styles.metaValue}>{subjectName}</Text>
+                </View>
+                <View style={styles.metaItem}>
+                  <Text style={styles.metaLabel}>Date Created</Text>
+                  <Text style={styles.metaValue}>
+                    {chapter
+                      ? new Date(chapter.created_at).toLocaleString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : "—"}
+                  </Text>
+                </View>
               </View>
             )}
           </View>
-        ) : (
-          <View style={styles.metadataList}>
-            <View style={styles.metaItem}>
-              <Text style={styles.metaLabel}>Chapter ID</Text>
-              <Text style={styles.metaValue}>#{chapterId}</Text>
-            </View>
-            <View style={styles.metaItem}>
-              <Text style={styles.metaLabel}>Subject Name</Text>
-              <Text style={styles.metaValue}>{subjectName}</Text>
-            </View>
-            <View style={styles.metaItem}>
-              <Text style={styles.metaLabel}>Date Created</Text>
-              <Text style={styles.metaValue}>
-                {chapter
-                  ? new Date(chapter.created_at).toLocaleString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
-                  : "—"}
-              </Text>
-            </View>
-          </View>
-        )}
         </View>
       </ScrollView>
 
@@ -799,9 +785,20 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: AppTheme.colors.background },
+  centerContainer: {
+    flex: 1,
+    alignItems: "center",
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.l,
+  },
+  body: {
+    width: "100%",
+    maxWidth: 800,
+    gap: AppTheme.spacing.l,
+  },
   plannerSection: {
     paddingHorizontal: 0,
-    marginTop: 20,
+    marginTop: 0,
     gap: 16,
   },
   plannerHeaderRow: {
@@ -828,61 +825,25 @@ const styles = StyleSheet.create({
   },
   addPlanText: {
     color: "#fff",
-    fontWeight: "700",
+    fontFamily: AppTheme.typography.family.bold,
     fontSize: 13,
   },
-  header: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: AppTheme.colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: AppTheme.colors.border,
-  },
-  headerInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    maxWidth: 1280,
-    width: '100%',
-    alignSelf: 'center',
-  },
-  backBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    color: AppTheme.colors.textPrimary,
-    fontSize: 17,
-    fontWeight: '700',
-  },
-  scroll: { paddingBottom: 40 },
-  mainContainer: {
-    maxWidth: 1280,
-    width: '100%',
-    alignSelf: 'center',
-    paddingHorizontal: 20,
-  },
+  scroll: { paddingBottom: 40, flexGrow: 1 },
 
   // Hero Section
   hero: {
-    backgroundColor: AppTheme.colors.surface,
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: AppTheme.colors.border,
-  },
-  heroInner: {
-    maxWidth: 1280,
-    width: '100%',
-    alignSelf: 'center',
     gap: 8,
+    marginBottom: AppTheme.spacing.xs,
   },
   heroKicker: {
     fontSize: 11,
-    fontWeight: '700',
+    fontFamily: AppTheme.typography.family.bold,
     letterSpacing: 1.1,
     color: AppTheme.colors.primary,
   },
   heroTitle: {
     fontSize: 26,
-    fontWeight: '800',
+    fontFamily: AppTheme.typography.family.bold,
     color: AppTheme.colors.textPrimary,
     letterSpacing: -0.5,
   },
@@ -908,7 +869,7 @@ const styles = StyleSheet.create({
   },
   metaBadgeText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: AppTheme.typography.family.bold,
     color: AppTheme.colors.primaryDark,
   },
   metaDate: {
@@ -918,8 +879,7 @@ const styles = StyleSheet.create({
 
   // Tab Selector
   tabContainer: {
-    flexDirection: 'row',
-    marginTop: 20,
+    flexDirection: "row",
     backgroundColor: AppTheme.colors.surfaceMuted,
     padding: 4,
     borderRadius: AppTheme.radius.large,
@@ -945,7 +905,7 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: AppTheme.typography.family.bold,
     color: AppTheme.colors.textSecondary,
   },
   tabTextActive: {
@@ -977,7 +937,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 15,
-    fontWeight: '800',
+    fontFamily: AppTheme.typography.family.bold,
     color: AppTheme.colors.textPrimary,
   },
   cardBody: {
@@ -1010,7 +970,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: AppTheme.typography.family.bold,
     color: AppTheme.colors.textPrimary,
   },
   uploadBtn: {
@@ -1023,9 +983,9 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
   },
   uploadBtnText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: AppTheme.typography.family.bold,
   },
   emptyDocBox: {
     alignItems: 'center',
@@ -1039,7 +999,7 @@ const styles = StyleSheet.create({
   },
   emptyDocTitle: {
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: AppTheme.typography.family.bold,
     color: AppTheme.colors.textPrimary,
   },
   emptyDocBody: {
@@ -1076,7 +1036,7 @@ const styles = StyleSheet.create({
   },
   docCardTitle: {
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: AppTheme.typography.family.bold,
     color: AppTheme.colors.textPrimary,
   },
   docCardMeta: {
@@ -1103,7 +1063,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 11,
-    fontWeight: '700',
+    fontFamily: AppTheme.typography.family.bold,
   },
 
   // Metadata tab
@@ -1126,12 +1086,12 @@ const styles = StyleSheet.create({
   },
   metaLabel: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: AppTheme.typography.family.semibold,
     color: AppTheme.colors.textSecondary,
   },
   metaValue: {
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: AppTheme.typography.family.bold,
     color: AppTheme.colors.textPrimary,
   },
 
@@ -1152,7 +1112,7 @@ const styles = StyleSheet.create({
   },
   emptyKbTitle: {
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: AppTheme.typography.family.bold,
     color: AppTheme.colors.textPrimary,
   },
   emptyKbBody: {

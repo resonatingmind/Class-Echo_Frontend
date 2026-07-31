@@ -1,72 +1,24 @@
-import {
-  ScrollView,
-  TextInput,
-  Pressable,
-  Text,
-  View,
-  StyleSheet,
-} from "react-native";
+import { TextInput, Pressable, Text, View, StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-
 import { AppTheme } from "../../theme/AppTheme";
 
 type Props = {
   search: string;
   onSearchChange: (value: string) => void;
-
-  selectedClass: string | null;
-  selectedSection: string | null;
-  selectedSubject: string | null;
-  selectedTeacher: string | null;
-  selectedYear: string | null;
-
-  onClassPress: () => void;
-  onSectionPress: () => void;
-  onSubjectPress: () => void;
-  onTeacherPress: () => void;
-  onYearPress: () => void;
-
-  onSelectedClassClear?: () => void;
-  onSelectedSectionClear?: () => void;
-  onSelectedSubjectClear?: () => void;
-  onSelectedTeacherClear?: () => void;
-  onSelectedYearClear?: () => void;
-
-  onClearAll?: () => void;
+  activeFilterCount: number;
+  onFilterPress: () => void;
 };
 
 export function PlannerFilters({
   search,
   onSearchChange,
-  selectedClass,
-  selectedSection,
-  selectedSubject,
-  selectedTeacher,
-  selectedYear,
-  onClassPress,
-  onSectionPress,
-  onSubjectPress,
-  onTeacherPress,
-  onYearPress,
-  onSelectedClassClear,
-  onSelectedSectionClear,
-  onSelectedSubjectClear,
-  onSelectedTeacherClear,
-  onSelectedYearClear,
-  onClearAll,
+  activeFilterCount,
+  onFilterPress,
 }: Props) {
-  const hasActiveFilters =
-    selectedClass != null ||
-    selectedSection != null ||
-    selectedSubject != null ||
-    selectedTeacher != null ||
-    selectedYear != null;
-
   return (
-    <>
+    <View style={styles.container}>
       <View style={styles.searchContainer}>
         <Ionicons name="search-outline" size={20} color={AppTheme.colors.textSecondary} />
-
         <TextInput
           value={search}
           onChangeText={onSearchChange}
@@ -76,161 +28,66 @@ export function PlannerFilters({
         />
       </View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.filterRow}
-      >
-        <FilterChip
-          title={selectedClass ?? "Class"}
-          selected={selectedClass != null}
-          onPress={onClassPress}
-          onClear={onSelectedClassClear}
-        />
-
-        <FilterChip
-          title={selectedSection ? `Section ${selectedSection}` : "Section"}
-          selected={selectedSection != null}
-          onPress={onSectionPress}
-          onClear={onSelectedSectionClear}
-        />
-
-        <FilterChip
-          title={selectedSubject ?? "Subject"}
-          selected={selectedSubject != null}
-          onPress={onSubjectPress}
-          onClear={onSelectedSubjectClear}
-        />
-
-        <FilterChip
-          title={selectedTeacher ?? "Teacher"}
-          selected={selectedTeacher != null}
-          onPress={onTeacherPress}
-          onClear={onSelectedTeacherClear}
-        />
-
-        <FilterChip
-          title={selectedYear ?? "Academic year"}
-          selected={selectedYear != null}
-          onPress={onYearPress}
-          onClear={onSelectedYearClear}
-        />
-
-        {hasActiveFilters ? (
-          <Pressable style={styles.clearAll} onPress={onClearAll}>
-            <Text style={styles.clearAllText}>Clear all</Text>
-          </Pressable>
-        ) : null}
-      </ScrollView>
-    </>
-  );
-}
-
-type FilterChipProps = {
-  title: string;
-  selected: boolean;
-  onPress: () => void;
-  onClear?: () => void;
-};
-
-function FilterChip({ title, selected, onPress, onClear }: FilterChipProps) {
-  return (
-    <Pressable
-      onPress={onPress}
-      style={[styles.filter, selected && styles.filterSelected]}
-    >
-      <Text
-        numberOfLines={1}
-        style={[styles.filterText, selected && styles.selectedText]}
-      >
-        {title}
-      </Text>
-
-      {selected ? (
-        <Pressable
-          hitSlop={10}
-          onPress={(e) => {
-            e.stopPropagation();
-            onClear?.();
-          }}
-        >
-          <Ionicons name="close-circle" size={16} color={AppTheme.colors.primaryDark} />
-        </Pressable>
-      ) : (
-        <Ionicons name="chevron-down" size={14} color={AppTheme.colors.textSecondary} />
-      )}
-    </Pressable>
+      <Pressable style={styles.filterBtn} onPress={onFilterPress}>
+        <Ionicons name="options-outline" size={20} color={AppTheme.colors.textPrimary} />
+        {activeFilterCount > 0 && (
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{activeFilterCount}</Text>
+          </View>
+        )}
+      </Pressable>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 16,
+  },
   searchContainer: {
+    flex: 1,
     height: 48,
     borderRadius: AppTheme.radius.medium,
     backgroundColor: AppTheme.colors.surface,
-
     ...AppTheme.shadows.subtle,
-
     flexDirection: "row",
     alignItems: "center",
-
     paddingHorizontal: 14,
-
-    marginBottom: 12,
   },
-
   input: {
     flex: 1,
     marginLeft: 10,
     color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.bodyLarge,
   },
-
-  filterRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    paddingBottom: 4,
-    marginBottom: 8,
-  },
-
-  filter: {
-    height: 38,
-    borderRadius: 999,
+  filterBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: AppTheme.radius.medium,
     backgroundColor: AppTheme.colors.surface,
-    borderWidth: 1,
-    borderColor: AppTheme.colors.border,
-    paddingHorizontal: 12,
-    flexDirection: "row",
+    ...AppTheme.shadows.subtle,
     alignItems: "center",
-    gap: 6,
-  },
-
-  filterSelected: {
-    backgroundColor: AppTheme.colors.primaryLight,
-    borderColor: AppTheme.colors.primaryLight,
-  },
-
-  filterText: {
-    fontSize: 13,
-    fontFamily: AppTheme.typography.family.medium,
-    color: AppTheme.colors.textPrimary,
-  },
-
-  selectedText: {
-    color: AppTheme.colors.primaryDark,
-    fontFamily: AppTheme.typography.family.semibold,
-  },
-
-  clearAll: {
-    height: 38,
     justifyContent: "center",
-    paddingHorizontal: 10,
   },
-
-  clearAllText: {
-    color: AppTheme.colors.textSecondary,
-    ...AppTheme.typography.label,
+  badge: {
+    position: "absolute",
+    top: -6,
+    right: -6,
+    backgroundColor: AppTheme.colors.primary,
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 4,
+    borderWidth: 2,
+    borderColor: AppTheme.colors.background,
+  },
+  badgeText: {
+    color: "#fff",
+    fontSize: 10,
+    fontFamily: AppTheme.typography.family.bold,
   },
 });
-

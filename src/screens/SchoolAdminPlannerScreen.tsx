@@ -13,15 +13,13 @@ import { PlannerStaffingSummary } from "../components/planner/PlannerStaffingSum
 import { PlannerStatusChips } from "../components/planner/PlannerStatusChips";
 import { PlannerTableRow } from "../components/planner/PlannerTableRow";
 import { PlannerEmpty } from "../components/planner/PlannerEmpty";
-import { SelectionBottomSheet } from "../components/common/SelectionBottomSheet";
+import { PlannerUnifiedFilterSheet, FilterState } from "../components/planner/PlannerUnifiedFilterSheet";
 import { QuickAssignmentModal } from "../components/planner/QuickAssignmentModal";
 import { AssignTeacherModal } from "../components/AssignTeacherModal";
 
 import { PlannerItemOut, TeacherOut } from "../types/api";
 import { getSchoolPlanner, getSchoolAdminTeachers } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
-
-type FilterType = "class" | "section" | "subject" | "teacher" | "year" | null;
 
 export function SchoolAdminPlannerScreen() {
   const { session } = useAuth();
@@ -38,16 +36,17 @@ export function SchoolAdminPlannerScreen() {
   } | null>(null);
 
   const [search, setSearch] = useState("");
-  const [selectedClass, setSelectedClass] = useState<string | null>(null);
-  const [selectedSection, setSelectedSection] = useState<string | null>(null);
-  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
-  const [selectedTeacher, setSelectedTeacher] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState<string | null>(null);
+  const [activeFilters, setActiveFilters] = useState<FilterState>({
+    class: null,
+    section: null,
+    subject: null,
+    teacher: null,
+    year: null,
+  });
   const [showOnlyUnassigned, setShowOnlyUnassigned] = useState(false);
 
   const [filterVisible, setFilterVisible] = useState(false);
   const [quickAssignmentVisible, setQuickAssignmentVisible] = useState(false);
-  const [filterType, setFilterType] = useState<FilterType>(null);
 
   useEffect(() => {
     loadPlanner();
@@ -70,11 +69,11 @@ export function SchoolAdminPlannerScreen() {
     }
   }
 
-  const classOptions = [...new Set(planner.map((item) => item.class_name))].sort().map(c => ({ id: c, label: c }));
-  const sectionOptions = [...new Set(planner.map((item) => item.section))].sort().map(s => ({ id: s, label: `Section ${s}` }));
-  const subjectOptions = [...new Set(planner.map((item) => item.subject_name))].sort().map(s => ({ id: s, label: s }));
-  const teacherOptions = [...new Set(planner.map((item) => item.teacher_name).filter(Boolean))].sort().map(t => ({ id: t as string, label: t as string }));
-  const yearOptions = [...new Set(planner.map((item) => item.academic_year))].sort().map(y => ({ id: y, label: y }));
+  const classOptions = [...new Set(planner.map((item) => item.class_name))].sort();
+  const sectionOptions = [...new Set(planner.map((item) => item.section))].sort();
+  const subjectOptions = [...new Set(planner.map((item) => item.subject_name))].sort();
+  const teacherOptions = [...new Set(planner.map((item) => item.teacher_name).filter(Boolean))].sort() as string[];
+  const yearOptions = [...new Set(planner.map((item) => item.academic_year))].sort();
 
   const totalUnassigned = planner.filter((item) => !item.teacher_id).length;
 
@@ -86,15 +85,15 @@ export function SchoolAdminPlannerScreen() {
       (item.teacher_name ?? "").toLowerCase().includes(search.toLowerCase());
 
     const matchesClass =
-      selectedClass == null || item.class_name === selectedClass;
+      activeFilters.class == null || item.class_name === activeFilters.class;
     const matchesSection =
-      selectedSection == null || item.section === selectedSection;
+      activeFilters.section == null || item.section === activeFilters.section;
     const matchesSubject =
-      selectedSubject == null || item.subject_name === selectedSubject;
+      activeFilters.subject == null || item.subject_name === activeFilters.subject;
     const matchesTeacher =
-      selectedTeacher == null || item.teacher_name === selectedTeacher;
+      activeFilters.teacher == null || item.teacher_name === activeFilters.teacher;
     const matchesYear =
-      selectedYear == null || item.academic_year === selectedYear;
+      activeFilters.year == null || item.academic_year === activeFilters.year;
     const matchesUnassigned = !showOnlyUnassigned || !item.teacher_id;
 
     return (
@@ -120,16 +119,34 @@ export function SchoolAdminPlannerScreen() {
     });
   }, [filteredPlanner]);
 
-  function clearAllFilters() {
-    setSelectedClass(null);
-    setSelectedSection(null);
-    setSelectedSubject(null);
-    setSelectedTeacher(null);
-    setSelectedYear(null);
-  }
+  const activeFilterCount = Object.values(activeFilters).filter((val) => val !== null).length;
 
-  function openQuickAssignment() {
-    setQuickAssignmentVisible(true);
+  function renderHeader() {
+    return (
+      <View style={styles.headerContainer}>
+        <PlannerHeader onCreatePress={() => setQuickAssignmentVisible(true)} />
+
+        <PlannerStaffingSummary
+          staffed={planner.length - totalUnassigned}
+          total={planner.length}
+        />
+
+        <PlannerStatusChips
+          totalCount={planner.length}
+          unassignedCount={totalUnassigned}
+          showOnlyUnassigned={showOnlyUnassigned}
+          onShowAll={() => setShowOnlyUnassigned(false)}
+          onShowUnassigned={() => setShowOnlyUnassigned(true)}
+        />
+
+        <PlannerFilters
+          search={search}
+          onSearchChange={setSearch}
+          activeFilterCount={activeFilterCount}
+          onFilterPress={() => setFilterVisible(true)}
+        />
+      </View>
+    );
   }
 
   return (
@@ -137,161 +154,61 @@ export function SchoolAdminPlannerScreen() {
       <AdminNavbar title="Planner" />
       <View style={styles.centerContainer}>
         <View style={styles.body}>
-          <View style={styles.headerContainer}>
-            <PlannerHeader onCreatePress={() => openQuickAssignment()} />
-
-            <PlannerStaffingSummary
-              staffed={planner.length - totalUnassigned}
-              total={planner.length}
+          {loading ? (
+            <ActivityIndicator
+              size="large"
+              color={AppTheme.colors.primary}
+              style={{ marginTop: 40 }}
             />
+          ) : (
+            <FlatList
+              data={sortedPlanner}
+              keyExtractor={(item) => String(item.subject_id)}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.listContent}
+              ListHeaderComponent={renderHeader}
+              ListEmptyComponent={<PlannerEmpty />}
+              renderItem={({ item }) => (
+                <PlannerTableRow
+                  item={item}
+                  onView={() =>
+                    navigation.navigate("SchoolAdminPlannerDetail", {
+                      subjectId: item.subject_id,
+                    })
+                  }
+                  onAssignTeacher={(assignItem) =>
+                    setAssignTarget({
+                      subjectId: assignItem.subject_id,
+                      subjectName: assignItem.subject_name,
+                      teacherId: assignItem.teacher_id,
+                    })
+                  }
+                  onTeacherPress={(pressedItem) => {
+                    if (!pressedItem.teacher_id) return;
 
-            <PlannerStatusChips
-              totalCount={planner.length}
-              unassignedCount={totalUnassigned}
-              showOnlyUnassigned={showOnlyUnassigned}
-              onShowAll={() => setShowOnlyUnassigned(false)}
-              onShowUnassigned={() => setShowOnlyUnassigned(true)}
-            />
-
-            <PlannerFilters
-              search={search}
-              onSearchChange={setSearch}
-              selectedClass={selectedClass}
-              selectedSection={selectedSection}
-              selectedSubject={selectedSubject}
-              selectedTeacher={selectedTeacher}
-              selectedYear={selectedYear}
-              onClassPress={() => {
-                setFilterType("class");
-                setFilterVisible(true);
-              }}
-              onSectionPress={() => {
-                setFilterType("section");
-                setFilterVisible(true);
-              }}
-              onSubjectPress={() => {
-                setFilterType("subject");
-                setFilterVisible(true);
-              }}
-              onTeacherPress={() => {
-                setFilterType("teacher");
-                setFilterVisible(true);
-              }}
-              onYearPress={() => {
-                setFilterType("year");
-                setFilterVisible(true);
-              }}
-              onSelectedClassClear={() => setSelectedClass(null)}
-              onSelectedSectionClear={() => setSelectedSection(null)}
-              onSelectedSubjectClear={() => setSelectedSubject(null)}
-              onSelectedTeacherClear={() => setSelectedTeacher(null)}
-              onSelectedYearClear={() => setSelectedYear(null)}
-              onClearAll={clearAllFilters}
-            />
-          </View>
-
-          <View style={styles.listContainer}>
-            {loading ? (
-              <ActivityIndicator
-                size="large"
-                color={AppTheme.colors.primary}
-                style={{ marginTop: 40 }}
-              />
-            ) : sortedPlanner.length === 0 ? (
-              <PlannerEmpty />
-            ) : (
-              <View style={styles.listContainerInner}>
-                <FlatList
-                  data={sortedPlanner}
-                  keyExtractor={(item) => String(item.subject_id)}
-                  showsVerticalScrollIndicator={false}
-                  contentContainerStyle={styles.listContent}
-                  renderItem={({ item }) => (
-                    <PlannerTableRow
-                      item={item}
-                      onView={() =>
-                        navigation.navigate("SchoolAdminPlannerDetail", {
-                          subjectId: item.subject_id,
-                        })
-                      }
-                      onAssignTeacher={(assignItem) =>
-                        setAssignTarget({
-                          subjectId: assignItem.subject_id,
-                          subjectName: assignItem.subject_name,
-                          teacherId: assignItem.teacher_id,
-                        })
-                      }
-                      onTeacherPress={(pressedItem) => {
-                        if (!pressedItem.teacher_id) return;
-
-                        navigation.navigate("SchoolAdminTeacherDetail", {
-                          teacherId: pressedItem.teacher_id,
-                        });
-                      }}
-                    />
-                  )}
+                    navigation.navigate("SchoolAdminTeacherDetail", {
+                      teacherId: pressedItem.teacher_id,
+                    });
+                  }}
                 />
-              </View>
-            )}
-          </View>
+              )}
+            />
+          )}
         </View>
       </View>
 
-      <SelectionBottomSheet
+      <PlannerUnifiedFilterSheet
         visible={filterVisible}
-        title={
-          filterType === "class"
-            ? "Select Class"
-            : filterType === "section"
-              ? "Select Section"
-              : filterType === "subject"
-                ? "Select Subject"
-                : filterType === "teacher"
-                  ? "Select Teacher"
-                  : "Select Academic Year"
-        }
-        items={
-          filterType === "class"
-            ? classOptions
-            : filterType === "section"
-              ? sectionOptions
-              : filterType === "subject"
-                ? subjectOptions
-                : filterType === "teacher"
-                  ? teacherOptions
-                  : yearOptions
-        }
-        selectedId={
-          (filterType === "class"
-            ? selectedClass
-            : filterType === "section"
-              ? selectedSection
-              : filterType === "subject"
-                ? selectedSubject
-                : filterType === "teacher"
-                  ? selectedTeacher
-                  : selectedYear) ?? undefined
-        }
         onClose={() => setFilterVisible(false)}
-        onSelect={(item) => {
-          switch (filterType) {
-            case "class":
-              setSelectedClass(item.id);
-              break;
-            case "section":
-              setSelectedSection(item.id);
-              break;
-            case "subject":
-              setSelectedSubject(item.id);
-              break;
-            case "teacher":
-              setSelectedTeacher(item.id);
-              break;
-            case "year":
-              setSelectedYear(item.id);
-              break;
-          }
+        options={{
+          classOptions,
+          sectionOptions,
+          subjectOptions,
+          teacherOptions,
+          yearOptions,
         }}
+        activeFilters={activeFilters}
+        onApply={setActiveFilters}
       />
 
       <QuickAssignmentModal
@@ -335,13 +252,6 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     paddingBottom: 4,
-  },
-  listContainer: {
-    flex: 1,
-  },
-  listContainerInner: {
-    flex: 1,
-    marginTop: 8,
   },
   listContent: {
     paddingBottom: 40,

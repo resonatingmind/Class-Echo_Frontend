@@ -86,13 +86,14 @@ const styles = StyleSheet.create({
   value: {
     marginTop: 6,
     fontSize: 20,
-    fontWeight: "800",
+    fontFamily: AppTheme.typography.family.bold,
     color: AppTheme.colors.textPrimary,
   },
 
   title: {
     marginTop: 2,
     fontSize: 12,
+    fontFamily: AppTheme.typography.family.medium,
     color: AppTheme.colors.textSecondary,
   },
 });

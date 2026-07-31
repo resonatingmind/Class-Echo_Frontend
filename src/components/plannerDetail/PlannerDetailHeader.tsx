@@ -8,8 +8,6 @@ type Props = {
   className: string;
   teacherName: string | null;
   academicYear: string;
-
-  onBack: () => void;
 };
 
 function toTitleCase(value: string): string {
@@ -25,17 +23,9 @@ export function PlannerDetailHeader({
   className,
   teacherName,
   academicYear,
-  onBack,
 }: Props) {
   return (
-    <>
-      <Pressable onPress={onBack} style={styles.backButton}>
-        <Ionicons name="arrow-back" size={20} color={AppTheme.colors.primaryDark} />
-
-        <Text style={styles.backText}>Academic Planner</Text>
-      </Pressable>
-
-      <View style={styles.container}>
+    <View style={styles.container}>
         <Text style={styles.subject}>{toTitleCase(subjectName)}</Text>
 
         <View style={styles.infoRow}>
@@ -44,7 +34,6 @@ export function PlannerDetailHeader({
           <InfoPill value={academicYear} />
         </View>
       </View>
-    </>
   );
 }
 
@@ -59,26 +48,13 @@ function InfoPill({ value }: { value: string }) {
 }
 
 const styles = StyleSheet.create({
-  backButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 14,
-  },
-
-  backText: {
-    marginLeft: 6,
-    color: AppTheme.colors.textSecondary,
-    fontSize: 13,
-    fontWeight: "600",
-  },
-
   container: {
     marginBottom: 16,
   },
 
   subject: {
     fontSize: 24,
-    fontWeight: "800",
+    fontFamily: AppTheme.typography.family.bold,
     color: AppTheme.colors.textPrimary,
     marginBottom: 10,
   },
@@ -98,7 +74,7 @@ const styles = StyleSheet.create({
 
   pillText: {
     fontSize: 12,
-    fontWeight: "600",
+    fontFamily: AppTheme.typography.family.semibold,
     color: AppTheme.colors.textSecondary,
   },
 });

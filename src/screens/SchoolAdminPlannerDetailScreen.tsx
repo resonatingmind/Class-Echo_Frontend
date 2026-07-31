@@ -128,9 +128,10 @@
 
 
 import { useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { AdminNavbar } from "../components/common/AdminNavbar";
 
 import { AppTheme } from "../theme/AppTheme";
 import { useAuth } from "../context/AuthContext";
@@ -145,7 +146,7 @@ import { PlannerStatistics } from "../components/plannerDetail/PlannerStatistics
 
 import { PlannerChapterProgress } from "../components/plannerDetail/PlannerChapterProgress";
 
-import { PlannerChapterTable } from "../components/plannerDetail/PlannerChapterTable";
+import { PlannerChapterList } from "../components/plannerDetail/PlannerChapterList";
 
 export function SchoolAdminPlannerDetailScreen() {
   const navigation = useNavigation<any>();
@@ -191,55 +192,62 @@ export function SchoolAdminPlannerDetailScreen() {
   if (!detail) return null;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <PlannerDetailHeader
-          subjectName={detail.subject_name}
-          className={detail.class_name}
-          teacherName={detail.teacher_name}
-          academicYear={detail.academic_year}
-          onBack={() => navigation.goBack()}
-        />
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+      <AdminNavbar
+        title="Planner Detail"
+        onBack={() => navigation.goBack()}
+      />
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <View style={styles.centerContainer}>
+          <View style={styles.body}>
+            <PlannerDetailHeader
+              subjectName={detail.subject_name}
+              className={detail.class_name}
+              teacherName={detail.teacher_name}
+              academicYear={detail.academic_year}
+            />
 
-        <PlannerStatistics statistics={detail.statistics} />
+            <PlannerStatistics statistics={detail.statistics} />
 
-        <PlannerChapterProgress
-          completed={
-            detail.chapters.filter((chapter) => chapter.status === "Completed")
-              .length
-          }
-          total={detail.chapters.length}
-        />
+            <PlannerChapterProgress
+              completed={
+                detail.chapters.filter((chapter) => chapter.status === "Completed")
+                  .length
+              }
+              total={detail.chapters.length}
+            />
 
-        <PlannerChapterTable
-          chapters={detail.chapters}
-          subjectId={detail.subject_id}
-          subjectName={detail.subject_name}
-          onOpenDocuments={(chapter) => {
-            navigation.navigate("SchoolAdminChapterDetail", {
-              chapterId: chapter.id,
-              chapterName: chapter.name,
-              subjectName: detail.subject_name,
-              subjectId: detail.subject_id,
-            });
-          }}
-          onAddDocument={(chapter) => {
-            navigation.navigate("SchoolAdminChapterDetail", {
-              chapterId: chapter.id,
-              chapterName: chapter.name,
-              subjectName: detail.subject_name,
-              subjectId: detail.subject_id,
-              openUpload: true,
-            });
-          }}
-          onOpenRecordings={(chapter) => {
-            navigation.navigate("SchoolAdminTeacherRecordings", {
-              chapterId: chapter.id,
-              chapterName: chapter.name,
-              subjectName: detail.subject_name,
-            });
-          }}
-        />
+            <PlannerChapterList
+              chapters={detail.chapters}
+              subjectId={detail.subject_id}
+              subjectName={detail.subject_name}
+              onOpenDocuments={(chapter) => {
+                navigation.navigate("SchoolAdminChapterDetail", {
+                  chapterId: chapter.id,
+                  chapterName: chapter.name,
+                  subjectName: detail.subject_name,
+                  subjectId: detail.subject_id,
+                });
+              }}
+              onAddDocument={(chapter) => {
+                navigation.navigate("SchoolAdminChapterDetail", {
+                  chapterId: chapter.id,
+                  chapterName: chapter.name,
+                  subjectName: detail.subject_name,
+                  subjectId: detail.subject_id,
+                  openUpload: true,
+                });
+              }}
+              onOpenRecordings={(chapter) => {
+                navigation.navigate("SchoolAdminTeacherRecordings", {
+                  chapterId: chapter.id,
+                  chapterName: chapter.name,
+                  subjectName: detail.subject_name,
+                });
+              }}
+            />
+          </View>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -248,23 +256,25 @@ export function SchoolAdminPlannerDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
     backgroundColor: AppTheme.colors.background,
   },
-
-  content: {
-    padding: 20,
-
-    paddingBottom: 40,
+  scroll: {
+    flexGrow: 1,
   },
-
+  centerContainer: {
+    flex: 1,
+    alignItems: "center",
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.xl,
+  },
+  body: {
+    width: "100%",
+    maxWidth: 800,
+  },
   center: {
     flex: 1,
-
     justifyContent: "center",
-
     alignItems: "center",
-
     backgroundColor: AppTheme.colors.background,
   },
 });

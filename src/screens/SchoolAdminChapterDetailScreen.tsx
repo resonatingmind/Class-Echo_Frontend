@@ -38,9 +38,9 @@ import {
   LearningPlanOut,
   LearningPlanCreatePayload,
 } from '../types/api';
-import { LearningPlanTable } from "../components/teacher/LearningPlanTable";
+import { LearningPlanList } from "../components/teacher/LearningPlanList";
 import { ChapterLearningPlanModal } from "../components/teacher/ChapterLearningPlanModal";
-import { ScreenHeader } from "../components/common/ScreenHeader";
+import { AdminNavbar } from "../components/common/AdminNavbar";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SchoolAdminChapterDetail'>;
 
@@ -287,8 +287,8 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
     : '';
 
   return (
-    <SafeAreaView edges={['top']} style={styles.safe}>
-      <ScreenHeader
+    <SafeAreaView edges={['top', 'bottom']} style={styles.safe}>
+      <AdminNavbar
         title={chapterName}
         onBack={() => {
           if (navigation.canGoBack()) {
@@ -318,34 +318,32 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
         }
         showsVerticalScrollIndicator={false}
       >
+        <View style={styles.centerContainer}>
+          <View style={styles.body}>
         {/* Hero Area */}
         <View style={styles.hero}>
-          <View style={styles.heroInner}>
-            <Text style={styles.heroKicker}>{subjectName.toUpperCase()}</Text>
-            <Text style={styles.heroTitle}>{chapterName}</Text>
-            {chapter?.description ? (
-              <Text style={styles.heroDesc}>{chapter.description}</Text>
-            ) : (
-              <Text style={[styles.heroDesc, { fontStyle: 'italic' }]}>
-                No description added for this chapter.
-              </Text>
-            )}
+          <Text style={styles.heroKicker}>{subjectName.toUpperCase()}</Text>
+          <Text style={styles.heroTitle}>{chapterName}</Text>
+          {chapter?.description ? (
+            <Text style={styles.heroDesc}>{chapter.description}</Text>
+          ) : (
+            <Text style={[styles.heroDesc, { fontStyle: 'italic' }]}>
+              No description added for this chapter.
+            </Text>
+          )}
 
-            <View style={styles.metaRow}>
-              <View style={styles.metaBadge}>
-                <Ionicons color={AppTheme.colors.primaryDark} name="document-text" size={14} />
-                <Text style={styles.metaBadgeText}>
-                  {chapter?.document_count ?? 0} reference files
-                </Text>
-              </View>
-              {chapter && (
-                <Text style={styles.metaDate}>Last updated: {formattedDate}</Text>
-              )}
+          <View style={styles.metaRow}>
+            <View style={styles.metaBadge}>
+              <Ionicons color={AppTheme.colors.primaryDark} name="document-text" size={14} />
+              <Text style={styles.metaBadgeText}>
+                {chapter?.document_count ?? 0} reference files
+              </Text>
             </View>
+            {chapter && (
+              <Text style={styles.metaDate}>Last updated: {formattedDate}</Text>
+            )}
           </View>
         </View>
-
-        <View style={styles.mainContainer}>
 
         {/* Tab Selector - Full Width */}
         <ScrollView
@@ -452,7 +450,7 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
               </Pressable>
             </View>
 
-            <LearningPlanTable
+            <LearningPlanList
               items={learningPlans}
               onEditItem={(item) => {
                 setSelectedLpItem(item);
@@ -653,6 +651,7 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
             </View>
           </View>
         )}
+          </View>
         </View>
       </ScrollView>
 
@@ -672,9 +671,20 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: AppTheme.colors.background },
+  centerContainer: {
+    flex: 1,
+    alignItems: "center",
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.l,
+  },
+  body: {
+    width: "100%",
+    maxWidth: 800,
+    gap: AppTheme.spacing.l,
+  },
   plannerSection: {
     paddingHorizontal: 0,
-    marginTop: 20,
+    marginTop: 0,
     gap: 16,
   },
   plannerHeaderRow: {
@@ -701,39 +711,25 @@ const styles = StyleSheet.create({
   },
   addPlanText: {
     color: "#fff",
-    fontWeight: "700",
+    fontFamily: AppTheme.typography.family.bold,
     fontSize: 13,
   },
-  scroll: { paddingBottom: 40 },
-  mainContainer: {
-    maxWidth: 1280,
-    width: '100%',
-    alignSelf: 'center',
-    paddingHorizontal: 20,
-  },
+  scroll: { paddingBottom: 40, flexGrow: 1 },
 
   // Hero Section
   hero: {
-    backgroundColor: AppTheme.colors.surface,
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: AppTheme.colors.border,
-  },
-  heroInner: {
-    maxWidth: 1280,
-    width: '100%',
-    alignSelf: 'center',
     gap: 8,
+    marginBottom: AppTheme.spacing.xs,
   },
   heroKicker: {
     fontSize: 11,
-    fontWeight: '700',
+    fontFamily: AppTheme.typography.family.bold,
     letterSpacing: 1.1,
     color: AppTheme.colors.primary,
   },
   heroTitle: {
     fontSize: 26,
-    fontWeight: '800',
+    fontFamily: AppTheme.typography.family.bold,
     color: AppTheme.colors.textPrimary,
     letterSpacing: -0.5,
   },
@@ -759,7 +755,7 @@ const styles = StyleSheet.create({
   },
   metaBadgeText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: AppTheme.typography.family.bold,
     color: AppTheme.colors.primaryDark,
   },
   metaDate: {
@@ -770,7 +766,6 @@ const styles = StyleSheet.create({
   // Tab Selector
   tabContainer: {
     flexDirection: 'row',
-    marginTop: 20,
     backgroundColor: AppTheme.colors.surfaceMuted,
     padding: 4,
     borderRadius: AppTheme.radius.large,
@@ -796,7 +791,7 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: AppTheme.typography.family.bold,
     color: AppTheme.colors.textSecondary,
   },
   tabTextActive: {
@@ -828,7 +823,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 15,
-    fontWeight: '800',
+    fontFamily: AppTheme.typography.family.bold,
     color: AppTheme.colors.textPrimary,
   },
   cardBody: {
@@ -861,7 +856,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: AppTheme.typography.family.bold,
     color: AppTheme.colors.textPrimary,
   },
   uploadBtn: {
@@ -876,7 +871,7 @@ const styles = StyleSheet.create({
   uploadBtnText: {
     color: '#fff',
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: AppTheme.typography.family.bold,
   },
   emptyDocBox: {
     alignItems: 'center',
@@ -890,7 +885,7 @@ const styles = StyleSheet.create({
   },
   emptyDocTitle: {
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: AppTheme.typography.family.bold,
     color: AppTheme.colors.textPrimary,
   },
   emptyDocBody: {
@@ -927,7 +922,7 @@ const styles = StyleSheet.create({
   },
   docCardTitle: {
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: AppTheme.typography.family.bold,
     color: AppTheme.colors.textPrimary,
   },
   docCardMeta: {
@@ -954,7 +949,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 11,
-    fontWeight: '700',
+    fontFamily: AppTheme.typography.family.bold,
   },
 
   // Metadata tab
@@ -977,12 +972,12 @@ const styles = StyleSheet.create({
   },
   metaLabel: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: AppTheme.typography.family.semibold,
     color: AppTheme.colors.textSecondary,
   },
   metaValue: {
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: AppTheme.typography.family.bold,
     color: AppTheme.colors.textPrimary,
   },
 
@@ -1003,7 +998,7 @@ const styles = StyleSheet.create({
   },
   emptyKbTitle: {
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: AppTheme.typography.family.bold,
     color: AppTheme.colors.textPrimary,
   },
   emptyKbBody: {

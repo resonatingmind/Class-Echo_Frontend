@@ -307,17 +307,19 @@ export function SchoolAdminTeachersScreen({ navigation }: Props) {
             <View style={styles.body}>
               {/* Page heading */}
               <View style={styles.pageHeading}>
-                <Text style={styles.pageTitle}>Teacher Directory</Text>
+                <View style={styles.titleRow}>
+                  <Text style={styles.pageTitle}>Teacher Directory</Text>
+                  <Pressable
+                    onPress={() => setShowAdd(true)}
+                    style={styles.addTeacherBtn}
+                  >
+                    <Ionicons color="#fff" name="person-add" size={14} />
+                    <Text style={styles.addTeacherText}>Add Teacher</Text>
+                  </Pressable>
+                </View>
                 <Text style={styles.pageSubtitle}>
                   Manage faculty members and active teaching statuses.
                 </Text>
-                <Pressable
-                  onPress={() => setShowAdd(true)}
-                  style={styles.addTeacherBtn}
-                >
-                  <Ionicons color="#fff" name="person-add" size={16} />
-                  <Text style={styles.addTeacherText}>Add Teacher</Text>
-                </Pressable>
               </View>
 
               {/* Search */}
@@ -424,6 +426,14 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.heading1,
   },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+    flexWrap: "wrap",
+    marginBottom: 4,
+  },
   pageSubtitle: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body },
   addTeacherBtn: {
     flexDirection: "row",
@@ -434,7 +444,6 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.primary,
     paddingHorizontal: AppTheme.spacing.m,
     paddingVertical: AppTheme.spacing.s,
-    marginTop: AppTheme.spacing.xs,
   },
   addTeacherText: { color: "#fff", ...AppTheme.typography.button },
   searchBar: {

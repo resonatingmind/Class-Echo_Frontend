@@ -10,14 +10,16 @@ type Props = {
 export function PlannerHeader({ onCreatePress }: Props) {
   return (
     <View style={styles.pageHeading}>
-      <Text style={styles.pageTitle}>Academic Planner</Text>
+      <View style={styles.titleRow}>
+        <Text style={styles.pageTitle}>Academic Planner</Text>
+        <Pressable style={styles.addBtn} onPress={onCreatePress}>
+          <Ionicons name="add" size={14} color="#fff" />
+          <Text style={styles.addText}>Quick assignment</Text>
+        </Pressable>
+      </View>
       <Text style={styles.pageSubtitle}>
         Manage teaching assignments for the academic session.
       </Text>
-      <Pressable style={styles.addBtn} onPress={onCreatePress}>
-        <Ionicons name="add" size={16} color="#fff" />
-        <Text style={styles.addText}>Quick assignment</Text>
-      </Pressable>
     </View>
   );
 }
@@ -30,6 +32,14 @@ const styles = StyleSheet.create({
   pageTitle: {
     color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.heading1,
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+    flexWrap: "wrap",
+    marginBottom: 4,
   },
   pageSubtitle: {
     color: AppTheme.colors.textSecondary,
@@ -44,7 +54,6 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.primary,
     paddingHorizontal: AppTheme.spacing.m,
     paddingVertical: AppTheme.spacing.s,
-    marginTop: AppTheme.spacing.xs,
   },
   addText: {
     color: "#fff",

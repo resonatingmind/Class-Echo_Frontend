@@ -373,22 +373,22 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
           <View style={styles.body}>
             {/* Page Heading */}
             <View style={styles.pageHeading}>
-        <View style={{ flex: 1, gap: 4 }}>
-          <Text style={styles.pageTitle}>Class Schedules</Text>
-          <Text style={styles.pageSubtitle}>Manage your weekly class timetables.</Text>
-        </View>
-        <Pressable
-          style={styles.importButton}
-          onPress={() => setShowImportModal(true)}
-        >
-          <Ionicons
-            name="cloud-upload-outline"
-            size={16}
-            color={AppTheme.colors.primaryDark}
-          />
-          <Text style={styles.importButtonText}>Import</Text>
-        </Pressable>
-      </View>
+              <View style={styles.titleRow}>
+                <Text style={styles.pageTitle}>Class Schedules</Text>
+                <Pressable
+                  style={styles.importButton}
+                  onPress={() => setShowImportModal(true)}
+                >
+                  <Ionicons
+                    name="cloud-upload-outline"
+                    size={14}
+                    color={AppTheme.colors.primaryDark}
+                  />
+                  <Text style={styles.importButtonText}>Import</Text>
+                </Pressable>
+              </View>
+              <Text style={styles.pageSubtitle}>Manage your weekly class timetables.</Text>
+            </View>
 
       {/* Day Selector */}
       <View style={styles.daySelectorWrap}>
@@ -616,14 +616,20 @@ const styles = StyleSheet.create({
     gap: AppTheme.spacing.l,
   },
   pageHeading: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    paddingBottom: AppTheme.spacing.s,
+    gap: AppTheme.spacing.s,
+    marginBottom: AppTheme.spacing.xs,
   },
   pageTitle: {
     color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.heading1,
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+    flexWrap: "wrap",
+    marginBottom: 4,
   },
   pageSubtitle: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body },
 

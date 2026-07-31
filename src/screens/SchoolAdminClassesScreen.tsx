@@ -243,18 +243,20 @@ export function SchoolAdminClassesScreen({ navigation }: Props) {
             <View style={styles.body}>
               {/* Page heading */}
               <View style={styles.pageHeading}>
-                <Text style={styles.pageTitle}>Academic Classes</Text>
+                <View style={styles.titleRow}>
+                  <Text style={styles.pageTitle}>Academic Classes</Text>
+                  <Pressable
+                    onPress={() => setShowCreate(true)}
+                    style={styles.addClassBtn}
+                  >
+                    <Ionicons color="#fff" name="add" size={14} />
+                    <Text style={styles.addClassText}>Add Class</Text>
+                  </Pressable>
+                </View>
                 <Text style={styles.pageSubtitle}>
                   Managing {classes.length} active classroom
                   {classes.length !== 1 ? "s" : ""} for the current session.
                 </Text>
-                <Pressable
-                  onPress={() => setShowCreate(true)}
-                  style={styles.addClassBtn}
-                >
-                  <Ionicons color="#fff" name="add" size={16} />
-                  <Text style={styles.addClassText}>Add Class</Text>
-                </Pressable>
               </View>
 
               {isLoading ? (
@@ -339,6 +341,14 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.heading1,
   },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+    flexWrap: "wrap",
+    marginBottom: 4,
+  },
   pageSubtitle: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body },
   addClassBtn: {
     flexDirection: "row",
@@ -349,7 +359,6 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.primary,
     paddingHorizontal: AppTheme.spacing.m,
     paddingVertical: AppTheme.spacing.s,
-    marginTop: AppTheme.spacing.xs,
   },
   addClassText: { color: "#fff", ...AppTheme.typography.button },
   center: {

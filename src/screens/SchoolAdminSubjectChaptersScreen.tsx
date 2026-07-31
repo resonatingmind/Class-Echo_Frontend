@@ -30,7 +30,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 import { ChapterOut, LearningPlanOut, RecordingWithReport } from '../types/api';
 import { ExpandedChapterDetailView } from '../components/ExpandedChapterDetailView';
-import { ScreenHeader } from '../components/common/ScreenHeader';
+import { AdminNavbar } from '../components/common/AdminNavbar';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SchoolAdminSubjectChapters'>;
 
@@ -271,8 +271,8 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
   };
 
   return (
-    <SafeAreaView edges={['top']} style={styles.safe}>
-      <ScreenHeader
+    <SafeAreaView edges={['top', 'bottom']} style={styles.safe}>
+      <AdminNavbar
         title={subjectName}
         onBack={() => {
           if (navigation.canGoBack()) {
@@ -302,14 +302,16 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
         }
         showsVerticalScrollIndicator={false}
       >
-        {/* Page heading */}
-        <View style={styles.pageHeading}>
-          <Text style={styles.kicker}>SUBJECT CURRICULUM</Text>
-          <Text style={styles.pageTitle}>Chapters</Text>
-          <Text style={styles.pageSubtitle}>
-            Manage and view chapters, reference materials, and lesson profiles for {subjectName}.
-          </Text>
-        </View>
+        <View style={styles.centerContainer}>
+          <View style={styles.body}>
+            {/* Page heading */}
+            <View style={styles.pageHeading}>
+              <Text style={styles.kicker}>SUBJECT CURRICULUM</Text>
+              <Text style={styles.pageTitle}>Chapters</Text>
+              <Text style={styles.pageSubtitle}>
+                Manage and view chapters, reference materials, and lesson profiles for {subjectName}.
+              </Text>
+            </View>
 
         {isLoading ? (
           <View style={styles.center}>
@@ -456,6 +458,8 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
             })}
           </View>
         )}
+          </View>
+        </View>
       </ScrollView>
 
       {/* Create/Edit Modal */}
@@ -538,44 +542,49 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: AppTheme.colors.background },
-  scroll: { paddingBottom: 40 },
+  scroll: { flexGrow: 1 },
+  centerContainer: {
+    flex: 1,
+    alignItems: "center",
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.xl,
+  },
+  body: {
+    width: "100%",
+    maxWidth: 800,
+    gap: AppTheme.spacing.l,
+  },
 
   // Page heading
   pageHeading: {
-    backgroundColor: AppTheme.colors.surface,
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: AppTheme.colors.border,
-    gap: 8,
-    marginBottom: 20,
+    gap: AppTheme.spacing.s,
+    marginBottom: AppTheme.spacing.xs,
   },
   kicker: {
     color: AppTheme.colors.primary,
-    fontSize: 11,
+    ...AppTheme.typography.caption,
     fontWeight: '700',
     letterSpacing: 1.2,
   },
   pageTitle: {
     color: AppTheme.colors.textPrimary,
-    fontSize: 28,
-    fontWeight: '800',
-    letterSpacing: -0.5,
+    ...AppTheme.typography.heading1,
   },
   pageSubtitle: {
     color: AppTheme.colors.textSecondary,
-    fontSize: 14,
-    lineHeight: 20,
+    ...AppTheme.typography.body,
   },
 
   // Chapter List
-  chapterList: { paddingHorizontal: 20, gap: 16 },
+  chapterList: { gap: 16 },
   chapterCard: {
     backgroundColor: AppTheme.colors.surface,
-    borderRadius: 18,
+    borderRadius: AppTheme.radius.large,
     borderWidth: 1,
     borderColor: AppTheme.colors.border,
-    padding: 16,
+    padding: AppTheme.spacing.xl,
     gap: 12,
+    ...AppTheme.shadows.subtle,
   },
   chapterCardHeader: {
     flexDirection: 'row',
@@ -584,14 +593,13 @@ const styles = StyleSheet.create({
   },
   chapterInfoWrap: { flex: 1, gap: 4 },
   chapterName: {
-    fontSize: 16,
+    ...AppTheme.typography.bodyLarge,
     fontWeight: '700',
     color: AppTheme.colors.textPrimary,
   },
   chapterDesc: {
-    fontSize: 13,
+    ...AppTheme.typography.body,
     color: AppTheme.colors.textSecondary,
-    lineHeight: 18,
   },
   chapterActions: {
     flexDirection: 'row',
@@ -621,20 +629,21 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   footerStatText: {
-    fontSize: 12,
+    ...AppTheme.typography.caption,
     fontWeight: '600',
     color: AppTheme.colors.textSecondary,
   },
   footerDate: {
-    fontSize: 12,
+    ...AppTheme.typography.caption,
     color: AppTheme.colors.textSecondary,
+    fontStyle: 'italic',
   },
 
   // State Views
   center: { alignItems: 'center', padding: 40, gap: 12, marginTop: 40 },
-  loadingText: { color: AppTheme.colors.textSecondary, fontSize: 14 },
-  emptyTitle: { color: AppTheme.colors.textPrimary, fontSize: 18, fontWeight: '700' },
-  emptyBody: { color: AppTheme.colors.textSecondary, fontSize: 14, textAlign: 'center', lineHeight: 20, paddingHorizontal: 20 },
+  loadingText: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body },
+  emptyTitle: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.bodyLarge, fontWeight: '700' },
+  emptyBody: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body, textAlign: 'center', paddingHorizontal: 20 },
   createBtnInline: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -645,7 +654,7 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
     marginTop: 8,
   },
-  createBtnInlineText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  createBtnInlineText: { color: '#fff', ...AppTheme.typography.body, fontWeight: '700' },
 
   // Modals
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
@@ -666,12 +675,12 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: 8,
   },
-  modalTitle: { color: AppTheme.colors.textPrimary, fontSize: 20, fontWeight: '800' },
-  modalSubtitle: { color: AppTheme.colors.textSecondary, fontSize: 14, lineHeight: 20 },
+  modalTitle: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.heading3 },
+  modalSubtitle: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body },
   modalField: { gap: 8 },
   modalFieldLabel: {
     color: AppTheme.colors.textSecondary,
-    fontSize: 11,
+    ...AppTheme.typography.caption,
     fontWeight: '700',
     letterSpacing: 0.8,
   },
@@ -682,7 +691,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: AppTheme.colors.border,
     paddingHorizontal: 16,
-    fontSize: 16,
+    ...AppTheme.typography.bodyLarge,
     color: AppTheme.colors.textPrimary,
   },
   descriptionInput: {
@@ -699,7 +708,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
-  modalErrorText: { color: '#B42318', fontSize: 13, flex: 1, fontWeight: '600' },
+  modalErrorText: { color: '#B42318', ...AppTheme.typography.body, flex: 1, fontWeight: '600' },
   modalActions: { flexDirection: 'row', gap: 12, marginTop: 4 },
   modalCancelBtn: {
     flex: 1,
@@ -710,7 +719,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  modalCancelText: { color: AppTheme.colors.textSecondary, fontWeight: '600', fontSize: 15 },
+  modalCancelText: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.button },
   modalSubmitBtn: {
     flex: 1,
     height: 50,
@@ -720,6 +729,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   btnDisabled: { opacity: 0.45 },
-  modalSubmitText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  modalSubmitText: { color: '#fff', ...AppTheme.typography.button },
 });
 

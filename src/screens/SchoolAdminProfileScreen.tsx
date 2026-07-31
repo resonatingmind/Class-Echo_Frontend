@@ -156,7 +156,7 @@ export function SchoolAdminProfileScreen({ navigation }: Props) {
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <Pressable onPress={() => navigation.goBack()} style={styles.iconBtn}>
-            <Ionicons color={AppTheme.AppTheme.colors.textPrimary} name="arrow-back" size={24} />
+            <Ionicons color={AppTheme.colors.textPrimary} name="arrow-back" size={24} />
           </Pressable>
         </View>
         <Text style={styles.headerTitle}>{isMobile ? "" : "My Profile"}</Text>
@@ -358,7 +358,7 @@ export function SchoolAdminProfileScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: AppTheme.AppTheme.colors.background,
+    backgroundColor: AppTheme.colors.background,
   },
   flex: { flex: 1 },
   header: {
@@ -366,9 +366,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: AppTheme.spacing.l,
     paddingVertical: AppTheme.spacing.m,
-    backgroundColor: AppTheme.AppTheme.colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: AppTheme.AppTheme.colors.border,
+    borderBottomColor: AppTheme.colors.border,
   },
   headerLeft: {
     width: 60,
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     flex: 1,
     textAlign: "center",
-    color: AppTheme.AppTheme.colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.heading3,
   },
   headerRight: {
@@ -408,11 +408,11 @@ const styles = StyleSheet.create({
     marginBottom: AppTheme.spacing.xs,
   },
   pageTitle: {
-    color: AppTheme.AppTheme.colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.heading1,
   },
   pageSubtitle: {
-    color: AppTheme.AppTheme.colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
   },
   hero: { alignItems: "center", gap: AppTheme.spacing.m, marginBottom: AppTheme.spacing.m },
@@ -441,7 +441,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: AppTheme.AppTheme.colors.surface,
+    borderColor: AppTheme.colors.surface,
   },
   roleBadge: {
     paddingHorizontal: AppTheme.spacing.m,
@@ -454,37 +454,37 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   card: {
-    backgroundColor: AppTheme.AppTheme.colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: AppTheme.AppTheme.colors.border,
+    borderColor: AppTheme.colors.border,
     padding: AppTheme.spacing.xl,
     gap: AppTheme.spacing.m,
   },
   cardHeader: { flexDirection: "row", alignItems: "center", marginBottom: AppTheme.spacing.xs },
   cardTitle: {
     flex: 1,
-    color: AppTheme.AppTheme.colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.heading3,
   },
   linkText: { color: AppTheme.colors.primary, ...AppTheme.typography.button, fontSize: 14 },
   label: {
     ...AppTheme.typography.caption,
     letterSpacing: 1,
-    color: AppTheme.AppTheme.colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     marginTop: AppTheme.spacing.xs,
   },
-  value: { ...AppTheme.typography.bodyLarge, color: AppTheme.AppTheme.colors.textPrimary, fontWeight: "600" },
-  subtleValue: { ...AppTheme.typography.body, color: AppTheme.AppTheme.colors.textSecondary },
+  value: { ...AppTheme.typography.bodyLarge, color: AppTheme.colors.textPrimary, fontWeight: "600" },
+  subtleValue: { ...AppTheme.typography.body, color: AppTheme.colors.textSecondary },
   input: {
     minHeight: 48,
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
-    borderColor: AppTheme.AppTheme.colors.border,
-    backgroundColor: AppTheme.AppTheme.colors.background,
+    borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.background,
     paddingHorizontal: AppTheme.spacing.m,
     ...AppTheme.typography.body,
-    color: AppTheme.AppTheme.colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   addressInput: {
     minHeight: 92,
@@ -509,9 +509,9 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: AppTheme.radius.medium,
-    backgroundColor: AppTheme.AppTheme.colors.background,
+    backgroundColor: AppTheme.colors.background,
     borderWidth: 1,
-    borderColor: AppTheme.AppTheme.colors.border,
+    borderColor: AppTheme.colors.border,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -530,3 +530,4 @@ const styles = StyleSheet.create({
   },
   signOutText: { color: AppTheme.colors.error, ...AppTheme.typography.button },
 });
+

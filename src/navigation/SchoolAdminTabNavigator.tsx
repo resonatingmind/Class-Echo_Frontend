@@ -51,7 +51,7 @@ function SchoolAdminTabBar({ state, navigation }: BottomTabBarProps) {
 
 export function SchoolAdminTabNavigator() {
   return (
-    <Tab.Navigator
+    <Tab.Navigator id="SchoolAdminTabNavigator.tsx" 
       initialRouteName="SchoolAdminDashboard"
       tabBar={(props) => <SchoolAdminTabBar {...props} />}
       screenOptions={{ headerShown: false }}
@@ -64,3 +64,4 @@ export function SchoolAdminTabNavigator() {
     </Tab.Navigator>
   );
 }
+

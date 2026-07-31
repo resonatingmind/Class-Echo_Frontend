@@ -103,7 +103,7 @@ function AddTeacherModal({
                 autoFocus
                 onChangeText={setName}
                 placeholder="Dr. Elena Rodriguez"
-                placeholderTextColor={AppTheme.AppTheme.colors.textPlaceholder}
+                placeholderTextColor={AppTheme.colors.textPlaceholder}
                 style={styles.input}
                 value={name}
               />
@@ -117,7 +117,7 @@ function AddTeacherModal({
                 keyboardType="email-address"
                 onChangeText={setEmail}
                 placeholder="teacher@school.edu"
-                placeholderTextColor={AppTheme.AppTheme.colors.textPlaceholder}
+                placeholderTextColor={AppTheme.colors.textPlaceholder}
                 style={styles.input}
                 textContentType="emailAddress"
                 value={email}
@@ -130,7 +130,7 @@ function AddTeacherModal({
                 <TextInput
                   onChangeText={setPassword}
                   placeholder="Min. 6 characters"
-                  placeholderTextColor={AppTheme.AppTheme.colors.textPlaceholder}
+                  placeholderTextColor={AppTheme.colors.textPlaceholder}
                   secureTextEntry={!showPass}
                   style={[styles.input, { paddingRight: 40 }]}
                   textContentType="newPassword"
@@ -142,7 +142,7 @@ function AddTeacherModal({
                   style={styles.eyeBtn}
                 >
                   <Ionicons
-                    color={AppTheme.AppTheme.colors.textSecondary}
+                    color={AppTheme.colors.textSecondary}
                     name={showPass ? "eye-off-outline" : "eye-outline"}
                     size={18}
                   />
@@ -222,13 +222,13 @@ function TeacherCard({
           <Text style={styles.cardEmail}>{teacher.email}</Text>
         </View>
 
-        <Ionicons name="chevron-forward" size={22} color={AppTheme.AppTheme.colors.textSecondary} />
+        <Ionicons name="chevron-forward" size={22} color={AppTheme.colors.textSecondary} />
       </View>
 
       <View style={styles.cardDivider} />
 
       <View style={styles.cardMeta}>
-        <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="calendar-outline" size={13} />
+        <Ionicons color={AppTheme.colors.textSecondary} name="calendar-outline" size={13} />
 
         <Text style={styles.cardMetaText}>
           Joined{" "}
@@ -322,18 +322,18 @@ export function SchoolAdminTeachersScreen({ navigation }: Props) {
 
               {/* Search */}
               <View style={styles.searchBar}>
-                <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="search-outline" size={16} />
+                <Ionicons color={AppTheme.colors.textSecondary} name="search-outline" size={16} />
                 <TextInput
                   onChangeText={setQuery}
                   placeholder="Search by name, email…"
-                  placeholderTextColor={AppTheme.AppTheme.colors.textPlaceholder}
+                  placeholderTextColor={AppTheme.colors.textPlaceholder}
                   style={styles.searchInput}
                   value={query}
                 />
                 {query.length > 0 ? (
                   <Pressable hitSlop={8} onPress={() => setQuery("")}>
                     <Ionicons
-                      color={AppTheme.AppTheme.colors.textSecondary}
+                      color={AppTheme.colors.textSecondary}
                       name="close-circle"
                       size={16}
                     />
@@ -349,7 +349,7 @@ export function SchoolAdminTeachersScreen({ navigation }: Props) {
               ) : error ? (
                 <View style={styles.center}>
                   <Ionicons
-                    color={AppTheme.AppTheme.colors.textSecondary}
+                    color={AppTheme.colors.textSecondary}
                     name="cloud-offline-outline"
                     size={40}
                   />
@@ -362,7 +362,7 @@ export function SchoolAdminTeachersScreen({ navigation }: Props) {
               ) : filtered.length === 0 ? (
                 <View style={styles.center}>
                   <Ionicons
-                    color={AppTheme.AppTheme.colors.textSecondary}
+                    color={AppTheme.colors.textSecondary}
                     name="people-outline"
                     size={44}
                   />
@@ -405,7 +405,7 @@ export function SchoolAdminTeachersScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: AppTheme.AppTheme.colors.background },
+  safe: { flex: 1, backgroundColor: AppTheme.colors.background },
   flex: { flex: 1 },
   scroll: { flexGrow: 1 },
   centerContainer: {
@@ -421,10 +421,10 @@ const styles = StyleSheet.create({
   },
   pageHeading: { gap: AppTheme.spacing.s, marginBottom: AppTheme.spacing.m },
   pageTitle: {
-    color: AppTheme.AppTheme.colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.heading1,
   },
-  pageSubtitle: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.body },
+  pageSubtitle: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body },
   addTeacherBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -441,22 +441,22 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    backgroundColor: AppTheme.AppTheme.colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1.5,
-    borderColor: AppTheme.AppTheme.colors.border,
+    borderColor: AppTheme.colors.border,
     paddingHorizontal: 14,
     height: 48,
   },
-  searchInput: { flex: 1, color: AppTheme.AppTheme.colors.textPrimary, ...AppTheme.typography.body, padding: 0, outlineStyle: 'none' as any },
+  searchInput: { flex: 1, color: AppTheme.colors.textPrimary, ...AppTheme.typography.body, padding: 0, outlineStyle: 'none' as any },
   center: {
     alignItems: "center",
     paddingVertical: AppTheme.spacing.huge,
     gap: AppTheme.spacing.m,
   },
-  loadingText: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.body },
-  emptyTitle: { color: AppTheme.AppTheme.colors.textPrimary, ...AppTheme.typography.heading3 },
-  emptyBody: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.body, textAlign: "center" },
+  loadingText: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body },
+  emptyTitle: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.heading3 },
+  emptyBody: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body, textAlign: "center" },
   retryBtn: {
     marginTop: AppTheme.spacing.s,
     borderRadius: AppTheme.radius.medium,
@@ -469,10 +469,10 @@ const styles = StyleSheet.create({
 
   // Teacher Card
   card: {
-    backgroundColor: AppTheme.AppTheme.colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: AppTheme.AppTheme.colors.border,
+    borderColor: AppTheme.colors.border,
     overflow: "hidden",
   },
   cardTop: {
@@ -492,9 +492,9 @@ const styles = StyleSheet.create({
   avatarText: { color: AppTheme.colors.primary, ...AppTheme.typography.heading3 },
   avatarImage: { width: 48, height: 48, borderRadius: 24 },
   cardInfo: { flex: 1, gap: 3 },
-  cardName: { color: AppTheme.AppTheme.colors.textPrimary, ...AppTheme.typography.heading3 },
-  cardEmail: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.body },
-  cardDivider: { height: 1, backgroundColor: AppTheme.AppTheme.colors.border },
+  cardName: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.heading3 },
+  cardEmail: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body },
+  cardDivider: { height: 1, backgroundColor: AppTheme.colors.border },
   cardMeta: {
     flexDirection: "row",
     alignItems: "center",
@@ -502,7 +502,7 @@ const styles = StyleSheet.create({
     padding: AppTheme.spacing.m,
     paddingHorizontal: AppTheme.spacing.l,
   },
-  cardMetaText: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.caption },
+  cardMetaText: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.caption },
 
   // Modal
   modalOverlay: {
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modalSheet: {
-    backgroundColor: AppTheme.AppTheme.colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderTopLeftRadius: AppTheme.radius.large,
     borderTopRightRadius: AppTheme.radius.large,
     padding: 24,
@@ -522,31 +522,31 @@ const styles = StyleSheet.create({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: AppTheme.AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.border,
     alignSelf: "center",
     marginBottom: 8,
   },
-  modalTitle: { color: AppTheme.AppTheme.colors.textPrimary, ...AppTheme.typography.heading2 },
-  modalSubtitle: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.body },
+  modalTitle: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.heading2 },
+  modalSubtitle: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body },
   fields: {
-    backgroundColor: AppTheme.AppTheme.colors.background,
+    backgroundColor: AppTheme.colors.background,
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1.5,
-    borderColor: AppTheme.AppTheme.colors.border,
+    borderColor: AppTheme.colors.border,
     overflow: "hidden",
   },
   field: { padding: 14, gap: 6 },
   fieldLabel: {
-    color: AppTheme.AppTheme.colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     ...AppTheme.typography.caption,
     textTransform: "uppercase",
   },
   fieldDivider: {
     height: 1,
-    backgroundColor: AppTheme.AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.border,
     marginHorizontal: 0,
   },
-  input: { color: AppTheme.AppTheme.colors.textPrimary, ...AppTheme.typography.body, padding: 0, minHeight: 24, outlineStyle: 'none' as any },
+  input: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.body, padding: 0, minHeight: 24, outlineStyle: 'none' as any },
   passWrap: { position: "relative" },
   eyeBtn: {
     position: "absolute",
@@ -571,12 +571,12 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1.5,
-    borderColor: AppTheme.AppTheme.colors.border,
+    borderColor: AppTheme.colors.border,
     alignItems: "center",
     justifyContent: "center",
   },
   modalCancelText: {
-    color: AppTheme.AppTheme.colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     ...AppTheme.typography.button,
   },
   modalSubmitBtn: {
@@ -590,3 +590,4 @@ const styles = StyleSheet.create({
   btnDisabled: { opacity: 0.45 },
   modalSubmitText: { color: "#fff", ...AppTheme.typography.button },
 });
+

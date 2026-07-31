@@ -45,7 +45,7 @@ function TeacherTabBar({ state, navigation }: BottomTabBarProps) {
 
 export function TeacherTabNavigator() {
   return (
-    <Tab.Navigator
+    <Tab.Navigator id="TeacherTabNavigator.tsx" 
       initialRouteName="TeacherHome"
       tabBar={(props) => <TeacherTabBar {...props} />}
       screenOptions={{ headerShown: false }}
@@ -56,3 +56,4 @@ export function TeacherTabNavigator() {
     </Tab.Navigator>
   );
 }
+

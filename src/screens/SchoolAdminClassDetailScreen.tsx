@@ -1,3 +1,4 @@
+import { AppTheme } from '../theme/AppTheme';
 import { useCallback, useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -571,7 +572,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primaryLight,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -699,7 +700,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: AppTheme.radius.large,
-    backgroundColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primaryLight,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -723,8 +724,8 @@ const styles = StyleSheet.create({
     gap: 5,
     borderRadius: AppTheme.radius.small,
     borderWidth: 1.5,
-    borderColor: AppTheme.colors.primarySoft,
-    backgroundColor: AppTheme.colors.primarySoft,
+    borderColor: AppTheme.colors.primaryLight,
+    backgroundColor: AppTheme.colors.primaryLight,
     paddingHorizontal: 10,
     paddingVertical: 6,
   },
@@ -864,3 +865,5 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textSecondary,
   },
 });
+
+

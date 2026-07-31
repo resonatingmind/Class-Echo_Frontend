@@ -1,3 +1,4 @@
+import { AppTheme } from '../theme/AppTheme';
 import { useCallback, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -721,3 +722,4 @@ const styles = StyleSheet.create({
   btnDisabled: { opacity: 0.45 },
   modalSubmitText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 });
+

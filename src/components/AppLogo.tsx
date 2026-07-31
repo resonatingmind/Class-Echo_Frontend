@@ -1,3 +1,4 @@
+import { AppTheme } from '../theme/AppTheme';
 import { Feather } from '@expo/vector-icons';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -69,3 +70,5 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
 });
+
+

@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
   chip: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primaryLight,
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 20,
@@ -74,3 +74,4 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 });
+

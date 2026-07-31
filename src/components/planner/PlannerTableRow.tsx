@@ -59,7 +59,7 @@ export function PlannerTableRow({
             <Ionicons
               name="alert-circle-outline"
               size={12}
-              color={colors.warning}
+              color={AppTheme.colors.warning}
             />
             <Text style={styles.assignPillText} numberOfLines={1}>
               Assign teacher
@@ -73,7 +73,7 @@ export function PlannerTableRow({
             <View
               style={[
                 styles.avatar,
-                { backgroundColor: avatar?.bg ?? AppTheme.colors.primarySoft },
+                { backgroundColor: avatar?.bg ?? AppTheme.colors.primaryLight },
               ]}
             >
               <Text
@@ -189,15 +189,17 @@ const styles = StyleSheet.create({
   assignPillText: {
     fontSize: 11,
     fontWeight: "700",
-    color: colors.warning,
+    color: AppTheme.colors.warning,
   },
 
   viewButton: {
     width: 28,
     height: 28,
     borderRadius: AppTheme.radius.large,
-    backgroundColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primaryLight,
     alignItems: "center",
     justifyContent: "center",
   },
 });
+
+

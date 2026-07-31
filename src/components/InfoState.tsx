@@ -1,3 +1,4 @@
+import { AppTheme } from '../theme/AppTheme';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { colors } from '../theme/colors';
@@ -49,3 +50,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+
+

@@ -1,3 +1,4 @@
+import { LearningPlanOut, LearningPlanCreatePayload } from '../types/api';
 import {
   ClassOut,
   LLMReportOut,
@@ -481,7 +482,7 @@ export type ClassCreatePayload = {
 
 export async function createSchoolAdminClass(
   token: string,
-  payload: ClassCreatePayload,
+  payload: Partial<ClassCreatePayload>,
 ) {
   return request<ClassOut>(
     "/school/classes",
@@ -493,7 +494,7 @@ export async function createSchoolAdminClass(
 export async function updateSchoolAdminClass(
   token: string,
   classId: number,
-  payload: ClassCreatePayload,
+  payload: Partial<ClassCreatePayload>,
 ) {
   return request<ClassOut>(
     `/school/classes/${classId}`,
@@ -1771,4 +1772,8 @@ export async function reactivateAdminSchool(token: string, schoolId: number) {
     token,
   );
 }
+
+
+
+
 

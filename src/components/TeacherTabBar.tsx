@@ -1,3 +1,4 @@
+import { AppTheme } from '../theme/AppTheme';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -69,3 +70,5 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.primary,
   },
 });
+
+

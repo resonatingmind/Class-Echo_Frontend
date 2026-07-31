@@ -631,7 +631,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primaryLight,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 999,
@@ -806,3 +806,4 @@ const styles = StyleSheet.create({
   },
   fabText: { color: "#FFFFFF", fontSize: 15, fontWeight: "700" },
 });
+

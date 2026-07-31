@@ -1,3 +1,4 @@
+import { AppTheme } from '../theme/AppTheme';
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -62,7 +63,7 @@ const ci = StyleSheet.create({
   },
   header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   iconWrap: {
-    width: 32, height: 32, borderRadius: AppTheme.radius.medium, backgroundColor: AppTheme.colors.primarySoft,
+    width: 32, height: 32, borderRadius: AppTheme.radius.medium, backgroundColor: AppTheme.colors.primaryLight,
     alignItems: 'center', justifyContent: 'center',
   },
   title: { fontSize: 14, fontWeight: '700', color: AppTheme.colors.textPrimary },
@@ -422,3 +423,6 @@ const lo = StyleSheet.create({
   },
   statusText: { fontSize: 11, fontWeight: '700' },
 });
+
+
+

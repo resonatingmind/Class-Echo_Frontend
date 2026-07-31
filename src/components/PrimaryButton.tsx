@@ -1,3 +1,4 @@
+import { AppTheme } from '../theme/AppTheme';
 import { ComponentProps, useRef } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -126,3 +127,5 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
 });
+
+

@@ -61,7 +61,7 @@ export function PrimaryButton({
         ]}
       >
         {loading ? (
-          <ActivityIndicator color={AppTheme.AppTheme.colors.surface} />
+          <ActivityIndicator color={AppTheme.colors.surface} />
         ) : (
           <>
             <Text style={[styles.text, textStyle]}>{title}</Text>
@@ -88,7 +88,8 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.disabled,
   },
   text: {
-    color: AppTheme.AppTheme.colors.surface,
+    color: AppTheme.colors.surface,
     ...AppTheme.typography.button,
   },
 });
+

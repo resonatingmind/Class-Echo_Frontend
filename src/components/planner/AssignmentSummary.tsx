@@ -1,3 +1,4 @@
+import { AppTheme } from '../../theme/AppTheme';
 import { View, Text, StyleSheet } from "react-native";
 
 type Props = {
@@ -113,3 +114,5 @@ const styles = StyleSheet.create({
     color: "#334155",
   },
 });
+
+

@@ -1,3 +1,4 @@
+import { AppTheme } from '../../../theme/AppTheme';
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -78,7 +79,7 @@ const styles = StyleSheet.create({
     width: 52,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primaryLight,
   },
 
   periodBadgeText: {
@@ -150,10 +151,13 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primaryLight,
   },
 
   deleteButton: {
     backgroundColor: "#FEE2E2",
   },
 });
+
+
+

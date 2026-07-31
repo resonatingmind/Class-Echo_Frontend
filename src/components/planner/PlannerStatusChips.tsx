@@ -46,7 +46,7 @@ export function PlannerStatusChips({
           <Ionicons
             name="alert-circle-outline"
             size={14}
-            color={colors.warning}
+            color={AppTheme.colors.warning}
           />
           <Text style={styles.warningChipText}>
             Needs teacher · {unassignedCount}
@@ -96,12 +96,13 @@ const styles = StyleSheet.create({
 
   warningChipActive: {
     borderWidth: 1.5,
-    borderColor: colors.warning,
+    borderColor: AppTheme.colors.warning,
   },
 
   warningChipText: {
     fontSize: 12,
     fontWeight: "700",
-    color: colors.warning,
+    color: AppTheme.colors.warning,
   },
 });
+

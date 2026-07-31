@@ -165,7 +165,7 @@ export function AppNavigator() {
     return null;
   }
   return (
-    <Stack.Navigator
+    <Stack.Navigator id="AppNavigator.tsx" 
       screenOptions={{
         headerShown: false,
         contentStyle: { backgroundColor: "#FAF9F9" },
@@ -321,3 +321,4 @@ export function AppNavigator() {
     </Stack.Navigator>
   );
 }
+

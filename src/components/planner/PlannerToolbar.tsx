@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
 
     alignItems: "center",
 
-    backgroundColor: colors.primary,
+    backgroundColor: AppTheme.colors.primary,
 
     paddingHorizontal: 18,
     paddingVertical: 12,
@@ -50,3 +50,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 });
+

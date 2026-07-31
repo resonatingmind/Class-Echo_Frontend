@@ -35,7 +35,7 @@ import { ActiveFilterChips } from "../components/teacher/ActiveFilterChips";
 
 
 
-type Props = NativeStackScreenProps<RootStackParamList, 'TeacherSubjects'>;
+type Props = any;
 
 const SUBJECT_COLORS = [
   { bg: '#D1E4FF', text: AppTheme.colors.primaryDark, border: '#A8C8FF' },
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primaryLight,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -498,7 +498,7 @@ const styles = StyleSheet.create({
   retryBtn: {
     marginTop: 8,
     borderRadius: AppTheme.radius.medium,
-    backgroundColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primaryLight,
     paddingHorizontal: 20,
     paddingVertical: 10,
   },
@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primaryLight,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -593,3 +593,4 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
 });
+

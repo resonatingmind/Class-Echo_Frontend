@@ -1,3 +1,4 @@
+import { AppTheme } from '../theme/AppTheme';
 import { useCallback, useMemo, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -289,7 +290,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: AppTheme.radius.medium,
-    backgroundColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -303,3 +304,5 @@ const styles = StyleSheet.create({
   emptyTitle: { fontSize: 18, fontWeight: '800', color: AppTheme.colors.textPrimary },
   emptyBody: { fontSize: 14, lineHeight: 20, color: AppTheme.colors.textSecondary, textAlign: 'center' },
 });
+
+

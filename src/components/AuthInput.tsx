@@ -1,3 +1,4 @@
+import { AppTheme } from '../theme/AppTheme';
 import { useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 import {
@@ -137,3 +138,5 @@ const styles = StyleSheet.create({
     padding: 0,
   },
 });
+
+

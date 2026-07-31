@@ -1,3 +1,4 @@
+import { AppTheme } from '../theme/AppTheme';
 import { PropsWithChildren, useRef } from 'react';
 import { Animated, Pressable, StyleSheet, ViewStyle } from 'react-native';
 
@@ -74,7 +75,7 @@ const styles = StyleSheet.create({
     ...shadow.card,
   },
   elevated: {
-    backgroundColor: AppTheme.colors.surfaceElevated,
+    backgroundColor: AppTheme.colors.surface,
     ...shadow.card,
   },
   outline: {
@@ -86,3 +87,5 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
 });
+
+

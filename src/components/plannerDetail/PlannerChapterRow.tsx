@@ -25,8 +25,8 @@ const STATUS_STYLES: Record<
   string,
   { bg: string; text: string; icon: keyof typeof Ionicons.glyphMap }
 > = {
-  Completed: { bg: "#E7F6EC", text: colors.success, icon: "checkmark-circle" },
-  Processing: { bg: "#FDF3E3", text: colors.warning, icon: "time-outline" },
+  Completed: { bg: "#E7F6EC", text: AppTheme.colors.success, icon: "checkmark-circle" },
+  Processing: { bg: "#FDF3E3", text: AppTheme.colors.warning, icon: "time-outline" },
 };
 
 const DEFAULT_STATUS_STYLE = {
@@ -49,7 +49,7 @@ export function PlannerChapterRow({
   const statusStyle = STATUS_STYLES[chapter.status] ?? DEFAULT_STATUS_STYLE;
 
   const [isExpanded, setIsExpanded] = useState(false);
-  const [recordings, setRecordings] = useState<RecordingWithReport[]>([]);
+  const [recordings, setRecordings] = useState<any[]>([]);
   const [learningPlans, setLearningPlans] = useState<LearningPlanOut[]>([]);
   const [loadingExpanded, setLoadingExpanded] = useState(false);
 
@@ -64,7 +64,7 @@ export function PlannerChapterRow({
           getChapterRecordings(session.token, chapter.id),
           getSchoolLearningPlans(session.token, subjectId, chapter.id),
         ]);
-        let chapterRecs = recs || [];
+        let chapterRecs: any[] = recs || [];
         if (chapterRecs.length === 0) {
           const allSubRecs = await getSchoolSubjectRecordings(session.token, subjectId);
           chapterRecs = allSubRecs.filter(
@@ -73,7 +73,7 @@ export function PlannerChapterRow({
               (r.chapter_name && r.chapter_name.toLowerCase().trim() === chapter.name.toLowerCase().trim())
           );
         }
-        setRecordings(chapterRecs);
+        setRecordings(chapterRecs as any);
         setLearningPlans(lps);
       } catch (err) {
         console.error("Error loading expanded planner row details", err);
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primaryLight,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -253,3 +253,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 });
+
+
+
+

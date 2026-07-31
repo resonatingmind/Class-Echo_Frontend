@@ -45,13 +45,13 @@ export function QuickAssignmentModal({
   const [className, setClassName] = useState("");
   const [section, setSection] = useState("");
   const [subject, setSubject] = useState("");
-  const [teacherLookup, setTeacherLookup] = useState({
-    exists: null as boolean | null,
-    teacherId: undefined as number | undefined,
+  const [teacherLookup, setTeacherLookup] = useState<{ exists: boolean | null; teacherId?: number }>({
+    exists: null,
+    teacherId: undefined,
   });
-  const [classLookup, setClassLookup] = useState({
-    exists: null as boolean | null,
-    classId: undefined as number | undefined,
+  const [classLookup, setClassLookup] = useState<{ exists: boolean | null; classId?: number }>({
+    exists: null,
+    classId: undefined,
   });
 
   const [submitting, setSubmitting] = useState(false);
@@ -329,3 +329,5 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 });
+
+

@@ -1,3 +1,4 @@
+import { AppTheme } from '../theme/AppTheme';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -368,7 +369,7 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
           if (navigation.canGoBack()) {
             navigation.goBack();
           } else {
-            navigation.navigate("TeacherSubjects");
+            navigation.navigate("TeacherTabs");
           }
         }} style={styles.headerButton}>
           <Ionicons color={AppTheme.colors.textPrimary} name="arrow-back" size={22} />
@@ -520,7 +521,7 @@ export function TeacherSubjectDetailScreen({ navigation, route }: Props) {
                 </Text>
               </Pressable>
               
-              <View style={[styles.card, { backgroundColor: AppTheme.colors.primarySoft, borderColor: AppTheme.colors.primary, borderStyle: 'dashed' }]}>
+              <View style={[styles.card, { backgroundColor: AppTheme.colors.primaryLight, borderColor: AppTheme.colors.primary, borderStyle: 'dashed' }]}>
                 <View style={[styles.cardIcon, { backgroundColor: AppTheme.colors.surface }]}>
                   <Ionicons color={AppTheme.colors.primary} name="folder-open" size={20} />
                 </View>
@@ -829,7 +830,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -870,7 +871,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 16,
-    backgroundColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -900,7 +901,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -956,3 +957,5 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.primary,
   },
 });
+
+

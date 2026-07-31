@@ -29,7 +29,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   logoText: {
-    color: AppTheme.AppTheme.colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.heading3,
   },
 });
+

@@ -25,6 +25,8 @@ import {
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { AppTheme } from "../theme/AppTheme";
 import { ClassOut } from "../types/api";
+import { SelectDropdown } from "../components/ui/SelectDropdown";
+import { CLASS_NAME_OPTIONS, SECTION_OPTIONS } from "../constants";
 
 
 type Props = NativeStackScreenProps<RootStackParamList, "SchoolAdminClasses">;
@@ -72,7 +74,7 @@ function ClassCard({
           </Text>
         </View>
       </View>
-      <Ionicons color={AppTheme.AppTheme.colors.textSecondary} name="chevron-forward" size={18} />
+      <Ionicons color={AppTheme.colors.textSecondary} name="chevron-forward" size={18} />
     </Pressable>
   );
 }
@@ -104,7 +106,7 @@ function CreateClassModal({
           section: section.trim(),
         });
       setName("");
-      setSection("A");
+      setSection("");
       onCreated(cls);
       onClose();
     } catch (e) {
@@ -137,34 +139,21 @@ function CreateClassModal({
             after.
           </Text>
 
-          <View style={styles.modalField}>
-            <Text style={styles.modalFieldLabel}>CLASS NAME</Text>
-            <TextInput
-              autoCapitalize="words"
-              autoFocus
-              onChangeText={setName}
-              onSubmitEditing={handleCreate}
-              placeholder="e.g. Class 10B"
-              placeholderTextColor={AppTheme.AppTheme.colors.textPlaceholder}
-              returnKeyType="done"
-              style={styles.modalInput}
-              value={name}
-            />
-          </View>
+          <SelectDropdown
+            label="CLASS NAME"
+            placeholder="Select a class"
+            options={CLASS_NAME_OPTIONS}
+            value={name}
+            onChange={setName}
+          />
 
-          <View style={styles.modalField}>
-            <Text style={styles.modalFieldLabel}>SECTION</Text>
-
-            <TextInput
-              value={section}
-              onChangeText={setSection}
-              placeholder="e.g. A"
-              placeholderTextColor={AppTheme.AppTheme.colors.textPlaceholder}
-              autoCapitalize="characters"
-              maxLength={20}
-              style={styles.modalInput}
-            />
-          </View>
+          <SelectDropdown
+            label="SECTION"
+            placeholder="Select a section"
+            options={SECTION_OPTIONS}
+            value={section}
+            onChange={setSection}
+          />
 
           {error ? (
             <View style={styles.modalError}>
@@ -276,7 +265,7 @@ export function SchoolAdminClassesScreen({ navigation }: Props) {
               ) : error ? (
                 <View style={styles.center}>
                   <Ionicons
-                    color={AppTheme.AppTheme.colors.textSecondary}
+                    color={AppTheme.colors.textSecondary}
                     name="cloud-offline-outline"
                     size={40}
                   />
@@ -289,7 +278,7 @@ export function SchoolAdminClassesScreen({ navigation }: Props) {
               ) : classes.length === 0 ? (
                 <View style={styles.center}>
                   <Ionicons
-                    color={AppTheme.AppTheme.colors.textSecondary}
+                    color={AppTheme.colors.textSecondary}
                     name="school-outline"
                     size={44}
                   />
@@ -331,7 +320,7 @@ export function SchoolAdminClassesScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: AppTheme.AppTheme.colors.background },
+  safe: { flex: 1, backgroundColor: AppTheme.colors.background },
   flex: { flex: 1 },
   scroll: { flexGrow: 1 },
   centerContainer: {
@@ -347,10 +336,10 @@ const styles = StyleSheet.create({
   },
   pageHeading: { gap: AppTheme.spacing.s, marginBottom: AppTheme.spacing.m },
   pageTitle: {
-    color: AppTheme.AppTheme.colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.heading1,
   },
-  pageSubtitle: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.body },
+  pageSubtitle: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body },
   addClassBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -368,9 +357,9 @@ const styles = StyleSheet.create({
     paddingVertical: AppTheme.spacing.huge,
     gap: AppTheme.spacing.m,
   },
-  loadingText: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.body },
-  emptyTitle: { color: AppTheme.AppTheme.colors.textPrimary, ...AppTheme.typography.heading3 },
-  emptyBody: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.body, textAlign: "center" },
+  loadingText: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body },
+  emptyTitle: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.heading3 },
+  emptyBody: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body, textAlign: "center" },
   retryBtn: {
     marginTop: AppTheme.spacing.s,
     borderRadius: AppTheme.radius.medium,
@@ -385,10 +374,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: AppTheme.AppTheme.colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: AppTheme.AppTheme.colors.border,
+    borderColor: AppTheme.colors.border,
     padding: AppTheme.spacing.l,
   },
   cardLeft: { flexDirection: "row", alignItems: "center", gap: AppTheme.spacing.m, flex: 1 },
@@ -401,13 +390,13 @@ const styles = StyleSheet.create({
   },
   cardIconText: { ...AppTheme.typography.heading3 },
   cardInfo: { flex: 1, gap: 4 },
-  cardName: { color: AppTheme.AppTheme.colors.textPrimary, ...AppTheme.typography.heading3 },
+  cardName: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.heading3 },
   cardSection: {
     color: AppTheme.colors.primary,
     ...AppTheme.typography.body,
     fontWeight: "600",
   },
-  cardDate: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.caption },
+  cardDate: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.caption },
   // Modal
   modalOverlay: {
     flex: 1,
@@ -415,7 +404,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modalSheet: {
-    backgroundColor: AppTheme.AppTheme.colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderTopLeftRadius: AppTheme.radius.large,
     borderTopRightRadius: AppTheme.radius.large,
     padding: 24,
@@ -426,26 +415,26 @@ const styles = StyleSheet.create({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: AppTheme.AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.border,
     alignSelf: "center",
     marginBottom: 8,
   },
-  modalTitle: { color: AppTheme.AppTheme.colors.textPrimary, ...AppTheme.typography.heading2 },
-  modalSubtitle: { color: AppTheme.AppTheme.colors.textSecondary, ...AppTheme.typography.body },
+  modalTitle: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.heading2 },
+  modalSubtitle: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body },
   modalField: { gap: 8 },
   modalFieldLabel: {
-    color: AppTheme.AppTheme.colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     ...AppTheme.typography.caption,
     textTransform: "uppercase",
   },
   modalInput: {
     height: 52,
     borderRadius: AppTheme.radius.medium,
-    backgroundColor: AppTheme.AppTheme.colors.background,
+    backgroundColor: AppTheme.colors.background,
     borderWidth: 1.5,
-    borderColor: AppTheme.AppTheme.colors.border,
+    borderColor: AppTheme.colors.border,
     paddingHorizontal: 16,
-    color: AppTheme.AppTheme.colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.body,
   },
   modalError: {
@@ -464,12 +453,12 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1.5,
-    borderColor: AppTheme.AppTheme.colors.border,
+    borderColor: AppTheme.colors.border,
     alignItems: "center",
     justifyContent: "center",
   },
   modalCancelText: {
-    color: AppTheme.AppTheme.colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     ...AppTheme.typography.button,
   },
   modalSubmitBtn: {
@@ -483,3 +472,5 @@ const styles = StyleSheet.create({
   btnDisabled: { opacity: 0.45 },
   modalSubmitText: { color: "#fff", ...AppTheme.typography.button },
 });
+
+

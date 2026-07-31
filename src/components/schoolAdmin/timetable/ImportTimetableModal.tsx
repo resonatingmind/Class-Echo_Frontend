@@ -1,3 +1,4 @@
+import { AppTheme } from '../../../theme/AppTheme';
 import { useState } from "react";
 import * as DocumentPicker from "expo-document-picker";
 import {
@@ -148,7 +149,7 @@ export function ImportTimetableModal({ visible, onClose, token, onImported }: Pr
                   <Switch
                     value={replaceExisting}
                     onValueChange={setReplaceExisting}
-                    trackColor={{ false: AppTheme.colors.border, true: AppTheme.colors.primarySoft }}
+                    trackColor={{ false: AppTheme.colors.border, true: AppTheme.colors.primaryLight }}
                     thumbColor={replaceExisting ? AppTheme.colors.primary : "#f4f3f4"}
                   />
                 </View>
@@ -271,7 +272,7 @@ const styles = StyleSheet.create({
     height: 54,
     borderWidth: 1.5,
     borderStyle: "dashed",
-    borderColor: AppTheme.colors.primarySoft,
+    borderColor: AppTheme.colors.primaryLight,
     borderRadius: AppTheme.radius.large,
     paddingHorizontal: 16,
     backgroundColor: AppTheme.colors.surfaceSoft,
@@ -377,3 +378,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 });
+
+
+

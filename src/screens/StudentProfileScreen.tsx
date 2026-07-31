@@ -1,3 +1,4 @@
+import { AppTheme } from '../theme/AppTheme';
 import { useCallback, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -237,7 +238,7 @@ const styles = StyleSheet.create({
     width: 104,
     height: 104,
     borderRadius: 52,
-    backgroundColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -257,7 +258,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 999,
-    backgroundColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primaryLight,
     color: AppTheme.colors.primaryDark,
     fontWeight: '700',
     overflow: 'hidden',
@@ -310,3 +311,5 @@ const styles = StyleSheet.create({
   },
   signOutText: { color: '#EF4444', fontSize: 15, fontWeight: '700' },
 });
+
+

@@ -333,7 +333,7 @@ export function SchoolAdminPlannerScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: AppTheme.AppTheme.colors.background,
+    backgroundColor: AppTheme.colors.background,
   },
   centerContainer: {
     flex: 1,
@@ -356,12 +356,13 @@ const styles = StyleSheet.create({
   tableCard: {
     flex: 1,
     borderWidth: 1,
-    borderColor: AppTheme.AppTheme.colors.border,
+    borderColor: AppTheme.colors.border,
     borderRadius: AppTheme.radius.large,
     overflow: "hidden",
-    backgroundColor: AppTheme.AppTheme.colors.surface,
+    backgroundColor: AppTheme.colors.surface,
   },
   listContent: {
     paddingBottom: 40,
   },
 });
+

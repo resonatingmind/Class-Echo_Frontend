@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
 
   filterSelected: {
     borderColor: AppTheme.colors.primary,
-    backgroundColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primaryLight,
   },
 
   filterText: {
@@ -245,3 +245,4 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textSecondary,
   },
 });
+

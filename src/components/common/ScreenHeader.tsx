@@ -1,3 +1,4 @@
+import { AppTheme } from '../../theme/AppTheme';
 import { ReactNode } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -136,8 +137,10 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: AppTheme.colors.surfaceSubtle,
+    backgroundColor: AppTheme.colors.surfaceSoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
 });
+
+

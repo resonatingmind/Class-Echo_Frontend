@@ -16,11 +16,12 @@ const styles = StyleSheet.create({
     gap: AppTheme.spacing.s,
   },
   title: {
-    color: AppTheme.AppTheme.colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.display,
   },
   subtitle: {
-    color: AppTheme.AppTheme.colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
   },
 });
+

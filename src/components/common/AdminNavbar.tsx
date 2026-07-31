@@ -18,13 +18,13 @@ export function AdminNavbar({ title, rightActions }: Props) {
   return (
     <View style={styles.header}>
       <View style={styles.headerLeft}>
-         <AppLogo hideText size={24} />
+         <AppLogo showText={false} />
       </View>
       <Text style={styles.headerTitle} numberOfLines={1}>{isMobile ? "" : title}</Text>
       <View style={styles.headerRight}>
         {rightActions}
         <Pressable onPress={() => navigation.navigate("SchoolAdminProfile" as never)} style={styles.iconBtn}>
-          <Ionicons color={AppTheme.AppTheme.colors.textPrimary} name="person-circle-outline" size={28} />
+          <Ionicons color={AppTheme.colors.textPrimary} name="person-circle-outline" size={28} />
         </Pressable>
       </View>
     </View>
@@ -37,9 +37,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: AppTheme.spacing.l,
     paddingVertical: AppTheme.spacing.m,
-    backgroundColor: AppTheme.AppTheme.colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: AppTheme.AppTheme.colors.border,
+    borderBottomColor: AppTheme.colors.border,
   },
   headerLeft: {
     flex: 1,
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     flex: 2,
     textAlign: "center",
-    color: AppTheme.AppTheme.colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.heading3,
   },
   headerRight: {
@@ -65,3 +65,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
+
+

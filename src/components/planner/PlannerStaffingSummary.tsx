@@ -28,7 +28,7 @@ export function PlannerStaffingSummary({ staffed, total }: Props) {
             styles.fill,
             {
               width: `${percent}%`,
-              backgroundColor: isComplete ? colors.success : colors.warning,
+              backgroundColor: isComplete ? AppTheme.colors.success : AppTheme.colors.warning,
             },
           ]}
         />
@@ -37,7 +37,7 @@ export function PlannerStaffingSummary({ staffed, total }: Props) {
       <Text
         style={[
           styles.percent,
-          { color: isComplete ? colors.success : colors.warning },
+          { color: isComplete ? AppTheme.colors.success : AppTheme.colors.warning },
         ]}
       >
         {percent}%
@@ -91,3 +91,4 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
 });
+

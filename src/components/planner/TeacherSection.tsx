@@ -1,3 +1,4 @@
+import { AppTheme } from '../../theme/AppTheme';
 // import {
 //   View,
 //   Text,
@@ -321,3 +322,4 @@ const styles = StyleSheet.create({
     top: 13,
   },
 });
+

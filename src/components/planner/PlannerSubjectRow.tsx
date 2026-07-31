@@ -48,7 +48,7 @@ export function PlannerSubjectRow({
       <View style={styles.bottomLine}>
         {isUnassigned ? (
           <>
-            <Ionicons name="alert-circle-outline" size={14} color={colors.warning} />
+            <Ionicons name="alert-circle-outline" size={14} color={AppTheme.colors.warning} />
             <Text style={styles.unassignedText}>Needs teacher</Text>
             <Pressable
               style={styles.assignButton}
@@ -65,7 +65,7 @@ export function PlannerSubjectRow({
             <View
               style={[
                 styles.avatar,
-                { backgroundColor: avatar?.bg ?? AppTheme.colors.primarySoft },
+                { backgroundColor: avatar?.bg ?? AppTheme.colors.primaryLight },
               ]}
             >
               <Text style={[styles.avatarText, { color: avatar?.text ?? AppTheme.colors.primaryDark }]}>
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: AppTheme.radius.large,
-    backgroundColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primaryLight,
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
 
   unassignedText: {
     fontSize: 12,
-    color: colors.warning,
+    color: AppTheme.colors.warning,
     fontWeight: "600",
     flex: 1,
   },
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     height: 24,
     paddingHorizontal: 10,
     borderRadius: AppTheme.radius.medium,
-    backgroundColor: colors.warning,
+    backgroundColor: AppTheme.colors.warning,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -185,3 +185,4 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textSecondary,
   },
 });
+

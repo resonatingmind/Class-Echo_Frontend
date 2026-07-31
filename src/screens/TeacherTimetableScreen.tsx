@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    backgroundColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primaryLight,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
@@ -196,3 +196,4 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
+

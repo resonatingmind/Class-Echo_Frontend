@@ -1,3 +1,4 @@
+import { AppTheme } from '../theme/AppTheme';
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
     borderBottomColor: AppTheme.colors.border,
   },
   teacherRowActive: {
-    backgroundColor: AppTheme.colors.primarySoft + '55',
+    backgroundColor: AppTheme.colors.primaryLight + '55',
     borderRadius: AppTheme.radius.medium,
   },
   teacherAvatar: {
@@ -178,7 +179,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  teacherAvatarActive: { backgroundColor: AppTheme.colors.primarySoft },
+  teacherAvatarActive: { backgroundColor: AppTheme.colors.primaryLight },
   teacherAvatarText: {
     color: AppTheme.colors.textSecondary,
     fontSize: 13,
@@ -196,3 +197,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 });
+
+
+

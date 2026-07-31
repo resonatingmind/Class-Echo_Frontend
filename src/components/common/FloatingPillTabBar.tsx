@@ -1,3 +1,4 @@
+import { AppTheme } from '../../theme/AppTheme';
 import { useEffect, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -158,3 +159,5 @@ const styles = StyleSheet.create({
     opacity: 0,
   },
 });
+
+

@@ -150,7 +150,7 @@ export function SchoolAdminDashboardScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: AppTheme.AppTheme.colors.background,
+    backgroundColor: AppTheme.colors.background,
   },
   flex: { flex: 1 },
   scroll: {
@@ -172,15 +172,15 @@ const styles = StyleSheet.create({
     marginBottom: AppTheme.spacing.xs,
   },
   pageTitle: {
-    color: AppTheme.AppTheme.colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.heading1,
   },
   pageSubtitle: {
-    color: AppTheme.AppTheme.colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
   },
   sectionTitle: {
-    color: AppTheme.AppTheme.colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.heading3,
     marginTop: AppTheme.spacing.s,
   },
@@ -192,12 +192,12 @@ const styles = StyleSheet.create({
   statCard: {
     flex: 1,
     minWidth: 100,
-    backgroundColor: AppTheme.AppTheme.colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     paddingVertical: AppTheme.spacing.xl,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: AppTheme.AppTheme.colors.border,
+    borderColor: AppTheme.colors.border,
   },
   statNumber: {
     color: AppTheme.colors.primary,
@@ -205,25 +205,25 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     marginTop: AppTheme.spacing.xs,
-    color: AppTheme.AppTheme.colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
   },
   recordingCard: {
-    backgroundColor: AppTheme.AppTheme.colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     padding: AppTheme.spacing.xl,
     flexDirection: "row",
     justifyContent: "space-between",
     borderWidth: 1,
-    borderColor: AppTheme.AppTheme.colors.border,
+    borderColor: AppTheme.colors.border,
   },
   recordTitle: {
-    color: AppTheme.AppTheme.colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
   },
   recordValue: {
     marginTop: AppTheme.spacing.xs,
-    color: AppTheme.AppTheme.colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.heading1,
   },
   pendingValue: {
@@ -239,14 +239,14 @@ const styles = StyleSheet.create({
   quickCard: {
     flex: 1,
     minWidth: 150,
-    backgroundColor: AppTheme.AppTheme.colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     padding: AppTheme.spacing.l,
     flexDirection: "row",
     alignItems: "center",
     gap: AppTheme.spacing.m,
     borderWidth: 1,
-    borderColor: AppTheme.AppTheme.colors.border,
+    borderColor: AppTheme.colors.border,
   },
   quickIconContainer: {
     width: 44,
@@ -260,22 +260,22 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   quickTitle: {
-    color: AppTheme.AppTheme.colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.bodyLarge,
     fontWeight: "700",
   },
   quickSubtitle: {
-    color: AppTheme.AppTheme.colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     ...AppTheme.typography.caption,
   },
   list: {
     gap: AppTheme.spacing.m,
   },
   card: {
-    backgroundColor: AppTheme.AppTheme.colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: AppTheme.AppTheme.colors.border,
+    borderColor: AppTheme.colors.border,
   },
   cardTop: {
     flexDirection: "row",
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: AppTheme.radius.medium,
-    backgroundColor: AppTheme.AppTheme.colors.background,
+    backgroundColor: AppTheme.colors.background,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -299,11 +299,11 @@ const styles = StyleSheet.create({
     gap: AppTheme.spacing.xs,
   },
   cardName: {
-    color: AppTheme.AppTheme.colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.heading3,
   },
   cardAddress: {
-    color: AppTheme.AppTheme.colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
   },
   scoreContainer: {
@@ -314,3 +314,4 @@ const styles = StyleSheet.create({
     ...AppTheme.typography.heading2,
   },
 });
+

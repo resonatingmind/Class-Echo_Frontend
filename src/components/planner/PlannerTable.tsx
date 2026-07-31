@@ -7,9 +7,10 @@ type Props = {
   data: PlannerItemOut[];
   onView: (item: PlannerItemOut) => void;
   onTeacherPress?: (item: PlannerItemOut) => void;
+  onAssignTeacher?: (item: PlannerItemOut) => void;
 };
 
-export function PlannerTable({ data, onView, onTeacherPress }: Props) {
+export function PlannerTable({ data, onView, onTeacherPress, onAssignTeacher }: Props) {
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -36,6 +37,7 @@ export function PlannerTable({ data, onView, onTeacherPress }: Props) {
           item={item}
           onView={() => onView(item)}
           onTeacherPress={onTeacherPress}
+          onAssignTeacher={onAssignTeacher}
         />
       ))}
     </View>
@@ -81,3 +83,5 @@ const styles = StyleSheet.create({
     color: "#64748B",
   },
 });
+
+

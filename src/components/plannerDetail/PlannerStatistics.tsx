@@ -34,7 +34,7 @@ export function PlannerStatistics({ statistics }: Props) {
 
       <StatCard
         icon="sparkles-outline"
-        color={colors.success}
+        color={AppTheme.colors.success}
         value={
           statistics.average_score == null
             ? "--"
@@ -96,3 +96,4 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textSecondary,
   },
 });
+

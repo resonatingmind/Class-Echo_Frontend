@@ -1,3 +1,4 @@
+import { AppTheme } from '../../theme/AppTheme';
 import { ComponentProps, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -172,3 +173,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 2,
   },
 });
+
+

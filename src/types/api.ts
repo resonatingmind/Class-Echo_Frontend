@@ -92,6 +92,9 @@ export type SubjectOut = {
   academic_year?: string;
 
   status?: string;
+  created_at?: string;
+  teacher_id?: number | null;
+  teacher_assigned_at?: string | null;
 };
 
 export type SubjectWithClassOut = {
@@ -558,3 +561,4 @@ export type TimetableImportResult = {
   skipped: number;
   errors: string[];
 };
+

@@ -1,3 +1,4 @@
+import { AppTheme } from '../theme/AppTheme';
 import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -117,3 +118,5 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 });
+
+

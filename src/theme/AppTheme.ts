@@ -7,6 +7,8 @@ export const AppTheme = {
     primaryLight: "#EAF4FF",
     background: "#F8FAFC",
     surface: "#FFFFFF",
+    surfaceMuted: "#F4F3F3",
+    surfaceSoft: "#F8FAFC",
     card: "#FFFFFF",
     border: "#E5E7EB",
     divider: "#EEF2F7",
@@ -16,6 +18,7 @@ export const AppTheme = {
     textPrimary: "#111827",
     textSecondary: "#6B7280",
     hint: "#9CA3AF",
+    textPlaceholder: "#BFC7D4",
     disabled: "#D1D5DB",
   },
   spacing: {
@@ -129,3 +132,4 @@ export const AppTheme = {
     segment: 250,
   }
 };
+

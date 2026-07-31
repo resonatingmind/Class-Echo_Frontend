@@ -1,3 +1,4 @@
+import { AppTheme } from '../../../theme/AppTheme';
 import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -124,3 +125,5 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textSecondary,
   },
 });
+
+

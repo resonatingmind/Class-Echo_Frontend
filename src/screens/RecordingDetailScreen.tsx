@@ -72,7 +72,7 @@ function statusStyle(status: RecordingStatus) {
   switch (status) {
     case 'completed':  return { bg: '#E8F7EE', text: '#127A40', label: 'Analysed' };
     case 'processing': return { bg: '#FFF4E0', text: '#92400E', label: 'Processing' };
-    case 'pending':    return { bg: AppTheme.AppTheme.colors.background, text: AppTheme.AppTheme.colors.textSecondary, label: 'Pending' };
+    case 'pending':    return { bg: AppTheme.colors.background, text: AppTheme.colors.textSecondary, label: 'Pending' };
     case 'failed':     return { bg: '#FFF1F1', text: '#B42318', label: 'Failed' };
   }
 }
@@ -102,7 +102,7 @@ const ring = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 2,
   },
   score: { fontSize: 30, fontWeight: '800' },
-  outOf: { fontSize: 12, fontWeight: '600', color: AppTheme.AppTheme.colors.textSecondary, marginTop: 10 },
+  outOf: { fontSize: 12, fontWeight: '600', color: AppTheme.colors.textSecondary, marginTop: 10 },
   gradeBadge: {
     paddingHorizontal: 14, paddingVertical: 4, borderRadius: 999,
   },
@@ -133,14 +133,14 @@ const ms = StyleSheet.create({
     flexDirection: 'row',
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
-    borderColor: AppTheme.AppTheme.colors.border,
-    backgroundColor: AppTheme.AppTheme.colors.background,
+    borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.background,
     overflow: 'hidden',
   },
   cell: { flex: 1, alignItems: 'center', paddingVertical: 14, gap: 3 },
-  cellBorder: { borderRightWidth: 1, borderRightColor: AppTheme.AppTheme.colors.border },
-  value: { fontSize: 18, fontWeight: '800', color: AppTheme.AppTheme.colors.textPrimary },
-  label: { fontSize: 10, fontWeight: '700', color: AppTheme.AppTheme.colors.textSecondary, letterSpacing: 0.8 },
+  cellBorder: { borderRightWidth: 1, borderRightColor: AppTheme.colors.border },
+  value: { fontSize: 18, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  label: { fontSize: 10, fontWeight: '700', color: AppTheme.colors.textSecondary, letterSpacing: 0.8 },
 });
 
 function LanguagePill({ text }: { text: string }) {
@@ -204,31 +204,31 @@ const dc = StyleSheet.create({
   card: {
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
-    borderColor: AppTheme.AppTheme.colors.border,
-    backgroundColor: AppTheme.AppTheme.colors.surface,
+    borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.surface,
     padding: 16,
     gap: 10,
   },
   header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   iconWrap: {
-    width: 32, height: 32, borderRadius: AppTheme.radius.medium, backgroundColor: AppTheme.AppTheme.colors.background,
+    width: 32, height: 32, borderRadius: AppTheme.radius.medium, backgroundColor: AppTheme.colors.background,
     alignItems: 'center', justifyContent: 'center',
   },
-  label: { flex: 1, fontSize: 14, fontWeight: '700', color: AppTheme.AppTheme.colors.textPrimary },
+  label: { flex: 1, fontSize: 14, fontWeight: '700', color: AppTheme.colors.textPrimary },
   scoreBadge: {
     paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, borderWidth: 1,
   },
   scoreText: { fontSize: 14, fontWeight: '800' },
   maxText: { fontSize: 11, fontWeight: '600' },
   barTrack: {
-    height: 6, borderRadius: 3, backgroundColor: AppTheme.AppTheme.colors.background, overflow: 'hidden',
+    height: 6, borderRadius: 3, backgroundColor: AppTheme.colors.background, overflow: 'hidden',
   },
   barFill: { height: 6, borderRadius: 3 },
-  finding: { fontSize: 13, lineHeight: 19, color: AppTheme.AppTheme.colors.textSecondary, fontStyle: 'italic' },
+  finding: { fontSize: 13, lineHeight: 19, color: AppTheme.colors.textSecondary, fontStyle: 'italic' },
   evidenceList: { gap: 5 },
   evidenceRow: { flexDirection: 'row', gap: 6 },
-  evidenceDot: { fontSize: 14, color: AppTheme.AppTheme.colors.textSecondary, lineHeight: 20, marginTop: 1 },
-  evidenceText: { flex: 1, fontSize: 12, lineHeight: 18, color: AppTheme.AppTheme.colors.textSecondary },
+  evidenceDot: { fontSize: 14, color: AppTheme.colors.textSecondary, lineHeight: 20, marginTop: 1 },
+  evidenceText: { flex: 1, fontSize: 12, lineHeight: 18, color: AppTheme.colors.textSecondary },
 });
 
 function BulletList({ items, color, title, icon }: {
@@ -257,7 +257,7 @@ const bl = StyleSheet.create({
   title: { fontSize: 13, fontWeight: '700' },
   row: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
   dot: { width: 5, height: 5, borderRadius: 3, marginTop: 7 },
-  text: { flex: 1, fontSize: 13, lineHeight: 20, color: AppTheme.AppTheme.colors.textSecondary },
+  text: { flex: 1, fontSize: 13, lineHeight: 20, color: AppTheme.colors.textSecondary },
 });
 
 // ── Main screen ───────────────────────────────────────────────────────────────
@@ -414,7 +414,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
         </Text>
         <View style={styles.headerRight}>
           <Pressable onPress={() => setShowOptionsSheet(true)} style={styles.iconBtn}>
-            <Ionicons color={AppTheme.AppTheme.colors.textPrimary} name="ellipsis-horizontal" size={22} />
+            <Ionicons color={AppTheme.colors.textPrimary} name="ellipsis-horizontal" size={22} />
           </Pressable>
         </View>
       </View>
@@ -424,7 +424,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
           <View style={styles.centerContainer}>
             <View style={styles.body}>
               <Pressable onPress={() => navigation.goBack()} style={styles.backBtnRow}>
-                <Ionicons name="arrow-back" size={20} color={AppTheme.AppTheme.colors.textSecondary} />
+                <Ionicons name="arrow-back" size={20} color={AppTheme.colors.textSecondary} />
                 <Text style={styles.backBtnText}>Back</Text>
               </Pressable>
 
@@ -489,7 +489,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
           <View style={styles.card}>
             <Text style={styles.sectionLabel}>LECTURE TRANSCRIPTION</Text>
             <ScrollView style={{ maxHeight: 200, marginTop: 8 }} nestedScrollEnabled>
-              <Text style={{ fontSize: 14, lineHeight: 22, color: AppTheme.AppTheme.colors.textSecondary }}>
+              <Text style={{ fontSize: 14, lineHeight: 22, color: AppTheme.colors.textSecondary }}>
                 {recording.transcription}
               </Text>
             </ScrollView>
@@ -749,16 +749,16 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: AppTheme.AppTheme.colors.background },
+  safe: { flex: 1, backgroundColor: AppTheme.colors.background },
   flex: { flex: 1 },
   globalHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: AppTheme.spacing.l,
     paddingVertical: AppTheme.spacing.m,
-    backgroundColor: AppTheme.AppTheme.colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: AppTheme.AppTheme.colors.border,
+    borderBottomColor: AppTheme.colors.border,
   },
   headerLeft: {
     width: 60,
@@ -767,7 +767,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     flex: 1,
     textAlign: 'center',
-    color: AppTheme.AppTheme.colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.heading3,
   },
   headerRight: {
@@ -801,7 +801,7 @@ const styles = StyleSheet.create({
     marginBottom: AppTheme.spacing.s,
   },
   backBtnText: {
-    color: AppTheme.AppTheme.colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
     fontWeight: '600',
   },
@@ -809,10 +809,10 @@ const styles = StyleSheet.create({
   scroll: { paddingBottom: 40 },
   hero: {
     padding: 24,
-    backgroundColor: AppTheme.AppTheme.colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     borderWidth: 1,
-    borderColor: AppTheme.AppTheme.colors.border,
+    borderColor: AppTheme.colors.border,
     gap: AppTheme.spacing.s,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -821,18 +821,18 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   subjectLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 1.1, color: AppTheme.colors.primary },
-  heroTitle: { fontSize: 28, fontWeight: '800', color: AppTheme.AppTheme.colors.textPrimary, letterSpacing: -0.6 },
-  heroDescription: { fontSize: 14, lineHeight: 22, color: AppTheme.AppTheme.colors.textSecondary },
+  heroTitle: { fontSize: 28, fontWeight: '800', color: AppTheme.colors.textPrimary, letterSpacing: -0.6 },
+  heroDescription: { fontSize: 14, lineHeight: 22, color: AppTheme.colors.textSecondary },
   heroBadgeRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8 },
-  heroMeta: { fontSize: 13, color: AppTheme.AppTheme.colors.textSecondary },
+  heroMeta: { fontSize: 13, color: AppTheme.colors.textSecondary },
   statusBadge: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999 },
   statusText: { fontSize: 12, fontWeight: '700' },
   card: {
     padding: 24,
     borderRadius: AppTheme.radius.large,
-    backgroundColor: AppTheme.AppTheme.colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderWidth: 1,
-    borderColor: AppTheme.AppTheme.colors.border,
+    borderColor: AppTheme.colors.border,
     gap: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -841,15 +841,15 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   cardHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
-  cardHeading: { fontSize: 17, fontWeight: '800', color: AppTheme.AppTheme.colors.textPrimary },
-  playerTime: { fontSize: 12, color: AppTheme.AppTheme.colors.textSecondary, fontWeight: '600' },
+  cardHeading: { fontSize: 17, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  playerTime: { fontSize: 12, color: AppTheme.colors.textSecondary, fontWeight: '600' },
   playerButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
     padding: 14,
     borderRadius: AppTheme.radius.medium,
-    backgroundColor: AppTheme.AppTheme.colors.background,
+    backgroundColor: AppTheme.colors.background,
   },
   playerIcon: {
     width: 48,
@@ -860,32 +860,32 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   playerTextWrap: { flex: 1, gap: 3 },
-  playerTitle: { fontSize: 15, fontWeight: '700', color: AppTheme.AppTheme.colors.textPrimary },
-  playerSubtitle: { fontSize: 13, color: AppTheme.AppTheme.colors.textSecondary },
+  playerTitle: { fontSize: 15, fontWeight: '700', color: AppTheme.colors.textPrimary },
+  playerSubtitle: { fontSize: 13, color: AppTheme.colors.textSecondary },
   waveformWrap: {
     padding: 14,
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
-    borderColor: AppTheme.AppTheme.colors.border,
-    backgroundColor: AppTheme.AppTheme.colors.background,
+    borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.background,
   },
   reportWrap: { gap: 16 },
   overallNotes: {
-    fontSize: 14, lineHeight: 22, color: AppTheme.AppTheme.colors.textSecondary,
+    fontSize: 14, lineHeight: 22, color: AppTheme.colors.textSecondary,
     textAlign: 'center', paddingHorizontal: 4,
   },
   sectionLabel: {
     fontSize: 11, fontWeight: '800', letterSpacing: 1.2,
-    color: AppTheme.AppTheme.colors.textSecondary,
+    color: AppTheme.colors.textSecondary,
   },
   langRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6 },
-  langPrefix: { fontSize: 12, color: AppTheme.AppTheme.colors.textSecondary, fontWeight: '600' },
+  langPrefix: { fontSize: 12, color: AppTheme.colors.textSecondary, fontWeight: '600' },
   processingCard: {
     padding: 24,
     borderRadius: AppTheme.radius.large,
-    backgroundColor: AppTheme.AppTheme.colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderWidth: 1,
-    borderColor: AppTheme.AppTheme.colors.border,
+    borderColor: AppTheme.colors.border,
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 12,
@@ -897,7 +897,7 @@ const styles = StyleSheet.create({
   },
   processingCardFailed: { borderColor: '#FECACA', backgroundColor: '#FFF8F8' },
   processingBody: { flex: 1, gap: 12 },
-  processingText: { fontSize: 14, lineHeight: 20, color: AppTheme.AppTheme.colors.textSecondary },
+  processingText: { fontSize: 14, lineHeight: 20, color: AppTheme.colors.textSecondary },
   retryButton: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     alignSelf: 'flex-start', paddingHorizontal: 14, paddingVertical: 9,
@@ -910,7 +910,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   sheet: {
-    backgroundColor: AppTheme.AppTheme.colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 20,
@@ -924,17 +924,17 @@ const styles = StyleSheet.create({
     width: 42,
     height: 4,
     borderRadius: 999,
-    backgroundColor: AppTheme.AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.border,
   },
-  sheetTitle: { fontSize: 20, fontWeight: '800', color: AppTheme.AppTheme.colors.textPrimary },
-  sheetSubtitle: { fontSize: 14, lineHeight: 20, color: AppTheme.AppTheme.colors.textSecondary },
+  sheetTitle: { fontSize: 20, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  sheetSubtitle: { fontSize: 14, lineHeight: 20, color: AppTheme.colors.textSecondary },
   sheetOption: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
     padding: 16,
     borderRadius: AppTheme.radius.medium,
-    backgroundColor: AppTheme.AppTheme.colors.background,
+    backgroundColor: AppTheme.colors.background,
   },
   sheetOptionIcon: {
     width: 44,
@@ -945,18 +945,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   sheetOptionBody: { flex: 1, gap: 4 },
-  sheetOptionTitle: { fontSize: 15, fontWeight: '700', color: AppTheme.AppTheme.colors.textPrimary },
-  sheetOptionText: { fontSize: 13, lineHeight: 18, color: AppTheme.AppTheme.colors.textSecondary },
-  inputLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 0.8, color: AppTheme.AppTheme.colors.textSecondary },
+  sheetOptionTitle: { fontSize: 15, fontWeight: '700', color: AppTheme.colors.textPrimary },
+  sheetOptionText: { fontSize: 13, lineHeight: 18, color: AppTheme.colors.textSecondary },
+  inputLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 0.8, color: AppTheme.colors.textSecondary },
   input: {
     borderWidth: 1,
-    borderColor: AppTheme.AppTheme.colors.border,
+    borderColor: AppTheme.colors.border,
     borderRadius: AppTheme.radius.medium,
-    backgroundColor: AppTheme.AppTheme.colors.background,
+    backgroundColor: AppTheme.colors.background,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
-    color: AppTheme.AppTheme.colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
   },
   descriptionInput: { minHeight: 96, textAlignVertical: 'top' },
   modalActions: { flexDirection: 'row', gap: 12, marginTop: 6 },
@@ -967,10 +967,10 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
-    borderColor: AppTheme.AppTheme.colors.border,
-    backgroundColor: AppTheme.AppTheme.colors.surface,
+    borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.surface,
   },
-  secondaryButtonText: { fontSize: 15, fontWeight: '700', color: AppTheme.AppTheme.colors.textSecondary },
+  secondaryButtonText: { fontSize: 15, fontWeight: '700', color: AppTheme.colors.textSecondary },
   primaryButton: {
     flex: 1,
     flexDirection: 'row',
@@ -984,3 +984,4 @@ const styles = StyleSheet.create({
   primaryButtonText: { fontSize: 15, fontWeight: '800', color: '#fff' },
   buttonDisabled: { opacity: 0.55 },
 });
+

@@ -61,7 +61,7 @@ export function SecondaryButton({
         ]}
       >
         {loading ? (
-          <ActivityIndicator color={AppTheme.AppTheme.colors.textPrimary} />
+          <ActivityIndicator color={AppTheme.colors.textPrimary} />
         ) : (
           <>
             <Text style={[styles.text, textStyle]}>{title}</Text>
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
-    borderColor: AppTheme.AppTheme.colors.border,
+    borderColor: AppTheme.colors.border,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -90,7 +90,8 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   text: {
-    color: AppTheme.AppTheme.colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.button,
   },
 });
+

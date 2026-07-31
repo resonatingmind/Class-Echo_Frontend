@@ -1,3 +1,4 @@
+import { AppTheme } from '../../../theme/AppTheme';
 import { Pressable, ScrollView, StyleSheet, Text } from "react-native";
 
 import { colors } from "../../../theme/colors";
@@ -74,3 +75,5 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 });
+
+

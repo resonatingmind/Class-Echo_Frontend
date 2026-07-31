@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   subtitleText: {
-    color: AppTheme.AppTheme.colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.heading3,
     marginBottom: AppTheme.spacing.s,
   },
@@ -67,3 +67,4 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.divider,
   },
 });
+

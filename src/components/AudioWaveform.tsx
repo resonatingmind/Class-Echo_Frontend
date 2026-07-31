@@ -1,3 +1,4 @@
+import { AppTheme } from '../theme/AppTheme';
 import { memo } from 'react';
 import { StyleSheet, View } from 'react-native';
 
@@ -52,3 +53,5 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
 });
+
+

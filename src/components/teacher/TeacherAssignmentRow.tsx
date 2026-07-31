@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.small,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: AppTheme.colors.primarySoft,
+    backgroundColor: AppTheme.colors.primaryLight,
   },
   viewText: {
     color: AppTheme.colors.primaryDark,
@@ -177,3 +177,4 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 });
+

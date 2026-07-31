@@ -70,14 +70,14 @@ const styles = StyleSheet.create({
     gap: AppTheme.spacing.s,
   },
   label: {
-    color: AppTheme.AppTheme.colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.label,
   },
   inputContainer: {
     height: 48,
-    backgroundColor: AppTheme.AppTheme.colors.surface,
+    backgroundColor: AppTheme.colors.surface,
     borderWidth: 1,
-    borderColor: AppTheme.AppTheme.colors.border,
+    borderColor: AppTheme.colors.border,
     borderRadius: AppTheme.radius.medium,
     flexDirection: "row",
     alignItems: "center",
@@ -92,14 +92,10 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    color: AppTheme.AppTheme.colors.textPrimary,
+    color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.bodyLarge,
-    // @ts-ignore
-    outlineStyle: 'none',
-    paddingRight: AppTheme.spacing.xl,
-    // @ts-ignore
-    outlineStyle: 'none',
-  },
+paddingRight: AppTheme.spacing.xl,
+},
   eyeButton: {
     padding: AppTheme.spacing.xs,
   },
@@ -108,3 +104,5 @@ const styles = StyleSheet.create({
     ...AppTheme.typography.caption,
   },
 });
+
+

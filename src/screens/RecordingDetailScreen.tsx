@@ -574,7 +574,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
                   <ChapterInfoBanner data={report.chapter_info} />
                 ) : null}
 
-                {/* Selected Learning Plan (Micro Planner) */}
+                {/* Selected Learning Plan (Lecture Planner) */}
                 {recording.learning_plan ? (
                   <LearningPlanInfoCard data={recording.learning_plan} />
                 ) : null}

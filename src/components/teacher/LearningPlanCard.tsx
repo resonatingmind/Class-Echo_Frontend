@@ -21,15 +21,28 @@ export function LearningPlanCard({
   isSelected,
   readOnly,
 }: Props) {
+  const formatDate = (dateString?: string | null) => {
+    if (!dateString) return "No Date";
+    const parts = dateString.split('/');
+    if (parts.length === 2) {
+      // It's DD/MM, assume current year
+      const year = new Date().getFullYear();
+      const d = new Date(year, parseInt(parts[1]) - 1, parseInt(parts[0]));
+      return d.toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
+    }
+    const d = new Date(dateString);
+    if (!isNaN(d.getTime())) {
+      return d.toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
+    }
+    return dateString;
+  };
+
   return (
-    <Pressable
-      style={[styles.card, isSelected && styles.selectedCard]}
-      onPress={onSelect}
-    >
+    <View style={[styles.card, isSelected && styles.selectedCard]}>
       <View style={styles.header}>
         <View style={styles.dateBadge}>
           <Ionicons name="calendar-outline" size={14} color={AppTheme.colors.primaryDark} />
-          <Text style={styles.dateText}>{item.date || "No Date"}</Text>
+          <Text style={styles.dateText}>{formatDate(item.date)}</Text>
         </View>
 
         {!readOnly && (
@@ -48,37 +61,38 @@ export function LearningPlanCard({
         )}
       </View>
 
-      <View style={styles.content}>
-        <Text style={styles.topicName}>{item.topic_name}</Text>
-        <Text style={styles.subTopic}>{item.sub_topic}</Text>
+      <Pressable onPress={onSelect} disabled={!onSelect}>
+        <View style={styles.content}>
+          <Text style={styles.topicName}>{item.sub_topic}</Text>
 
-        <View style={styles.divider} />
+          <View style={styles.divider} />
 
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Activities & Classwork</Text>
-          <Text style={styles.detailText}>{item.classwork_activities || "None"}</Text>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Activities & Classwork</Text>
+            <Text style={styles.detailText}>{item.classwork_activities || "None"}</Text>
+          </View>
+
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Assessment Task</Text>
+            <Text style={[styles.detailText, !item.assessment_task && styles.mutedText]}>
+              {item.assessment_task || "None"}
+            </Text>
+          </View>
+
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Teaching Aids</Text>
+            <Text style={[styles.detailText, !item.teaching_aids && styles.mutedText]}>
+              {item.teaching_aids || "None"}
+            </Text>
+          </View>
+
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Learning Outcomes</Text>
+            <Text style={styles.detailText}>{item.learning_outcomes || "None"}</Text>
+          </View>
         </View>
-
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Assessment Task</Text>
-          <Text style={[styles.detailText, !item.assessment_task && styles.mutedText]}>
-            {item.assessment_task || "None"}
-          </Text>
-        </View>
-
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Teaching Aids</Text>
-          <Text style={[styles.detailText, !item.teaching_aids && styles.mutedText]}>
-            {item.teaching_aids || "None"}
-          </Text>
-        </View>
-
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Learning Outcomes</Text>
-          <Text style={styles.detailText}>{item.learning_outcomes || "None"}</Text>
-        </View>
-      </View>
-    </Pressable>
+      </Pressable>
+    </View>
   );
 }
 

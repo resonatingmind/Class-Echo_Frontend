@@ -27,6 +27,8 @@ import {
   createSchoolLearningPlan,
   updateSchoolLearningPlan,
   deleteSchoolLearningPlan,
+  getSchoolAdminMe,
+  login,
 } from "../lib/api";
 
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -41,6 +43,7 @@ import {
 import { LearningPlanList } from "../components/teacher/LearningPlanList";
 import { ChapterLearningPlanModal } from "../components/teacher/ChapterLearningPlanModal";
 import { AdminNavbar } from "../components/common/AdminNavbar";
+import { ConfirmDialog } from "../components/common/ConfirmDialog";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SchoolAdminChapterDetail'>;
 
@@ -75,6 +78,11 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
   const [lpModalVisible, setLpModalVisible] = useState(false);
   const [selectedLpItem, setSelectedLpItem] = useState<LearningPlanOut | null>(null);
   const [savingLp, setSavingLp] = useState(false);
+  const [deleteLpItem, setDeleteLpItem] = useState<LearningPlanOut | null>(null);
+  const [deleteLpPassword, setDeleteLpPassword] = useState("");
+  const [deleteLpError, setDeleteLpError] = useState<string | null>(null);
+  const [deletingLp, setDeletingLp] = useState(false);
+  const [adminEmail, setAdminEmail] = useState<string | null>(null);
 
   const [activeTab, setActiveTab] = useState<ActiveTab>(
     openUpload ? "documents" : "planner",
@@ -119,6 +127,15 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
         } catch (kbErr) {
           setKnowledge(null);
         }
+        // Fetch admin me if email not cached yet
+        if (!adminEmail) {
+          try {
+            const me = await getSchoolAdminMe(session.token);
+            setAdminEmail(me.email);
+          } catch {
+            // ignore
+          }
+        }
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Could not load chapter details.');
       } finally {
@@ -126,7 +143,7 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
         setRefreshing(false);
       }
     },
-    [session, chapterId, route.params.subjectId]
+    [session, chapterId, route.params.subjectId, adminEmail]
   );
 
   const handleSaveLearningPlan = async (payload: LearningPlanCreatePayload) => {
@@ -150,26 +167,39 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
   };
 
   const handleDeleteLearningPlan = (item: LearningPlanOut) => {
-    Alert.alert(
-      "Delete Learning Plan Entry",
-      `Are you sure you want to delete "${item.sub_topic}"?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            if (!session) return;
-            try {
-              await deleteSchoolLearningPlan(session.token, item.id);
-              void load(true);
-            } catch (err) {
-              Alert.alert("Error", "Could not delete item.");
-            }
-          },
-        },
-      ],
-    );
+    setDeleteLpItem(item);
+    setDeleteLpPassword("");
+    setDeleteLpError(null);
+  };
+
+  const confirmDeleteLearningPlan = async () => {
+    if (!session || !deleteLpItem) return;
+    if (!adminEmail) {
+      setDeleteLpError("Verifying admin details... Please try again.");
+      return;
+    }
+    setDeletingLp(true);
+    setDeleteLpError(null);
+    
+    try {
+      // Validate password against the actual login API
+      await login(adminEmail, deleteLpPassword);
+    } catch (err) {
+      setDeleteLpError("Incorrect Password. Please enter your login password.");
+      setDeletingLp(false);
+      return;
+    }
+
+    try {
+      await deleteSchoolLearningPlan(session.token, deleteLpItem.id);
+      void load(true);
+      setDeleteLpItem(null);
+      setDeleteLpPassword("");
+    } catch (err) {
+      setDeleteLpError("Could not delete item. Please try again.");
+    } finally {
+      setDeletingLp(false);
+    }
   };
 
   useFocusEffect(
@@ -373,7 +403,7 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
                   activeTab === "planner" && styles.tabTextActive,
                 ]}
               >
-                Micro Planner
+                Lecture Planner
               </Text>
             </Pressable>
             <Pressable
@@ -402,19 +432,6 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
                 Documents
               </Text>
             </Pressable>
-            <Pressable
-              onPress={() => setActiveTab('metadata')}
-              style={[styles.tabButton, activeTab === 'metadata' && styles.tabButtonActive]}
-            >
-              <Ionicons
-                color={activeTab === 'metadata' ? AppTheme.colors.primaryDark : AppTheme.colors.textSecondary}
-                name="information-circle-outline"
-                size={14}
-              />
-              <Text style={[styles.tabText, activeTab === 'metadata' && styles.tabTextActive]}>
-                Details
-              </Text>
-            </Pressable>
           </View>
         </ScrollView>
 
@@ -433,9 +450,9 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
           <View style={styles.plannerSection}>
             <View style={styles.plannerHeaderRow}>
               <View style={styles.plannerHeaderTitles}>
-                <Text style={styles.sectionTitle}>MICRO PLANNER</Text>
+                <Text style={styles.sectionTitle}>Planned Lectures</Text>
                 <Text style={styles.plannerSub}>
-                  Subject: {subjectName} • Chapter: {chapterName}
+                  {learningPlans.length} {learningPlans.length === 1 ? 'lecture' : 'lectures'} total
                 </Text>
               </View>
               <Pressable
@@ -462,9 +479,7 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
         ) : activeTab === 'profile' ? (
           !knowledge ? (
             <View style={styles.emptyKbContainer}>
-              <View style={styles.emptyKbIconBox}>
-                <Ionicons color={AppTheme.colors.textSecondary} name="analytics-outline" size={32} />
-              </View>
+              <Ionicons color="#94A3B8" name="analytics-outline" size={40} />
               <Text style={styles.emptyKbTitle}>No Knowledge Profile Yet</Text>
               <Text style={styles.emptyKbBody}>
                 Upload reference documents (PDF, DOCX, PPTX, or TXT) to automatically construct a structured chapter knowledge profile using AI.
@@ -548,29 +563,34 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
               )}
             </View>
           )
-        ) : activeTab === 'documents' ? (
+        ) : (
           <View style={styles.docSection}>
-            <View style={styles.docHeaderRow}>
-              <Text style={styles.sectionTitle}>Reference Documents</Text>
+            <View style={styles.plannerHeaderRow}>
+              <View style={styles.plannerHeaderTitles}>
+                <Text style={styles.sectionTitle}>Reference Documents</Text>
+                <Text style={styles.plannerSub}>
+                  {documents.length} {documents.length === 1 ? 'file' : 'files'} total
+                </Text>
+              </View>
               <Pressable
                 disabled={uploading}
                 onPress={handlePickDocument}
-                style={[styles.uploadBtn, uploading && styles.btnDisabled]}
+                style={[styles.addPlanBtn, uploading && styles.btnDisabled]}
               >
                 {uploading ? (
                   <ActivityIndicator color="#fff" size="small" />
                 ) : (
                   <Ionicons color="#fff" name="cloud-upload-outline" size={16} />
                 )}
-                <Text style={styles.uploadBtnText}>
-                  {uploading ? `${uploadProgress}%` : 'Upload file'}
+                <Text style={styles.addPlanText}>
+                  {uploading ? `${uploadProgress}%` : 'Upload File'}
                 </Text>
               </Pressable>
             </View>
 
             {documents.length === 0 ? (
               <View style={styles.emptyDocBox}>
-                <Ionicons color={AppTheme.colors.textSecondary} name="document-attach-outline" size={40} />
+                <Ionicons color="#94A3B8" name="document-attach-outline" size={40} />
                 <Text style={styles.emptyDocTitle}>No reference files</Text>
                 <Text style={styles.emptyDocBody}>
                   Upload reading materials, syllabi, or lesson plans (PDF, DOCX, PPTX, TXT) to generate a knowledge profile.
@@ -625,38 +645,14 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
               </View>
             )}
           </View>
-        ) : (
-          <View style={styles.metadataList}>
-            <View style={styles.metaItem}>
-              <Text style={styles.metaLabel}>Chapter ID</Text>
-              <Text style={styles.metaValue}>#{chapterId}</Text>
-            </View>
-            <View style={styles.metaItem}>
-              <Text style={styles.metaLabel}>Subject Name</Text>
-              <Text style={styles.metaValue}>{subjectName}</Text>
-            </View>
-            <View style={styles.metaItem}>
-              <Text style={styles.metaLabel}>Date Created</Text>
-              <Text style={styles.metaValue}>
-                {chapter
-                  ? new Date(chapter.created_at).toLocaleString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })
-                  : '—'}
-              </Text>
-            </View>
-          </View>
-        )}
+            )}
           </View>
         </View>
       </ScrollView>
 
       <ChapterLearningPlanModal
         visible={lpModalVisible}
+        chapterName={chapterName}
         initialItem={selectedLpItem}
         loading={savingLp}
         onClose={() => {
@@ -664,6 +660,24 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
           setSelectedLpItem(null);
         }}
         onSave={handleSaveLearningPlan}
+      />
+
+      <ConfirmDialog
+        visible={!!deleteLpItem}
+        title="Delete Lecture Planner Entry"
+        message={`Are you sure you want to delete "${deleteLpItem?.sub_topic}"? This action cannot be undone.`}
+        confirmText="Delete"
+        destructive={true}
+        requirePassword={true}
+        passwordValue={deleteLpPassword}
+        onPasswordChange={(val) => {
+          setDeleteLpPassword(val);
+          setDeleteLpError(null);
+        }}
+        error={deleteLpError}
+        loading={deletingLp}
+        onConfirm={confirmDeleteLearningPlan}
+        onCancel={() => setDeleteLpItem(null)}
       />
     </SafeAreaView>
   );
@@ -845,14 +859,9 @@ const styles = StyleSheet.create({
 
   // Documents Tab
   docSection: {
-    paddingHorizontal: 20,
-    marginTop: 20,
+    paddingHorizontal: 0,
+    marginTop: 0,
     gap: 16,
-  },
-  docHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
   },
   sectionTitle: {
     fontSize: 18,
@@ -893,7 +902,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     color: AppTheme.colors.textSecondary,
     textAlign: 'center',
-    paddingHorizontal: 16,
+    maxWidth: 400,
   },
   docList: {
     gap: 12,
@@ -986,15 +995,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 32,
     gap: 12,
-    marginTop: 32,
-  },
-  emptyKbIconBox: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: AppTheme.colors.surfaceMuted,
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: AppTheme.colors.border,
+    borderStyle: 'dashed',
+    borderRadius: 16,
+    backgroundColor: AppTheme.colors.surface,
   },
   emptyKbTitle: {
     fontSize: 16,
@@ -1006,7 +1011,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     color: AppTheme.colors.textSecondary,
     textAlign: 'center',
-    paddingHorizontal: 16,
+    maxWidth: 400,
   },
 
   // Shared States

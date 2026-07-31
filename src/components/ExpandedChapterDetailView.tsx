@@ -72,7 +72,7 @@ export function ExpandedChapterDetailView({
     );
   }
 
-  // Match recordings to Micro Planner topics
+  // Match recordings to Lecture Planner topics
   const assignedRecordingIds = new Set<number>();
 
   const titleRows = learningPlans.map((lp) => {
@@ -198,7 +198,7 @@ export function ExpandedChapterDetailView({
                   </View>
                 </View>
 
-                {/* Column 2: Teaching Plan (Micro Planner) */}
+                {/* Column 2: Teaching Plan (Lecture Planner) */}
                 <View style={[{ flex: 2 }, styles.cellCol]}>
                   {lp.classwork_activities || lp.learning_outcomes ? (
                     <Pressable

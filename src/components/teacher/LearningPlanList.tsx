@@ -26,9 +26,9 @@ export function LearningPlanList({
     return (
       <View style={styles.emptyState}>
         <Ionicons name="journal-outline" size={40} color="#94A3B8" />
-        <Text style={styles.emptyTitle}>No Learning Plan Entries</Text>
+        <Text style={styles.emptyTitle}>No Lecture Planner Entries</Text>
         <Text style={styles.emptySubtitle}>
-          Add entries to the Micro Planner for this chapter to align lecture recordings with planned learning outcomes.
+          Add entries to the Lecture Planner for this chapter to align lecture recordings with planned learning outcomes.
         </Text>
       </View>
     );
@@ -56,13 +56,14 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   emptyState: {
-    padding: 32,
     alignItems: "center",
-    backgroundColor: AppTheme.colors.surfaceMuted,
-    borderRadius: AppTheme.radius.medium,
-    borderWidth: 1,
+    padding: 32,
+    gap: 12,
+    borderWidth: 1.5,
     borderColor: AppTheme.colors.border,
-    gap: 8,
+    borderStyle: "dashed",
+    borderRadius: 16,
+    backgroundColor: AppTheme.colors.surface,
   },
   emptyTitle: {
     fontSize: 16,
@@ -71,6 +72,7 @@ const styles = StyleSheet.create({
   },
   emptySubtitle: {
     fontSize: 13,
+    lineHeight: 18,
     color: AppTheme.colors.textSecondary,
     textAlign: "center",
     maxWidth: 400,

@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Text,
   TouchableWithoutFeedback,
+  TextInput,
   View,
 } from "react-native";
 
@@ -29,6 +30,11 @@ type Props = {
   onConfirm: () => void;
 
   onCancel: () => void;
+
+  requirePassword?: boolean;
+  passwordValue?: string;
+  onPasswordChange?: (val: string) => void;
+  error?: string | null;
 };
 
 export function ConfirmDialog({
@@ -41,6 +47,10 @@ export function ConfirmDialog({
   loading = false,
   onConfirm,
   onCancel,
+  requirePassword,
+  passwordValue,
+  onPasswordChange,
+  error,
 }: Props) {
   return (
     <Modal visible={visible} transparent animationType="fade">
@@ -51,6 +61,22 @@ export function ConfirmDialog({
               <Text style={styles.title}>{title}</Text>
 
               <Text style={styles.message}>{message}</Text>
+
+              {requirePassword && (
+                <TextInput
+                  style={styles.passwordInput}
+                  placeholder="Enter password to confirm"
+                  placeholderTextColor="#94A3B8"
+                  secureTextEntry
+                  value={passwordValue}
+                  onChangeText={onPasswordChange}
+                  autoCapitalize="none"
+                />
+              )}
+
+              {error ? (
+                <Text style={styles.errorText}>{error}</Text>
+              ) : null}
 
               <View style={styles.actions}>
                 <Pressable
@@ -112,7 +138,19 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 22,
     color: AppTheme.colors.textSecondary,
-    marginBottom: 28,
+    marginBottom: 20,
+  },
+
+  passwordInput: {
+    borderWidth: 1,
+    borderColor: "#CBD5E1",
+    borderRadius: AppTheme.radius.small,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 14,
+    color: "#0F172A",
+    backgroundColor: "#F8FAFC",
+    marginBottom: 24,
   },
 
   actions: {
@@ -152,5 +190,11 @@ const styles = StyleSheet.create({
   confirmText: {
     color: "#FFFFFF",
     fontWeight: "700",
+  },
+  errorText: {
+    color: "#DC2626",
+    fontSize: 13,
+    marginBottom: 16,
+    fontWeight: "500",
   },
 });

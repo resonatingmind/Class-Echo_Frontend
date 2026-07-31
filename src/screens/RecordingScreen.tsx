@@ -577,7 +577,7 @@ export function RecordingScreen({ navigation, route }: Props) {
 
               {learningPlans.length > 0 ? (
                 <View style={{ marginBottom: 14 }}>
-                  <Text style={styles.metaLabel}>MICRO PLANNER TOPIC / SUB-TOPIC</Text>
+                  <Text style={styles.metaLabel}>LECTURE PLANNER TOPIC / SUB-TOPIC</Text>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 6, marginBottom: 4 }}>
                     <View style={{ flexDirection: 'row', gap: 8 }}>
                       <Pressable

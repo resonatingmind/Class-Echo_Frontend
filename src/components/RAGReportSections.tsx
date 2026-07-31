@@ -90,7 +90,7 @@ export function LearningPlanInfoCard({ data }: { data: any }) {
           <Ionicons color="#0284C7" name="calendar-outline" size={16} />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={lpic.title}>Selected Learning Plan (Micro Planner)</Text>
+          <Text style={lpic.title}>Selected Learning Plan (Lecture Planner)</Text>
           <Text style={lpic.subtitle}>
             {data.topic_name} {data.sub_topic ? `• ${data.sub_topic}` : ""}
           </Text>

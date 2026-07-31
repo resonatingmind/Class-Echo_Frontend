@@ -281,11 +281,6 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
             navigation.navigate("SchoolAdminClasses");
           }
         }}
-        rightActions={
-          <Pressable onPress={openCreateModal} hitSlop={8}>
-            <Ionicons color={AppTheme.colors.primary} name="add" size={24} />
-          </Pressable>
-        }
       />
 
       <ScrollView
@@ -307,7 +302,16 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
             {/* Page heading */}
             <View style={styles.pageHeading}>
               <Text style={styles.kicker}>SUBJECT CURRICULUM</Text>
-              <Text style={styles.pageTitle}>Chapters</Text>
+              <View style={styles.titleRow}>
+                <Text style={styles.pageTitle}>Chapters</Text>
+                <Pressable
+                  onPress={openCreateModal}
+                  style={styles.addChapterBtn}
+                >
+                  <Ionicons color="#fff" name="add" size={14} />
+                  <Text style={styles.addChapterText}>Add Chapter</Text>
+                </Pressable>
+              </View>
               <Text style={styles.pageSubtitle}>
                 Manage and view chapters, reference materials, and lesson profiles for {subjectName}.
               </Text>
@@ -574,6 +578,25 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
   },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+    flexWrap: "wrap",
+    marginBottom: 4,
+  },
+  addChapterBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primary,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    alignSelf: 'flex-start'
+  },
+  addChapterText: { color: "#fff", ...AppTheme.typography.body, fontWeight: "700" },
 
   // Chapter List
   chapterList: { gap: 16 },

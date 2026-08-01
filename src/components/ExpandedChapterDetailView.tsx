@@ -104,28 +104,6 @@ export function ExpandedChapterDetailView({
 
   return (
     <View style={styles.container}>
-      {/* Top Breadcrumb & Actions Bar */}
-      <View style={styles.breadcrumbBar}>
-        <View style={styles.titleWrapper}>
-          <Text style={styles.dropdownTitle}>Lectures & Recordings</Text>
-        </View>
-
-        <View style={styles.topActionsRow}>
-          {role === "teacher" && onAddRecording ? (
-            <Pressable style={styles.actionBtn} onPress={onAddRecording}>
-              <Ionicons name="add" size={14} color="#fff" />
-              <Text style={styles.actionBtnText}>+ Add / Record Audio</Text>
-            </Pressable>
-          ) : null}
-
-          {onOpenChapterDetail ? (
-            <Pressable style={styles.secondaryActionBtn} onPress={onOpenChapterDetail}>
-              <Ionicons name="add-circle-outline" size={14} color="#0284C7" />
-              <Text style={styles.secondaryActionText}>+ Add Lecture Title</Text>
-            </Pressable>
-          ) : null}
-        </View>
-      </View>
 
       {/* NESTED LECTURE TABLE */}
       {titleRows.length === 0 && unassignedRecordings.length === 0 ? (

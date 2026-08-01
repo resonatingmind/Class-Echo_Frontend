@@ -382,17 +382,10 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
               return (
                 <View key={chapter.id} style={{ gap: 8 }}>
                   <Pressable
-                    onPress={() =>
-                      navigation.navigate('SchoolAdminChapterDetail', {
-                        chapterId: chapter.id,
-                        chapterName: chapter.name,
-                        subjectName,
-                        subjectId,
-                      })
-                    }
+                    onPress={() => toggleExpandChapter(chapter.id)}
                     style={styles.chapterCard}
                   >
-                    <View style={styles.chapterCardHeader}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
                       <View style={styles.chapterInfoWrap}>
                         <Text style={styles.chapterName}>{chapter.name}</Text>
                         {chapter.description ? (
@@ -405,22 +398,42 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                           </Text>
                         )}
                       </View>
-                      <View style={styles.chapterActions}>
-                        <Pressable
-                          hitSlop={8}
-                          onPress={() => openEditModal(chapter)}
-                          style={styles.actionIconBtn}
-                        >
-                          <Ionicons color={AppTheme.colors.textSecondary} name="create-outline" size={18} />
-                        </Pressable>
-                        <Pressable
-                          hitSlop={8}
-                          onPress={() => handleDelete(chapter)}
-                          style={styles.actionIconBtn}
-                        >
-                          <Ionicons color="#B42318" name="trash-outline" size={18} />
-                        </Pressable>
+                      <View style={{ marginTop: 2 }}>
+                        <Ionicons name={isExpanded ? "chevron-up" : "chevron-down"} size={20} color={AppTheme.colors.textSecondary} />
                       </View>
+                    </View>
+
+                    <View style={styles.chapterActions}>
+                      <Pressable
+                        style={styles.actionPillBtn}
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          navigation.navigate('SchoolAdminChapterDetail', {
+                            chapterId: chapter.id,
+                            chapterName: chapter.name,
+                            subjectName,
+                            subjectId,
+                          });
+                        }}
+                      >
+                        <Ionicons name="add" size={14} color="#0284C7" />
+                        <Text style={styles.actionPillText}>Add Lecture</Text>
+                      </Pressable>
+                      <View style={{ flex: 1 }} />
+                      <Pressable
+                        hitSlop={8}
+                        onPress={() => openEditModal(chapter)}
+                        style={styles.actionIconBtn}
+                      >
+                        <Ionicons color={AppTheme.colors.textSecondary} name="create-outline" size={18} />
+                      </Pressable>
+                      <Pressable
+                        hitSlop={8}
+                        onPress={() => handleDelete(chapter)}
+                        style={styles.actionIconBtn}
+                      >
+                        <Ionicons color="#B42318" name="trash-outline" size={18} />
+                      </Pressable>
                     </View>
 
                     <View style={styles.chapterDivider} />
@@ -433,26 +446,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                         </Text>
                       </View>
 
-                      <Pressable
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          gap: 4,
-                          paddingVertical: 4,
-                          paddingHorizontal: 10,
-                          borderRadius: AppTheme.radius.small,
-                          backgroundColor: isExpanded ? "#E0F2FE" : "#F1F5F9",
-                        }}
-                        onPress={(e) => {
-                          e.stopPropagation();
-                          void toggleExpandChapter(chapter.id);
-                        }}
-                      >
-                        <Ionicons name={isExpanded ? "chevron-up" : "chevron-down"} size={16} color="#0284C7" />
-                        <Text style={{ fontSize: 12, fontWeight: "700", color: "#0284C7" }}>
-                          {isExpanded ? "Hide Lectures" : "View Lectures & Sub-Table"}
-                        </Text>
-                      </Pressable>
+
 
                       <Text style={styles.footerDate}>Updated {lastUpdatedStr}</Text>
                     </View>
@@ -635,11 +629,7 @@ const styles = StyleSheet.create({
     gap: 12,
     ...AppTheme.shadows.subtle,
   },
-  chapterCardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
+
   chapterInfoWrap: { flex: 1, gap: 4 },
   chapterName: {
     ...AppTheme.typography.bodyLarge,
@@ -652,8 +642,23 @@ const styles = StyleSheet.create({
   },
   chapterActions: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 4,
+  },
+  actionPillBtn: {
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: AppTheme.radius.small,
+    backgroundColor: "#F1F5F9",
+  },
+  actionPillText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#0284C7",
   },
   actionIconBtn: {
     width: 32,

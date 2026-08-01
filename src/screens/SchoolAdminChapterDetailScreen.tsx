@@ -662,6 +662,8 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
         onSave={handleSaveLearningPlan}
       />
 
+
+
       <ConfirmDialog
         visible={!!deleteLpItem}
         title="Delete Lecture Planner Entry"
@@ -728,6 +730,7 @@ const styles = StyleSheet.create({
     fontFamily: AppTheme.typography.family.bold,
     fontSize: 13,
   },
+
   scroll: { paddingBottom: 40, flexGrow: 1 },
 
   // Hero Section

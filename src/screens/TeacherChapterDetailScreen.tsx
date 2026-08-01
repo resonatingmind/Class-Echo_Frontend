@@ -471,16 +471,16 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
                       {learningPlans.length} {learningPlans.length === 1 ? 'lecture' : 'lectures'} total
                     </Text>
                   </View>
-                  <Pressable
-                    style={styles.addPlanBtn}
-                    onPress={() => {
-                      setSelectedLpItem(null);
-                      setLpModalVisible(true);
-                    }}
-                  >
-                    <Ionicons name="add" size={16} color="#fff" />
-                    <Text style={styles.addPlanText}>Add Entry</Text>
-                  </Pressable>
+              <Pressable
+                style={styles.addPlanBtn}
+                onPress={() => {
+                  setSelectedLpItem(null);
+                  setLpModalVisible(true);
+                }}
+              >
+                <Ionicons name="add" size={16} color="#fff" />
+                <Text style={styles.addPlanText}>Add Entry</Text>
+              </Pressable>
                 </View>
 
                 <LearningPlanList
@@ -723,6 +723,8 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
         onSave={handleSaveLearningPlan}
       />
 
+
+
       <ConfirmDialog
         visible={!!deleteLpItem}
         title="Delete Lecture Planner Entry"
@@ -782,6 +784,7 @@ const styles = StyleSheet.create({
     fontFamily: AppTheme.typography.family.bold,
     fontSize: 13,
   },
+
   scroll: { paddingBottom: 40, flexGrow: 1 },
 
   // Hero Section

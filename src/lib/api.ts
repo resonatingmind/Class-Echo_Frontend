@@ -1781,7 +1781,52 @@ export async function reactivateAdminSchool(token: string, schoolId: number) {
   );
 }
 
+export async function importSchoolSubjectLearningPlans(
+  token: string,
+  subjectId: number,
+  fileUri: string,
+  mimeType: string,
+  fileName: string,
+): Promise<LearningPlanOut[]> {
+  const form = new FormData();
+  await appendFile(
+    form,
+    "file",
+    fileUri,
+    mimeType,
+    fileName.replace(/\.[^/.]+$/, ""),
+  );
 
+  return request<LearningPlanOut[]>(
+    `/school/subjects/${subjectId}/learning-plans/import`,
+    { method: "POST", body: form },
+    token,
+  );
+}
 
+export async function importTeacherSubjectLearningPlans(
+  token: string,
+  subjectId: number,
+  fileUri: string,
+  mimeType: string,
+  fileName: string,
+): Promise<LearningPlanOut[]> {
+  const form = new FormData();
+  await appendFile(
+    form,
+    "file",
+    fileUri,
+    mimeType,
+    fileName.replace(/\.[^/.]+$/, ""),
+  );
 
+  return request<LearningPlanOut[]>(
+    `/teacher/subjects/${subjectId}/learning-plans/import`,
+    { method: "POST", body: form },
+    token,
+  );
+}
 
+export function getSubjectLearningPlanTemplateUrl() {
+  return `${API_BASE_URL}/public/learning-plans/subject-template`;
+}

@@ -34,6 +34,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 import { ChapterOut, LearningPlanOut, RecordingWithReport, PlannerSubjectDetail } from '../types/api';
 import { ExpandedChapterDetailView } from '../components/ExpandedChapterDetailView';
+import { ImportLearningPlansModal } from '../components/plannerDetail/ImportLearningPlansModal';
 import { AdminNavbar } from '../components/common/AdminNavbar';
 import { PlannerDetailHeader } from '../components/plannerDetail/PlannerDetailHeader';
 import { PlannerStatistics } from '../components/plannerDetail/PlannerStatistics';
@@ -128,6 +129,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
   const { subjectId, subjectName } = route.params;
 
   const [chapters, setChapters] = useState<ChapterOut[]>([]);
+  const [importModalVisible, setImportModalVisible] = useState(false);
   const [plannerDetail, setPlannerDetail] = useState<PlannerSubjectDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -404,13 +406,22 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
               <Text style={styles.kicker}>SUBJECT CURRICULUM</Text>
               <View style={styles.titleRow}>
                 <Text style={styles.pageTitle}>{subjectName}</Text>
-                <Pressable
-                  onPress={openCreateModal}
-                  style={styles.addChapterBtn}
-                >
-                  <Ionicons color="#fff" name="add" size={14} />
-                  <Text style={styles.addChapterText}>Add Chapter</Text>
-                </Pressable>
+                <View style={{ flexDirection: "row", gap: 8 }}>
+                  <Pressable
+                    onPress={() => setImportModalVisible(true)}
+                    style={styles.importBtn}
+                  >
+                    <Ionicons color={AppTheme.colors.primary} name="cloud-upload-outline" size={15} />
+                    <Text style={styles.importBtnText}>Bulk Import</Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={openCreateModal}
+                    style={styles.addChapterBtn}
+                  >
+                    <Ionicons color="#fff" name="add" size={14} />
+                    <Text style={styles.addChapterText}>Add Chapter</Text>
+                  </Pressable>
+                </View>
               </View>
               <Text style={styles.pageSubtitle}>
                 Manage and view chapters, reference materials, and lesson profiles.
@@ -655,6 +666,17 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
         </Pressable>
       </Modal>
 
+      <ImportLearningPlansModal
+        visible={importModalVisible}
+        role="school_admin"
+        subjectId={subjectId}
+        token={session?.token ?? ""}
+        onClose={() => setImportModalVisible(false)}
+        onImported={() => {
+          void load(true);
+        }}
+      />
+
       <ConfirmDialog
         visible={!!chapterToDelete}
         title="Delete Chapter"
@@ -755,6 +777,23 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start'
   },
   addChapterText: { color: "#fff", ...AppTheme.typography.body, fontWeight: "700" },
+  importBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primaryLight,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.primary,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    alignSelf: 'flex-start'
+  },
+  importBtnText: {
+    color: AppTheme.colors.primaryDark,
+    ...AppTheme.typography.body,
+    fontWeight: "700"
+  },
 
   // Chapter List
   chapterList: { gap: 16 },

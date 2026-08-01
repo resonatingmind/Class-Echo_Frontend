@@ -20,6 +20,7 @@ import { RootStackParamList } from "../navigation/AppNavigator";
 import { AppTheme } from "../theme/AppTheme";
 
 import { ChapterEditorModal } from "../components/teacher/ChapterEditorModal";
+import { ImportLearningPlansModal } from "../components/plannerDetail/ImportLearningPlansModal";
 import { ChapterActionSheet } from "../components/teacher/ChapterActionSheet";
 import { ConfirmDialog } from "../components/common/ConfirmDialog";
 
@@ -50,6 +51,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
   const [students, setStudents] = useState<StudentOut[]>([]);
   const [activeTab, setActiveTab] = useState<"chapters" | "students">("chapters");
   const [loading, setLoading] = useState(true);
+  const [importModalVisible, setImportModalVisible] = useState(false);
   const [editorVisible, setEditorVisible] = useState(false);
   const [creating, setCreating] = useState(false);
   const [confirmVisible, setConfirmVisible] = useState(false);
@@ -272,13 +274,22 @@ const filteredChapters = chapters.filter((chapter) => {
                     : "Without PDF"}
               </Text>
             </Pressable>
-            <Pressable
-              style={styles.addButton}
-              onPress={() => setEditorVisible(true)}
-            >
-              <Ionicons name="add" size={18} color="#fff" />
-              <Text style={styles.addText}>Add Chapter</Text>
-            </Pressable>
+            <View style={{ flexDirection: "row", gap: 8 }}>
+              <Pressable
+                style={styles.importBtn}
+                onPress={() => setImportModalVisible(true)}
+              >
+                <Ionicons name="cloud-upload-outline" size={15} color={AppTheme.colors.primary} />
+                <Text style={styles.importText}>Bulk Import</Text>
+              </Pressable>
+              <Pressable
+                style={styles.addButton}
+                onPress={() => setEditorVisible(true)}
+              >
+                <Ionicons name="add" size={18} color="#fff" />
+                <Text style={styles.addText}>Add Chapter</Text>
+              </Pressable>
+            </View>
           </View>
 
           {/* Full Width Responsive Table Framework */}
@@ -516,6 +527,17 @@ const filteredChapters = chapters.filter((chapter) => {
         </View>
       </ScrollView>
 
+      <ImportLearningPlansModal
+        visible={importModalVisible}
+        role="teacher"
+        subjectId={subjectId}
+        token={token}
+        onClose={() => setImportModalVisible(false)}
+        onImported={() => {
+          void loadData();
+        }}
+      />
+
       <ChapterEditorModal
         visible={editorVisible}
         title={editing ? "Edit Chapter" : "Add Chapter"}
@@ -691,6 +713,22 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
   },
   addText: { color: "#fff", marginLeft: 6, fontWeight: "700", fontSize: 14 },
+  importBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: AppTheme.colors.primaryLight,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.primary,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: AppTheme.radius.medium,
+    gap: 6,
+  },
+  importText: {
+    color: AppTheme.colors.primaryDark,
+    fontSize: 13,
+    fontWeight: "700",
+  },
   tableWrapper: {
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1,

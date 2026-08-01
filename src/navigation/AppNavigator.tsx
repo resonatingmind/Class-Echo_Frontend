@@ -2,7 +2,6 @@ import { NavigatorScreenParams } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import { SchoolAdminTabParamList } from "./SchoolAdminTabNavigator";
-import { SchoolAdminPlannerDetailScreen } from "../screens/SchoolAdminPlannerDetailScreen";
 import { useAuth } from "../context/AuthContext";
 import { RecordingWithReport, UserRole } from "../types/api";
 import { SchoolAdminTabNavigator } from "./SchoolAdminTabNavigator";
@@ -41,7 +40,6 @@ import { StudentSubjectDetailScreen } from "../screens/StudentSubjectDetailScree
 import { RecordingDetailScreen } from "../screens/RecordingDetailScreen";
 import { RecordingScreen } from "../screens/RecordingScreen";
 import { TeacherProfileScreen } from "../screens/TeacherProfileScreen";
-import { TeacherSubjectDetailScreen } from "../screens/TeacherSubjectDetailScreen";
 import { TeacherSubjectWorkspaceScreen } from "../screens/TeacherSubjectWorkspaceScreen";
 import { TeacherTabNavigator } from "./TeacherTabNavigator";
 
@@ -94,9 +92,7 @@ export type RootStackParamList = {
   SchoolAdminTimetable: undefined;
   SchoolAdminProfile: undefined;
 
-  SchoolAdminPlannerDetail: {
-    subjectId: number;
-  };
+
   SchoolAdminSubjectChapters: { subjectId: number; subjectName: string };
   SchoolAdminChapterDetail: {
     chapterId: number;
@@ -114,12 +110,7 @@ export type RootStackParamList = {
     openUpload?: boolean;
   };
   TeacherTabs: undefined;
-  TeacherSubjectDetail: {
-    subjectId: number;
-    subjectName: string;
-    initialChapterId?: number;
-    initialTab?: "recordings" | "students";
-  };
+
   TeacherSubjectWorkspace: {
     subjectId: number;
     subjectName: string;
@@ -228,11 +219,6 @@ export function AppNavigator() {
           />
 
           <Stack.Screen
-            name="SchoolAdminPlannerDetail"
-            component={SchoolAdminPlannerDetailScreen}
-          />
-
-          <Stack.Screen
             name="SchoolAdminClassDetail"
             component={SchoolAdminClassDetailScreen}
           />
@@ -275,11 +261,6 @@ export function AppNavigator() {
       ) : session.role === "teacher" ? (
         <>
           <Stack.Screen name="TeacherTabs" component={TeacherTabNavigator} />
-
-          <Stack.Screen
-            name="TeacherSubjectDetail"
-            component={TeacherSubjectDetailScreen}
-          />
 
           <Stack.Screen
             name="TeacherSubjectWorkspace"

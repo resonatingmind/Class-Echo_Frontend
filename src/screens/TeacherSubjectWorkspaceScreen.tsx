@@ -30,8 +30,9 @@ import {
   deleteTeacherChapter,
   getTeacherSubjectRecordings,
   getTeacherLearningPlans,
+  getTeacherSubjectStudents,
 } from "../lib/api";
-import { ChapterOut, LearningPlanOut, RecordingWithReport } from "../types/api";
+import { ChapterOut, LearningPlanOut, RecordingWithReport, StudentOut } from "../types/api";
 import { getTeacherStatusStyle } from "../components/teacher/teacherStatusStyles";
 import { ExpandedChapterDetailView } from "../components/ExpandedChapterDetailView";
 
@@ -46,6 +47,8 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
   const token = session?.token ?? "";
 
   const [chapters, setChapters] = useState<ChapterOut[]>([]);
+  const [students, setStudents] = useState<StudentOut[]>([]);
+  const [activeTab, setActiveTab] = useState<"chapters" | "students">("chapters");
   const [loading, setLoading] = useState(true);
   const [editorVisible, setEditorVisible] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -66,12 +69,18 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
   const [expandedLps, setExpandedLps] = useState<Record<number, LearningPlanOut[]>>({});
   const [loadingExpandedId, setLoadingExpandedId] = useState<number | null>(null);
 
-  const loadChapters = useCallback(async () => {
+  const loadData = useCallback(async () => {
     if (!token) return;
     try {
       setLoading(true);
-      const data = await getTeacherChapters(token, subjectId);
-      setChapters(data);
+      const [chaptersData, studentsData] = await Promise.all([
+        getTeacherChapters(token, subjectId),
+        getTeacherSubjectStudents(token, subjectId),
+      ]);
+      setChapters(chaptersData);
+      setStudents(studentsData);
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -79,8 +88,8 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
 
   useFocusEffect(
     useCallback(() => {
-      void loadChapters();
-    }, [loadChapters])
+      void loadData();
+    }, [loadData])
   );
 
   const toggleExpandChapter = async (chapId: number) => {
@@ -116,7 +125,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
         });
         setEditing(false);
         setSelectedChapter(null);
-        await loadChapters();
+        await loadData();
       } catch (error) {
         Alert.alert(
           "Unable to create chapter",
@@ -126,7 +135,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
         setCreating(false);
       }
     },
-    [token, subjectId, loadChapters],
+    [token, subjectId, loadData],
   );
 
   const handleUpdateChapter = useCallback(
@@ -140,12 +149,12 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
         });
         setEditing(false);
         setEditorVisible(false);
-        await loadChapters();
+        await loadData();
       } finally {
         setCreating(false);
       }
     },
-    [token, selectedChapter, loadChapters],
+    [token, selectedChapter, loadData],
   );
 
   const handleDeleteChapter = useCallback(async () => {
@@ -155,7 +164,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
       await deleteTeacherChapter(token, selectedChapter.id);
       setConfirmVisible(false);
       setSelectedChapter(null);
-      await loadChapters();
+      await loadData();
     } catch (error) {
       console.error(error);
       setConfirmVisible(false);
@@ -167,7 +176,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
     } finally {
       setDeleting(false);
     }
-  }, [token, selectedChapter, loadChapters]);
+  }, [token, selectedChapter, loadData]);
 
 
 const filteredChapters = chapters.filter((chapter) => {
@@ -214,14 +223,35 @@ const filteredChapters = chapters.filter((chapter) => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        <View style={styles.tabBar}>
+          <Pressable
+            style={[styles.tabButton, activeTab === "chapters" && styles.tabButtonActive]}
+            onPress={() => setActiveTab("chapters")}
+          >
+            <Text style={[styles.tabLabel, activeTab === "chapters" && styles.tabLabelActive]}>
+              Chapters
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[styles.tabButton, activeTab === "students" && styles.tabButtonActive]}
+            onPress={() => setActiveTab("students")}
+          >
+            <Text style={[styles.tabLabel, activeTab === "students" && styles.tabLabelActive]}>
+              Students
+            </Text>
+          </Pressable>
+        </View>
+
         <View style={styles.workspaceCard}>
-          <TextInput
-            placeholder="Search chapter..."
-            placeholderTextColor="#94A3B8"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            style={styles.search}
-          />
+          {activeTab === "chapters" ? (
+            <>
+              <TextInput
+                placeholder="Search chapter..."
+                placeholderTextColor="#94A3B8"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                style={styles.search}
+              />
 
           <View style={styles.toolbar}>
             <Pressable
@@ -442,6 +472,47 @@ const filteredChapters = chapters.filter((chapter) => {
               )}
             </View>
           </ScrollView>
+            </>
+          ) : (
+            <View style={{ width: "100%" }}>
+              {students.length === 0 ? (
+                <View style={{ alignItems: "center", paddingVertical: 40, gap: 10 }}>
+                  <Ionicons name="people-outline" size={40} color={AppTheme.colors.textSecondary} />
+                  <Text style={{ fontSize: 16, fontWeight: "600", color: AppTheme.colors.textPrimary }}>
+                    No students enrolled
+                  </Text>
+                  <Text style={{ fontSize: 14, color: AppTheme.colors.textSecondary }}>
+                    Students in this class will appear here.
+                  </Text>
+                </View>
+              ) : (
+                <View style={{ gap: 12 }}>
+                  <Text style={{ fontSize: 16, fontWeight: "700", color: AppTheme.colors.textPrimary, marginBottom: 8 }}>
+                    Class Roster ({students.length})
+                  </Text>
+                  {students.map((student) => {
+                    const initials = student.name
+                      .split(' ')
+                      .map((word) => word[0] ?? '')
+                      .join('')
+                      .toUpperCase()
+                      .slice(0, 2);
+                    return (
+                      <View key={student.id} style={{ flexDirection: "row", alignItems: "center", padding: 12, backgroundColor: "#F8FAFC", borderRadius: 12, borderWidth: 1, borderColor: "#E2E8F0" }}>
+                        <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: "#E0F2FE", justifyContent: "center", alignItems: "center", marginRight: 12 }}>
+                          <Text style={{ fontWeight: "700", color: "#0284C7" }}>{initials}</Text>
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text style={{ fontSize: 15, fontWeight: "600", color: "#0F172A" }}>{student.name}</Text>
+                          <Text style={{ fontSize: 13, color: "#64748B" }}>{student.email}</Text>
+                        </View>
+                      </View>
+                    );
+                  })}
+                </View>
+              )}
+            </View>
+          )}
         </View>
       </ScrollView>
 
@@ -539,6 +610,38 @@ const styles = StyleSheet.create({
     padding: 24,
     alignItems: "center",
     paddingBottom: 48,
+  },
+  tabBar: {
+    flexDirection: "row",
+    width: "100%",
+    maxWidth: 1280,
+    backgroundColor: "#F1F5F9",
+    borderRadius: 12,
+    padding: 4,
+    marginBottom: 20,
+  },
+  tabButton: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: "center",
+    borderRadius: 10,
+  },
+  tabButtonActive: {
+    backgroundColor: "#fff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  tabLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#64748B",
+  },
+  tabLabelActive: {
+    color: "#0F172A",
+    fontWeight: "700",
   },
   workspaceCard: {
     backgroundColor: "#fff",

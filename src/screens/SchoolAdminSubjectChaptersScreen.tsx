@@ -25,12 +25,16 @@ import {
   getChapters,
   getSchoolLearningPlans,
   updateChapter,
+  getPlannerSubjectDetail,
 } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
-import { ChapterOut, LearningPlanOut, RecordingWithReport } from '../types/api';
+import { ChapterOut, LearningPlanOut, RecordingWithReport, PlannerSubjectDetail } from '../types/api';
 import { ExpandedChapterDetailView } from '../components/ExpandedChapterDetailView';
 import { AdminNavbar } from '../components/common/AdminNavbar';
+import { PlannerDetailHeader } from '../components/plannerDetail/PlannerDetailHeader';
+import { PlannerStatistics } from '../components/plannerDetail/PlannerStatistics';
+import { PlannerChapterProgress } from '../components/plannerDetail/PlannerChapterProgress';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SchoolAdminSubjectChapters'>;
 
@@ -120,6 +124,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
   const { subjectId, subjectName } = route.params;
 
   const [chapters, setChapters] = useState<ChapterOut[]>([]);
+  const [plannerDetail, setPlannerDetail] = useState<PlannerSubjectDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -168,8 +173,12 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
       if (!silent) setIsLoading(true);
       setError(null);
       try {
-        const data = await getChapters(session.token, subjectId);
-        setChapters(data);
+        const [chaptersData, plannerData] = await Promise.all([
+          getChapters(session.token, subjectId),
+          getPlannerSubjectDetail(session.token, subjectId).catch(() => null),
+        ]);
+        setChapters(chaptersData);
+        setPlannerDetail(plannerData);
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Could not load chapters.');
       } finally {
@@ -299,7 +308,6 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
       >
         <View style={styles.centerContainer}>
           <View style={styles.body}>
-            {/* Page heading */}
             <View style={styles.pageHeading}>
               <Text style={styles.kicker}>SUBJECT CURRICULUM</Text>
               <View style={styles.titleRow}>
@@ -316,6 +324,25 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                 Manage and view chapters, reference materials, and lesson profiles for {subjectName}.
               </Text>
             </View>
+
+            {plannerDetail ? (
+              <View style={{ gap: AppTheme.spacing.l, marginBottom: AppTheme.spacing.m }}>
+                <PlannerDetailHeader
+                  subjectName={plannerDetail.subject_name}
+                  className={plannerDetail.class_name}
+                  teacherName={plannerDetail.teacher_name}
+                  academicYear={plannerDetail.academic_year}
+                />
+                <PlannerStatistics statistics={plannerDetail.statistics} />
+                <PlannerChapterProgress
+                  completed={
+                    plannerDetail.chapters.filter((chapter) => chapter.status === "Completed").length
+                  }
+                  total={plannerDetail.chapters.length}
+                />
+              </View>
+            ) : null}
+
 
         {isLoading ? (
           <View style={styles.center}>
@@ -694,7 +721,7 @@ const styles = StyleSheet.create({
     maxWidth: 500,
     gap: 16,
     maxHeight: "90%",
-    ...AppTheme.shadows.medium,
+    ...AppTheme.shadows.card,
   },
   modalTitle: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.heading3 },
   modalSubtitle: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body },

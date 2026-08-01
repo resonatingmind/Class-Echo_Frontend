@@ -362,9 +362,11 @@ export function TeacherSubjectsScreen({ navigation }: Props) {
                 rows={filteredRows}
                 onOpenSubject={(row) => {
                   // 1. Tapping the main row takes them to the standard details screen
-                  navigation.navigate("TeacherSubjectDetail", {
+                  navigation.navigate("TeacherSubjectWorkspace", {
                     subjectId: row.subject_id,
                     subjectName: row.subject_name,
+                    className: row.class_name,
+                    section: row.section,
                   });
                 }}
                 onOpenWorkspace={(row) => {

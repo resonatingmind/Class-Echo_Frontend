@@ -171,11 +171,12 @@ export function SchoolAdminPlannerScreen() {
               renderItem={({ item }) => (
                 <PlannerTableRow
                   item={item}
-                  onView={() =>
-                    navigation.navigate("SchoolAdminPlannerDetail", {
+                  onView={() => {
+                    navigation.navigate("SchoolAdminSubjectChapters", {
                       subjectId: item.subject_id,
-                    })
-                  }
+                      subjectName: item.subject_name
+                    });
+                  }}
                   onAssignTeacher={(assignItem) =>
                     setAssignTarget({
                       subjectId: assignItem.subject_id,

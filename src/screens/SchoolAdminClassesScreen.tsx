@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
     maxWidth: 500,
     gap: 16,
     maxHeight: "90%",
-    ...AppTheme.shadows.medium,
+    ...AppTheme.shadows.card,
   },
   modalTitle: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.heading2 },
   modalSubtitle: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body },

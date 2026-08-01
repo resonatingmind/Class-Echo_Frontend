@@ -26,7 +26,6 @@ export function PlannerDetailHeader({
 }: Props) {
   return (
     <View style={styles.container}>
-        <Text style={styles.subject}>{toTitleCase(subjectName)}</Text>
 
         <View style={styles.infoRow}>
           <InfoPill value={className} />

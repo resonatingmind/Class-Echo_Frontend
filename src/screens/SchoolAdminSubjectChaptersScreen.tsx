@@ -311,7 +311,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
             <View style={styles.pageHeading}>
               <Text style={styles.kicker}>SUBJECT CURRICULUM</Text>
               <View style={styles.titleRow}>
-                <Text style={styles.pageTitle}>Chapters</Text>
+                <Text style={styles.pageTitle}>{subjectName}</Text>
                 <Pressable
                   onPress={openCreateModal}
                   style={styles.addChapterBtn}
@@ -321,7 +321,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                 </Pressable>
               </View>
               <Text style={styles.pageSubtitle}>
-                Manage and view chapters, reference materials, and lesson profiles for {subjectName}.
+                Manage and view chapters, reference materials, and lesson profiles.
               </Text>
             </View>
 

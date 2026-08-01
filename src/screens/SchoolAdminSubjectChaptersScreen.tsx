@@ -380,10 +380,10 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
               const isExLoading = loadingExpandedId === chapter.id;
 
               return (
-                <View key={chapter.id} style={{ gap: 8 }}>
+                <View key={chapter.id} style={styles.chapterCardContainer}>
                   <Pressable
                     onPress={() => toggleExpandChapter(chapter.id)}
-                    style={styles.chapterCard}
+                    style={styles.chapterCardHeaderWrap}
                   >
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
                       <View style={styles.chapterInfoWrap}>
@@ -453,30 +453,32 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                   </Pressable>
 
                   {isExpanded ? (
-                    <ExpandedChapterDetailView
-                      chapterId={chapter.id}
-                      chapterName={chapter.name}
-                      subjectId={subjectId}
-                      subjectName={subjectName}
-                      recordings={recs}
-                      learningPlans={lps}
-                      loading={isExLoading}
-                      role="school_admin"
-                      onViewRecordingReport={(rec) => {
-                        navigation.navigate("RecordingDetail", {
-                          recording: rec,
-                          subjectName,
-                        });
-                      }}
-                      onOpenChapterDetail={() => {
-                        navigation.navigate("SchoolAdminChapterDetail", {
-                          chapterId: chapter.id,
-                          chapterName: chapter.name,
-                          subjectName,
-                          subjectId,
-                        });
-                      }}
-                    />
+                    <View style={styles.chapterCardExpandedWrap}>
+                      <ExpandedChapterDetailView
+                        chapterId={chapter.id}
+                        chapterName={chapter.name}
+                        subjectId={subjectId}
+                        subjectName={subjectName}
+                        recordings={recs}
+                        learningPlans={lps}
+                        loading={isExLoading}
+                        role="school_admin"
+                        onViewRecordingReport={(rec) => {
+                          navigation.navigate("RecordingDetail", {
+                            recording: rec,
+                            subjectName,
+                          });
+                        }}
+                        onOpenChapterDetail={() => {
+                          navigation.navigate("SchoolAdminChapterDetail", {
+                            chapterId: chapter.id,
+                            chapterName: chapter.name,
+                            subjectName,
+                            subjectId,
+                          });
+                        }}
+                      />
+                    </View>
                   ) : null}
                 </View>
               );
@@ -620,14 +622,23 @@ const styles = StyleSheet.create({
 
   // Chapter List
   chapterList: { gap: 16 },
-  chapterCard: {
+  chapterCardContainer: {
     backgroundColor: AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     borderWidth: 1,
     borderColor: AppTheme.colors.border,
+    ...AppTheme.shadows.subtle,
+    overflow: 'hidden',
+  },
+  chapterCardHeaderWrap: {
     padding: AppTheme.spacing.xl,
     gap: 12,
-    ...AppTheme.shadows.subtle,
+  },
+  chapterCardExpandedWrap: {
+    padding: AppTheme.spacing.xl,
+    paddingTop: 0,
+    borderTopWidth: 1,
+    borderTopColor: AppTheme.colors.border,
   },
 
   chapterInfoWrap: { flex: 1, gap: 4 },

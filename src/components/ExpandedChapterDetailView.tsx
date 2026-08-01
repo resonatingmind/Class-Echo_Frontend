@@ -292,14 +292,8 @@ export function ExpandedChapterDetailView({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#F8FAFC",
-    borderRadius: AppTheme.radius.medium,
-    borderWidth: 1,
-    borderColor: "#CBD5E1",
-    padding: 12,
-    marginVertical: 6,
-    marginHorizontal: 4,
     gap: 12,
+    paddingTop: 8,
   },
   titleWrapper: {
     flexDirection: "row",

@@ -13,17 +13,21 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-import { colors } from "../../../theme/colors";
-import {
-  SelectionBottomSheet,
-  SelectionItem,
-} from "../../common/SelectionBottomSheet";
+import { SelectionBottomSheet, SelectionItem } from "../../common/SelectionBottomSheet";
 import {
   SubjectOut,
   TeacherOut,
   TimetableEntryOut,
   TimetableEntryPayload,
 } from "../../../types/api";
+
+// ─── Period slot type ─────────────────────────────────────────────────────────
+export type PeriodSlot = {
+  number: number;
+  startTime: string;
+  endTime: string;
+  label?: string; // e.g. "Lunch", "Assembly"
+};
 
 type Props = {
   visible: boolean;
@@ -36,9 +40,19 @@ type Props = {
   initialEntry?: TimetableEntryOut | null;
   submitting?: boolean;
   errorMessage?: string | null;
+  /** Pre-configured period slots for quick selection */
+  periodSlots?: PeriodSlot[];
 };
 
 const TIME_PATTERN = /^([01]?\d|2[0-3]):([0-5]\d)$/;
+
+function fmt12(time: string): string {
+  if (!TIME_PATTERN.test(time)) return time;
+  const [h, m] = time.split(":").map(Number);
+  const ampm = h >= 12 ? "PM" : "AM";
+  const hour = h % 12 || 12;
+  return `${hour}:${String(m).padStart(2, "0")} ${ampm}`;
+}
 
 export function TimetableEntryModal({
   visible,
@@ -51,12 +65,11 @@ export function TimetableEntryModal({
   initialEntry,
   submitting = false,
   errorMessage,
+  periodSlots = [],
 }: Props) {
   const isEditing = Boolean(initialEntry);
 
-  const [periodNumber, setPeriodNumber] = useState("1");
-  const [startTime, setStartTime] = useState("08:00");
-  const [endTime, setEndTime] = useState("08:45");
+  const [selectedSlot, setSelectedSlot] = useState<PeriodSlot | null>(null);
   const [subjectId, setSubjectId] = useState<number | null>(null);
   const [teacherId, setTeacherId] = useState<number | null>(null);
   const [room, setRoom] = useState("");
@@ -67,22 +80,22 @@ export function TimetableEntryModal({
   useEffect(() => {
     if (!visible) return;
     if (initialEntry) {
-      setPeriodNumber(String(initialEntry.period_number));
-      setStartTime(initialEntry.start_time);
-      setEndTime(initialEntry.end_time);
+      // Try to match the entry's period number to a configured slot
+      const matchingSlot = periodSlots.find(
+        (s) => s.number === initialEntry.period_number,
+      );
+      setSelectedSlot(matchingSlot ?? null);
       setSubjectId(initialEntry.subject_id);
       setTeacherId(initialEntry.teacher_id);
       setRoom(initialEntry.room ?? "");
     } else {
-      setPeriodNumber("1");
-      setStartTime("08:00");
-      setEndTime("08:45");
+      setSelectedSlot(periodSlots[0] ?? null);
       setSubjectId(null);
       setTeacherId(null);
       setRoom("");
     }
     setLocalError(null);
-  }, [visible, initialEntry]);
+  }, [visible, initialEntry, periodSlots]);
 
   const subjectItems: SelectionItem[] = subjects.map((s) => ({
     id: String(s.id),
@@ -97,17 +110,12 @@ export function TimetableEntryModal({
   const selectedTeacherName = teachers.find((t) => t.id === teacherId)?.name;
 
   const handleSubmit = () => {
-    const period = parseInt(periodNumber, 10);
-    if (!period || period < 1) {
-      setLocalError("Enter a valid period number (1 or higher).");
-      return;
-    }
-    if (!TIME_PATTERN.test(startTime.trim()) || !TIME_PATTERN.test(endTime.trim())) {
-      setLocalError('Times must look like "08:00" (24-hour format).');
-      return;
-    }
-    if (startTime.trim() >= endTime.trim()) {
-      setLocalError("End time must be after start time.");
+    if (!selectedSlot) {
+      setLocalError(
+        periodSlots.length === 0
+          ? "No period slots configured. Please set up periods first."
+          : "Select a period slot.",
+      );
       return;
     }
     if (!subjectId) {
@@ -124,9 +132,9 @@ export function TimetableEntryModal({
     const payload: TimetableEntryPayload = {
       class_id: classId,
       day_of_week: dayOfWeek,
-      period_number: period,
-      start_time: startTime.trim(),
-      end_time: endTime.trim(),
+      period_number: selectedSlot.number,
+      start_time: selectedSlot.startTime,
+      end_time: selectedSlot.endTime,
       subject_id: subjectId,
       teacher_id: teacherId,
       room: room.trim() || null,
@@ -135,12 +143,16 @@ export function TimetableEntryModal({
     onSubmit(payload);
   };
 
+  const noPeriods = periodSlots.length === 0;
+
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
             <View style={styles.sheet}>
+              {/* ── Header ─────────────────────────────────────────── */}
+              <View style={styles.dragHandle} />
               <View style={styles.headerRow}>
                 <View>
                   <Text style={styles.title}>
@@ -148,9 +160,8 @@ export function TimetableEntryModal({
                   </Text>
                   <Text style={styles.subtitle}>{dayOfWeek}</Text>
                 </View>
-
-                <Pressable onPress={onClose} hitSlop={12}>
-                  <Ionicons name="close" size={24} color={AppTheme.colors.textSecondary} />
+                <Pressable onPress={onClose} hitSlop={12} style={styles.closeBtn}>
+                  <Ionicons name="close" size={20} color={AppTheme.colors.textSecondary} />
                 </Pressable>
               </View>
 
@@ -159,39 +170,67 @@ export function TimetableEntryModal({
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}
               >
-                <Text style={styles.label}>Period Number</Text>
-                <TextInput
-                  style={styles.input}
-                  value={periodNumber}
-                  onChangeText={setPeriodNumber}
-                  keyboardType="number-pad"
-                  placeholder="1"
-                />
+                {/* ── Period Slot Picker ──────────────────────────── */}
+                <Text style={styles.label}>Period Slot</Text>
 
-                <View style={styles.row}>
-                  <View style={styles.half}>
-                    <Text style={styles.label}>Start Time</Text>
-                    <TextInput
-                      style={styles.input}
-                      value={startTime}
-                      onChangeText={setStartTime}
-                      placeholder="08:00"
-                      autoCapitalize="none"
+                {noPeriods ? (
+                  <View style={styles.noPeriodsBanner}>
+                    <Ionicons
+                      name="time-outline"
+                      size={18}
+                      color={AppTheme.colors.warning}
                     />
+                    <Text style={styles.noPeriodsBannerText}>
+                      No period slots configured yet. Set up your school's period
+                      schedule from the timetable screen first.
+                    </Text>
                   </View>
+                ) : (
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.slotRow}
+                  >
+                    {periodSlots.map((slot) => {
+                      const active = selectedSlot?.number === slot.number;
+                      return (
+                        <Pressable
+                          key={slot.number}
+                          onPress={() => setSelectedSlot(slot)}
+                          style={[styles.slotChip, active && styles.slotChipActive]}
+                        >
+                          <Text style={[styles.slotChipNum, active && styles.slotChipNumActive]}>
+                            P{slot.number}
+                          </Text>
+                          <Text style={[styles.slotChipTime, active && styles.slotChipTimeActive]}>
+                            {fmt12(slot.startTime)}
+                          </Text>
+                          {slot.label ? (
+                            <Text style={[styles.slotChipLabel, active && styles.slotChipLabelActive]}>
+                              {slot.label}
+                            </Text>
+                          ) : null}
+                        </Pressable>
+                      );
+                    })}
+                  </ScrollView>
+                )}
 
-                  <View style={styles.half}>
-                    <Text style={styles.label}>End Time</Text>
-                    <TextInput
-                      style={styles.input}
-                      value={endTime}
-                      onChangeText={setEndTime}
-                      placeholder="08:45"
-                      autoCapitalize="none"
+                {/* Selected slot detail pill */}
+                {selectedSlot && (
+                  <View style={styles.selectedSlotPill}>
+                    <Ionicons
+                      name="time-outline"
+                      size={13}
+                      color={AppTheme.colors.primary}
                     />
+                    <Text style={styles.selectedSlotText}>
+                      Period {selectedSlot.number} · {fmt12(selectedSlot.startTime)} – {fmt12(selectedSlot.endTime)}
+                    </Text>
                   </View>
-                </View>
+                )}
 
+                {/* ── Subject ─────────────────────────────────────── */}
                 <Text style={styles.label}>Subject</Text>
                 <Pressable
                   style={styles.selectInput}
@@ -209,10 +248,11 @@ export function TimetableEntryModal({
                 </Pressable>
                 {subjects.length === 0 ? (
                   <Text style={styles.helperNote}>
-                    This class has no subjects yet — add one before scheduling periods.
+                    This class has no subjects yet — add one before scheduling.
                   </Text>
                 ) : null}
 
+                {/* ── Teacher ─────────────────────────────────────── */}
                 <Text style={styles.label}>Teacher</Text>
                 <Pressable
                   style={styles.selectInput}
@@ -229,22 +269,31 @@ export function TimetableEntryModal({
                   <Ionicons name="chevron-down" size={18} color={AppTheme.colors.textSecondary} />
                 </Pressable>
 
+                {/* ── Room ────────────────────────────────────────── */}
                 <Text style={styles.label}>Room (optional)</Text>
                 <TextInput
                   style={styles.input}
                   value={room}
                   onChangeText={setRoom}
                   placeholder="e.g. 203"
+                  placeholderTextColor={AppTheme.colors.textPlaceholder}
                 />
 
                 {(localError || errorMessage) && (
-                  <Text style={styles.errorText}>{localError ?? errorMessage}</Text>
+                  <View style={styles.errorRow}>
+                    <Ionicons name="alert-circle-outline" size={14} color="#DC2626" />
+                    <Text style={styles.errorText}>{localError ?? errorMessage}</Text>
+                  </View>
                 )}
 
                 <Pressable
-                  style={styles.submitButton}
+                  style={({ pressed }) => [
+                    styles.submitButton,
+                    pressed && { opacity: 0.88 },
+                    (submitting || noPeriods) && styles.submitDisabled,
+                  ]}
                   onPress={handleSubmit}
-                  disabled={submitting}
+                  disabled={submitting || noPeriods}
                 >
                   {submitting ? (
                     <ActivityIndicator color="#FFFFFF" />
@@ -255,7 +304,7 @@ export function TimetableEntryModal({
                   )}
                 </Pressable>
 
-                <View style={{ height: 20 }} />
+                <View style={{ height: 24 }} />
               </ScrollView>
             </View>
           </TouchableWithoutFeedback>
@@ -289,23 +338,33 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     justifyContent: "flex-end",
-    backgroundColor: "rgba(15, 23, 42, 0.4)",
+    backgroundColor: "rgba(15, 23, 42, 0.45)",
   },
 
   sheet: {
     backgroundColor: AppTheme.colors.surface,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     paddingHorizontal: 20,
-    paddingTop: 20,
-    maxHeight: "88%",
+    paddingTop: 10,
+    paddingBottom: 0,
+    maxHeight: "90%",
+  },
+
+  dragHandle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: AppTheme.colors.border,
+    alignSelf: "center",
+    marginBottom: 14,
   },
 
   headerRow: {
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
-    marginBottom: 12,
+    marginBottom: 8,
   },
 
   title: {
@@ -320,27 +379,118 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textSecondary,
   },
 
-  scroll: {
-    marginTop: 4,
+  closeBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: AppTheme.colors.surfaceMuted,
+    alignItems: "center",
+    justifyContent: "center",
   },
+
+  scroll: { marginTop: 4 },
 
   label: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "700",
     color: AppTheme.colors.textSecondary,
-    marginTop: 16,
-    marginBottom: 6,
+    marginTop: 18,
+    marginBottom: 8,
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
   },
 
-  row: {
+  // ── Period slot chips ─────────────────────────────────────────────
+  noPeriodsBanner: {
     flexDirection: "row",
-    gap: 12,
+    alignItems: "flex-start",
+    gap: 8,
+    backgroundColor: "#FFF7ED",
+    borderRadius: AppTheme.radius.medium,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#F97316" + "33",
   },
-
-  half: {
+  noPeriodsBannerText: {
     flex: 1,
+    fontSize: 13,
+    color: "#C2410C",
+    lineHeight: 18,
   },
 
+  slotRow: {
+    gap: 8,
+    paddingVertical: 2,
+  },
+
+  slotChip: {
+    alignItems: "center",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.surfaceSoft,
+    borderWidth: 1.5,
+    borderColor: AppTheme.colors.border,
+    minWidth: 70,
+    gap: 2,
+  },
+
+  slotChipActive: {
+    backgroundColor: AppTheme.colors.primaryLight,
+    borderColor: AppTheme.colors.primary,
+  },
+
+  slotChipNum: {
+    fontSize: 13,
+    fontWeight: "800",
+    color: AppTheme.colors.textPrimary,
+  },
+
+  slotChipNumActive: {
+    color: AppTheme.colors.primaryDark,
+  },
+
+  slotChipTime: {
+    fontSize: 10,
+    color: AppTheme.colors.textSecondary,
+    fontWeight: "500",
+  },
+
+  slotChipTimeActive: {
+    color: AppTheme.colors.primary,
+  },
+
+  slotChipLabel: {
+    fontSize: 9,
+    color: AppTheme.colors.hint,
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+  },
+
+  slotChipLabelActive: {
+    color: AppTheme.colors.primary,
+  },
+
+  selectedSlotPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 8,
+    backgroundColor: AppTheme.colors.primaryLight,
+    borderRadius: AppTheme.radius.pill,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    alignSelf: "flex-start",
+  },
+
+  selectedSlotText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: AppTheme.colors.primaryDark,
+  },
+
+  // ── Common inputs ─────────────────────────────────────────────────
   input: {
     height: 48,
     borderWidth: 1,
@@ -367,6 +517,7 @@ const styles = StyleSheet.create({
   selectInputText: {
     fontSize: 15,
     color: AppTheme.colors.textPrimary,
+    flex: 1,
   },
 
   placeholderText: {
@@ -379,8 +530,15 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textSecondary,
   },
 
+  errorRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 14,
+  },
+
   errorText: {
-    marginTop: 16,
+    flex: 1,
     color: "#DC2626",
     fontSize: 13,
   },
@@ -394,11 +552,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
+  submitDisabled: {
+    backgroundColor: AppTheme.colors.disabled,
+  },
+
   submitText: {
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "700",
   },
 });
-
-

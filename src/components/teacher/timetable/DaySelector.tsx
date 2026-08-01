@@ -1,7 +1,5 @@
 import { AppTheme } from '../../../theme/AppTheme';
-import { Pressable, ScrollView, StyleSheet, Text } from "react-native";
-
-import { colors } from "../../../theme/colors";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 const DAYS = [
   "Monday",
@@ -15,9 +13,11 @@ const DAYS = [
 type Props = {
   selectedDay: string;
   onSelectDay: (day: string) => void;
+  /** Optional: set of days that have at least one entry (shows a dot indicator) */
+  daysWithEntries?: Set<string>;
 };
 
-export function DaySelector({ selectedDay, onSelectDay }: Props) {
+export function DaySelector({ selectedDay, onSelectDay, daysWithEntries }: Props) {
   return (
     <ScrollView
       horizontal
@@ -26,16 +26,33 @@ export function DaySelector({ selectedDay, onSelectDay }: Props) {
     >
       {DAYS.map((day) => {
         const active = day === selectedDay;
+        const hasEntries = daysWithEntries?.has(day) ?? false;
 
         return (
           <Pressable
             key={day}
             onPress={() => onSelectDay(day)}
-            style={[styles.dayButton, active && styles.activeButton]}
+            style={({ pressed }) => [
+              styles.dayButton,
+              active && styles.activeButton,
+              pressed && styles.pressedButton,
+            ]}
           >
+            {/* Day abbreviation */}
             <Text style={[styles.dayText, active && styles.activeText]}>
               {day.slice(0, 3)}
             </Text>
+
+            {/* Active underline OR entry dot */}
+            <View style={styles.indicatorRow}>
+              {active ? (
+                <View style={styles.activeUnderline} />
+              ) : hasEntries ? (
+                <View style={styles.entryDot} />
+              ) : (
+                <View style={styles.emptyIndicator} />
+              )}
+            </View>
           </Pressable>
         );
       })}
@@ -45,35 +62,68 @@ export function DaySelector({ selectedDay, onSelectDay }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 14,
-    gap: 10,
+    paddingVertical: 6,
+    gap: 6,
+    paddingHorizontal: 2,
   },
 
   dayButton: {
-    minWidth: 70,
-    height: 42,
+    minWidth: 62,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
     borderRadius: AppTheme.radius.medium,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#F3F4F6",
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderWidth: 1.5,
+    borderColor: "transparent",
+    gap: 4,
   },
 
   activeButton: {
-    backgroundColor: AppTheme.colors.primary,
+    backgroundColor: AppTheme.colors.primaryLight,
     borderColor: AppTheme.colors.primary,
   },
 
+  pressedButton: {
+    opacity: 0.75,
+    transform: [{ scale: 0.97 }],
+  },
+
   dayText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: 13,
+    fontWeight: "700",
     color: AppTheme.colors.textSecondary,
+    letterSpacing: 0.3,
   },
 
   activeText: {
-    color: "#FFFFFF",
+    color: AppTheme.colors.primary,
+  },
+
+  indicatorRow: {
+    height: 5,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  activeUnderline: {
+    width: 20,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: AppTheme.colors.primary,
+  },
+
+  entryDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: AppTheme.colors.textSecondary,
+    opacity: 0.5,
+  },
+
+  emptyIndicator: {
+    width: 5,
+    height: 5,
   },
 });
-
-

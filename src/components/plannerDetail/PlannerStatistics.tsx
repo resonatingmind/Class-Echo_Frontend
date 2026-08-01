@@ -77,10 +77,13 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     flexBasis: "22%",
     minWidth: 130,
-    backgroundColor: AppTheme.colors.surfaceMuted,
+    backgroundColor: AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
-    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+    paddingVertical: 14,
     paddingHorizontal: 14,
+    ...AppTheme.shadows.subtle,
   },
 
   value: {

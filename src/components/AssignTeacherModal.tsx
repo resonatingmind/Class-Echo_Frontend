@@ -40,11 +40,16 @@ export function AssignTeacherModal({
 }: Props) {
   const { session } = useAuth();
   const [assigningId, setAssigningId] = useState<number | null>(null);
+  const [unassigning, setUnassigning] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleAssign = async (teacherId: number) => {
-    if (!session || !subjectId || assigningId) return;
-    setAssigningId(teacherId);
+  const handleAssign = async (teacherId: number | null) => {
+    if (!session || !subjectId || assigningId || unassigning) return;
+    if (teacherId === null) {
+      setUnassigning(true);
+    } else {
+      setAssigningId(teacherId);
+    }
     setError(null);
     try {
       const updated = await assignTeacherToSubject(session.token, subjectId, teacherId);
@@ -54,6 +59,7 @@ export function AssignTeacherModal({
       setError(e instanceof Error ? e.message : 'Failed to assign teacher');
     } finally {
       setAssigningId(null);
+      setUnassigning(false);
     }
   };
 
@@ -74,6 +80,23 @@ export function AssignTeacherModal({
               <Ionicons color="#B42318" name="alert-circle-outline" size={14} />
               <Text style={styles.modalErrorText}>{error}</Text>
             </View>
+          ) : null}
+
+          {currentTeacherId !== null ? (
+            <Pressable
+              onPress={() => handleAssign(null)}
+              disabled={assigningId !== null || unassigning}
+              style={styles.unassignBtn}
+            >
+              {unassigning ? (
+                <ActivityIndicator color="#B42318" size="small" />
+              ) : (
+                <>
+                  <Ionicons name="person-remove-outline" size={16} color="#B42318" />
+                  <Text style={styles.unassignBtnText}>Unassign Current Teacher</Text>
+                </>
+              )}
+            </Pressable>
           ) : null}
 
           {teachers.length === 0 ? (
@@ -196,7 +219,21 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
+  unassignBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#FFF1F1',
+    borderWidth: 1,
+    borderColor: '#FCA5A5',
+    paddingVertical: 10,
+    borderRadius: AppTheme.radius.medium,
+    marginTop: 4,
+  },
+  unassignBtnText: {
+    color: '#B42318',
+    fontSize: 14,
+    fontWeight: '700',
+  },
 });
-
-
-

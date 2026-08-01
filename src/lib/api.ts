@@ -550,10 +550,18 @@ export async function updateSubject(
   );
 }
 
+export async function deleteSubject(token: string, subjectId: number) {
+  return request<{ message: string } | any>(
+    `/school/subjects/${subjectId}`,
+    { method: "DELETE" },
+    token,
+  );
+}
+
 export async function assignTeacherToSubject(
   token: string,
   subjectId: number,
-  teacherId: number,
+  teacherId: number | null,
 ) {
   return request<SubjectOut>(
     `/school/subjects/${subjectId}/assign-teacher`,

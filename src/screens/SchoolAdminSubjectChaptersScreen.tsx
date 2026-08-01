@@ -26,6 +26,9 @@ import {
   getSchoolLearningPlans,
   updateChapter,
   getPlannerSubjectDetail,
+  login,
+  getSchoolAdminMe,
+  deleteSubject,
 } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
@@ -35,6 +38,7 @@ import { AdminNavbar } from '../components/common/AdminNavbar';
 import { PlannerDetailHeader } from '../components/plannerDetail/PlannerDetailHeader';
 import { PlannerStatistics } from '../components/plannerDetail/PlannerStatistics';
 import { PlannerChapterProgress } from '../components/plannerDetail/PlannerChapterProgress';
+import { ConfirmDialog } from '../components/common/ConfirmDialog';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SchoolAdminSubjectChapters'>;
 
@@ -143,6 +147,19 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
   const [expandedLps, setExpandedLps] = useState<Record<number, LearningPlanOut[]>>({});
   const [loadingExpandedId, setLoadingExpandedId] = useState<number | null>(null);
 
+  // Password-Based Delete State
+  const [chapterToDelete, setChapterToDelete] = useState<ChapterOut | null>(null);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [adminEmail, setAdminEmail] = useState<string | null>(null);
+
+  // Subject Password-Based Delete State
+  const [subjectDeleteVisible, setSubjectDeleteVisible] = useState(false);
+  const [subjectDeletePassword, setSubjectDeletePassword] = useState('');
+  const [subjectDeleteError, setSubjectDeleteError] = useState<string | null>(null);
+  const [deletingSubject, setDeletingSubject] = useState(false);
+
   const toggleExpandChapter = async (chapterId: number) => {
     if (!session) return;
     if (expandedChapterId === chapterId) {
@@ -179,6 +196,16 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
         ]);
         setChapters(chaptersData);
         setPlannerDetail(plannerData);
+        
+        // Fetch admin me if email not cached yet
+        if (!adminEmail) {
+          try {
+            const me = await getSchoolAdminMe(session.token);
+            setAdminEmail(me.email);
+          } catch {
+            // ignore
+          }
+        }
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Could not load chapters.');
       } finally {
@@ -257,26 +284,79 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
   };
 
   const handleDelete = (chapter: ChapterOut) => {
-    Alert.alert(
-      'Delete Chapter',
-      `Are you sure you want to delete "${chapter.name}"? This action cannot be undone and will delete all documents and recordings under it.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            if (!session) return;
-            try {
-              await deleteChapter(session.token, chapter.id);
-              void load(true);
-            } catch (e) {
-              Alert.alert('Error', e instanceof Error ? e.message : 'Could not delete chapter.');
-            }
-          },
-        },
-      ]
-    );
+    setChapterToDelete(chapter);
+    setDeletePassword('');
+    setDeleteError(null);
+  };
+
+  const confirmDeleteChapter = async () => {
+    if (!session || !chapterToDelete) return;
+    if (!adminEmail) {
+      setDeleteError("Verifying admin details... Please try again.");
+      return;
+    }
+    if (!deletePassword) {
+      setDeleteError('Password is required.');
+      return;
+    }
+    setDeleting(true);
+    setDeleteError(null);
+
+    try {
+      await login(adminEmail, deletePassword);
+    } catch (err) {
+      setDeleteError('Incorrect Password. Please enter your login password.');
+      setDeleting(false);
+      return;
+    }
+
+    try {
+      await deleteChapter(session.token, chapterToDelete.id);
+      setChapterToDelete(null);
+      setDeletePassword('');
+      void load(true);
+    } catch (e) {
+      setDeleteError(e instanceof Error ? e.message : 'Could not delete chapter.');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const confirmDeleteSubject = async () => {
+    if (!session) return;
+    if (!adminEmail) {
+      setSubjectDeleteError("Verifying admin details... Please try again.");
+      return;
+    }
+    if (!subjectDeletePassword) {
+      setSubjectDeleteError('Password is required.');
+      return;
+    }
+    setDeletingSubject(true);
+    setSubjectDeleteError(null);
+
+    try {
+      await login(adminEmail, subjectDeletePassword);
+    } catch (err) {
+      setSubjectDeleteError('Incorrect Password. Please enter your login password.');
+      setDeletingSubject(false);
+      return;
+    }
+
+    try {
+      await deleteSubject(session.token, subjectId);
+      setSubjectDeleteVisible(false);
+      setSubjectDeletePassword('');
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      } else {
+        navigation.navigate("SchoolAdminClasses");
+      }
+    } catch (e) {
+      setSubjectDeleteError(e instanceof Error ? e.message : 'Could not delete subject.');
+    } finally {
+      setDeletingSubject(false);
+    }
   };
 
   return (
@@ -290,6 +370,18 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
             navigation.navigate("SchoolAdminClasses");
           }
         }}
+        rightActions={
+          <Pressable
+            onPress={() => {
+              setSubjectDeleteVisible(true);
+              setSubjectDeletePassword('');
+              setSubjectDeleteError(null);
+            }}
+            style={{ marginRight: 8, padding: 4 }}
+          >
+            <Ionicons name="trash-outline" size={22} color="#B42318" />
+          </Pressable>
+        }
       />
 
       <ScrollView
@@ -562,6 +654,50 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
           </Pressable>
         </Pressable>
       </Modal>
+
+      <ConfirmDialog
+        visible={!!chapterToDelete}
+        title="Delete Chapter"
+        message={`Are you sure you want to delete "${chapterToDelete?.name}"? This action cannot be undone and will delete all documents and recordings under it.`}
+        confirmText="Delete"
+        destructive={true}
+        requirePassword={true}
+        passwordValue={deletePassword}
+        onPasswordChange={(val) => {
+          setDeletePassword(val);
+          setDeleteError(null);
+        }}
+        error={deleteError}
+        loading={deleting}
+        onConfirm={confirmDeleteChapter}
+        onCancel={() => {
+          setChapterToDelete(null);
+          setDeletePassword('');
+          setDeleteError(null);
+        }}
+      />
+
+      <ConfirmDialog
+        visible={subjectDeleteVisible}
+        title="Delete Subject"
+        message={`Are you sure you want to delete the subject "${subjectName}"? This action cannot be undone and will delete all chapters, documents, and recordings under it.`}
+        confirmText="Delete"
+        destructive={true}
+        requirePassword={true}
+        passwordValue={subjectDeletePassword}
+        onPasswordChange={(val) => {
+          setSubjectDeletePassword(val);
+          setSubjectDeleteError(null);
+        }}
+        error={subjectDeleteError}
+        loading={deletingSubject}
+        onConfirm={confirmDeleteSubject}
+        onCancel={() => {
+          setSubjectDeleteVisible(false);
+          setSubjectDeletePassword('');
+          setSubjectDeleteError(null);
+        }}
+      />
     </SafeAreaView>
   );
 }

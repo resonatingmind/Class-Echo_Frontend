@@ -22,7 +22,11 @@ import {
   getClassSubjects,
   getSchoolAdminTeachers,
   updateSchoolAdminClass,
+  deleteSubject,
+  getSchoolAdminMe,
+  login,
 } from '../lib/api';
+import { ConfirmDialog } from '../components/common/ConfirmDialog';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { AdminNavbar } from '../components/common/AdminNavbar';
 import { SelectDropdown } from '../components/ui/SelectDropdown';
@@ -140,11 +144,13 @@ function SubjectCard({
   colorIdx,
   onAssignPress,
   onCardPress,
+  onDeletePress,
 }: {
   subject: SubjectOut;
   colorIdx: number;
   onAssignPress: () => void;
   onCardPress: () => void;
+  onDeletePress: () => void;
 }) {
   const c = SUBJECT_COLORS[colorIdx % SUBJECT_COLORS.length];
   const nameLetters = subject.name.slice(0, 1).toUpperCase();
@@ -167,6 +173,16 @@ function SubjectCard({
             })}
           </Text>
         </View>
+        <Pressable
+          hitSlop={8}
+          onPress={(e) => {
+            e.stopPropagation?.();
+            onDeletePress();
+          }}
+          style={{ padding: 4 }}
+        >
+          <Ionicons name="trash-outline" size={18} color="#B42318" />
+        </Pressable>
       </View>
 
       <View style={styles.subjectCardDivider} />
@@ -251,6 +267,13 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
     "All" | "Assigned" | "Unassigned"
   >("All");
 
+  // Subject deletion state
+  const [subjectToDelete, setSubjectToDelete] = useState<SubjectOut | null>(null);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deletingSubject, setDeletingSubject] = useState(false);
+  const [adminEmail, setAdminEmail] = useState<string | null>(null);
+
   const load = useCallback(
     async (silent = false) => {
       if (!session) return;
@@ -263,6 +286,16 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
         ]);
         setSubjects(subjectsData);
         setTeachers(teachersData);
+
+        // Fetch admin me if email not cached yet
+        if (!adminEmail) {
+          try {
+            const me = await getSchoolAdminMe(session.token);
+            setAdminEmail(me.email);
+          } catch {
+            // ignore
+          }
+        }
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Could not load class data');
       } finally {
@@ -270,7 +303,7 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
         setRefreshing(false);
       }
     },
-    [session, classId],
+    [session, classId, adminEmail],
   );
 
   useFocusEffect(useCallback(() => { void load(); }, [load]));
@@ -296,6 +329,45 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
       setEditClassError(e instanceof Error ? e.message : 'Failed to update class');
     } finally {
       setEditingClass(false);
+    }
+  };
+
+  const handleDeleteSubject = (subject: SubjectOut) => {
+    setSubjectToDelete(subject);
+    setDeletePassword('');
+    setDeleteError(null);
+  };
+
+  const confirmDeleteSubject = async () => {
+    if (!session || !subjectToDelete) return;
+    if (!adminEmail) {
+      setDeleteError("Verifying admin details... Please try again.");
+      return;
+    }
+    if (!deletePassword) {
+      setDeleteError("Password is required.");
+      return;
+    }
+    setDeletingSubject(true);
+    setDeleteError(null);
+
+    try {
+      await login(adminEmail, deletePassword);
+    } catch (err) {
+      setDeleteError("Incorrect Password. Please enter your login password.");
+      setDeletingSubject(false);
+      return;
+    }
+
+    try {
+      await deleteSubject(session.token, subjectToDelete.id);
+      setSubjectToDelete(null);
+      setDeletePassword('');
+      void load(true);
+    } catch (e) {
+      setDeleteError(e instanceof Error ? e.message : 'Could not delete subject.');
+    } finally {
+      setDeletingSubject(false);
     }
   };
 
@@ -439,7 +511,7 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
 
         {/* Subjects section */}
         <View style={styles.subjectsSection}>
-          <Text style={styles.sectionTitle}>Departmental Subjects</Text>
+          <Text style={styles.sectionTitle}>Subjects</Text>
 
           {isLoading ? (
             <View style={styles.center}>
@@ -481,6 +553,7 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
                       subjectName: subject.name,
                     })
                   }
+                  onDeletePress={() => handleDeleteSubject(subject)}
                   subject={subject}
                 />
               ))}
@@ -571,6 +644,28 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
           </Pressable>
         </Pressable>
       </Modal>
+
+      <ConfirmDialog
+        visible={!!subjectToDelete}
+        title="Delete Subject"
+        message={`Are you sure you want to delete the subject "${subjectToDelete?.name}"? This action cannot be undone and will delete all chapters, documents, and recordings under it.`}
+        confirmText="Delete"
+        destructive={true}
+        requirePassword={true}
+        passwordValue={deletePassword}
+        onPasswordChange={(val) => {
+          setDeletePassword(val);
+          setDeleteError(null);
+        }}
+        error={deleteError}
+        loading={deletingSubject}
+        onConfirm={confirmDeleteSubject}
+        onCancel={() => {
+          setSubjectToDelete(null);
+          setDeletePassword('');
+          setDeleteError(null);
+        }}
+      />
     </SafeAreaView>
   );
 }

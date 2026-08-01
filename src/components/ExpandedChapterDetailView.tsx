@@ -102,8 +102,29 @@ export function ExpandedChapterDetailView({
     (r) => !assignedRecordingIds.has(r.id)
   );
 
+  // Calculate stats
+  const gradedRecordings = recordings.filter(r => r.report?.overall_score != null);
+  const averageScore = gradedRecordings.length > 0
+    ? Math.round(gradedRecordings.reduce((sum, r) => sum + (r.report?.overall_score || 0), 0) / gradedRecordings.length)
+    : null;
+
   return (
     <View style={styles.container}>
+      <View style={styles.statsBar}>
+        <View style={styles.statItem}>
+          <Ionicons name="mic-outline" size={14} color="#64748B" />
+          <Text style={styles.statLabel}>Total Lectures:</Text>
+          <Text style={styles.statValue}>{recordings.length}</Text>
+        </View>
+        <View style={styles.statDivider} />
+        <View style={styles.statItem}>
+          <Ionicons name="analytics-outline" size={14} color="#64748B" />
+          <Text style={styles.statLabel}>Avg Score:</Text>
+          <Text style={[styles.statValue, averageScore != null && { color: getScoreColor(averageScore) }]}>
+            {averageScore !== null ? `${averageScore}%` : "—"}
+          </Text>
+        </View>
+      </View>
 
       {/* NESTED LECTURE TABLE */}
       {titleRows.length === 0 && unassignedRecordings.length === 0 ? (
@@ -132,10 +153,9 @@ export function ExpandedChapterDetailView({
           <View style={[styles.subTableWrapper, { width: "100%" }]}>
           {/* Sub-Table Header */}
           <View style={styles.subTableHeader}>
-            <Text style={[styles.subHeaderCell, { flex: 2.2 }]}>LECTURE TITLE</Text>
-            <Text style={[styles.subHeaderCell, { flex: 1.8 }]}>RECORDING AUDIO</Text>
+            <Text style={[styles.subHeaderCell, { flex: 3 }]}>LECTURE TITLE</Text>
             <Text style={[styles.subHeaderCell, { flex: 0.8, textAlign: "center" }]}>SCORE</Text>
-            <Text style={[styles.subHeaderCell, { flex: 1.1, textAlign: "center" }]}>STATUS</Text>
+            <Text style={[styles.subHeaderCell, { flex: 1.2, textAlign: "center" }]}>STATUS</Text>
           </View>
 
           {/* Sub-Table Rows */}
@@ -147,69 +167,64 @@ export function ExpandedChapterDetailView({
             const statusStyle = getStatusStyle(rec?.status ?? "no_video");
             const score = rec?.report?.overall_score;
             const scoreCol = getScoreColor(score);
+            const isProcessed = rec && (rec.status.toLowerCase() === "completed" || rec.status.toLowerCase() === "analysed");
 
              return (
               <View key={lp.id || idx} style={styles.subTableRow}>
                 {/* Column 1: Lecture Title / Display Title */}
-                <View style={[{ flex: 2.2 }, styles.cellCol]}>
+                <View style={[{ flex: 3 }, styles.cellCol]}>
                   <Text style={styles.subTopicTitle} numberOfLines={2}>
                     {activeTitle}
                   </Text>
-                  <View style={styles.titleMetaBadgeRow}>
-                    <Text style={styles.titleTypeBadge}>
-                      {actualTitle ? "Recorded Title" : "Display Title"}
-                    </Text>
-                    {lp.date ? <Text style={styles.subDateText}>📅 {lp.date}</Text> : null}
-                  </View>
+                  {lp.date ? (
+                    <View style={styles.titleMetaBadgeRow}>
+                      <Text style={styles.subDateText}>📅 {lp.date}</Text>
+                    </View>
+                  ) : null}
                 </View>
 
-                {/* Column 2: Recording Audio */}
-                <View style={[{ flex: 1.8 }, styles.cellCol]}>
-                  {rec ? (
-                    <Pressable
-                      style={styles.videoMetaWrap}
-                      onPress={() => onViewRecordingReport?.(rec)}
-                    >
-                      <Ionicons name="volume-medium" size={16} color="#0284C7" />
-                      <Text style={styles.videoTitleText} numberOfLines={1}>
-                        {formatAudioTime(rec.duration_seconds)}
-                      </Text>
-                    </Pressable>
-                  ) : (
-                    <Pressable
-                      style={styles.attachVideoSmallBtn}
-                      onPress={onAddRecording}
-                    >
-                      <Ionicons name="mic-outline" size={13} color="#0284C7" />
-                      <Text style={styles.attachVideoSmallText}>+ Audio</Text>
-                    </Pressable>
-                  )}
-                </View>
-
-                {/* Column 3: Score */}
+                {/* Column 2: Score */}
                 <View style={[{ flex: 0.8, alignItems: "center" }, styles.cellCol]}>
                   <Text style={[styles.subScoreText, { color: scoreCol }]}>
                     {score != null ? `${Math.round(score)}%` : "—"}
                   </Text>
                 </View>
 
-                {/* Column 4: Status */}
-                <View style={[{ flex: 1.1, alignItems: "center" }, styles.cellCol]}>
-                  {rec && onViewRecordingReport ? (
-                    <Pressable
-                      onPress={() => onViewRecordingReport(rec)}
-                      style={[styles.badgePill, { backgroundColor: statusStyle.bg }]}
-                    >
-                      <Text style={[styles.badgePillText, { color: statusStyle.text }]}>
-                        {statusStyle.label}
-                      </Text>
-                    </Pressable>
+                {/* Column 3: Status */}
+                <View style={[{ flex: 1.2, alignItems: "center" }, styles.cellCol]}>
+                  {rec ? (
+                    isProcessed && onViewRecordingReport ? (
+                      <Pressable
+                        onPress={() => onViewRecordingReport(rec)}
+                        style={[styles.badgePill, { backgroundColor: "#E8F7EE", borderWidth: 1, borderColor: "#81C784" }]}
+                      >
+                        <Text style={[styles.badgePillText, { color: "#127A40" }]}>
+                          Report
+                        </Text>
+                      </Pressable>
+                    ) : (
+                      <View style={[styles.badgePill, { backgroundColor: statusStyle.bg }]}>
+                        <Text style={[styles.badgePillText, { color: statusStyle.text }]}>
+                          {statusStyle.label}
+                        </Text>
+                      </View>
+                    )
                   ) : (
-                    <View style={[styles.badgePill, { backgroundColor: statusStyle.bg }]}>
-                      <Text style={[styles.badgePillText, { color: statusStyle.text }]}>
-                        {statusStyle.label}
-                      </Text>
-                    </View>
+                    role === "teacher" && onAddRecording ? (
+                      <Pressable
+                        style={styles.attachVideoSmallBtn}
+                        onPress={onAddRecording}
+                      >
+                        <Ionicons name="mic-outline" size={13} color="#0284C7" />
+                        <Text style={styles.attachVideoSmallText}>+ Audio</Text>
+                      </Pressable>
+                    ) : (
+                      <View style={[styles.badgePill, { backgroundColor: statusStyle.bg }]}>
+                        <Text style={[styles.badgePillText, { color: statusStyle.text }]}>
+                          {statusStyle.label}
+                        </Text>
+                      </View>
+                    )
                   )}
                 </View>
               </View>
@@ -222,22 +237,15 @@ export function ExpandedChapterDetailView({
             const score = rec.report?.overall_score;
             const scoreCol = getScoreColor(score);
             const displayTitle = rec.lecture_title?.trim() || `Lecture Video #${rec.id}`;
+            const isProcessed = rec.status.toLowerCase() === "completed" || rec.status.toLowerCase() === "analysed";
+
             return (
               <View key={rec.id} style={styles.subTableRow}>
-                <View style={[{ flex: 2.2 }, styles.cellCol]}>
+                <View style={[{ flex: 3 }, styles.cellCol]}>
                   <Text style={styles.subTopicTitle} numberOfLines={2}>
                     {displayTitle}
                   </Text>
-                  <Text style={styles.titleTypeBadge}>Recorded Lecture</Text>
-                </View>
 
-                <View style={[{ flex: 1.8 }, styles.cellCol]}>
-                  <View style={styles.videoMetaWrap}>
-                    <Ionicons name="volume-medium" size={16} color="#0284C7" />
-                    <Text style={styles.videoTitleText} numberOfLines={1}>
-                      {formatAudioTime(rec.duration_seconds)}
-                    </Text>
-                  </View>
                 </View>
 
                 <View style={[{ flex: 0.8, alignItems: "center" }, styles.cellCol]}>
@@ -246,14 +254,14 @@ export function ExpandedChapterDetailView({
                   </Text>
                 </View>
 
-                <View style={[{ flex: 1.1, alignItems: "center" }, styles.cellCol]}>
-                  {onViewRecordingReport ? (
+                <View style={[{ flex: 1.2, alignItems: "center" }, styles.cellCol]}>
+                  {isProcessed && onViewRecordingReport ? (
                     <Pressable
                       onPress={() => onViewRecordingReport(rec)}
-                      style={[styles.badgePill, { backgroundColor: statusStyle.bg }]}
+                      style={[styles.badgePill, { backgroundColor: "#E8F7EE", borderWidth: 1, borderColor: "#81C784" }]}
                     >
-                      <Text style={[styles.badgePillText, { color: statusStyle.text }]}>
-                        {statusStyle.label}
+                      <Text style={[styles.badgePillText, { color: "#127A40" }]}>
+                        Report
                       </Text>
                     </Pressable>
                   ) : (
@@ -599,5 +607,37 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
     color: "#64748B",
+  },
+  statsBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F8FAFC",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    gap: 16,
+    marginBottom: 8,
+  },
+  statItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  statLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#64748B",
+  },
+  statValue: {
+    fontSize: 13,
+    fontWeight: "800",
+    color: "#0F172A",
+  },
+  statDivider: {
+    width: 1,
+    height: 14,
+    backgroundColor: "#CBD5E1",
   },
 });

@@ -10,6 +10,7 @@ import {
   Text,
   View,
   TextInput,
+  useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -27,7 +28,7 @@ import {
   getTeacherProfile,
 } from "../lib/api";
 import { AppTheme } from "../theme/AppTheme";
-import { ScreenHeader } from "../components/common/ScreenHeader";
+import { AdminNavbar } from "../components/common/AdminNavbar";
 
 type Props = NativeStackScreenProps<
   RootStackParamList,
@@ -104,6 +105,8 @@ export function SchoolAdminTeacherAnalyticsScreen({
 }: Props) {
   const { teacherId } = route.params;
   const { session } = useAuth();
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
 
   const [analytics, setAnalytics] = useState<TeacherAnalytics | null>(null);
   const [teacherProfile, setTeacherProfile] = useState<TeacherProfile | null>(
@@ -227,13 +230,6 @@ export function SchoolAdminTeacherAnalyticsScreen({
 
   const performanceMetrics = [
     {
-      title: "Overall Score",
-      value: analytics.overall_score,
-      icon: "analytics-outline",
-      color: "#2563EB",
-      background: "#EEF5FF",
-    },
-    {
       title: "Engagement",
       value: analytics.engagement_score,
       icon: "people-outline",
@@ -269,13 +265,6 @@ export function SchoolAdminTeacherAnalyticsScreen({
       background: "#ECFDF5",
     },
     {
-      title: "Coverage",
-      value: analytics.curriculum_coverage,
-      icon: "book-outline",
-      color: "#4F46E5",
-      background: "#EEF2FF",
-    },
-    {
       title: "Confidence",
       value: analytics.confidence_score,
       icon: "shield-checkmark-outline",
@@ -286,10 +275,8 @@ export function SchoolAdminTeacherAnalyticsScreen({
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScreenHeader
-        variant="large"
+      <AdminNavbar
         title="Teacher Analytics"
-        subtitle="Track performance, engagement & AI-powered teaching insights."
         onBack={() => {
           if (navigation.canGoBack()) {
             navigation.goBack();
@@ -300,200 +287,54 @@ export function SchoolAdminTeacherAnalyticsScreen({
           }
         }}
       />
-      <ScrollView contentContainerStyle={styles.content}>
-        {/* HERO CARD (KEPT ABOVE THE FILTER CARD) */}
-        <View style={styles.analyticsHeroCard}>
-          {/* Left Side */}
-          <View style={styles.teacherSection}>
-            <View style={styles.avatarWrapper}>
-              {teacherProfile?.profile_image_url ? (
-                <Image
-                  source={{ uri: teacherProfile.profile_image_url }}
-                  style={styles.avatarImage}
-                />
-              ) : (
-                <View style={styles.avatar}>
-                  <Ionicons name="person" size={52} color="#fff" />
-                </View>
-              )}
+      <ScrollView contentContainerStyle={styles.scroll}>
+        <View style={styles.centerContainer}>
+          <View style={styles.body}>
+            <View style={styles.pageHeading}>
+              <Text style={styles.academicLabel}>ANALYTICS</Text>
+              <Text style={styles.pageTitle}>Teacher Performance</Text>
             </View>
 
-            <View style={styles.teacherInfo}>
-              <Text style={styles.teacherName}>{teacherProfile?.name}</Text>
-
-              <View style={styles.teacherBadge}>
-                <Ionicons name="school-outline" size={16} color="#2563EB" />
-
-                <Text style={styles.teacherBadgeText}>Teacher</Text>
-              </View>
-
-              <View style={styles.infoRow}>
-                <Ionicons
-                  name="mail-outline"
-                  size={18}
-                  color={AppTheme.colors.textSecondary}
-                />
-
-                <Text style={styles.infoText}>{teacherProfile?.email}</Text>
-              </View>
-
-              {teacherProfile?.classes && teacherProfile.classes.length > 0 ? (
-                <View style={styles.infoRow}>
-                  <Ionicons
-                    name="easel-outline"
-                    size={18}
-                    color={AppTheme.colors.textSecondary}
-                  />
-
-                  <Text style={styles.infoText}>
-                    {teacherProfile.classes.join(", ")}
-                  </Text>
-                </View>
-              ) : null}
-
-              <View style={styles.infoRow}>
-                <Ionicons
-                  name="calendar-outline"
-                  size={18}
-                  color={AppTheme.colors.textSecondary}
-                />
-
-                <Text style={styles.infoText}>
-                  Assigned{" "}
-                  {teacherProfile?.assigned_at
-                    ? new Date(teacherProfile.assigned_at).toLocaleDateString()
-                    : "-"}
-                </Text>
-              </View>
-            </View>
+        {/* Teacher Profile */}
+        <View style={[styles.profileCard, isMobile && { flexDirection: "column", alignItems: "flex-start" }]}>
+          <View style={[styles.avatar, isMobile && { marginBottom: 16 }]}>
+            {teacherProfile?.profile_image_url ? (
+              <Image source={{ uri: teacherProfile.profile_image_url }} style={styles.avatarImage} />
+            ) : (
+              <Ionicons name="person" size={42} color={AppTheme.colors.primary} />
+            )}
           </View>
-
-          {/* <View style={styles.heroDivider} /> */}
-
-          <View style={styles.analyticsMetrics}>
-            {/* Overall Score */}
-            <View style={styles.kpiCard}>
-              <View
-                style={[
-                  styles.kpiIconContainer,
-                  { backgroundColor: "#EEF4FF" },
-                ]}
-              >
-                <Ionicons name="bar-chart-outline" size={22} color="#2563EB" />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.name}>{teacherProfile?.name}</Text>
+            <Text style={styles.email}>{teacherProfile?.email}</Text>
+            <View style={styles.statusRow}>
+              <View style={[styles.statusBadge, { backgroundColor: "#EEF5FF", marginTop: 0 }]}>
+                <Ionicons name="school-outline" size={14} color="#2563EB" />
+                <Text style={[styles.statusText, { color: "#2563EB", marginLeft: 4 }]}>Teacher</Text>
               </View>
-
-              <Text style={styles.kpiValue}>
-                {Math.round(analytics.overall_score)}%
-              </Text>
-
-              <Text style={styles.kpiTitle}>Overall Score</Text>
-
-              <View style={styles.kpiProgressBackground}>
-                <View
-                  style={[
-                    styles.kpiProgressFill,
-                    {
-                      width: `${Math.min(analytics.overall_score, 100)}%`,
-                      backgroundColor: "#2563EB",
-                    },
-                  ]}
-                />
-              </View>
-            </View>
-
-            {/* Teaching Hours */}
-            <View style={styles.kpiCard}>
-              <View
-                style={[
-                  styles.kpiIconContainer,
-                  { backgroundColor: "#ECFDF5" },
-                ]}
-              >
-                <Ionicons name="time-outline" size={22} color="#22C55E" />
-              </View>
-
-              <Text style={styles.kpiValue}>
-                {analytics.total_recording_hours.toFixed(1)} h
-              </Text>
-
-              <Text style={styles.kpiTitle}>Teaching Hours</Text>
-
-              <View style={styles.kpiProgressBackground}>
-                <View
-                  style={[
-                    styles.kpiProgressFill,
-                    {
-                      // Set to 100% or adjust dynamically based on your target goal
-                      width: "100%",
-                      backgroundColor: "#22C55E",
-                    },
-                  ]}
-                />
-              </View>
-            </View>
-
-            {/* Average Duration */}
-            <View style={styles.kpiCard}>
-              <View
-                style={[
-                  styles.kpiIconContainer,
-                  { backgroundColor: "#F3E8FF" },
-                ]}
-              >
-                <Ionicons name="stopwatch-outline" size={22} color="#9333EA" />
-              </View>
-
-              <Text style={styles.kpiValue}>
-                {Math.round(analytics.average_duration_seconds / 60)} min
-              </Text>
-
-              <Text style={styles.kpiTitle}>Avg Duration</Text>
-
-              <View style={styles.kpiProgressBackground}>
-                <View
-                  style={[
-                    styles.kpiProgressFill,
-                    {
-                      // Set to 100% or adjust dynamically based on your target goal
-                      width: "100%",
-                      backgroundColor: "#9333EA",
-                    },
-                  ]}
-                />
-              </View>
-            </View>
-
-            {/* Curriculum Coverage */}
-            <View style={styles.kpiCard}>
-              <View
-                style={[
-                  styles.kpiIconContainer,
-                  { backgroundColor: "#FFF7ED" },
-                ]}
-              >
-                <Ionicons name="book-outline" size={22} color="#F97316" />
-              </View>
-
-              <Text style={styles.kpiValue}>
-                {Math.round(analytics.curriculum_coverage)}%
-              </Text>
-
-              <Text style={styles.kpiTitle}>Coverage</Text>
-
-              <View style={styles.kpiProgressBackground}>
-                <View
-                  style={[
-                    styles.kpiProgressFill,
-                    {
-                      width: `${Math.min(analytics.curriculum_coverage, 100)}%`,
-                      backgroundColor: "#F97316",
-                    },
-                  ]}
-                />
-              </View>
+              {teacherProfile?.assigned_at && (
+                <Text style={styles.assignedDateText}>
+                  Joined {new Date(teacherProfile.assigned_at).toLocaleDateString()}
+                </Text>
+              )}
             </View>
           </View>
         </View>
+
+        {teacherProfile?.classes && teacherProfile.classes.length > 0 && (
+          <>
+            <Text style={styles.sectionTitle}>Assigned Classes</Text>
+            <View style={styles.chipContainer}>
+              {teacherProfile.classes.map((cls, idx) => (
+                <View key={idx} style={styles.chip}>
+                  <Text style={styles.chipText}>{cls}</Text>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
+
+
 
         {/* SEARCH AND FILTERS */}
         {/* <View style={styles.filterCard}> */}
@@ -535,8 +376,8 @@ export function SchoolAdminTeacherAnalyticsScreen({
           </View>
 
           {/* Filters */}
-          <View style={styles.filterGrid}>
-            <View style={styles.filterItem}>
+          <View style={[styles.filterGrid, isMobile && { flexWrap: "wrap", rowGap: 16 }]}>
+            <View style={[styles.filterItem, isMobile && { minWidth: "48%" }]}>
               <FilterSelector
                 title="Class"
                 placeholder="All Classes"
@@ -554,7 +395,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
               />
             </View>
 
-            <View style={styles.filterItem}>
+            <View style={[styles.filterItem, isMobile && { minWidth: "48%" }]}>
               <FilterSelector
                 title="Subject"
                 placeholder="All Subjects"
@@ -572,7 +413,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
               />
             </View>
 
-            <View style={styles.filterItem}>
+            <View style={[styles.filterItem, isMobile && { minWidth: "48%" }]}>
               <FilterSelector
                 title="Status"
                 placeholder="All Status"
@@ -590,7 +431,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
               />
             </View>
 
-            <View style={styles.filterItem}>
+            <View style={[styles.filterItem, isMobile && { minWidth: "48%" }]}>
               <FilterSelector
                 title="Semester"
                 placeholder="All Semesters"
@@ -610,9 +451,9 @@ export function SchoolAdminTeacherAnalyticsScreen({
           </View>
 
           {/* Date */}
-          <View style={styles.dateRow}>
+          <View style={[styles.dateRow, isMobile && { flexDirection: "column", gap: 16 }]}>
             <Pressable
-              style={styles.dateInput}
+              style={[styles.dateInput, isMobile && { width: "100%" }]}
               onPress={() => setShowStartCalendar(true)}
             >
               <Text
@@ -629,7 +470,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
             </Pressable>
 
             <Pressable
-              style={styles.dateInput}
+              style={[styles.dateInput, isMobile && { width: "100%" }]}
               onPress={() => setShowEndCalendar(true)}
             >
               <Text style={endDate ? styles.dateValue : styles.datePlaceholder}>
@@ -645,8 +486,8 @@ export function SchoolAdminTeacherAnalyticsScreen({
           </View>
 
           {/* Buttons */}
-          <View style={styles.buttonRow}>
-            <Pressable style={styles.resetButton} onPress={handleReset}>
+          <View style={[styles.buttonRow, isMobile && { flexDirection: "column", gap: 16 }]}>
+            <Pressable style={[styles.resetButton, isMobile && { width: "100%" }]} onPress={handleReset}>
               <Ionicons
                 name="refresh-outline"
                 size={18}
@@ -656,7 +497,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
             </Pressable>
 
             <Pressable
-              style={styles.applyButton}
+              style={[styles.applyButton, isMobile && { width: "100%" }]}
               onPress={() => void load(currentFilters)}
             >
               <Ionicons name="filter-outline" size={18} color="#fff" />
@@ -665,73 +506,128 @@ export function SchoolAdminTeacherAnalyticsScreen({
           </View>
         </View>
 
-        {/* Performance High/Low Summary Blocks */}
-        <View style={styles.sectionHeader}>
-          <Ionicons name="bar-chart-outline" size={22} color={AppTheme.colors.primary} />
+        <Text style={styles.sectionTitle}>Key Performance Indicators</Text>
+        
+        <View style={styles.kpiGrid}>
+            {/* Overall Score */}
+            <View style={[styles.kpiCard, isMobile && { width: "100%" }]}>
+              <View
+                style={[
+                  styles.kpiIconContainer,
+                  { backgroundColor: "#EEF4FF" },
+                ]}
+              >
+                <Ionicons name="bar-chart-outline" size={22} color="#2563EB" />
+              </View>
 
-          <Text style={styles.sectionTitle}>Teaching Summary</Text>
-        </View>
+              <Text style={styles.kpiValue}>
+                {Math.round(analytics.overall_score)}%
+              </Text>
 
-        <View style={styles.summaryGrid}>
-          <View style={[styles.summaryCard, { backgroundColor: "#EEF4FF" }]}>
-            <View style={[styles.summaryIcon, { backgroundColor: "#DBEAFE" }]}>
-              <Ionicons name="trophy-outline" size={24} color="#2563EB" />
+              <Text style={styles.kpiTitle}>Overall Score</Text>
+
+              <View style={styles.kpiProgressBackground}>
+                <View
+                  style={[
+                    styles.kpiProgressFill,
+                    {
+                      width: `${Math.min(analytics.overall_score, 100)}%`,
+                      backgroundColor: "#2563EB",
+                    },
+                  ]}
+                />
+              </View>
             </View>
 
-            <Text style={styles.summaryValue}>
-              {Math.round(analytics.highest_score)}%
-            </Text>
+            {/* Teaching Hours */}
+            <View style={[styles.kpiCard, isMobile && { width: "100%" }]}>
+              <View
+                style={[
+                  styles.kpiIconContainer,
+                  { backgroundColor: "#ECFDF5" },
+                ]}
+              >
+                <Ionicons name="time-outline" size={22} color="#22C55E" />
+              </View>
 
-            <Text style={styles.summaryTitle}>Highest Score</Text>
+              <Text style={styles.kpiValue}>
+                {analytics.total_recording_hours.toFixed(1)} h
+              </Text>
 
-            <Text style={styles.summarySubtitle}>Excellent</Text>
-          </View>
+              <Text style={styles.kpiTitle}>Teaching Hours</Text>
 
-          <View style={[styles.summaryCard, { backgroundColor: "#FEF3C7" }]}>
-            <View style={[styles.summaryIcon, { backgroundColor: "#FDE68A" }]}>
-              <Ionicons
-                name="trending-down-outline"
-                size={24}
-                color="#D97706"
-              />
+              <View style={styles.kpiProgressBackground}>
+                <View
+                  style={[
+                    styles.kpiProgressFill,
+                    {
+                      width: "100%",
+                      backgroundColor: "#22C55E",
+                    },
+                  ]}
+                />
+              </View>
             </View>
 
-            <Text style={styles.summaryValue}>
-              {Math.round(analytics.lowest_score)}%
-            </Text>
+            {/* Average Duration */}
+            <View style={[styles.kpiCard, isMobile && { width: "100%" }]}>
+              <View
+                style={[
+                  styles.kpiIconContainer,
+                  { backgroundColor: "#F3E8FF" },
+                ]}
+              >
+                <Ionicons name="stopwatch-outline" size={22} color="#9333EA" />
+              </View>
 
-            <Text style={styles.summaryTitle}>Lowest Score</Text>
+              <Text style={styles.kpiValue}>
+                {Math.round(analytics.average_duration_seconds / 60)} min
+              </Text>
 
-            <Text style={styles.summarySubtitle}>Needs Attention</Text>
-          </View>
+              <Text style={styles.kpiTitle}>Avg Duration</Text>
 
-          <View style={[styles.summaryCard, { backgroundColor: "#ECFDF5" }]}>
-            <View style={[styles.summaryIcon, { backgroundColor: "#BBF7D0" }]}>
-              <Ionicons name="time-outline" size={24} color="#16A34A" />
+              <View style={styles.kpiProgressBackground}>
+                <View
+                  style={[
+                    styles.kpiProgressFill,
+                    {
+                      width: "100%",
+                      backgroundColor: "#9333EA",
+                    },
+                  ]}
+                />
+              </View>
             </View>
 
-            <Text style={styles.summaryValue}>
-              {Math.round(analytics.average_duration_seconds / 60)} min
-            </Text>
+            {/* Curriculum Coverage */}
+            <View style={[styles.kpiCard, isMobile && { width: "100%" }]}>
+              <View
+                style={[
+                  styles.kpiIconContainer,
+                  { backgroundColor: "#FFF7ED" },
+                ]}
+              >
+                <Ionicons name="book-outline" size={22} color="#F97316" />
+              </View>
 
-            <Text style={styles.summaryTitle}>Avg Duration</Text>
+              <Text style={styles.kpiValue}>
+                {Math.round(analytics.curriculum_coverage)}%
+              </Text>
 
-            <Text style={styles.summarySubtitle}>Per Lecture</Text>
-          </View>
+              <Text style={styles.kpiTitle}>Coverage</Text>
 
-          <View style={[styles.summaryCard, { backgroundColor: "#F3E8FF" }]}>
-            <View style={[styles.summaryIcon, { backgroundColor: "#DDD6FE" }]}>
-              <Ionicons name="book-outline" size={24} color="#7C3AED" />
+              <View style={styles.kpiProgressBackground}>
+                <View
+                  style={[
+                    styles.kpiProgressFill,
+                    {
+                      width: `${Math.min(analytics.curriculum_coverage, 100)}%`,
+                      backgroundColor: "#F97316",
+                    },
+                  ]}
+                />
+              </View>
             </View>
-
-            <Text style={styles.summaryValue}>
-              {analytics.total_recording_hours.toFixed(1)} h
-            </Text>
-
-            <Text style={styles.summaryTitle}>Teaching Hours</Text>
-
-            <Text style={styles.summarySubtitle}>Total Recorded</Text>
-          </View>
         </View>
 
         {/* Detailed Criteria Scores */}
@@ -785,7 +681,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
 
         <View style={styles.metricsGrid}>
           {performanceMetrics.map((metric) => (
-            <View key={metric.title} style={styles.metricCard}>
+            <View key={metric.title} style={[styles.metricCard, isMobile && { width: "100%" }]}>
               <View style={styles.metricHeader}>
                 <View
                   style={[
@@ -1037,7 +933,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
 
         <View style={styles.monthGrid}>
           {analytics.monthly_performance.map((month) => (
-            <View key={month.month} style={styles.monthCard}>
+            <View key={month.month} style={[styles.monthCard, isMobile && { width: "100%" }]}>
               <View style={styles.monthHeader}>
                 <View style={styles.monthIcon}>
                   <Ionicons
@@ -1247,6 +1143,8 @@ export function SchoolAdminTeacherAnalyticsScreen({
             ))
           )}
         </View>
+          </View>
+        </View>
       </ScrollView>
 
       <CalendarPicker
@@ -1286,11 +1184,33 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: AppTheme.colors.background,
   },
-  content: {
-    paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 40,
+  scroll: {
+    flexGrow: 1,
+  },
+  centerContainer: {
+    flex: 1,
+    alignItems: "center",
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.xl,
+  },
+  body: {
+    width: "100%",
+    maxWidth: 800,
     gap: 32,
+  },
+  pageHeading: {
+    gap: AppTheme.spacing.s,
+    marginBottom: AppTheme.spacing.xs,
+  },
+  academicLabel: {
+    color: AppTheme.colors.primary,
+    ...AppTheme.typography.caption,
+    fontWeight: "700",
+    letterSpacing: 1.2,
+  },
+  pageTitle: {
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.heading1,
   },
   center: {
     flex: 1,
@@ -1543,7 +1463,7 @@ const styles = StyleSheet.create({
 
   // Metrics
   sectionTitle: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: "700",
     color: AppTheme.colors.textPrimary,
   },
@@ -1809,109 +1729,100 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: AppTheme.colors.textSecondary,
   },
-  analyticsHeroCard: {
+  profileCard: {
+    flexDirection: "row",
     backgroundColor: AppTheme.colors.surface,
-    borderRadius: 24,
-    padding: 24,
-    flexDirection: "row",
-    alignItems: "stretch",
-
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    elevation: 5,
-  },
-
-  teacherSection: {
-    flex: 1.2,
-    flexDirection: "row",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+    padding: 20,
     alignItems: "center",
-    paddingRight: 28,
+    gap: 18,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
-
-  avatarWrapper: {
-    marginRight: 24,
-  },
-
   avatar: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    backgroundColor: AppTheme.colors.primary,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "#EEF4FF",
     justifyContent: "center",
     alignItems: "center",
   },
-
   avatarImage: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
   },
-
-  teacherInfo: {
-    flex: 1,
-  },
-
-  teacherName: {
-    fontSize: 30,
-    fontWeight: "800",
+  name: {
+    fontSize: 22,
+    fontWeight: "700",
     color: AppTheme.colors.textPrimary,
   },
-
-  teacherBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "flex-start",
-    marginTop: 10,
-    backgroundColor: "#EEF5FF",
-    borderRadius: 18,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-  },
-
-  teacherBadgeText: {
-    marginLeft: 6,
-    color: "#2563EB",
-    fontWeight: "700",
-  },
-
-  infoRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 16,
-  },
-
-  infoText: {
-    marginLeft: 10,
+  email: {
+    fontSize: 15,
     color: AppTheme.colors.textSecondary,
-    fontSize: 16,
+  },
+  statusRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 12,
+    marginTop: 10,
+  },
+  statusBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
+    gap: 5,
+  },
+  statusText: {
+    fontWeight: "600",
+  },
+  assignedDateText: {
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.caption,
+    fontWeight: "600",
+  },
+  chipContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  chip: {
+    backgroundColor: "#EEF4FF",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#D1E4FF",
+  },
+  chipText: {
+    color: AppTheme.colors.primary,
+    fontWeight: "600",
+    fontSize: 13,
   },
 
-  kpiContainer: {
-    flex: 1.9,
+  kpiGrid: {
     flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "space-between",
-    gap: 18,
+    rowGap: 16,
   },
 
   kpiCard: {
-    flex: 1,
-
-    backgroundColor: "#fff",
-
-    borderRadius: 20,
-
-    padding: 18,
-
-    justifyContent: "space-between",
-
+    width: "48%",
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: 16,
     borderWidth: 1,
-
-    borderColor: "#EEF2F7",
+    borderColor: AppTheme.colors.border,
+    padding: 18,
+    justifyContent: "space-between",
   },
 
   kpiIconContainer: {
@@ -1929,20 +1840,14 @@ const styles = StyleSheet.create({
   },
 
   kpiValue: {
-    fontSize: 30,
-
+    fontSize: 28,
     fontWeight: "800",
-
-    color: AppTheme.colors.textPrimary,
+    color: AppTheme.colors.primary,
   },
 
   kpiTitle: {
     marginTop: 6,
-
-    fontSize: 15,
-
     color: AppTheme.colors.textSecondary,
-
     marginBottom: 16,
   },
 
@@ -2014,7 +1919,10 @@ const styles = StyleSheet.create({
 
   summaryCard: {
     width: "48%",
-    borderRadius: 22,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
     padding: 20,
   },
 
@@ -2105,10 +2013,10 @@ const styles = StyleSheet.create({
   // },
   searchCard: {
     backgroundColor: AppTheme.colors.surface,
-    borderRadius: 24,
+    borderRadius: 16,
     padding: 24,
     borderWidth: 1,
-    borderColor: "#EEF2F7",
+    borderColor: AppTheme.colors.border,
   },
 
   searchHeader: {
@@ -2133,8 +2041,8 @@ const styles = StyleSheet.create({
   },
 
   searchTitle: {
-    fontSize: 24,
-    fontWeight: "800",
+    fontSize: 18,
+    fontWeight: "700",
     color: AppTheme.colors.textPrimary,
   },
 
@@ -2248,11 +2156,11 @@ const styles = StyleSheet.create({
 
   metricCard: {
     width: "48.5%",
-    backgroundColor: "#fff",
-    borderRadius: 20,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: 16,
     padding: 18,
     borderWidth: 1,
-    borderColor: "#EEF2F7",
+    borderColor: AppTheme.colors.border,
   },
 
   metricHeader: {
@@ -2295,11 +2203,11 @@ const styles = StyleSheet.create({
   },
 
   subjectCard: {
-    backgroundColor: "#fff",
-    borderRadius: 22,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: 16,
     padding: 20,
     borderWidth: 1,
-    borderColor: "#EEF2F7",
+    borderColor: AppTheme.colors.border,
   },
 
   subjectHeader: {
@@ -2385,11 +2293,11 @@ const styles = StyleSheet.create({
 
   monthCard: {
     width: "48.5%",
-    backgroundColor: "#fff",
-    borderRadius: 20,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: 16,
     padding: 18,
     borderWidth: 1,
-    borderColor: "#EEF2F7",
+    borderColor: AppTheme.colors.border,
   },
 
   monthHeader: {
@@ -2420,7 +2328,7 @@ const styles = StyleSheet.create({
   },
 
   monthScore: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: "800",
     color: AppTheme.colors.primary,
   },
@@ -2439,11 +2347,11 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.primary,
   },
   lectureCard: {
-    backgroundColor: "#fff",
-    borderRadius: 22,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: 16,
     padding: 20,
     borderWidth: 1,
-    borderColor: "#EEF2F7",
+    borderColor: AppTheme.colors.border,
     marginBottom: 18,
   },
 

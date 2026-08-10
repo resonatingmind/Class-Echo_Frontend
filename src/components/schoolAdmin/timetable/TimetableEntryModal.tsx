@@ -13,8 +13,12 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-import { SelectionBottomSheet, SelectionItem } from "../../common/SelectionBottomSheet";
 import {
+  SelectionBottomSheet,
+  SelectionItem,
+} from "../../common/SelectionBottomSheet";
+import {
+  ClassOut,
   SubjectOut,
   TeacherOut,
   TimetableEntryOut,
@@ -26,22 +30,26 @@ export type PeriodSlot = {
   number: number;
   startTime: string;
   endTime: string;
-  label?: string; // e.g. "Lunch", "Assembly"
+  label?: string;
 };
 
 type Props = {
   visible: boolean;
   onClose: () => void;
   onSubmit: (payload: TimetableEntryPayload) => Promise<void> | void;
-  classId: number;
+  /** All classes available to pick from */
+  classes: ClassOut[];
   dayOfWeek: string;
-  subjects: SubjectOut[];
   teachers: TeacherOut[];
   initialEntry?: TimetableEntryOut | null;
   submitting?: boolean;
   errorMessage?: string | null;
-  /** Pre-configured period slots for quick selection */
+  /** Pre-configured period slots */
   periodSlots?: PeriodSlot[];
+  /** Subjects already loaded for each class (classId → list) */
+  subjectsCache?: Record<number, SubjectOut[]>;
+  /** Callback to fetch subjects for a given class on demand */
+  onFetchSubjects?: (classId: number) => Promise<SubjectOut[]>;
 };
 
 const TIME_PATTERN = /^([01]?\d|2[0-3]):([0-5]\d)$/;
@@ -58,45 +66,86 @@ export function TimetableEntryModal({
   visible,
   onClose,
   onSubmit,
-  classId,
+  classes,
   dayOfWeek,
-  subjects,
   teachers,
   initialEntry,
   submitting = false,
   errorMessage,
   periodSlots = [],
+  subjectsCache = {},
+  onFetchSubjects,
 }: Props) {
   const isEditing = Boolean(initialEntry);
 
+  const [classId, setClassId] = useState<number>(0);
   const [selectedSlot, setSelectedSlot] = useState<PeriodSlot | null>(null);
   const [subjectId, setSubjectId] = useState<number | null>(null);
   const [teacherId, setTeacherId] = useState<number | null>(null);
   const [room, setRoom] = useState("");
+  const [subjects, setSubjects] = useState<SubjectOut[]>([]);
+  const [loadingSubjects, setLoadingSubjects] = useState(false);
+
+  const [showClassPicker, setShowClassPicker] = useState(false);
   const [showSubjectPicker, setShowSubjectPicker] = useState(false);
   const [showTeacherPicker, setShowTeacherPicker] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
 
+  // ─── Initialise when modal opens ────────────────────────────────────────
   useEffect(() => {
     if (!visible) return;
+
     if (initialEntry) {
-      // Try to match the entry's period number to a configured slot
-      const matchingSlot = periodSlots.find(
-        (s) => s.number === initialEntry.period_number,
-      );
+      // Editing an existing entry — pre-fill all fields
+      setClassId(initialEntry.class_id);
+      const matchingSlot = periodSlots.find((s) => s.number === initialEntry.period_number);
       setSelectedSlot(matchingSlot ?? null);
       setSubjectId(initialEntry.subject_id);
       setTeacherId(initialEntry.teacher_id);
       setRoom(initialEntry.room ?? "");
     } else {
+      // New entry — default to first class, first slot
+      const defaultClassId = classes[0]?.id ?? 0;
+      setClassId(defaultClassId);
       setSelectedSlot(periodSlots[0] ?? null);
       setSubjectId(null);
       setTeacherId(null);
       setRoom("");
     }
     setLocalError(null);
-  }, [visible, initialEntry, periodSlots]);
+  }, [visible, initialEntry]);
 
+  // ─── Load subjects whenever classId changes ──────────────────────────────
+  useEffect(() => {
+    if (!classId || !visible) return;
+
+    // Use cached subjects if available
+    if (subjectsCache[classId]) {
+      setSubjects(subjectsCache[classId]);
+      return;
+    }
+
+    // Otherwise fetch
+    if (onFetchSubjects) {
+      setLoadingSubjects(true);
+      onFetchSubjects(classId)
+        .then((list) => setSubjects(list))
+        .finally(() => setLoadingSubjects(false));
+    }
+  }, [classId, visible]);
+
+  // When subjectsCache updates externally (e.g. prefetch), sync locally
+  useEffect(() => {
+    if (classId && subjectsCache[classId]) {
+      setSubjects(subjectsCache[classId]);
+    }
+  }, [subjectsCache, classId]);
+
+  // ─── Derived display values ──────────────────────────────────────────────
+  const classItems: SelectionItem[] = classes.map((c) => ({
+    id: String(c.id),
+    label: `${c.name} – Section ${c.section}`,
+  }));
   const subjectItems: SelectionItem[] = subjects.map((s) => ({
     id: String(s.id),
     label: s.name,
@@ -106,14 +155,23 @@ export function TimetableEntryModal({
     label: t.name,
   }));
 
+  const selectedClassName = classes.find((c) => c.id === classId);
+  const selectedClassLabel = selectedClassName
+    ? `${selectedClassName.name} – Sec ${selectedClassName.section}`
+    : undefined;
   const selectedSubjectName = subjects.find((s) => s.id === subjectId)?.name;
   const selectedTeacherName = teachers.find((t) => t.id === teacherId)?.name;
 
+  // ─── Submit ─────────────────────────────────────────────────────────────
   const handleSubmit = () => {
+    if (!classId) {
+      setLocalError("Select a class.");
+      return;
+    }
     if (!selectedSlot) {
       setLocalError(
         periodSlots.length === 0
-          ? "No period slots configured. Please set up periods first."
+          ? "No period slots configured. Set up your school's period schedule first."
           : "Select a period slot.",
       );
       return;
@@ -151,13 +209,13 @@ export function TimetableEntryModal({
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
             <View style={styles.sheet}>
-              {/* ── Header ─────────────────────────────────────────── */}
+              {/* Drag handle */}
               <View style={styles.dragHandle} />
+
+              {/* Header */}
               <View style={styles.headerRow}>
                 <View>
-                  <Text style={styles.title}>
-                    {isEditing ? "Edit Period" : "Add Period"}
-                  </Text>
+                  <Text style={styles.title}>{isEditing ? "Edit Period" : "Add Period"}</Text>
                   <Text style={styles.subtitle}>{dayOfWeek}</Text>
                 </View>
                 <Pressable onPress={onClose} hitSlop={12} style={styles.closeBtn}>
@@ -170,19 +228,26 @@ export function TimetableEntryModal({
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}
               >
-                {/* ── Period Slot Picker ──────────────────────────── */}
+                {/* ── Class ────────────────────────────────────────── */}
+                <Text style={styles.label}>Class</Text>
+                <Pressable
+                  style={styles.selectInput}
+                  onPress={() => setShowClassPicker(true)}
+                >
+                  <Text style={[styles.selectInputText, !selectedClassLabel && styles.placeholderText]}>
+                    {selectedClassLabel ?? "Select a class"}
+                  </Text>
+                  <Ionicons name="chevron-down" size={18} color={AppTheme.colors.textSecondary} />
+                </Pressable>
+
+                {/* ── Period Slot Chips ────────────────────────────── */}
                 <Text style={styles.label}>Period Slot</Text>
 
                 {noPeriods ? (
                   <View style={styles.noPeriodsBanner}>
-                    <Ionicons
-                      name="time-outline"
-                      size={18}
-                      color={AppTheme.colors.warning}
-                    />
+                    <Ionicons name="time-outline" size={18} color={AppTheme.colors.warning} />
                     <Text style={styles.noPeriodsBannerText}>
-                      No period slots configured yet. Set up your school's period
-                      schedule from the timetable screen first.
+                      No period slots configured. Set up periods from the "Set Up Periods" button on the timetable screen.
                     </Text>
                   </View>
                 ) : (
@@ -216,60 +281,51 @@ export function TimetableEntryModal({
                   </ScrollView>
                 )}
 
-                {/* Selected slot detail pill */}
                 {selectedSlot && (
                   <View style={styles.selectedSlotPill}>
-                    <Ionicons
-                      name="time-outline"
-                      size={13}
-                      color={AppTheme.colors.primary}
-                    />
+                    <Ionicons name="time-outline" size={13} color={AppTheme.colors.primary} />
                     <Text style={styles.selectedSlotText}>
                       Period {selectedSlot.number} · {fmt12(selectedSlot.startTime)} – {fmt12(selectedSlot.endTime)}
                     </Text>
                   </View>
                 )}
 
-                {/* ── Subject ─────────────────────────────────────── */}
+                {/* ── Subject ──────────────────────────────────────── */}
                 <Text style={styles.label}>Subject</Text>
-                <Pressable
-                  style={styles.selectInput}
-                  onPress={() => setShowSubjectPicker(true)}
-                >
-                  <Text
-                    style={[
-                      styles.selectInputText,
-                      !selectedSubjectName && styles.placeholderText,
-                    ]}
+                {loadingSubjects ? (
+                  <View style={styles.loadingRow}>
+                    <ActivityIndicator size="small" color={AppTheme.colors.primary} />
+                    <Text style={styles.loadingRowText}>Loading subjects…</Text>
+                  </View>
+                ) : (
+                  <Pressable
+                    style={[styles.selectInput, !classId && styles.selectInputDisabled]}
+                    onPress={() => classId && setShowSubjectPicker(true)}
                   >
-                    {selectedSubjectName ?? "Choose from class subjects"}
-                  </Text>
-                  <Ionicons name="chevron-down" size={18} color={AppTheme.colors.textSecondary} />
-                </Pressable>
-                {subjects.length === 0 ? (
-                  <Text style={styles.helperNote}>
-                    This class has no subjects yet — add one before scheduling.
-                  </Text>
-                ) : null}
+                    <Text style={[styles.selectInputText, !selectedSubjectName && styles.placeholderText]}>
+                      {!classId
+                        ? "Select a class first"
+                        : subjects.length === 0
+                        ? "No subjects in this class yet"
+                        : selectedSubjectName ?? "Choose from class subjects"}
+                    </Text>
+                    <Ionicons name="chevron-down" size={18} color={AppTheme.colors.textSecondary} />
+                  </Pressable>
+                )}
 
-                {/* ── Teacher ─────────────────────────────────────── */}
+                {/* ── Teacher ──────────────────────────────────────── */}
                 <Text style={styles.label}>Teacher</Text>
                 <Pressable
                   style={styles.selectInput}
                   onPress={() => setShowTeacherPicker(true)}
                 >
-                  <Text
-                    style={[
-                      styles.selectInputText,
-                      !selectedTeacherName && styles.placeholderText,
-                    ]}
-                  >
+                  <Text style={[styles.selectInputText, !selectedTeacherName && styles.placeholderText]}>
                     {selectedTeacherName ?? "Assign a teacher"}
                   </Text>
                   <Ionicons name="chevron-down" size={18} color={AppTheme.colors.textSecondary} />
                 </Pressable>
 
-                {/* ── Room ────────────────────────────────────────── */}
+                {/* ── Room ─────────────────────────────────────────── */}
                 <Text style={styles.label}>Room (optional)</Text>
                 <TextInput
                   style={styles.input}
@@ -311,6 +367,22 @@ export function TimetableEntryModal({
         </View>
       </TouchableWithoutFeedback>
 
+      {/* Class picker */}
+      <SelectionBottomSheet
+        visible={showClassPicker}
+        title="Select Class"
+        items={classItems}
+        selectedId={classId ? String(classId) : undefined}
+        placeholder="Search classes..."
+        onClose={() => setShowClassPicker(false)}
+        onSelect={(item) => {
+          const newId = Number(item.id);
+          setClassId(newId);
+          setSubjectId(null); // Reset subject when class changes
+        }}
+      />
+
+      {/* Subject picker */}
       <SelectionBottomSheet
         visible={showSubjectPicker}
         title="Choose a Subject"
@@ -321,6 +393,7 @@ export function TimetableEntryModal({
         onSelect={(item) => setSubjectId(Number(item.id))}
       />
 
+      {/* Teacher picker */}
       <SelectionBottomSheet
         visible={showTeacherPicker}
         title="Assign a Teacher"
@@ -347,8 +420,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 28,
     paddingHorizontal: 20,
     paddingTop: 10,
-    paddingBottom: 0,
-    maxHeight: "90%",
+    maxHeight: "92%",
   },
 
   dragHandle: {
@@ -418,10 +490,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
 
-  slotRow: {
-    gap: 8,
-    paddingVertical: 2,
-  },
+  slotRow: { gap: 8, paddingVertical: 2 },
 
   slotChip: {
     alignItems: "center",
@@ -434,32 +503,14 @@ const styles = StyleSheet.create({
     minWidth: 70,
     gap: 2,
   },
-
   slotChipActive: {
     backgroundColor: AppTheme.colors.primaryLight,
     borderColor: AppTheme.colors.primary,
   },
-
-  slotChipNum: {
-    fontSize: 13,
-    fontWeight: "800",
-    color: AppTheme.colors.textPrimary,
-  },
-
-  slotChipNumActive: {
-    color: AppTheme.colors.primaryDark,
-  },
-
-  slotChipTime: {
-    fontSize: 10,
-    color: AppTheme.colors.textSecondary,
-    fontWeight: "500",
-  },
-
-  slotChipTimeActive: {
-    color: AppTheme.colors.primary,
-  },
-
+  slotChipNum: { fontSize: 13, fontWeight: "800", color: AppTheme.colors.textPrimary },
+  slotChipNumActive: { color: AppTheme.colors.primaryDark },
+  slotChipTime: { fontSize: 10, color: AppTheme.colors.textSecondary, fontWeight: "500" },
+  slotChipTimeActive: { color: AppTheme.colors.primary },
   slotChipLabel: {
     fontSize: 9,
     color: AppTheme.colors.hint,
@@ -467,10 +518,7 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 0.4,
   },
-
-  slotChipLabelActive: {
-    color: AppTheme.colors.primary,
-  },
+  slotChipLabelActive: { color: AppTheme.colors.primary },
 
   selectedSlotPill: {
     flexDirection: "row",
@@ -483,11 +531,27 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     alignSelf: "flex-start",
   },
-
   selectedSlotText: {
     fontSize: 12,
     fontWeight: "600",
     color: AppTheme.colors.primaryDark,
+  },
+
+  // ── Loading subjects ───────────────────────────────────────────────
+  loadingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    height: 48,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.surfaceSoft,
+  },
+  loadingRowText: {
+    fontSize: 14,
+    color: AppTheme.colors.textSecondary,
   },
 
   // ── Common inputs ─────────────────────────────────────────────────
@@ -513,35 +577,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-
-  selectInputText: {
-    fontSize: 15,
-    color: AppTheme.colors.textPrimary,
-    flex: 1,
+  selectInputDisabled: {
+    opacity: 0.6,
   },
+  selectInputText: { fontSize: 15, color: AppTheme.colors.textPrimary, flex: 1 },
+  placeholderText: { color: AppTheme.colors.textPlaceholder },
 
-  placeholderText: {
-    color: AppTheme.colors.textPlaceholder,
-  },
-
-  helperNote: {
-    marginTop: 6,
-    fontSize: 12,
-    color: AppTheme.colors.textSecondary,
-  },
-
-  errorRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    marginTop: 14,
-  },
-
-  errorText: {
-    flex: 1,
-    color: "#DC2626",
-    fontSize: 13,
-  },
+  errorRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 14 },
+  errorText: { flex: 1, color: "#DC2626", fontSize: 13 },
 
   submitButton: {
     marginTop: 24,
@@ -551,14 +594,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-
-  submitDisabled: {
-    backgroundColor: AppTheme.colors.disabled,
-  },
-
-  submitText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "700",
-  },
+  submitDisabled: { backgroundColor: AppTheme.colors.disabled },
+  submitText: { color: "#FFFFFF", fontSize: 16, fontWeight: "700" },
 });

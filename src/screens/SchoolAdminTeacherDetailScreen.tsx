@@ -25,7 +25,7 @@ import {
   reactivateSchoolAdminTeacher,
 } from "../lib/api";
 import { RootStackParamList } from "../navigation/AppNavigator";
-import { ScreenHeader } from "../components/common/ScreenHeader";
+import { AdminNavbar } from "../components/common/AdminNavbar";
 import { AppTheme } from "../theme/AppTheme";
 import { TeacherOut } from "../types/api";
 
@@ -242,10 +242,17 @@ try {
   };
 
   return (
-    <SafeAreaView edges={['bottom']} style={styles.safe}>
-      <ScreenHeader title="Teacher Profile" onBack={handleBack} />
-      <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.profileCard}>
+    <SafeAreaView edges={['top', 'bottom']} style={styles.safe}>
+      <AdminNavbar title="Teacher Profile" onBack={handleBack} />
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <View style={styles.centerContainer}>
+          <View style={styles.body}>
+            <View style={styles.pageHeading}>
+              <Text style={styles.academicLabel}>TEACHER PROFILE</Text>
+              <Text style={styles.pageTitle}>{teacher.name}</Text>
+            </View>
+
+            <View style={styles.profileCard}>
           <View style={styles.avatar}>
             <Ionicons name="person" size={42} color={AppTheme.colors.primary} />
           </View>
@@ -258,62 +265,25 @@ try {
             {(() => {
               const display = getStatusDisplay(teacher.status ?? "active");
               return (
-                <View style={[styles.statusBadge, { backgroundColor: display.bgColor }]}>
-                  <Ionicons name={display.icon} size={14} color={display.textColor} />
-                  <Text style={[styles.statusText, { color: display.textColor, marginLeft: 4 }]}>
-                    {display.text}
-                  </Text>
+                <View style={styles.statusRow}>
+                  <View style={[styles.statusBadge, { backgroundColor: display.bgColor, marginTop: 0 }]}>
+                    <Ionicons name={display.icon} size={14} color={display.textColor} />
+                    <Text style={[styles.statusText, { color: display.textColor, marginLeft: 4 }]}>
+                      {display.text}
+                    </Text>
+                  </View>
+                  {profile.assigned_at && (
+                    <Text style={styles.assignedDateText}>
+                      Joined {new Date(profile.assigned_at).toLocaleDateString()}
+                    </Text>
+                  )}
                 </View>
               );
             })()}
           </View>
         </View>
 
-        <Text style={styles.sectionTitle}>Assignment Information</Text>
-
-        <View style={styles.infoGrid}>
-          <View style={styles.infoCard}>
-            <Ionicons name="school-outline" size={24} color={AppTheme.colors.primary} />
-
-            <Text style={styles.infoValue}>{profile.classes.join(", ")}</Text>
-
-            <Text style={styles.infoLabel}>Assigned Classes</Text>
-          </View>
-
-          <View style={styles.infoCard}>
-            <Ionicons name="book-outline" size={24} color={AppTheme.colors.primary} />
-
-            <Text style={styles.infoValue}>
-              {profile.statistics.total_subjects}
-            </Text>
-
-            <Text style={styles.infoLabel}>Subjects</Text>
-          </View>
-
-          <View style={styles.infoCard}>
-            <Ionicons name="calendar-outline" size={24} color={AppTheme.colors.primary} />
-
-            <Text style={styles.infoSmall}>
-              {profile.assigned_at
-                ? new Date(profile.assigned_at).toLocaleDateString()
-                : "--"}
-            </Text>
-
-            <Text style={styles.infoLabel}>Assigned On</Text>
-          </View>
-
-          <View style={styles.infoCard}>
-            <Ionicons name="library-outline" size={24} color={AppTheme.colors.primary} />
-
-            <Text style={styles.infoValue}>
-              {profile.statistics.total_recordings}
-            </Text>
-
-            <Text style={styles.infoLabel}>Recordings</Text>
-          </View>
-        </View>
-
-        <Text style={styles.sectionTitle}>Teaching Statistics</Text>
+        <Text style={styles.sectionTitle}>Teaching Overview</Text>
 
         <View style={styles.statsGrid}>
           <StatCard label="Classes" value={profile.statistics.total_classes} />
@@ -333,6 +303,19 @@ try {
             value={profile.statistics.total_recordings}
           />
         </View>
+
+        {profile.classes && profile.classes.length > 0 && (
+          <>
+            <Text style={styles.sectionTitle}>Assigned Classes</Text>
+            <View style={styles.chipContainer}>
+              {profile.classes.map((cls, idx) => (
+                <View key={idx} style={styles.chip}>
+                  <Text style={styles.chipText}>{cls}</Text>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
 
         <Text style={styles.sectionTitle}>Assigned Subjects</Text>
 
@@ -366,69 +349,75 @@ try {
           <Text style={styles.sectionTitle}>Quick Actions</Text>
 
           {teacher.status === "pending_approval" && (
-            <View style={{ gap: 10, marginBottom: 6 }}>
+            <View style={styles.actionButtonGroup}>
               <Pressable
-                style={[styles.actionButton, { backgroundColor: "#16A34A" }]}
+                style={[styles.actionBtn, styles.actionBtnSuccess]}
                 onPress={handleApprove}
               >
-                <Ionicons name="checkmark-circle" size={18} color="#fff" />
-                <Text style={styles.actionText}>Approve Request</Text>
+                <Ionicons name="checkmark-circle" size={20} color="#fff" />
+                <Text style={styles.actionBtnText}>Approve Request</Text>
               </Pressable>
               <Pressable
-                style={[styles.actionButton, { backgroundColor: "#DC2626" }]}
+                style={[styles.actionBtn, styles.actionBtnDanger]}
                 onPress={handleReject}
               >
-                <Ionicons name="close-circle" size={18} color="#fff" />
-                <Text style={styles.actionText}>Decline Request</Text>
+                <Ionicons name="close-circle" size={20} color="#fff" />
+                <Text style={styles.actionBtnText}>Decline Request</Text>
               </Pressable>
             </View>
           )}
 
           {teacher.status === "active" && (
-            <Pressable
-              style={[styles.actionButton, { backgroundColor: "#DC2626", marginBottom: 6 }]}
-              onPress={handleSuspend}
-            >
-              <Ionicons name="ban" size={18} color="#fff" />
-              <Text style={styles.actionText}>Suspend Account</Text>
-            </Pressable>
+            <View style={styles.actionButtonGroup}>
+              <Pressable
+                style={[styles.actionBtn, styles.actionBtnDanger]}
+                onPress={handleSuspend}
+              >
+                <Ionicons name="ban" size={20} color="#fff" />
+                <Text style={styles.actionBtnText}>Suspend Account</Text>
+              </Pressable>
+            </View>
           )}
 
           {teacher.status === "suspended" && (
-            <Pressable
-              style={[styles.actionButton, { backgroundColor: "#16A34A", marginBottom: 6 }]}
-              onPress={handleReactivate}
-            >
-              <Ionicons name="checkmark-circle" size={18} color="#fff" />
-              <Text style={styles.actionText}>Reactivate Account</Text>
-            </Pressable>
+            <View style={styles.actionButtonGroup}>
+              <Pressable
+                style={[styles.actionBtn, styles.actionBtnSuccess]}
+                onPress={handleReactivate}
+              >
+                <Ionicons name="checkmark-circle" size={20} color="#fff" />
+                <Text style={styles.actionBtnText}>Reactivate Account</Text>
+              </Pressable>
+            </View>
           )}
 
-          <Pressable
-            style={styles.actionButton}
-            onPress={() =>
-              navigation.navigate("SchoolAdminTeacherAnalytics", {
-                teacherId: teacher.id,
-              })
-            }
-          >
-            <Ionicons name="bar-chart" size={18} color="#fff" />
+          <View style={styles.actionButtonGroup}>
+            <Pressable
+              style={[styles.actionBtn, styles.actionBtnSecondary]}
+              onPress={() =>
+                navigation.navigate("SchoolAdminTeacherAnalytics", {
+                  teacherId: teacher.id,
+                })
+              }
+            >
+              <Ionicons name="bar-chart" size={20} color={AppTheme.colors.primary} />
+              <Text style={styles.actionBtnTextSecondary}>View Analytics</Text>
+            </Pressable>
 
-            <Text style={styles.actionText}>View Analytics</Text>
-          </Pressable>
-
-          <Pressable
-            style={styles.actionButton}
-            onPress={() =>
-              navigation.navigate("SchoolAdminTeacherRecordings", {
-                teacherId: teacher.id,
-              })
-            }
-          >
-            <Ionicons name="mic" size={18} color="#fff" />
-
-            <Text style={styles.actionText}>View Recordings</Text>
-          </Pressable>
+            <Pressable
+              style={[styles.actionBtn, styles.actionBtnSecondary]}
+              onPress={() =>
+                navigation.navigate("SchoolAdminTeacherRecordings", {
+                  teacherId: teacher.id,
+                })
+              }
+            >
+              <Ionicons name="mic" size={20} color={AppTheme.colors.primary} />
+              <Text style={styles.actionBtnTextSecondary}>View Recordings</Text>
+            </Pressable>
+          </View>
+        </View>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -450,9 +439,38 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.background,
   },
 
-  content: {
-    padding: 20,
-    gap: 20,
+  scroll: {
+    flexGrow: 1,
+  },
+
+  centerContainer: {
+    flex: 1,
+    alignItems: "center",
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.xl,
+  },
+
+  body: {
+    width: "100%",
+    maxWidth: 800,
+    gap: AppTheme.spacing.l,
+  },
+
+  pageHeading: {
+    gap: AppTheme.spacing.s,
+    marginBottom: AppTheme.spacing.xs,
+  },
+
+  academicLabel: {
+    color: AppTheme.colors.primary,
+    ...AppTheme.typography.caption,
+    fontWeight: "700",
+    letterSpacing: 1.2,
+  },
+
+  pageTitle: {
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.heading1,
   },
 
   center: {
@@ -468,6 +486,8 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: AppTheme.colors.surface,
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
     padding: 20,
     gap: 12,
   },
@@ -489,29 +509,71 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textPrimary,
   },
 
-  actionButton: {
-    height: 50,
-    borderRadius: AppTheme.radius.medium,
-    backgroundColor: AppTheme.colors.primary,
-    justifyContent: "center",
-    alignItems: "center",
+  actionButtonGroup: {
     flexDirection: "row",
-    gap: 10,
+    flexWrap: "wrap",
+    gap: 12,
+    marginTop: 6,
+    marginBottom: 6,
   },
 
-  actionText: {
+  actionBtn: {
+    flex: 1,
+    minWidth: 150,
+    height: 52,
+    borderRadius: AppTheme.radius.large,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+
+  actionBtnSuccess: {
+    backgroundColor: "#16A34A",
+  },
+
+  actionBtnDanger: {
+    backgroundColor: "#DC2626",
+  },
+
+  actionBtnSecondary: {
+    backgroundColor: AppTheme.colors.surface,
+    borderWidth: 1.5,
+    borderColor: AppTheme.colors.primary,
+    shadowOpacity: 0.05,
+  },
+
+  actionBtnText: {
     color: "#fff",
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 15,
+  },
+
+  actionBtnTextSecondary: {
+    color: AppTheme.colors.primary,
+    fontWeight: "700",
+    fontSize: 15,
   },
 
   profileCard: {
     flexDirection: "row",
     backgroundColor: AppTheme.colors.surface,
-    borderRadius: 20,
+    borderRadius: AppTheme.radius.large,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
     padding: 20,
     alignItems: "center",
     gap: 18,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
 
   avatar: {
@@ -523,11 +585,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
+  statusRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 12,
+    marginTop: 10,
+  },
+
   statusBadge: {
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start",
-    marginTop: 10,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 20,
@@ -540,37 +609,31 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 
-  infoGrid: {
+  assignedDateText: {
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.caption,
+    fontWeight: "600",
+  },
+
+  chipContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
-    rowGap: 16,
+    gap: 10,
   },
 
-  infoCard: {
-    width: "48%",
-    backgroundColor: AppTheme.colors.surface,
-    borderRadius: 16,
-    padding: 18,
-    alignItems: "center",
+  chip: {
+    backgroundColor: "#EEF4FF",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#D1E4FF",
   },
 
-  infoValue: {
-    fontSize: 22,
-    fontWeight: "700",
-    marginTop: 10,
-    color: AppTheme.colors.textPrimary,
-  },
-
-  infoSmall: {
-    fontSize: 14,
+  chipText: {
+    color: AppTheme.colors.primary,
     fontWeight: "600",
-    marginTop: 10,
-  },
-
-  infoLabel: {
-    marginTop: 8,
-    color: AppTheme.colors.textSecondary,
+    fontSize: 13,
   },
 
   statsGrid: {
@@ -584,6 +647,8 @@ const styles = StyleSheet.create({
     width: "48%",
     backgroundColor: AppTheme.colors.surface,
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
     padding: 20,
     alignItems: "center",
   },
@@ -602,6 +667,8 @@ const styles = StyleSheet.create({
   subjectCard: {
     backgroundColor: AppTheme.colors.surface,
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
     padding: 18,
     marginBottom: 14,
   },

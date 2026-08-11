@@ -5,5 +5,4 @@ export const TABLE_COLUMNS = {
   students: 1,
   recordings: 1,
   aiStatus: 1.2,
-  action: 0.8,
 } as const;

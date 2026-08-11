@@ -168,6 +168,7 @@ export function TeacherDashboardScreen() {
 
   const firstName = profile?.name?.split(" ")[0] ?? "Teacher";
 
+  return (
     <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
       <AdminNavbar title="Teacher" onProfilePress={() => navigation.navigate("TeacherProfile" as never)} />
       <View style={styles.flex}>

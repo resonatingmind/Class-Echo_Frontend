@@ -13,6 +13,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { AdminNavbar } from "../components/common/AdminNavbar";
 
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { AppTheme } from "../theme/AppTheme";
@@ -234,20 +235,9 @@ export function TeacherSubjectsScreen({ navigation }: Props) {
   ]);
 
   return (
-    <SafeAreaView edges={["top"]} style={styles.safe}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerLeft} />
-        <Text style={styles.headerTitle}>Teacher Hub</Text>
-        <View style={styles.headerRight}>
-          <Pressable
-            onPress={() => navigation.navigate("TeacherProfile")}
-            style={styles.avatarCircle}
-          >
-            <Ionicons color={AppTheme.colors.primary} name="person" size={18} />
-          </Pressable>
-        </View>
-      </View>
+    <SafeAreaView edges={["top", "bottom"]} style={styles.safe}>
+      <AdminNavbar title="Subjects" onProfilePress={() => navigation.navigate("TeacherProfile" as never)} />
+      <View style={styles.flex}>
 
       <ScrollView
         contentContainerStyle={styles.scroll}
@@ -260,7 +250,9 @@ export function TeacherSubjectsScreen({ navigation }: Props) {
         }
         showsVerticalScrollIndicator={false}
       >
-        {/* Page heading */}
+        <View style={styles.centerContainer}>
+          <View style={styles.body}>
+            {/* Page heading */}
         <View style={styles.pageHeading}>
           {teacher?.school_name ? (
             <Text style={styles.schoolKicker}>
@@ -369,15 +361,6 @@ export function TeacherSubjectsScreen({ navigation }: Props) {
                     section: row.section,
                   });
                 }}
-                onOpenWorkspace={(row) => {
-                  // 2. Tapping the "View" button navigates cleanly into the Workspace screen!
-                  navigation.navigate("TeacherSubjectWorkspace", {
-                    subjectId: row.subject_id,
-                    subjectName: row.subject_name,
-                    className: row.class_name,
-                    section: row.section,
-                  });
-                }}
               />
 
               // <TeacherAssignmentTable
@@ -403,8 +386,11 @@ export function TeacherSubjectsScreen({ navigation }: Props) {
               }}
             /> */}
           </>
-        )}
+            )}
+          </View>
+        </View>
       </ScrollView>
+    </View>
 
       <SelectionBottomSheet
         visible={classSheetVisible}
@@ -447,52 +433,39 @@ export function TeacherSubjectsScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: AppTheme.colors.background },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    backgroundColor: AppTheme.colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: AppTheme.colors.border,
-  },
-  headerLeft: { width: 40 },
-  headerTitle: {
-    flex: 1,
-    textAlign: "center",
-    color: AppTheme.colors.textPrimary,
-    fontSize: 17,
-    fontWeight: "700",
-  },
-  headerRight: { width: 40, alignItems: "flex-end" },
-  avatarCircle: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: AppTheme.colors.primaryLight,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  flex: { flex: 1 },
   scroll: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 32,
-    gap: 20,
+    flexGrow: 1,
   },
-  pageHeading: { gap: 6 },
+  centerContainer: {
+    flex: 1,
+    alignItems: "center",
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.xl,
+  },
+  body: {
+    width: "100%",
+    maxWidth: 800,
+    gap: AppTheme.spacing.l,
+  },
+  pageHeading: {
+    gap: AppTheme.spacing.s,
+    marginBottom: AppTheme.spacing.xs,
+  },
   schoolKicker: {
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 1.2,
-    color: AppTheme.colors.primary,
+    fontSize: 12,
+    fontWeight: "600",
+    color: AppTheme.colors.textSecondary,
+    marginBottom: -4,
   },
   pageTitle: {
     color: AppTheme.colors.textPrimary,
-    fontSize: 32,
-    fontWeight: "800",
-    letterSpacing: -0.75,
+    ...AppTheme.typography.heading1,
   },
-  pageSubtitle: { color: AppTheme.colors.textSecondary, fontSize: 15, lineHeight: 22 },
+  pageSubtitle: {
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.body,
+  },
   center: { alignItems: "center", paddingVertical: 56, gap: 10 },
   loadingText: { color: AppTheme.colors.textSecondary, fontSize: 14 },
   emptyTitle: { color: AppTheme.colors.textPrimary, fontSize: 16, fontWeight: "700" },

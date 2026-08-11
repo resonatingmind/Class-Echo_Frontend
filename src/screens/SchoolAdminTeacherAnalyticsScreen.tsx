@@ -2431,4 +2431,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 
+
+
+  completedBadge: {
+    backgroundColor: "#DCFCE7",
+  },
+
+  processingBadge: {
+    backgroundColor: "#FEF3C7",
+  },
+
+  pendingBadge: {
+    backgroundColor: "#DBEAFE",
+  },
+
+  failedBadge: {
+    backgroundColor: "#FEE2E2",
+  },
+
+
+
 });

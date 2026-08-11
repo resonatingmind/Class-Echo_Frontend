@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { TeacherDashboardSubject } from "../../types/api";
 import { AppTheme } from "../../theme/AppTheme";
@@ -11,93 +11,19 @@ import { TABLE_COLUMNS } from "./tableColumns";
 type Props = {
   rows: TeacherDashboardSubject[];
   onOpenSubject: (row: TeacherDashboardSubject) => void;
-  onOpenWorkspace: (row: TeacherDashboardSubject) => void;
 };
 
 export function TeacherAssignmentTable({
   rows,
   onOpenSubject,
-  onOpenWorkspace,
 }: Props) {
   return (
-    <View>
-      <View style={styles.header}>
-        <Text style={[styles.headerText, { flex: TABLE_COLUMNS.class }]}>
-          Class
-        </Text>
-
-        <Text
-          style={[
-            styles.headerText,
-            {
-              flex: TABLE_COLUMNS.section,
-              textAlign: "center",
-            },
-          ]}
-        >
-          Sec
-        </Text>
-
-        <Text style={[styles.headerText, { flex: TABLE_COLUMNS.subject }]}>
-          Subject
-        </Text>
-
-        <Text
-          style={[
-            styles.headerText,
-            {
-              flex: TABLE_COLUMNS.students,
-              textAlign: "center",
-            },
-          ]}
-        >
-          Students
-        </Text>
-
-        <Text
-          style={[
-            styles.headerText,
-            {
-              flex: TABLE_COLUMNS.recordings,
-              textAlign: "center",
-            },
-          ]}
-        >
-          Recordings
-        </Text>
-
-        <Text
-          style={[
-            styles.headerText,
-            {
-              flex: TABLE_COLUMNS.aiStatus,
-              textAlign: "center",
-            },
-          ]}
-        >
-          Avg Score
-        </Text>
-
-        <Text
-          style={[
-            styles.headerText,
-            {
-              flex: TABLE_COLUMNS.action,
-              textAlign: "center",
-            },
-          ]}
-        >
-          Action
-        </Text>
-      </View>
-
+    <View style={styles.grid}>
       {rows.map((row) => (
         <TeacherAssignmentRow
           key={row.subject_id}
           row={row}
           onPress={() => onOpenSubject(row)}
-          //   onViewPress={() => onOpenDetails(row)}
-          onViewPress={() => onOpenWorkspace(row)}
         />
       ))}
     </View>
@@ -105,15 +31,9 @@ export function TeacherAssignmentTable({
 }
 
 const styles = StyleSheet.create({
-  header: {
+  grid: {
     flexDirection: "row",
-    marginBottom: 10,
-    paddingHorizontal: 14,
-  },
-
-  headerText: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: AppTheme.colors.textSecondary,
+    flexWrap: "wrap",
+    gap: AppTheme.spacing.m,
   },
 });

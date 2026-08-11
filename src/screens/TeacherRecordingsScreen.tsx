@@ -10,9 +10,11 @@ import {
   Text,
   TextInput,
   View,
+  useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { useAuth } from "../context/AuthContext";
@@ -22,7 +24,35 @@ import {
 } from "../lib/api";
 import { RecordingWithReport, TeacherDashboardSubject } from "../types/api";
 import { AppTheme } from "../theme/AppTheme";
-import { ScreenHeader } from "../components/common/ScreenHeader";
+import { AdminNavbar } from "../components/common/AdminNavbar";
+
+function StatChip({ icon, label, value }: { icon: string; label: string; value: string | number }) {
+  return (
+    <View style={statStyles.chip}>
+      <Ionicons name={icon as any} size={14} color="rgba(255,255,255,0.85)" />
+      <View>
+        <Text style={statStyles.chipValue}>{value}</Text>
+        <Text style={statStyles.chipLabel}>{label}</Text>
+      </View>
+    </View>
+  );
+}
+
+const statStyles = StyleSheet.create({
+  chip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: "rgba(255,255,255,0.18)",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.25)",
+  },
+  chipValue: { fontSize: 15, fontWeight: "800", color: "#FFFFFF", lineHeight: 20 },
+  chipLabel: { fontSize: 10, color: "rgba(255,255,255,0.75)", fontWeight: "500", letterSpacing: 0.3 },
+});
 import { RootStackParamList } from "../navigation/AppNavigator";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -71,6 +101,8 @@ const SORT_OPTIONS           = ["Newest", "Oldest", "Highest Score", "Lowest Sco
 export function TeacherRecordingsScreen() {
   const navigation = useNavigation<Nav>();
   const { session } = useAuth();
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
 
   const [recordings, setRecordings]     = useState<RichRecording[]>([]);
   const [loading, setLoading]           = useState(true);
@@ -199,12 +231,8 @@ export function TeacherRecordingsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
-      <ScreenHeader
-        variant="large"
-        title="My Recordings"
-        subtitle={loading ? "Loading…" : `${stats.total} recording${stats.total === 1 ? "" : "s"} across all subjects`}
-      />
+    <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
+      <AdminNavbar title="Teacher" />
 
       <ScrollView
         contentContainerStyle={styles.scroll}
@@ -219,29 +247,47 @@ export function TeacherRecordingsScreen() {
       >
         <View style={styles.centerContainer}>
           <View style={styles.body}>
-        {/* ── Stats row ── */}
-        {!loading && !error && (
-          <View style={styles.statsRow}>
-            <View style={[styles.statCard, { borderColor: AppTheme.colors.primary + "30" }]}>
-              <Text style={[styles.statNumber, { color: AppTheme.colors.primary }]}>{stats.total}</Text>
-              <Text style={styles.statLabel}>Total</Text>
-            </View>
-            <View style={[styles.statCard, { borderColor: "#A7F3D0" }]}>
-              <Text style={[styles.statNumber, { color: "#047857" }]}>{stats.completed}</Text>
-              <Text style={styles.statLabel}>Done</Text>
-            </View>
-            <View style={[styles.statCard, { borderColor: "#BAE6FD" }]}>
-              <Text style={[styles.statNumber, { color: "#0369A1" }]}>{stats.processing}</Text>
-              <Text style={styles.statLabel}>Pending</Text>
-            </View>
-            <View style={[styles.statCard, { borderColor: AppTheme.colors.border }]}>
-              <Text style={[styles.statNumber, { color: AppTheme.colors.textPrimary }]}>
-                {stats.avg != null ? `${stats.avg}%` : "—"}
+        {/* ── Hero Banner ─────────────────────────────────────── */}
+        <LinearGradient
+          colors={["#1D8EF5", "#156FD6", "#0D4FAA"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.heroBanner}
+        >
+          <View style={styles.heroCircle1} />
+          <View style={styles.heroCircle2} />
+
+          <View style={[styles.heroTopRow, isMobile && styles.heroTopRowMobile]}>
+            <View style={isMobile ? { width: "100%", marginBottom: 12 } : { flex: 1 }}>
+              <View style={styles.heroLabelRow}>
+                <Ionicons name="mic-outline" size={13} color="rgba(255,255,255,0.8)" />
+                <Text style={styles.heroLabel}>TEACHER RECORDINGS</Text>
+              </View>
+              <Text style={styles.heroTitle}>My Recordings</Text>
+              <Text style={styles.heroSubtitle}>
+                {loading ? "Loading…" : `${stats.total} recording${stats.total === 1 ? "" : "s"} across all subjects`}
               </Text>
-              <Text style={styles.statLabel}>Avg Score</Text>
+            </View>
+
+            <View style={[styles.heroActions, isMobile && styles.heroActionsMobile]}>
+              <Pressable style={styles.heroGlassBtn} onPress={() => load(true)}>
+                <Ionicons name="refresh-outline" size={13} color="rgba(255,255,255,0.9)" />
+                <Text style={styles.heroGlassBtnText}>Refresh</Text>
+              </Pressable>
             </View>
           </View>
-        )}
+
+          {!loading && !error && (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.heroStats}>
+              <StatChip icon="list-outline" label="Total" value={stats.total} />
+              <StatChip icon="checkmark-circle-outline" label="Completed" value={stats.completed} />
+              <StatChip icon="time-outline" label="Processing" value={stats.processing} />
+              {stats.avg != null && (
+                <StatChip icon="star-outline" label="Avg Score" value={`${stats.avg}%`} />
+              )}
+            </ScrollView>
+          )}
+        </LinearGradient>
 
         {/* ── Search + filter bar ── */}
         <View style={styles.searchRow}>
@@ -472,8 +518,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     width: '100%',
-    paddingHorizontal: AppTheme.spacing.l,
-    paddingVertical: AppTheme.spacing.xl,
+    paddingTop: AppTheme.spacing.s,
+    paddingBottom: AppTheme.spacing.xxxl,
   },
   body: {
     width: '100%',
@@ -481,36 +527,102 @@ const styles = StyleSheet.create({
     gap: AppTheme.spacing.l,
   },
 
-  // ── Stats ──
-  statsRow: {
-    flexDirection: "row",
-    gap: AppTheme.spacing.s,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: AppTheme.colors.surface,
+  // ── Hero Banner Styles ──
+  heroBanner: {
+    marginHorizontal: AppTheme.spacing.l,
     borderRadius: AppTheme.radius.large,
-    borderWidth: 1,
-    paddingVertical: AppTheme.spacing.m,
-    alignItems: "center",
+    padding: 18,
+    overflow: "hidden",
+    gap: 14,
   },
-  statNumber: {
+  heroCircle1: {
+    position: "absolute",
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: "rgba(255,255,255,0.07)",
+    top: -40,
+    right: -30,
+  },
+  heroCircle2: {
+    position: "absolute",
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: "rgba(255,255,255,0.05)",
+    bottom: -20,
+    left: 60,
+  },
+  heroTopRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: 10,
+    flexWrap: "wrap",
+  },
+  heroTopRowMobile: {
+    flexDirection: "column",
+  },
+  heroLabelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    marginBottom: 3,
+  },
+  heroLabel: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: "rgba(255,255,255,0.75)",
+    letterSpacing: 1.2,
+  },
+  heroTitle: {
     fontSize: 20,
     fontWeight: "800",
-    letterSpacing: -0.5,
+    color: "#FFFFFF",
+    letterSpacing: -0.3,
   },
-  statLabel: {
-    fontSize: 11,
-    color: AppTheme.colors.textSecondary,
-    fontWeight: "600",
+  heroSubtitle: {
+    fontSize: 12,
+    color: "rgba(255,255,255,0.75)",
     marginTop: 2,
   },
+  heroActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    alignItems: "center",
+    justifyContent: "flex-end",
+  },
+  heroActionsMobile: {
+    justifyContent: "flex-start",
+    width: "100%",
+  },
+  heroGlassBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    backgroundColor: "rgba(255,255,255,0.18)",
+    paddingHorizontal: 11,
+    paddingVertical: 8,
+    borderRadius: AppTheme.radius.pill,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.3)",
+  },
+  heroGlassBtnText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#FFFFFF",
+  },
+  heroStats: {
+    gap: 8,
+    paddingRight: 4,
+  },
 
-  // ── Search ──
   searchRow: {
     flexDirection: "row",
     gap: AppTheme.spacing.s,
     alignItems: "center",
+    paddingHorizontal: AppTheme.spacing.l,
   },
   searchBox: {
     flex: 1,
@@ -563,6 +675,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: AppTheme.spacing.s,
     alignItems: "center",
+    paddingHorizontal: AppTheme.spacing.l,
   },
   chip: {
     backgroundColor: AppTheme.colors.primaryLight,
@@ -589,10 +702,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: AppTheme.colors.textSecondary,
     fontWeight: "500",
+    paddingHorizontal: AppTheme.spacing.l,
   },
 
   // ── List ──
-  list: { gap: AppTheme.spacing.m },
+  list: { 
+    gap: AppTheme.spacing.m,
+    paddingHorizontal: AppTheme.spacing.l,
+  },
   card: {
     flexDirection: "row",
     alignItems: "center",
@@ -664,6 +781,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: AppTheme.spacing.giant,
+    paddingHorizontal: AppTheme.spacing.l,
     gap: AppTheme.spacing.s,
   },
   loadingText: { fontSize: 14, color: AppTheme.colors.textSecondary },

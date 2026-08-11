@@ -24,7 +24,7 @@ import {
   LearningPlanInfoCard,
 } from '../components/RAGReportSections';
 import { useAuth } from '../context/AuthContext';
-import { archiveTeacherRecording, deleteTeacherRecording, retryRecording, updateTeacherRecording } from '../lib/api';
+import { API_BASE_URL, archiveTeacherRecording, deleteTeacherRecording, retryRecording, updateTeacherRecording } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { AppTheme } from '../theme/AppTheme';
 import { AppLogo } from '../components/ui/AppLogo';
@@ -279,9 +279,11 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
 
   // const player = useAudioPlayer(recordingDetails.cloudinary_url, { updateInterval: 200 });
 
+  // Relative storage paths have to resolve against whichever backend this build
+  // points at — a hardcoded localhost never works in a packaged APK.
   const audioUrl = recordingDetails.cloudinary_url.startsWith("http")
     ? recordingDetails.cloudinary_url
-    : `http://127.0.0.1:8000/${recordingDetails.cloudinary_url}`;
+    : `${API_BASE_URL}/${recordingDetails.cloudinary_url.replace(/^\/+/, "")}`;
 
   const player = useAudioPlayer(audioUrl, {
     updateInterval: 200,

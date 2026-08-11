@@ -43,6 +43,15 @@ const RECORDER_OPTIONS = {
   isMeteringEnabled: true,
 };
 
+/* Local calendar day, not UTC — a late-evening class in IST must not be dated
+   as the previous day. */
+function todayIsoDate(): string {
+  const now = new Date();
+  const month = `${now.getMonth() + 1}`.padStart(2, '0');
+  const day = `${now.getDate()}`.padStart(2, '0');
+  return `${now.getFullYear()}-${month}-${day}`;
+}
+
 function safelyPausePlayer(player: { pause: () => void }) {
   try {
     player.pause();
@@ -408,6 +417,9 @@ export function RecordingScreen({ navigation, route }: Props) {
           subjectId,
           chapterId,
           {
+            // A lecture created straight from an upload happened today, so it
+            // lands in the planner dated instead of blank.
+            date: todayIsoDate(),
             topic_name: paramChapterName || targetLectureTitle,
             sub_topic: targetLectureTitle,
           },
@@ -646,8 +658,10 @@ export function RecordingScreen({ navigation, route }: Props) {
 
               <View style={{ marginBottom: 14 }}>
                 <Text style={styles.metaLabel}>LECTURE (SUB-TOPIC) *</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 6, marginBottom: 4 }}>
-                  <View style={{ flexDirection: 'row', gap: 8 }}>
+                {/* Wraps instead of scrolling sideways — a horizontal strip hides
+                    lectures past the edge and a mouse wheel can't reach them. */}
+                <View style={{ marginTop: 6, marginBottom: 4 }}>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
                     {learningPlans.map((lp) => {
                       const isSel = !creatingNewLecture && selectedLearningPlanId === lp.id;
                       return (
@@ -692,7 +706,7 @@ export function RecordingScreen({ navigation, route }: Props) {
                       </Text>
                     </Pressable>
                   </View>
-                </ScrollView>
+                </View>
                 {lectureSelectError ? (
                   <Text style={{ color: '#E53935', fontSize: 12, marginTop: 4, fontWeight: '600' }}>
                     {lectureSelectError}

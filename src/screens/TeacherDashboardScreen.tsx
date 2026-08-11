@@ -168,21 +168,23 @@ export function TeacherDashboardScreen() {
 
   const firstName = profile?.name?.split(" ")[0] ?? "Teacher";
 
-  return (
     <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
-      <AdminNavbar title="Teacher Dashboard" onProfilePress={() => navigation.navigate("TeacherProfile" as never)} />
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={() => void load(true)}
-            tintColor={AppTheme.colors.primary}
-          />
-        }
-      >
-         {/* Page heading */}
+      <AdminNavbar title="Teacher" onProfilePress={() => navigation.navigate("TeacherProfile" as never)} />
+      <View style={styles.flex}>
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => void load(true)}
+              tintColor={AppTheme.colors.primary}
+            />
+          }
+        >
+          <View style={styles.centerContainer}>
+            <View style={styles.body}>
+              {/* Page heading */}
         <View style={styles.pageHeading}>
           <Text style={styles.pageTitle}>{greeting()} 👋</Text>
           <Text style={styles.pageSubtitle}>
@@ -194,9 +196,7 @@ export function TeacherDashboardScreen() {
         </View>
 
         {/* Stats Grid */}
-        <View style={styles.sectionHeaderMain}>
-          <Text style={styles.sectionTitle}>Dashboard Overview</Text>
-        </View>
+        <Text style={styles.sectionTitle}>Teacher Overview</Text>
         <View style={styles.statsGrid}>
           <View style={styles.statCard}>
             <Text style={styles.statNumber}>{stats.subjects}</Text>
@@ -399,7 +399,10 @@ export function TeacherDashboardScreen() {
           </View>
         )}
 
-      </ScrollView>
+            </View>
+          </View>
+        </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
@@ -408,16 +411,25 @@ export function TeacherDashboardScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: AppTheme.colors.background },
+  flex: { flex: 1 },
   loadingCenter: { flex: 1, alignItems: "center", justifyContent: "center" },
   scroll: {
-    paddingBottom: AppTheme.spacing.giant,
-    gap: AppTheme.spacing.xs,
+    flexGrow: 1,
+  },
+  centerContainer: {
+    flex: 1,
+    alignItems: "center",
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.xl,
+  },
+  body: {
+    width: "100%",
+    maxWidth: 800,
+    gap: AppTheme.spacing.l,
   },
 
   // ── Page Header ──
   pageHeading: {
-    paddingHorizontal: AppTheme.spacing.xl,
-    paddingTop: AppTheme.spacing.xl,
     gap: AppTheme.spacing.s,
     marginBottom: AppTheme.spacing.xs,
   },
@@ -434,21 +446,16 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: AppTheme.colors.textSecondary,
   },
-  sectionHeaderMain: {
-    paddingHorizontal: AppTheme.spacing.xl,
-    marginTop: AppTheme.spacing.s,
-  },
 
   // Stats Grid
   statsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: AppTheme.spacing.m,
-    paddingHorizontal: AppTheme.spacing.xl,
   },
   statCard: {
     flex: 1,
-    minWidth: "45%",
+    minWidth: 100,
     backgroundColor: AppTheme.colors.surface,
     borderRadius: AppTheme.radius.large,
     paddingVertical: AppTheme.spacing.xl,
@@ -468,8 +475,6 @@ const styles = StyleSheet.create({
 
   // ── Sections ──
   section: {
-    paddingHorizontal: AppTheme.spacing.xl,
-    paddingTop: AppTheme.spacing.xl,
     gap: AppTheme.spacing.m,
   },
   sectionHeader: {
@@ -478,10 +483,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   sectionTitle: {
-    fontSize: 17,
-    fontWeight: "800",
     color: AppTheme.colors.textPrimary,
-    letterSpacing: -0.2,
+    ...AppTheme.typography.heading3,
+    marginTop: AppTheme.spacing.s,
   },
   sectionSub: {
     fontSize: 12,

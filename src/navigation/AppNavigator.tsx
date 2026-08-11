@@ -39,7 +39,6 @@ import { StudentSubjectDetailScreen } from "../screens/StudentSubjectDetailScree
 // Teacher screens
 import { RecordingDetailScreen } from "../screens/RecordingDetailScreen";
 import { RecordingScreen } from "../screens/RecordingScreen";
-import { TeacherProfileScreen } from "../screens/TeacherProfileScreen";
 import { TeacherSubjectWorkspaceScreen } from "../screens/TeacherSubjectWorkspaceScreen";
 import { TeacherTabNavigator } from "./TeacherTabNavigator";
 
@@ -124,7 +123,6 @@ export type RootStackParamList = {
     chapterId?: number;
     chapterName?: string;
   };
-  TeacherProfile: undefined;
 
   // Student
   StudentHome: undefined;
@@ -273,10 +271,6 @@ export function AppNavigator() {
           />
 
           <Stack.Screen name="TeacherRecording" component={RecordingScreen} />
-          <Stack.Screen
-            name="TeacherProfile"
-            component={TeacherProfileScreen}
-          />
           <Stack.Screen
             name="RecordingDetail"
             component={RecordingDetailScreen}

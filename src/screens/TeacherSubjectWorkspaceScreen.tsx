@@ -2,17 +2,16 @@ import { Ionicons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import {
   Alert,
-  FlatList,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../context/AuthContext";
 
@@ -37,10 +36,7 @@ import { ChapterOut, LearningPlanOut, RecordingWithReport, StudentOut } from "..
 import { getTeacherStatusStyle } from "../components/teacher/teacherStatusStyles";
 import { ExpandedChapterDetailView } from "../components/ExpandedChapterDetailView";
 
-type Props = NativeStackScreenProps<
-  RootStackParamList,
-  "TeacherSubjectWorkspace"
->;
+type Props = NativeStackScreenProps<RootStackParamList, "TeacherSubjectWorkspace">;
 
 export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
   const { subjectId, subjectName, className, section } = route.params;
@@ -56,16 +52,13 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
   const [creating, setCreating] = useState(false);
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [selectedChapter, setSelectedChapter] = useState<ChapterOut | null>(
-    null,
-  );
+  const [selectedChapter, setSelectedChapter] = useState<ChapterOut | null>(null);
   const [actionSheetVisible, setActionSheetVisible] = useState(false);
   const [editing, setEditing] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<"all" | "withPdf" | "withoutPdf">("all");
 
-  // Expanded chapter row state
   const [expandedChapterId, setExpandedChapterId] = useState<number | null>(null);
   const [expandedRecordings, setExpandedRecordings] = useState<Record<number, RecordingWithReport[]>>({});
   const [expandedLps, setExpandedLps] = useState<Record<number, LearningPlanOut[]>>({});
@@ -128,7 +121,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
         setEditing(false);
         setSelectedChapter(null);
         await loadData();
-      } catch (error) {
+      } catch {
         Alert.alert(
           "Unable to create chapter",
           "A chapter with this name already exists or something went wrong.",
@@ -171,65 +164,60 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
       console.error(error);
       setConfirmVisible(false);
       const message =
-        error instanceof Error
-          ? error.message
-          : "Unable to delete the chapter.";
+        error instanceof Error ? error.message : "Unable to delete the chapter.";
       Alert.alert("Error", message);
     } finally {
       setDeleting(false);
     }
   }, [token, selectedChapter, loadData]);
 
-
-const filteredChapters = chapters.filter((chapter) => {
-  const query = searchQuery.trim().toLowerCase();
-
-  const matchesSearch =
-    !query ||
-    chapter.name.toLowerCase().includes(query) ||
-    (chapter.description ?? "").toLowerCase().includes(query);
-
-  const matchesFilter =
-    filter === "all"
-      ? true
-      : filter === "withPdf"
-        ? chapter.document_count > 0
-        : chapter.document_count === 0;
-
-  return matchesSearch && matchesFilter;
-});
+  const filteredChapters = chapters.filter((chapter) => {
+    const query = searchQuery.trim().toLowerCase();
+    const matchesSearch =
+      !query ||
+      chapter.name.toLowerCase().includes(query) ||
+      (chapter.description ?? "").toLowerCase().includes(query);
+    const matchesFilter =
+      filter === "all"
+        ? true
+        : filter === "withPdf"
+          ? chapter.document_count > 0
+          : chapter.document_count === 0;
+    return matchesSearch && matchesFilter;
+  });
 
   return (
-    <SafeAreaView style={styles.safe}>
-      {/* Header Container */}
+    <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
+      {/* ── Header ── */}
       <View style={styles.header}>
-        <View style={styles.headerCenteredContent}>
-          <Pressable
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
-            <Ionicons name="arrow-back" size={22} color={AppTheme.colors.textPrimary} />
-          </Pressable>
-          <View style={styles.headerTextWrapper}>
-            <Text style={styles.subject}>{subjectName}</Text>
-            <Text style={styles.subtitle}>
-              Class {className} • Section {section}
-            </Text>
-          </View>
+        <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={22} color={AppTheme.colors.textPrimary} />
+        </Pressable>
+        <View style={styles.headerTextWrapper}>
+          <Text style={styles.subject} numberOfLines={1}>{subjectName}</Text>
+          <Text style={styles.subtitle}>
+            Class {className} · Section {section}
+          </Text>
         </View>
       </View>
 
-      {/* Main Content Body - Smooth Vertical Scroll */}
+      {/* ── Main scroll ── */}
       <ScrollView
         style={styles.content}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {/* Tab bar */}
         <View style={styles.tabBar}>
           <Pressable
             style={[styles.tabButton, activeTab === "chapters" && styles.tabButtonActive]}
             onPress={() => setActiveTab("chapters")}
           >
+            <Ionicons
+              name={activeTab === "chapters" ? "layers" : "layers-outline"}
+              size={15}
+              color={activeTab === "chapters" ? AppTheme.colors.primaryDark : AppTheme.colors.textSecondary}
+            />
             <Text style={[styles.tabLabel, activeTab === "chapters" && styles.tabLabelActive]}>
               Chapters
             </Text>
@@ -238,284 +226,285 @@ const filteredChapters = chapters.filter((chapter) => {
             style={[styles.tabButton, activeTab === "students" && styles.tabButtonActive]}
             onPress={() => setActiveTab("students")}
           >
+            <Ionicons
+              name={activeTab === "students" ? "people" : "people-outline"}
+              size={15}
+              color={activeTab === "students" ? AppTheme.colors.primaryDark : AppTheme.colors.textSecondary}
+            />
             <Text style={[styles.tabLabel, activeTab === "students" && styles.tabLabelActive]}>
               Students
             </Text>
           </Pressable>
         </View>
 
+        {/* ── Workspace card ── */}
         <View style={styles.workspaceCard}>
           {activeTab === "chapters" ? (
             <>
+              {/* Search */}
               <TextInput
                 placeholder="Search chapter..."
-                placeholderTextColor="#94A3B8"
+                placeholderTextColor={AppTheme.colors.textPlaceholder}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 style={styles.search}
               />
 
-          <View style={styles.toolbar}>
-            <Pressable
-              style={styles.filterButton}
-              onPress={() => {
-                setFilter((prev) => {
-                  if (prev === "all") return "withPdf";
-                  if (prev === "withPdf") return "withoutPdf";
-                  return "all";
-                });
-              }}
-            >
-              <Text style={styles.filterText}>
-                {filter === "all"
-                  ? "All Chapters"
-                  : filter === "withPdf"
-                    ? "With PDF"
-                    : "Without PDF"}
-              </Text>
-            </Pressable>
-            <View style={{ flexDirection: "row", gap: 8 }}>
-              <Pressable
-                style={styles.importBtn}
-                onPress={() => setImportModalVisible(true)}
-              >
-                <Ionicons name="cloud-upload-outline" size={15} color={AppTheme.colors.primary} />
-                <Text style={styles.importText}>Bulk Import</Text>
-              </Pressable>
-              <Pressable
-                style={styles.addButton}
-                onPress={() => setEditorVisible(true)}
-              >
-                <Ionicons name="add" size={18} color="#fff" />
-                <Text style={styles.addText}>Add Chapter</Text>
-              </Pressable>
-            </View>
-          </View>
+              {/* Toolbar */}
+              <View style={styles.toolbar}>
+                <Pressable
+                  style={styles.filterButton}
+                  onPress={() => {
+                    setFilter((prev) => {
+                      if (prev === "all") return "withPdf";
+                      if (prev === "withPdf") return "withoutPdf";
+                      return "all";
+                    });
+                  }}
+                >
+                  <Ionicons
+                    name="filter-outline"
+                    size={14}
+                    color={AppTheme.colors.textSecondary}
+                  />
+                  <Text style={styles.filterText}>
+                    {filter === "all"
+                      ? "All Chapters"
+                      : filter === "withPdf"
+                        ? "With PDF"
+                        : "Without PDF"}
+                  </Text>
+                </Pressable>
 
-          {/* Full Width Responsive Table Framework */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={{ width: "100%" }}
-            contentContainerStyle={{ minWidth: "100%" }}
-          >
-            <View style={[styles.tableWrapper, { width: "100%" }]}>
-              <View style={styles.tableHeader}>
-                <Text style={[styles.headerCell, styles.chapterColumn]}>
-                  Chapter
-                </Text>
-                <Text style={[styles.headerCell, styles.pdfColumn]}>PDF</Text>
-                <Text style={[styles.headerCell, styles.recordingColumn]}>
-                  Recordings
-                </Text>
-                <Text style={[styles.headerCell, styles.statusColumn]}>Status</Text>
-                <Text style={[styles.headerCell, styles.actionColumn]}>
-                  Action
-                </Text>
+                <View style={styles.toolbarActions}>
+                  <Pressable
+                    style={styles.importBtn}
+                    onPress={() => setImportModalVisible(true)}
+                  >
+                    <Ionicons name="cloud-upload-outline" size={15} color={AppTheme.colors.primaryDark} />
+                    <Text style={styles.importText}>Bulk Import</Text>
+                  </Pressable>
+                  <Pressable
+                    style={styles.addButton}
+                    onPress={() => setEditorVisible(true)}
+                  >
+                    <Ionicons name="add" size={18} color={AppTheme.colors.surface} />
+                    <Text style={styles.addText}>Add Chapter</Text>
+                  </Pressable>
+                </View>
               </View>
 
-              {loading ? (
-                <Text style={styles.loadingText}>Loading chapters...</Text>
-              ) : (
-                filteredChapters.map((item) => {
-                  const status = item.ai_status ?? "No Recording";
-                  const statusStyle = getTeacherStatusStyle(status);
-                  const isExpanded = expandedChapterId === item.id;
-                  const recs = expandedRecordings[item.id] || [];
-                  const lps = expandedLps[item.id] || [];
-                  const isExLoading = loadingExpandedId === item.id;
+              {/* Table */}
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={{ width: "100%" }}
+                contentContainerStyle={{ minWidth: "100%" }}
+              >
+                <View style={[styles.tableWrapper, { width: "100%" }]}>
+                  {/* Table header */}
+                  <View style={styles.tableHeader}>
+                    <Text style={[styles.headerCell, styles.colChapter]}>Chapter</Text>
+                    <Text style={[styles.headerCell, styles.colPdf]}>PDF</Text>
+                    <Text style={[styles.headerCell, styles.colRecording]}>Recordings</Text>
+                    <Text style={[styles.headerCell, styles.colStatus]}>Status</Text>
+                    <Text style={[styles.headerCell, styles.colAction]}>Action</Text>
+                  </View>
 
-                  return (
-                    <View key={item.id}>
-                      <View style={[styles.row, isExpanded && { backgroundColor: "#F0F9FF" }]}>
-                        <Pressable
-                          style={[styles.chapterColumn, { flexDirection: "row", alignItems: "center", gap: 4 }]}
-                          onPress={() => void toggleExpandChapter(item.id)}
-                        >
-                          <Ionicons
-                            name={isExpanded ? "chevron-down" : "chevron-forward"}
-                            size={16}
-                            color="#0284C7"
-                          />
-                          <Text
-                            style={[
-                              styles.boldText,
-                              { flex: 1, color: isExpanded ? "#0284C7" : "#0F172A" },
-                            ]}
-                            numberOfLines={1}
-                          >
-                            {item.name}
-                          </Text>
-                        </Pressable>
-
-                        <View style={styles.pdfColumn}>
-                          <Pressable
-                            style={[
-                              styles.pdfButton,
-                              {
-                                backgroundColor: item.document_count
-                                  ? "#E0F2FE"
-                                  : "#F8FAFC",
-                              },
-                            ]}
-                            onPress={() => {
-                              navigation.navigate("TeacherChapterDetail", {
-                                chapterId: item.id,
-                                chapterName: item.name,
-                                subjectName,
-                                subjectId,
-                                openUpload: item.document_count === 0,
-                              });
-                            }}
-                          >
-                            <Text
-                              style={[
-                                styles.pdfText,
-                                {
-                                  color: item.document_count
-                                    ? "#0284C7"
-                                    : "#64748B",
-                                },
-                              ]}
-                            >
-                              {item.document_count ? "PDF" : "Add"}
-                            </Text>
-                          </Pressable>
-                        </View>
-
-                        <View style={styles.recordingColumn}>
-                          <Pressable
-                            onPress={() => void toggleExpandChapter(item.id)}
-                            style={styles.recordingPlayCircle}
-                          >
-                            <Ionicons
-                              name={isExpanded ? "chevron-up" : "play"}
-                              size={14}
-                              color="#0284C7"
-                              style={{ marginLeft: isExpanded ? 0 : 2 }}
-                            />
-                          </Pressable>
-                        </View>
-
-                        <View style={styles.statusColumn}>
-                          <View
-                            style={[
-                              styles.aiBadge,
-                              { backgroundColor: statusStyle.bg },
-                            ]}
-                          >
-                            <Text
-                              style={[styles.aiText, { color: statusStyle.text }]}
-                            >
-                              {status}
-                            </Text>
-                          </View>
-                        </View>
-
-                        <View style={styles.actionColumn}>
-                          <Pressable
-                            style={styles.manageButton}
-                            onPress={() => {
-                              setSelectedChapter(item);
-                              setActionSheetVisible(true);
-                            }}
-                          >
-                            <Text style={styles.manageText}>Manage</Text>
-                          </Pressable>
-                        </View>
-                      </View>
-
-                      {isExpanded ? (
-                        <ExpandedChapterDetailView
-                          chapterId={item.id}
-                          chapterName={item.name}
-                          subjectId={subjectId}
-                          subjectName={subjectName}
-                          recordings={recs}
-                          learningPlans={lps}
-                          loading={isExLoading}
-                          role="teacher"
-                          onAddRecording={() => {
-                            navigation.navigate("TeacherRecording", {
-                              subjectId,
-                              subjectName,
-                              existingChapters: chapters.map((c) => c.name),
-                              chapterId: item.id,
-                              chapterName: item.name,
-                            });
-                          }}
-                          onAddLearningPlan={() => {
-                            navigation.navigate("TeacherChapterDetail", {
-                              chapterId: item.id,
-                              chapterName: item.name,
-                              subjectName,
-                              subjectId,
-                            });
-                          }}
-                          onAddDocument={() => {
-                            navigation.navigate("TeacherChapterDetail", {
-                              chapterId: item.id,
-                              chapterName: item.name,
-                              subjectName,
-                              subjectId,
-                              openUpload: true,
-                            });
-                          }}
-                          onViewRecordingReport={(rec) => {
-                            navigation.navigate("RecordingDetail", {
-                              recording: rec,
-                              subjectName,
-                            });
-                          }}
-                          onOpenChapterDetail={() => {
-                            navigation.navigate("TeacherChapterDetail", {
-                              chapterId: item.id,
-                              chapterName: item.name,
-                              subjectName,
-                              subjectId,
-                            });
-                          }}
-                        />
-                      ) : null}
+                  {loading ? (
+                    <Text style={styles.loadingText}>Loading chapters...</Text>
+                  ) : filteredChapters.length === 0 ? (
+                    <View style={styles.emptyRow}>
+                      <Ionicons name="layers-outline" size={32} color={AppTheme.colors.hint} />
+                      <Text style={styles.emptyText}>
+                        {searchQuery ? "No chapters match your search." : "No chapters yet. Add one to get started."}
+                      </Text>
                     </View>
-                  );
-                })
-              )}
-            </View>
-          </ScrollView>
+                  ) : (
+                    filteredChapters.map((item) => {
+                      const status = item.ai_status ?? "No Recording";
+                      const statusStyle = getTeacherStatusStyle(status);
+                      const isExpanded = expandedChapterId === item.id;
+                      const recs = expandedRecordings[item.id] || [];
+                      const lps = expandedLps[item.id] || [];
+                      const isExLoading = loadingExpandedId === item.id;
+
+                      return (
+                        <View key={item.id}>
+                          <View style={[styles.row, isExpanded && styles.rowExpanded]}>
+                            {/* Chapter name */}
+                            <Pressable
+                              style={[styles.colChapter, styles.rowChapterCell]}
+                              onPress={() => void toggleExpandChapter(item.id)}
+                            >
+                              <Ionicons
+                                name={isExpanded ? "chevron-down" : "chevron-forward"}
+                                size={16}
+                                color={AppTheme.colors.primary}
+                              />
+                              <Text
+                                style={[styles.chapterName, isExpanded && styles.chapterNameExpanded]}
+                                numberOfLines={1}
+                              >
+                                {item.name}
+                              </Text>
+                            </Pressable>
+
+                            {/* PDF */}
+                            <View style={styles.colPdf}>
+                              <Pressable
+                                style={[
+                                  styles.pdfButton,
+                                  { backgroundColor: item.document_count ? AppTheme.colors.primaryLight : AppTheme.colors.background },
+                                ]}
+                                onPress={() => {
+                                  navigation.navigate("TeacherChapterDetail", {
+                                    chapterId: item.id,
+                                    chapterName: item.name,
+                                    subjectName,
+                                    subjectId,
+                                    openUpload: item.document_count === 0,
+                                  });
+                                }}
+                              >
+                                <Text
+                                  style={[
+                                    styles.pdfText,
+                                    { color: item.document_count ? AppTheme.colors.primaryDark : AppTheme.colors.textSecondary },
+                                  ]}
+                                >
+                                  {item.document_count ? "PDF" : "Add"}
+                                </Text>
+                              </Pressable>
+                            </View>
+
+                            {/* Recordings expand */}
+                            <View style={styles.colRecording}>
+                              <Pressable
+                                onPress={() => void toggleExpandChapter(item.id)}
+                                style={styles.playCircle}
+                              >
+                                <Ionicons
+                                  name={isExpanded ? "chevron-up" : "play"}
+                                  size={14}
+                                  color={AppTheme.colors.primary}
+                                  style={{ marginLeft: isExpanded ? 0 : 2 }}
+                                />
+                              </Pressable>
+                            </View>
+
+                            {/* AI Status */}
+                            <View style={styles.colStatus}>
+                              <View style={[styles.aiBadge, { backgroundColor: statusStyle.bg }]}>
+                                <Text style={[styles.aiText, { color: statusStyle.text }]}>
+                                  {status}
+                                </Text>
+                              </View>
+                            </View>
+
+                            {/* Action */}
+                            <View style={styles.colAction}>
+                              <Pressable
+                                style={styles.manageButton}
+                                onPress={() => {
+                                  setSelectedChapter(item);
+                                  setActionSheetVisible(true);
+                                }}
+                              >
+                                <Text style={styles.manageText}>Manage</Text>
+                              </Pressable>
+                            </View>
+                          </View>
+
+                          {/* Expanded detail */}
+                          {isExpanded && (
+                            <ExpandedChapterDetailView
+                              chapterId={item.id}
+                              chapterName={item.name}
+                              subjectId={subjectId}
+                              subjectName={subjectName}
+                              recordings={recs}
+                              learningPlans={lps}
+                              loading={isExLoading}
+                              role="teacher"
+                              onAddRecording={() => {
+                                navigation.navigate("TeacherRecording", {
+                                  subjectId,
+                                  subjectName,
+                                  existingChapters: chapters.map((c) => c.name),
+                                  chapterId: item.id,
+                                  chapterName: item.name,
+                                });
+                              }}
+                              onAddLearningPlan={() => {
+                                navigation.navigate("TeacherChapterDetail", {
+                                  chapterId: item.id,
+                                  chapterName: item.name,
+                                  subjectName,
+                                  subjectId,
+                                });
+                              }}
+                              onAddDocument={() => {
+                                navigation.navigate("TeacherChapterDetail", {
+                                  chapterId: item.id,
+                                  chapterName: item.name,
+                                  subjectName,
+                                  subjectId,
+                                  openUpload: true,
+                                });
+                              }}
+                              onViewRecordingReport={(rec) => {
+                                navigation.navigate("RecordingDetail", {
+                                  recording: rec,
+                                  subjectName,
+                                });
+                              }}
+                              onOpenChapterDetail={() => {
+                                navigation.navigate("TeacherChapterDetail", {
+                                  chapterId: item.id,
+                                  chapterName: item.name,
+                                  subjectName,
+                                  subjectId,
+                                });
+                              }}
+                            />
+                          )}
+                        </View>
+                      );
+                    })
+                  )}
+                </View>
+              </ScrollView>
             </>
           ) : (
+            /* ── Students tab ── */
             <View style={{ width: "100%" }}>
               {students.length === 0 ? (
-                <View style={{ alignItems: "center", paddingVertical: 40, gap: 10 }}>
-                  <Ionicons name="people-outline" size={40} color={AppTheme.colors.textSecondary} />
-                  <Text style={{ fontSize: 16, fontWeight: "600", color: AppTheme.colors.textPrimary }}>
-                    No students enrolled
-                  </Text>
-                  <Text style={{ fontSize: 14, color: AppTheme.colors.textSecondary }}>
-                    Students in this class will appear here.
-                  </Text>
+                <View style={styles.emptyRow}>
+                  <Ionicons name="people-outline" size={40} color={AppTheme.colors.hint} />
+                  <Text style={styles.emptyTitle}>No students enrolled</Text>
+                  <Text style={styles.emptyText}>Students in this class will appear here.</Text>
                 </View>
               ) : (
-                <View style={{ gap: 12 }}>
-                  <Text style={{ fontSize: 16, fontWeight: "700", color: AppTheme.colors.textPrimary, marginBottom: 8 }}>
+                <View style={styles.studentList}>
+                  <Text style={styles.rosterTitle}>
                     Class Roster ({students.length})
                   </Text>
                   {students.map((student) => {
                     const initials = student.name
-                      .split(' ')
-                      .map((word) => word[0] ?? '')
-                      .join('')
+                      .split(" ")
+                      .map((word) => word[0] ?? "")
+                      .join("")
                       .toUpperCase()
                       .slice(0, 2);
                     return (
-                      <View key={student.id} style={{ flexDirection: "row", alignItems: "center", padding: 12, backgroundColor: "#F8FAFC", borderRadius: 12, borderWidth: 1, borderColor: "#E2E8F0" }}>
-                        <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: "#E0F2FE", justifyContent: "center", alignItems: "center", marginRight: 12 }}>
-                          <Text style={{ fontWeight: "700", color: "#0284C7" }}>{initials}</Text>
+                      <View key={student.id} style={styles.studentRow}>
+                        <View style={styles.studentAvatar}>
+                          <Text style={styles.studentInitials}>{initials}</Text>
                         </View>
-                        <View style={{ flex: 1 }}>
-                          <Text style={{ fontSize: 15, fontWeight: "600", color: "#0F172A" }}>{student.name}</Text>
-                          <Text style={{ fontSize: 13, color: "#64748B" }}>{student.email}</Text>
+                        <View style={styles.studentInfo}>
+                          <Text style={styles.studentName}>{student.name}</Text>
+                          <Text style={styles.studentEmail}>{student.email}</Text>
                         </View>
                       </View>
                     );
@@ -527,15 +516,14 @@ const filteredChapters = chapters.filter((chapter) => {
         </View>
       </ScrollView>
 
+      {/* ── Modals ── */}
       <ImportLearningPlansModal
         visible={importModalVisible}
         role="teacher"
         subjectId={subjectId}
         token={token}
         onClose={() => setImportModalVisible(false)}
-        onImported={() => {
-          void loadData();
-        }}
+        onImported={() => { void loadData(); }}
       />
 
       <ChapterEditorModal
@@ -598,129 +586,141 @@ const filteredChapters = chapters.filter((chapter) => {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#F8FAFC",
+    backgroundColor: AppTheme.colors.background,
   },
+
+  // ── Header ──
   header: {
-    backgroundColor: "#fff",
+    backgroundColor: AppTheme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: "#E2E8F0",
-    paddingHorizontal: 24,
-    paddingVertical: 18,
-  },
-  headerCenteredContent: {
+    borderBottomColor: AppTheme.colors.border,
+    paddingHorizontal: AppTheme.spacing.xxl,
+    paddingVertical: AppTheme.spacing.l,
     flexDirection: "row",
     alignItems: "center",
-    maxWidth: 1280,
-    width: "100%",
-    alignSelf: "center",
+    gap: AppTheme.spacing.l,
   },
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: "#F1F5F9",
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.background,
     justifyContent: "center",
     alignItems: "center",
   },
-  headerTextWrapper: { marginLeft: 16, flex: 1 },
-  subject: { fontSize: 24, fontWeight: "800", color: "#0F172A" },
-  subtitle: { marginTop: 2, fontSize: 14, color: "#64748B", fontWeight: "500" },
-  content: {
-    flex: 1,
+  headerTextWrapper: { flex: 1 },
+  subject: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: AppTheme.colors.textPrimary,
+    letterSpacing: -0.3,
   },
+  subtitle: {
+    marginTop: 2,
+    fontSize: 13,
+    color: AppTheme.colors.textSecondary,
+    fontWeight: "500",
+  },
+
+  // ── Scroll ──
+  content: { flex: 1 },
   scrollContent: {
-    padding: 24,
+    padding: AppTheme.spacing.xxl,
+    paddingBottom: AppTheme.spacing.giant,
+    gap: AppTheme.spacing.l,
     alignItems: "center",
-    paddingBottom: 48,
   },
+
+  // ── Tab bar ──
   tabBar: {
     flexDirection: "row",
     width: "100%",
     maxWidth: 1280,
-    backgroundColor: "#F1F5F9",
-    borderRadius: 12,
+    backgroundColor: AppTheme.colors.surfaceMuted,
+    borderRadius: AppTheme.radius.large,
     padding: 4,
-    marginBottom: 20,
   },
   tabButton: {
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: 10,
     alignItems: "center",
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.medium,
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 6,
   },
   tabButtonActive: {
-    backgroundColor: "#fff",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    backgroundColor: AppTheme.colors.surface,
+    ...AppTheme.shadows.subtle,
   },
   tabLabel: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#64748B",
+    color: AppTheme.colors.textSecondary,
   },
   tabLabelActive: {
-    color: "#0F172A",
+    color: AppTheme.colors.primaryDark,
     fontWeight: "700",
   },
+
+  // ── Workspace card ──
   workspaceCard: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 24,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
+    padding: AppTheme.spacing.xxl,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: AppTheme.colors.border,
     width: "100%",
     maxWidth: 1280,
-    shadowColor: "#0F172A",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 12,
-    elevation: 2,
+    ...AppTheme.shadows.subtle,
   },
+
+  // ── Search & Toolbar ──
   search: {
     height: 48,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: AppTheme.colors.border,
     borderRadius: AppTheme.radius.medium,
-    paddingHorizontal: 16,
-    backgroundColor: "#F8FAFC",
+    paddingHorizontal: AppTheme.spacing.l,
+    backgroundColor: AppTheme.colors.background,
     fontSize: 15,
-    color: "#0F172A",
+    color: AppTheme.colors.textPrimary,
   },
   toolbar: {
-    marginTop: 20,
+    marginTop: AppTheme.spacing.l,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: AppTheme.spacing.l,
   },
   filterButton: {
-    paddingHorizontal: 16,
-    height: 40,
-    borderRadius: AppTheme.radius.medium,
-    backgroundColor: "#F1F5F9",
-    justifyContent: "center",
-  },
-  filterText: { fontWeight: "600", color: "#334155", fontSize: 14 },
-  addButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#0284C7",
-    paddingHorizontal: 16,
-    height: 42,
+    gap: 6,
+    paddingHorizontal: AppTheme.spacing.l,
+    height: 40,
     borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.background,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
   },
-  addText: { color: "#fff", marginLeft: 6, fontWeight: "700", fontSize: 14 },
+  filterText: {
+    fontWeight: "600",
+    color: AppTheme.colors.textSecondary,
+    fontSize: 13,
+  },
+  toolbarActions: {
+    flexDirection: "row",
+    gap: AppTheme.spacing.s,
+  },
   importBtn: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: AppTheme.colors.primaryLight,
     borderWidth: 1,
     borderColor: AppTheme.colors.primary,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: AppTheme.spacing.m,
+    paddingVertical: AppTheme.spacing.s,
     borderRadius: AppTheme.radius.medium,
     gap: 6,
   },
@@ -729,83 +729,183 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "700",
   },
+  addButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: AppTheme.colors.primary,
+    paddingHorizontal: AppTheme.spacing.l,
+    height: 40,
+    borderRadius: AppTheme.radius.medium,
+    gap: 4,
+  },
+  addText: {
+    color: AppTheme.colors.surface,
+    fontWeight: "700",
+    fontSize: 14,
+  },
+
+  // ── Table ──
   tableWrapper: {
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: AppTheme.colors.border,
     overflow: "hidden",
   },
   tableHeader: {
     flexDirection: "row",
-    backgroundColor: "#F8FAFC",
-    paddingVertical: 14,
-    paddingHorizontal: 16,
+    backgroundColor: AppTheme.colors.background,
+    paddingVertical: 12,
+    paddingHorizontal: AppTheme.spacing.l,
     borderBottomWidth: 1,
-    borderBottomColor: "#E2E8F0",
+    borderBottomColor: AppTheme.colors.border,
   },
   headerCell: {
     fontWeight: "700",
-    fontSize: 13,
-    color: "#475569",
+    fontSize: 11,
+    color: AppTheme.colors.textSecondary,
     textTransform: "uppercase",
-    letterSpacing: 0.5,
+    letterSpacing: 0.6,
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.l,
     borderBottomWidth: 1,
-    borderBottomColor: "#F1F5F9",
-    backgroundColor: "#fff",
+    borderBottomColor: AppTheme.colors.divider,
+    backgroundColor: AppTheme.colors.surface,
   },
-  cell: { fontSize: 14, color: "#0F172A" },
-  boldText: { fontWeight: "600", color: "#1E293B" },
-  mutedText: { color: "#64748B" },
+  rowExpanded: {
+    backgroundColor: AppTheme.colors.primaryLight,
+  },
+  rowChapterCell: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  chapterName: {
+    flex: 1,
+    fontWeight: "600",
+    color: AppTheme.colors.textPrimary,
+    fontSize: 14,
+  },
+  chapterNameExpanded: {
+    color: AppTheme.colors.primary,
+  },
+
+  // Column widths
+  colChapter:   { flex: 4.5 },
+  colPdf:       { flex: 1, alignItems: "center" },
+  colRecording: { flex: 1.2, alignItems: "center" },
+  colStatus:    { flex: 1.4, alignItems: "center" },
+  colAction:    { flex: 1, alignItems: "center" },
+
   pdfButton: {
-    minWidth: 64,
-    height: 32,
+    minWidth: 54,
+    height: 30,
     borderRadius: AppTheme.radius.small,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "transparent",
+    paddingHorizontal: AppTheme.spacing.s,
   },
   pdfText: { fontWeight: "700", fontSize: 12 },
-  aiBadge: {
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    borderRadius: AppTheme.radius.medium,
-    backgroundColor: "#F1F5F9",
-    alignItems: "center",
-  },
-  aiText: { fontWeight: "600", fontSize: 12, color: "#64748B" },
-  manageButton: {
-    backgroundColor: "#F1F5F9",
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: AppTheme.radius.small,
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
-  },
-  manageText: { color: "#334155", fontWeight: "700", fontSize: 13 },
-  chapterColumn: { flex: 4.5 },
-  pdfColumn: { flex: 1, alignItems: "center", textAlign: "center" },
-  recordingColumn: { flex: 1.2, alignItems: "center", textAlign: "center" },
-  statusColumn: { flex: 1.2, alignItems: "center", textAlign: "center" },
-  actionColumn: { flex: 1, alignItems: "center", textAlign: "center" },
-  recordingPlayCircle: {
+
+  playCircle: {
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: "#E0F2FE",
+    backgroundColor: AppTheme.colors.primaryLight,
     alignItems: "center",
     justifyContent: "center",
   },
+
+  aiBadge: {
+    paddingVertical: 4,
+    paddingHorizontal: AppTheme.spacing.s,
+    borderRadius: AppTheme.radius.small,
+    alignItems: "center",
+  },
+  aiText: { fontWeight: "600", fontSize: 11 },
+
+  manageButton: {
+    backgroundColor: AppTheme.colors.background,
+    paddingHorizontal: AppTheme.spacing.m,
+    paddingVertical: AppTheme.spacing.s,
+    borderRadius: AppTheme.radius.small,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+  },
+  manageText: {
+    color: AppTheme.colors.textPrimary,
+    fontWeight: "700",
+    fontSize: 12,
+  },
+
+  // ── Empty / loading states ──
   loadingText: {
-    paddingVertical: 40,
+    paddingVertical: AppTheme.spacing.huge,
     textAlign: "center",
-    color: "#64748B",
+    color: AppTheme.colors.textSecondary,
     fontSize: 14,
+  },
+  emptyRow: {
+    alignItems: "center",
+    paddingVertical: AppTheme.spacing.huge,
+    gap: AppTheme.spacing.s,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: AppTheme.colors.textPrimary,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: AppTheme.colors.textSecondary,
+    textAlign: "center",
+  },
+
+  // ── Students tab ──
+  studentList: {
+    gap: AppTheme.spacing.m,
+  },
+  rosterTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: AppTheme.colors.textPrimary,
+    marginBottom: AppTheme.spacing.s,
+  },
+  studentRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: AppTheme.spacing.m,
+    backgroundColor: AppTheme.colors.background,
+    borderRadius: AppTheme.radius.large,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+  },
+  studentAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: AppTheme.colors.primaryLight,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: AppTheme.spacing.m,
+  },
+  studentInitials: {
+    fontWeight: "700",
+    color: AppTheme.colors.primaryDark,
+    fontSize: 14,
+  },
+  studentInfo: { flex: 1 },
+  studentName: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: AppTheme.colors.textPrimary,
+  },
+  studentEmail: {
+    fontSize: 13,
+    color: AppTheme.colors.textSecondary,
+    marginTop: 2,
   },
 });

@@ -3,22 +3,28 @@ import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 
 import { FloatingPillTabBar, FloatingTabItem } from "../components/common/FloatingPillTabBar";
 
-import { TeacherSubjectsScreen } from "../screens/TeacherSubjectsScreen";
-import { TeacherTimetableScreen } from "../screens/TeacherTimetableScreen";
-import { TeacherProfileScreen } from "../screens/TeacherProfileScreen";
+import { TeacherDashboardScreen }  from "../screens/TeacherDashboardScreen";
+import { TeacherSubjectsScreen }   from "../screens/TeacherSubjectsScreen";
+import { TeacherTimetableScreen }  from "../screens/TeacherTimetableScreen";
+import { TeacherRecordingsScreen } from "../screens/TeacherRecordingsScreen";
+import { TeacherProfileScreen }    from "../screens/TeacherProfileScreen";
 
 export type TeacherTabParamList = {
-  TeacherHome: undefined;
-  TeacherTimetable: undefined;
-  TeacherProfile: undefined;
+  TeacherDashboard:  undefined;
+  TeacherHome:       undefined;
+  TeacherTimetable:  undefined;
+  TeacherRecordings: undefined;
+  TeacherProfile:    undefined;
 };
 
 const Tab = createBottomTabNavigator<TeacherTabParamList>();
 
 const TABS: FloatingTabItem[] = [
-  { key: "TeacherHome",      label: "Home",      icon: "home-outline",     activeIcon: "home"     },
-  { key: "TeacherTimetable", label: "Timetable", icon: "calendar-outline", activeIcon: "calendar" },
-  { key: "TeacherProfile",   label: "Profile",   icon: "person-outline",   activeIcon: "person"   },
+  { key: "TeacherDashboard",  label: "Home",       icon: "home-outline",      activeIcon: "home"      },
+  { key: "TeacherHome",       label: "Subjects",   icon: "book-outline",      activeIcon: "book"      },
+  { key: "TeacherTimetable",  label: "Timetable",  icon: "calendar-outline",  activeIcon: "calendar"  },
+  { key: "TeacherRecordings", label: "Recordings", icon: "mic-outline",       activeIcon: "mic"       },
+  { key: "TeacherProfile",    label: "Profile",    icon: "person-outline",    activeIcon: "person"    },
 ];
 
 function TeacherTabBar({ state, navigation }: BottomTabBarProps) {
@@ -45,15 +51,17 @@ function TeacherTabBar({ state, navigation }: BottomTabBarProps) {
 
 export function TeacherTabNavigator() {
   return (
-    <Tab.Navigator id="TeacherTabNavigator.tsx" 
-      initialRouteName="TeacherHome"
+    <Tab.Navigator
+      id="TeacherTabNavigator.tsx"
+      initialRouteName="TeacherDashboard"
       tabBar={(props) => <TeacherTabBar {...props} />}
       screenOptions={{ headerShown: false }}
     >
-      <Tab.Screen name="TeacherHome"      component={TeacherSubjectsScreen} options={{ title: "Home"      }} />
-      <Tab.Screen name="TeacherTimetable" component={TeacherTimetableScreen} options={{ title: "Timetable" }} />
-      <Tab.Screen name="TeacherProfile"   component={TeacherProfileScreen}   options={{ title: "Profile"   }} />
+      <Tab.Screen name="TeacherDashboard"  component={TeacherDashboardScreen}  options={{ title: "Home"       }} />
+      <Tab.Screen name="TeacherHome"       component={TeacherSubjectsScreen}   options={{ title: "Subjects"   }} />
+      <Tab.Screen name="TeacherTimetable"  component={TeacherTimetableScreen}  options={{ title: "Timetable"  }} />
+      <Tab.Screen name="TeacherRecordings" component={TeacherRecordingsScreen} options={{ title: "Recordings" }} />
+      <Tab.Screen name="TeacherProfile"    component={TeacherProfileScreen}    options={{ title: "Profile"    }} />
     </Tab.Navigator>
   );
 }
-

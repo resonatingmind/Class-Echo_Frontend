@@ -40,12 +40,12 @@ import {
 } from '../types/api';
 import { LearningPlanList } from "../components/teacher/LearningPlanList";
 import { ChapterLearningPlanModal } from "../components/teacher/ChapterLearningPlanModal";
-import { AdminNavbar } from "../components/common/AdminNavbar";
+import { ScreenHeader } from "../components/common/ScreenHeader";
 import { ConfirmDialog } from "../components/common/ConfirmDialog";
 
 type Props = NativeStackScreenProps<RootStackParamList, "TeacherChapterDetail">;
 
-type ActiveTab = 'planner' | 'profile' | 'documents' | 'metadata';
+type ActiveTab = 'planner' | 'profile' | 'documents';
 
 function statusStyle(status: string) {
   const norm = status.toLowerCase();
@@ -312,8 +312,9 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={styles.safe}>
-      <AdminNavbar
+      <ScreenHeader
         title={chapterName}
+        subtitle={subjectName}
         onBack={() => navigation.goBack()}
         rightActions={
           <Pressable onPress={() => void load(true)} hitSlop={8}>
@@ -885,7 +886,7 @@ const styles = StyleSheet.create({
   },
   warningCard: {
     backgroundColor: '#FFF1F1',
-    borderColor: '#FECDCA',
+    borderColor: '#FECDCA', // light red border — no AppTheme equivalent
   },
   cardHeader: {
     flexDirection: 'row',
@@ -940,7 +941,7 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
   },
   uploadBtnText: {
-    color: "#fff",
+    color: AppTheme.colors.surface,
     fontSize: 13,
     fontFamily: AppTheme.typography.family.bold,
   },
@@ -1009,7 +1010,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: AppTheme.radius.small,
-    backgroundColor: '#FFF1F1',
+    backgroundColor: '#FFF1F1', // soft red — intentional semantic color
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1023,34 +1024,7 @@ const styles = StyleSheet.create({
     fontFamily: AppTheme.typography.family.bold,
   },
 
-  // Metadata tab
-  metadataList: {
-    paddingHorizontal: 20,
-    marginTop: 20,
-    backgroundColor: AppTheme.colors.surface,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: AppTheme.colors.border,
-    overflow: 'hidden',
-  },
-  metaItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: AppTheme.colors.border,
-  },
-  metaLabel: {
-    fontSize: 14,
-    fontFamily: AppTheme.typography.family.semibold,
-    color: AppTheme.colors.textSecondary,
-  },
-  metaValue: {
-    fontSize: 14,
-    fontFamily: AppTheme.typography.family.bold,
-    color: AppTheme.colors.textPrimary,
-  },
+
 
   // KB Empty State
   emptyKbContainer: {

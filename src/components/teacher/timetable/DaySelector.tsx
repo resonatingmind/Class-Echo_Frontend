@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F3F4F6",
+    backgroundColor: AppTheme.colors.background,
     borderWidth: 1.5,
     borderColor: "transparent",
     gap: 4,

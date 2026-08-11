@@ -31,10 +31,24 @@ const ALL_DAY_NAMES = [
   "Friday",
   "Saturday",
 ];
+
 const jsDayToName = ALL_DAY_NAMES[new Date().getDay()];
+const TODAY = jsDayToName;
 const DEFAULT_DAY = (WEEKDAYS as readonly string[]).includes(jsDayToName)
   ? jsDayToName
   : "Monday";
+
+/** Parse "HH:MM" into total minutes since midnight */
+function toMinutes(time: string): number {
+  const [h = 0, m = 0] = time.split(":").map(Number);
+  return h * 60 + m;
+}
+
+/** Returns the current time as minutes since midnight */
+function nowMinutes(): number {
+  const now = new Date();
+  return now.getHours() * 60 + now.getMinutes();
+}
 
 export function TeacherTimetableScreen() {
   const { session } = useAuth();
@@ -68,28 +82,60 @@ export function TeacherTimetableScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      load();
+      void load();
     }, [load]),
   );
 
+  /** Periods for the selected day, sorted by period number */
   const periods = useMemo(() => {
     return entries
       .filter((item) => item.day_of_week === selectedDay)
       .sort((a, b) => a.period_number - b.period_number);
   }, [entries, selectedDay]);
 
+  /** Days that have at least one entry — used by DaySelector dots */
+  const daysWithEntries = useMemo(
+    () => new Set(entries.map((e) => e.day_of_week)),
+    [entries],
+  );
+
+  /** Find the "next" upcoming period on today's schedule */
+  const nextPeriodId = useMemo(() => {
+    if (selectedDay !== TODAY) return null;
+    const now = nowMinutes();
+    // Find the first period whose start_time is still in the future
+    const upcoming = periods.find((p) => toMinutes(p.start_time) > now);
+    return upcoming?.id ?? null;
+  }, [periods, selectedDay]);
+
+  /** Find a period that is currently ongoing (start ≤ now < end) */
+  const nowPeriodId = useMemo(() => {
+    if (selectedDay !== TODAY) return null;
+    const now = nowMinutes();
+    const ongoing = periods.find(
+      (p) => toMinutes(p.start_time) <= now && now < toMinutes(p.end_time),
+    );
+    return ongoing?.id ?? null;
+  }, [periods, selectedDay]);
+
   const weeklyCount = entries.length;
+  const todayCount  = useMemo(
+    () => entries.filter((e) => e.day_of_week === TODAY).length,
+    [entries],
+  );
+
+  const subtitleText = loading
+    ? "Loading…"
+    : weeklyCount > 0
+      ? `${todayCount} class${todayCount === 1 ? "" : "es"} today · ${weeklyCount} this week`
+      : "Set by your school admin";
 
   return (
-    <SafeAreaView style={styles.container} edges={[]}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <ScreenHeader
         variant="large"
         title="My Timetable"
-        subtitle={
-          weeklyCount > 0
-            ? `${weeklyCount} period${weeklyCount === 1 ? "" : "s"} this week`
-            : "Set by your school admin"
-        }
+        subtitle={subtitleText}
         rightActions={
           <View style={styles.viewOnlyPill}>
             <Ionicons name="eye-outline" size={14} color={AppTheme.colors.primaryDark} />
@@ -99,7 +145,11 @@ export function TeacherTimetableScreen() {
       />
 
       <View style={styles.daySelectorWrap}>
-        <DaySelector selectedDay={selectedDay} onSelectDay={setSelectedDay} />
+        <DaySelector
+          selectedDay={selectedDay}
+          onSelectDay={setSelectedDay}
+          daysWithEntries={daysWithEntries}
+        />
       </View>
 
       <ScrollView
@@ -107,7 +157,8 @@ export function TeacherTimetableScreen() {
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={() => load(true)}
+            onRefresh={() => void load(true)}
+            tintColor={AppTheme.colors.primary}
           />
         }
         showsVerticalScrollIndicator={false}
@@ -120,18 +171,25 @@ export function TeacherTimetableScreen() {
           <InfoState title="Something went wrong" body={error} />
         ) : periods.length > 0 ? (
           periods.map((period) => (
-            <PeriodCard key={period.id} period={period} />
+            <PeriodCard
+              key={period.id}
+              period={period}
+              isNow={period.id === nowPeriodId}
+              isNext={period.id === nextPeriodId}
+            />
           ))
         ) : (
           <View style={styles.empty}>
             <Ionicons
               name="calendar-clear-outline"
-              size={30}
-              color={AppTheme.colors.textSecondary}
+              size={40}
+              color={AppTheme.colors.hint}
             />
             <Text style={styles.emptyTitle}>No classes scheduled</Text>
             <Text style={styles.emptyText}>
-              Nothing on the timetable for {selectedDay} yet.
+              {selectedDay === TODAY
+                ? "Nothing on the timetable for today."
+                : `Nothing on the timetable for ${selectedDay} yet.`}
             </Text>
           </View>
         )}
@@ -151,9 +209,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 4,
     backgroundColor: AppTheme.colors.primaryLight,
-    paddingHorizontal: 10,
+    paddingHorizontal: AppTheme.spacing.m,
     paddingVertical: 6,
-    borderRadius: 999,
+    borderRadius: AppTheme.radius.pill,
   },
 
   viewOnlyText: {
@@ -163,12 +221,14 @@ const styles = StyleSheet.create({
   },
 
   daySelectorWrap: {
-    paddingHorizontal: 20,
+    paddingHorizontal: AppTheme.spacing.xl,
+    paddingBottom: AppTheme.spacing.s,
   },
 
   listContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 32,
+    paddingHorizontal: AppTheme.spacing.xl,
+    paddingTop: AppTheme.spacing.s,
+    paddingBottom: AppTheme.spacing.xxxl,
     flexGrow: 1,
   },
 
@@ -178,22 +238,23 @@ const styles = StyleSheet.create({
   },
 
   empty: {
-    marginTop: 40,
+    marginTop: AppTheme.spacing.huge,
     alignItems: "center",
-    gap: 8,
-    paddingHorizontal: 24,
+    gap: AppTheme.spacing.s,
+    paddingHorizontal: AppTheme.spacing.xxl,
   },
 
   emptyTitle: {
     fontSize: 16,
     fontWeight: "700",
     color: AppTheme.colors.textPrimary,
+    marginTop: AppTheme.spacing.s,
   },
 
   emptyText: {
     fontSize: 13,
     color: AppTheme.colors.textSecondary,
     textAlign: "center",
+    lineHeight: 20,
   },
 });
-

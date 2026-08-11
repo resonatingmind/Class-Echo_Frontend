@@ -51,6 +51,13 @@ export function SchoolAdminDashboardScreen({ navigation }: Props) {
     }, [load]),
   );
 
+  const greeting = () => {
+    const h = new Date().getHours();
+    if (h < 12) return 'Good morning';
+    if (h < 17) return 'Good afternoon';
+    return 'Good evening';
+  };
+
   return (
     <SafeAreaView edges={["top", "bottom"]} style={styles.safe}>
       {/* Header */}
@@ -70,7 +77,7 @@ export function SchoolAdminDashboardScreen({ navigation }: Props) {
               <View style={styles.body}>
                 {/* Page heading */}
                 <View style={styles.pageHeading}>
-                  <Text style={styles.pageTitle}>Good Morning 👋</Text>
+                  <Text style={styles.pageTitle}>{greeting()} 👋</Text>
                   <Text style={styles.pageSubtitle}>
                     Welcome back, School Administrator
                   </Text>

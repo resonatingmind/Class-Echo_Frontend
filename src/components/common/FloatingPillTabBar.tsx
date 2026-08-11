@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   },
   labelInactive: {
     color: colors.navInactive,
-    opacity: 0,
+    opacity: 1,
   },
 });
 

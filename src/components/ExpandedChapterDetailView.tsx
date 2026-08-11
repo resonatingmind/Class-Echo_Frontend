@@ -24,6 +24,7 @@ type Props = {
   onAddLearningPlan?: () => void;
   onAddDocument?: () => void;
   onViewRecordingReport?: (rec: RecordingWithReport) => void;
+  onRetryRecording?: (rec: RecordingWithReport) => void;
   onOpenChapterDetail?: () => void;
 };
 
@@ -59,6 +60,7 @@ export function ExpandedChapterDetailView({
   onAddLearningPlan,
   onAddDocument,
   onViewRecordingReport,
+  onRetryRecording,
   onOpenChapterDetail,
 }: Props) {
   if (loading) {
@@ -109,20 +111,18 @@ export function ExpandedChapterDetailView({
 
   return (
     <View style={styles.container}>
-      <View style={styles.statsBar}>
+      <View style={[styles.statsBar, { justifyContent: "space-between" }]}>
         <View style={styles.statItem}>
           <Ionicons name="mic-outline" size={14} color="#64748B" />
           <Text style={styles.statLabel}>Total Lectures:</Text>
-          <Text style={styles.statValue}>{recordings.length}</Text>
+          <Text style={styles.statValue}>{titleRows.length + unassignedRecordings.length}</Text>
         </View>
-        <View style={styles.statDivider} />
-        <View style={styles.statItem}>
-          <Ionicons name="analytics-outline" size={14} color="#64748B" />
-          <Text style={styles.statLabel}>Avg Score:</Text>
-          <Text style={[styles.statValue, averageScore != null && { color: getScoreColor(averageScore) }]}>
-            {averageScore !== null ? `${averageScore}%` : "—"}
-          </Text>
-        </View>
+        {role === "teacher" && onAddLearningPlan ? (
+          <Pressable style={styles.secondaryActionBtn} onPress={onAddLearningPlan}>
+            <Ionicons name="add" size={13} color="#0284C7" />
+            <Text style={styles.secondaryActionText}>Add lecture</Text>
+          </Pressable>
+        ) : null}
       </View>
 
       {/* NESTED LECTURE TABLE */}
@@ -191,13 +191,20 @@ export function ExpandedChapterDetailView({
 
                   <View style={[{ flex: 1.2, alignItems: "center" }, styles.cellCol]}>
                     {role === "teacher" && onAddRecording ? (
-                      <Pressable
-                        style={styles.attachVideoSmallBtn}
-                        onPress={() => onAddRecording(lp.id, lectureName)}
-                      >
-                        <Ionicons name="mic-outline" size={13} color="#0284C7" />
-                        <Text style={styles.attachVideoSmallText}>+ Audio</Text>
-                      </Pressable>
+                      <View style={{ alignItems: "center", gap: 6 }}>
+                        <View style={[styles.badgePill, { backgroundColor: statusStyle.bg }]}>
+                          <Text style={[styles.badgePillText, { color: statusStyle.text }]}>
+                            {statusStyle.label}
+                          </Text>
+                        </View>
+                        <Pressable
+                          style={styles.attachVideoSmallBtn}
+                          onPress={() => onAddRecording(lp.id, lectureName)}
+                        >
+                          <Ionicons name="mic-outline" size={13} color="#0284C7" />
+                          <Text style={styles.attachVideoSmallText}>+ Audio</Text>
+                        </Pressable>
+                      </View>
                     ) : (
                       <View style={[styles.badgePill, { backgroundColor: statusStyle.bg }]}>
                         <Text style={[styles.badgePillText, { color: statusStyle.text }]}>
@@ -249,10 +256,23 @@ export function ExpandedChapterDetailView({
                         </Text>
                       </Pressable>
                     ) : (
-                      <View style={[styles.badgePill, { backgroundColor: statusStyle.bg }]}>
-                        <Text style={[styles.badgePillText, { color: statusStyle.text }]}>
-                          {statusStyle.label}
-                        </Text>
+                      <View style={{ alignItems: "center", gap: 6 }}>
+                        <View style={[styles.badgePill, { backgroundColor: statusStyle.bg }]}>
+                          <Text style={[styles.badgePillText, { color: statusStyle.text }]}>
+                            {statusStyle.label}
+                          </Text>
+                        </View>
+                        {/* An evaluation can stall (worker restart, LLM rate limit) —
+                            without this the lecture has no way back to a report. */}
+                        {role === "teacher" && onRetryRecording ? (
+                          <Pressable
+                            style={styles.attachVideoSmallBtn}
+                            onPress={() => onRetryRecording(rec)}
+                          >
+                            <Ionicons name="refresh-outline" size={13} color="#0284C7" />
+                            <Text style={styles.attachVideoSmallText}>Retry</Text>
+                          </Pressable>
+                        ) : null}
                       </View>
                     )}
                   </View>
@@ -307,14 +327,6 @@ export function ExpandedChapterDetailView({
           })}
         </View>
       )}
-
-      {/* Add another lecture without leaving the chapter row */}
-      {role === "teacher" && onAddLearningPlan && titleRows.length > 0 ? (
-        <Pressable style={styles.addPlanSmallBtn} onPress={onAddLearningPlan}>
-          <Ionicons name="add" size={14} color="#0284C7" />
-          <Text style={styles.addPlanSmallText}>Add lecture</Text>
-        </Pressable>
-      ) : null}
 
       {/* Footer Row */}
       <View style={styles.footerRow}>

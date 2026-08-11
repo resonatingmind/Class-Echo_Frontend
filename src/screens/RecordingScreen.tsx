@@ -21,6 +21,7 @@ import {
   Text,
   TextInput,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -53,6 +54,8 @@ function safelyPausePlayer(player: { pause: () => void }) {
 export function RecordingScreen({ navigation, route }: Props) {
   const { session } = useAuth();
   const { subjectId, subjectName, existingChapters = [], chapterId, chapterName: paramChapterName, learningPlanId, lectureTitle: paramLectureTitle } = route.params;
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
 
   const recorder = useAudioRecorder(RECORDER_OPTIONS);
   const recorderState = useAudioRecorderState(recorder, 120);
@@ -66,6 +69,8 @@ export function RecordingScreen({ navigation, route }: Props) {
   const [description, setDescription] = useState('');
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadPhase, setUploadPhase] = useState<'idle' | 'sending' | 'finalizing' | 'done'>('idle');
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [recordedUri, setRecordedUri] = useState<string | null>(null);
   const [recordedDuration, setRecordedDuration] = useState(0);
   const [meterBars, setMeterBars] = useState<number[]>([]);
@@ -374,6 +379,8 @@ export function RecordingScreen({ navigation, route }: Props) {
     }
 
     setUploading(true);
+    setUploadError(null);
+    setUploadPhase('sending');
     setUploadProgress(0);
     const resolvedMime = inferMimeTypeFromUri(recordedUri, 'audio/mp4');
     const uploadUri = recordedUri.startsWith('/') ? `file://${recordedUri}` : recordedUri;
@@ -418,13 +425,19 @@ export function RecordingScreen({ navigation, route }: Props) {
         description.trim() || undefined,
         transcription.trim() || undefined,
         recordedDuration,
-        setUploadProgress,
+        (pct) => {
+          setUploadProgress(pct);
+          // Bytes are all sent; the server is still storing the audio and
+          // queuing the analysis, which can take a while on large files.
+          if (pct >= 100) setUploadPhase('finalizing');
+        },
         targetLearningPlanId,
       );
       console.log('[recording] upload:success', {
         subjectId,
         recordedUri,
       });
+      setUploadPhase('done');
       if (navigation.canGoBack()) {
         navigation.goBack();
       } else {
@@ -438,6 +451,10 @@ export function RecordingScreen({ navigation, route }: Props) {
         resolvedMime,
         error: e,
       });
+      // Alert.alert is a no-op on web, so the message has to be rendered inline
+      // or the teacher is left staring at a screen that looks frozen.
+      setUploadPhase('idle');
+      setUploadError(e instanceof Error ? e.message : 'Could not upload recording.');
       Alert.alert('Upload failed', e instanceof Error ? e.message : 'Could not upload recording.');
     } finally {
       setUploading(false);
@@ -465,6 +482,8 @@ export function RecordingScreen({ navigation, route }: Props) {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollBody} style={styles.body}>
+        <View style={styles.centerContainer}>
+          <View style={styles.contentBody}>
         {state === 'idle' ? (
           <>
             <View style={styles.hero}>
@@ -494,13 +513,13 @@ export function RecordingScreen({ navigation, route }: Props) {
               </Pressable>
             )}
 
-            <View style={styles.actionChoiceRow}>
-              <Pressable onPress={() => void startRecording()} style={[styles.recordBtn, { flex: 1 }]}>
+            <View style={[styles.actionChoiceRow, isMobile && { flexDirection: 'column' }]}>
+              <Pressable onPress={() => void startRecording()} style={[styles.recordBtn, isMobile ? { width: '100%' } : { flex: 1 }]}>
                 <Ionicons color="#fff" name="mic" size={22} />
                 <Text style={styles.recordBtnText}>Start Live Recording</Text>
               </Pressable>
 
-              <Pressable onPress={() => void pickAudioFile()} style={styles.uploadChoiceBtn}>
+              <Pressable onPress={() => void pickAudioFile()} style={[styles.uploadChoiceBtn, isMobile ? { width: '100%' } : {}]}>
                 <Ionicons color="#0284C7" name="cloud-upload-outline" size={22} />
                 <Text style={styles.uploadChoiceText}>Upload Audio File</Text>
               </Pressable>
@@ -720,8 +739,30 @@ export function RecordingScreen({ navigation, route }: Props) {
               />
             </View>
 
+            {uploadError ? (
+              <View style={styles.uploadErrorBox}>
+                <Ionicons color="#B42318" name="alert-circle-outline" size={18} />
+                <Text style={styles.uploadErrorText}>{uploadError}</Text>
+              </View>
+            ) : null}
+
+            {uploading ? (
+              <View style={styles.uploadStatusBox}>
+                <ActivityIndicator color={AppTheme.colors.primary} size="small" />
+                <Text style={styles.uploadStatusText}>
+                  {uploadPhase === 'finalizing'
+                    ? 'Audio sent. Saving it and starting the AI evaluation — this can take a minute, please keep this screen open.'
+                    : `Uploading audio… ${uploadProgress}%`}
+                </Text>
+              </View>
+            ) : null}
+
             <View style={styles.footerActions}>
-              <Pressable onPress={() => void reRecord()} style={styles.secondaryBtn}>
+              <Pressable
+                disabled={uploading}
+                onPress={() => void reRecord()}
+                style={[styles.secondaryBtn, uploading && styles.btnDisabled]}
+              >
                 <Ionicons color={AppTheme.colors.textSecondary} name="refresh-outline" size={18} />
                 <Text style={styles.secondaryBtnText}>Record Again</Text>
               </Pressable>
@@ -732,12 +773,18 @@ export function RecordingScreen({ navigation, route }: Props) {
               >
                 {uploading ? <ActivityIndicator color="#fff" size="small" /> : null}
                 <Text style={styles.primaryBtnText}>
-                  {uploading ? `Uploading… ${uploadProgress}%` : 'Upload'}
+                  {uploading
+                    ? uploadPhase === 'finalizing'
+                      ? 'Finishing…'
+                      : `Uploading… ${uploadProgress}%`
+                    : 'Upload'}
                 </Text>
               </Pressable>
             </View>
           </>
         ) : null}
+          </View>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -758,7 +805,18 @@ const styles = StyleSheet.create({
   headerTitle: { flex: 1, textAlign: 'center', fontSize: 17, fontWeight: '700', color: AppTheme.colors.textPrimary },
   headerSpacer: { width: 36 },
   body: { flex: 1 },
-  scrollBody: { padding: 20, gap: 18, paddingBottom: 40 },
+  scrollBody: { flexGrow: 1 },
+  centerContainer: {
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.xl,
+  },
+  contentBody: {
+    width: '100%',
+    maxWidth: 800,
+    gap: 18,
+  },
   hero: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 },
   micRing: {
     width: 132,
@@ -907,6 +965,38 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textPrimary,
   },
   descriptionInput: { minHeight: 96, textAlignVertical: 'top' },
+  uploadStatusBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    padding: 14,
+    borderRadius: 16,
+    backgroundColor: AppTheme.colors.primaryLight,
+  },
+  uploadStatusText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '600',
+    color: AppTheme.colors.primaryDark,
+  },
+  uploadErrorBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    padding: 14,
+    borderRadius: 16,
+    backgroundColor: '#FFF1F1',
+    borderWidth: 1,
+    borderColor: '#FECDCA',
+  },
+  uploadErrorText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '600',
+    color: '#B42318',
+  },
   footerActions: { flexDirection: 'row', gap: 12 },
   secondaryBtn: {
     flex: 1,

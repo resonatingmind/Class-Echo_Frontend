@@ -108,6 +108,7 @@ export type RootStackParamList = {
     subjectName: string;
     subjectId?: number;
     openUpload?: boolean;
+    initialTab?: 'planner' | 'profile' | 'documents';
   };
   TeacherProfile: undefined;
   TeacherTabs: undefined;

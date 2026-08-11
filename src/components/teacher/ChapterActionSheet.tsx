@@ -20,7 +20,7 @@ type Props = {
 
   onEdit: () => void;
 
-  onReferenceMaterial: () => void;
+  onOpenTab: (tab: "planner" | "profile" | "documents") => void;
 
   onDelete: () => void;
 };
@@ -30,7 +30,7 @@ export function ChapterActionSheet({
   chapterName,
   onClose,
   onEdit,
-  onReferenceMaterial,
+  onOpenTab,
   onDelete,
 }: Props) {
   return (
@@ -51,13 +51,30 @@ export function ChapterActionSheet({
                 <Text style={styles.itemText}>Edit Chapter</Text>
               </Pressable>
 
-              <Pressable style={styles.item} onPress={onReferenceMaterial}>
+              <Pressable style={styles.item} onPress={() => onOpenTab("planner")}>
+                <Ionicons
+                  name="calendar-outline"
+                  size={20}
+                  color={AppTheme.colors.primary}
+                />
+                <Text style={styles.itemText}>Lecture Planner</Text>
+              </Pressable>
+
+              <Pressable style={styles.item} onPress={() => onOpenTab("profile")}>
+                <Ionicons
+                  name="sparkles-outline"
+                  size={20}
+                  color={AppTheme.colors.primary}
+                />
+                <Text style={styles.itemText}>Knowledge Profile</Text>
+              </Pressable>
+
+              <Pressable style={styles.item} onPress={() => onOpenTab("documents")}>
                 <Ionicons
                   name="document-text-outline"
                   size={20}
                   color={AppTheme.colors.primary}
                 />
-
                 <Text style={styles.itemText}>Reference Material</Text>
               </Pressable>
 

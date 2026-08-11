@@ -237,6 +237,7 @@ export type ChapterOut = {
   updated_at: string;
   document_count: number;
   ai_status?: TeacherDashboardStatus | null;
+  average_score?: number | null;
 };
 
 export type ChapterCreatePayload = {

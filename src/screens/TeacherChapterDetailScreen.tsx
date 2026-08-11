@@ -67,6 +67,7 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
     chapterName,
     subjectName,
     openUpload,
+    initialTab,
   } = route.params;
 
   const [chapter, setChapter] = useState<ChapterOut | null>(null);
@@ -80,7 +81,7 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
   const [deletingLp, setDeletingLp] = useState(false);
 
   const [activeTab, setActiveTab] = useState<ActiveTab>(
-    openUpload ? "documents" : "planner",
+    initialTab || (openUpload ? "documents" : "planner"),
   );
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);

@@ -12,7 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AdminNavbar } from "../components/common/AdminNavbar";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../context/AuthContext";
 
@@ -32,6 +32,7 @@ import {
   getTeacherSubjectRecordings,
   getTeacherLearningPlans,
   createTeacherLearningPlan,
+  retryRecording,
   getTeacherSubjectStudents,
 } from "../lib/api";
 import {
@@ -44,6 +45,14 @@ import {
 import { ChapterLearningPlanModal } from "../components/teacher/ChapterLearningPlanModal";
 import { getTeacherStatusStyle } from "../components/teacher/teacherStatusStyles";
 import { ExpandedChapterDetailView } from "../components/ExpandedChapterDetailView";
+
+function getScoreColor(score: number | undefined | null) {
+  if (score == null) return "#64748B";
+  if (score >= 80) return "#127A40";
+  if (score >= 60) return AppTheme.colors.primary;
+  if (score >= 40) return "#92400E";
+  return "#B42318";
+}
 
 type Props = NativeStackScreenProps<RootStackParamList, "TeacherSubjectWorkspace">;
 
@@ -144,6 +153,40 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
     expandedChapterIdRef.current = chapId;
     await loadExpandedChapter(chapId);
   };
+
+  /* While a lecture's audio is still being transcribed/evaluated, refresh the open
+     row so the status moves on its own and the report link shows up when ready. */
+  useEffect(() => {
+    if (!expandedChapterId) return;
+    const recs = expandedRecordings[expandedChapterId] ?? [];
+    const stillWorking = recs.some((r) => {
+      const s = (r.status ?? "").toLowerCase();
+      return s === "pending" || s === "processing";
+    });
+    if (!stillWorking) return;
+
+    const timer = setInterval(() => {
+      void loadExpandedChapter(expandedChapterId, false);
+    }, 10000);
+    return () => clearInterval(timer);
+  }, [expandedChapterId, expandedRecordings, loadExpandedChapter]);
+
+  const handleRetryRecording = useCallback(
+    async (chapId: number, recordingId: number) => {
+      if (!token) return;
+      try {
+        await retryRecording(token, recordingId);
+        await loadExpandedChapter(chapId, false);
+      } catch (err) {
+        console.error("Could not re-queue recording", recordingId, err);
+        Alert.alert(
+          "Retry failed",
+          err instanceof Error ? err.message : "Could not re-queue this recording.",
+        );
+      }
+    },
+    [token, loadExpandedChapter],
+  );
 
   const handleCreateLecture = useCallback(
     async (payload: LearningPlanCreatePayload) => {
@@ -329,8 +372,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
                   <View style={styles.tableHeader}>
                     <Text style={[styles.headerCell, styles.colChapter]}>Chapter</Text>
                     <Text style={[styles.headerCell, styles.colPdf]}>PDF</Text>
-                    <Text style={[styles.headerCell, styles.colRecording]}>Recordings</Text>
-                    <Text style={[styles.headerCell, styles.colStatus]}>Status</Text>
+                    <Text style={[styles.headerCell, styles.colStatus]}>Score</Text>
                     <Text style={[styles.headerCell, styles.colAction]}>Action</Text>
                   </View>
 
@@ -401,28 +443,11 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
                               </Pressable>
                             </View>
 
-                            {/* Recordings expand */}
-                            <View style={styles.colRecording}>
-                              <Pressable
-                                onPress={() => void toggleExpandChapter(item.id)}
-                                style={styles.playCircle}
-                              >
-                                <Ionicons
-                                  name={isExpanded ? "chevron-up" : "play"}
-                                  size={14}
-                                  color={AppTheme.colors.primary}
-                                  style={{ marginLeft: isExpanded ? 0 : 2 }}
-                                />
-                              </Pressable>
-                            </View>
-
-                            {/* AI Status */}
+                            {/* AI Status -> Average Score */}
                             <View style={styles.colStatus}>
-                              <View style={[styles.aiBadge, { backgroundColor: statusStyle.bg }]}>
-                                <Text style={[styles.aiText, { color: statusStyle.text }]}>
-                                  {status}
-                                </Text>
-                              </View>
+                               <Text style={{ fontWeight: "800", color: getScoreColor(item.average_score) }}>
+                                 {item.average_score != null ? `${Math.round(item.average_score)}%` : "—"}
+                               </Text>
                             </View>
 
                             {/* Action */}
@@ -479,6 +504,9 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
                                   recording: rec,
                                   subjectName,
                                 });
+                              }}
+                              onRetryRecording={(rec) => {
+                                void handleRetryRecording(item.id, rec.id);
                               }}
                               onOpenChapterDetail={() => {
                                 navigation.navigate("TeacherChapterDetail", {
@@ -548,7 +576,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
           setEditing(true);
           setEditorVisible(true);
         }}
-        onReferenceMaterial={() => {
+        onOpenTab={(tab) => {
           if (!selectedChapter) return;
           setActionSheetVisible(false);
           navigation.navigate("TeacherChapterDetail", {
@@ -556,6 +584,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
             chapterName: selectedChapter.name,
             subjectName,
             subjectId,
+            initialTab: tab,
           });
         }}
         onDelete={() => {
@@ -780,11 +809,10 @@ const styles = StyleSheet.create({
   },
 
   // Column widths
-  colChapter:   { flex: 4.5 },
+  colChapter:   { flex: 5 },
   colPdf:       { flex: 1, alignItems: "center" },
-  colRecording: { flex: 1.2, alignItems: "center" },
-  colStatus:    { flex: 1.4, alignItems: "center" },
-  colAction:    { flex: 1, alignItems: "center" },
+  colStatus:    { flex: 1, alignItems: "center" },
+  colAction:    { flex: 1.2, alignItems: "center" },
 
   pdfButton: {
     minWidth: 54,

@@ -217,6 +217,8 @@ export function TeacherRecordingsScreen() {
           />
         }
       >
+        <View style={styles.centerContainer}>
+          <View style={styles.body}>
         {/* ── Stats row ── */}
         {!loading && !error && (
           <View style={styles.statsRow}>
@@ -381,6 +383,8 @@ export function TeacherRecordingsScreen() {
             })}
           </View>
         )}
+          </View>
+        </View>
       </ScrollView>
 
       {/* ── Filter modal ── */}
@@ -462,11 +466,18 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: AppTheme.colors.background },
 
   scroll: {
-    paddingHorizontal: AppTheme.spacing.xl,
-    paddingTop: AppTheme.spacing.l,
-    paddingBottom: AppTheme.spacing.giant,
-    gap: AppTheme.spacing.l,
     flexGrow: 1,
+  },
+  centerContainer: {
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.xl,
+  },
+  body: {
+    width: '100%',
+    maxWidth: 800,
+    gap: AppTheme.spacing.l,
   },
 
   // ── Stats ──

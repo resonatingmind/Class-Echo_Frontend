@@ -7,14 +7,12 @@ import { TeacherDashboardScreen }  from "../screens/TeacherDashboardScreen";
 import { TeacherSubjectsScreen }   from "../screens/TeacherSubjectsScreen";
 import { TeacherTimetableScreen }  from "../screens/TeacherTimetableScreen";
 import { TeacherRecordingsScreen } from "../screens/TeacherRecordingsScreen";
-import { TeacherProfileScreen }    from "../screens/TeacherProfileScreen";
 
 export type TeacherTabParamList = {
   TeacherDashboard:  undefined;
   TeacherHome:       undefined;
   TeacherTimetable:  undefined;
   TeacherRecordings: undefined;
-  TeacherProfile:    undefined;
 };
 
 const Tab = createBottomTabNavigator<TeacherTabParamList>();
@@ -24,7 +22,6 @@ const TABS: FloatingTabItem[] = [
   { key: "TeacherHome",       label: "Subjects",   icon: "book-outline",      activeIcon: "book"      },
   { key: "TeacherTimetable",  label: "Timetable",  icon: "calendar-outline",  activeIcon: "calendar"  },
   { key: "TeacherRecordings", label: "Recordings", icon: "mic-outline",       activeIcon: "mic"       },
-  { key: "TeacherProfile",    label: "Profile",    icon: "person-outline",    activeIcon: "person"    },
 ];
 
 function TeacherTabBar({ state, navigation }: BottomTabBarProps) {
@@ -61,7 +58,6 @@ export function TeacherTabNavigator() {
       <Tab.Screen name="TeacherHome"       component={TeacherSubjectsScreen}   options={{ title: "Subjects"   }} />
       <Tab.Screen name="TeacherTimetable"  component={TeacherTimetableScreen}  options={{ title: "Timetable"  }} />
       <Tab.Screen name="TeacherRecordings" component={TeacherRecordingsScreen} options={{ title: "Recordings" }} />
-      <Tab.Screen name="TeacherProfile"    component={TeacherProfileScreen}    options={{ title: "Profile"    }} />
     </Tab.Navigator>
   );
 }

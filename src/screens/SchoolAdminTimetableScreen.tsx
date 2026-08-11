@@ -1100,7 +1100,7 @@ const styles = StyleSheet.create({
   mobileGradeTitle: {
     fontSize: 18,
     fontWeight: "800",
-    color: AppTheme.colors.text,
+    color: AppTheme.colors.textPrimary,
   },
   mobileClassCard: {
     backgroundColor: "#FFFFFF",
@@ -1108,7 +1108,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: BORDER_COLOR,
     overflow: "hidden",
-    ...AppTheme.shadows.small,
+    ...AppTheme.shadows.subtle,
   },
   mobileClassHeader: {
     flexDirection: "row",
@@ -1169,7 +1169,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     height: 100,
     overflow: "hidden",
-    ...AppTheme.shadows.small,
+    ...AppTheme.shadows.subtle,
   },
   mobileEmptyCell: {
     flex: 1,

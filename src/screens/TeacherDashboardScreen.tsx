@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
+import { AdminNavbar } from "../components/common/AdminNavbar";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { useAuth } from "../context/AuthContext";
@@ -169,7 +169,8 @@ export function TeacherDashboardScreen() {
   const firstName = profile?.name?.split(" ")[0] ?? "Teacher";
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
+    <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
+      <AdminNavbar title="Teacher Dashboard" onProfilePress={() => navigation.navigate("TeacherProfile" as never)} />
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -181,100 +182,39 @@ export function TeacherDashboardScreen() {
           />
         }
       >
-        {/* ── Hero greeting banner ── */}
-        <LinearGradient
-          colors={[AppTheme.colors.primary, AppTheme.colors.primaryDark]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.hero}
-        >
-          <View style={styles.heroTop}>
-            <View>
-              <Text style={styles.greetingLabel}>{greeting()} 👋</Text>
-              <Text style={styles.greetingName}>{firstName}</Text>
-              {profile?.school_name ? (
-                <Text style={styles.schoolName}>{profile.school_name}</Text>
-              ) : null}
-            </View>
-            <Pressable
-              style={styles.avatarCircle}
-              onPress={() => navigation.navigate("TeacherTabs", { screen: "TeacherProfile" } as never)}
-            >
-              <Text style={styles.avatarInitials}>
-                {firstName.slice(0, 2).toUpperCase()}
-              </Text>
-            </Pressable>
+         {/* Page heading */}
+        <View style={styles.pageHeading}>
+          <Text style={styles.pageTitle}>{greeting()} 👋</Text>
+          <Text style={styles.pageSubtitle}>
+            Welcome back, {firstName}
+          </Text>
+          {profile?.school_name ? (
+            <Text style={styles.pageSubtitleSchool}>{profile.school_name}</Text>
+          ) : null}
+        </View>
+
+        {/* Stats Grid */}
+        <View style={styles.sectionHeaderMain}>
+          <Text style={styles.sectionTitle}>Dashboard Overview</Text>
+        </View>
+        <View style={styles.statsGrid}>
+          <View style={styles.statCard}>
+            <Text style={styles.statNumber}>{stats.subjects}</Text>
+            <Text style={styles.statLabel}>Subjects</Text>
           </View>
-
-          {/* Stats strip */}
-          <View style={styles.statsStrip}>
-            <View style={styles.stripStat}>
-              <Text style={styles.stripNum}>{stats.subjects}</Text>
-              <Text style={styles.stripLabel}>Subjects</Text>
-            </View>
-            <View style={styles.stripDivider} />
-            <View style={styles.stripStat}>
-              <Text style={styles.stripNum}>{stats.recordings}</Text>
-              <Text style={styles.stripLabel}>Recordings</Text>
-            </View>
-            <View style={styles.stripDivider} />
-            <View style={styles.stripStat}>
-              <Text style={styles.stripNum}>{stats.pending}</Text>
-              <Text style={styles.stripLabel}>Processing</Text>
-            </View>
-            <View style={styles.stripDivider} />
-            <View style={styles.stripStat}>
-              <Text style={styles.stripNum}>
-                {stats.avgScore != null ? `${stats.avgScore}%` : "—"}
-              </Text>
-              <Text style={styles.stripLabel}>Avg Score</Text>
-            </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statNumber}>{stats.recordings}</Text>
+            <Text style={styles.statLabel}>Recordings</Text>
           </View>
-        </LinearGradient>
-
-        {/* ── Quick Actions ── */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
-          <View style={styles.actionsRow}>
-            <Pressable
-              style={styles.actionCard}
-              onPress={() => navigation.navigate("TeacherTabs", { screen: "TeacherHome" } as never)}
-            >
-              <View style={[styles.actionIcon, { backgroundColor: AppTheme.colors.primaryLight }]}>
-                <Ionicons name="book" size={22} color={AppTheme.colors.primary} />
-              </View>
-              <Text style={styles.actionLabel}>My Subjects</Text>
-            </Pressable>
-
-            <Pressable
-              style={styles.actionCard}
-              onPress={() => navigation.navigate("TeacherTabs", { screen: "TeacherTimetable" } as never)}
-            >
-              <View style={[styles.actionIcon, { backgroundColor: "#EAF8F1" }]}>
-                <Ionicons name="calendar" size={22} color="#16A34A" />
-              </View>
-              <Text style={styles.actionLabel}>Timetable</Text>
-            </Pressable>
-
-            <Pressable
-              style={styles.actionCard}
-              onPress={() => navigation.navigate("TeacherTabs", { screen: "TeacherRecordings" } as never)}
-            >
-              <View style={[styles.actionIcon, { backgroundColor: "#FFF4E0" }]}>
-                <Ionicons name="mic" size={22} color="#D97706" />
-              </View>
-              <Text style={styles.actionLabel}>Recordings</Text>
-            </Pressable>
-
-            <Pressable
-              style={styles.actionCard}
-              onPress={() => navigation.navigate("TeacherTabs", { screen: "TeacherProfile" } as never)}
-            >
-              <View style={[styles.actionIcon, { backgroundColor: "#F5F0FF" }]}>
-                <Ionicons name="person" size={22} color="#7C3AED" />
-              </View>
-              <Text style={styles.actionLabel}>Profile</Text>
-            </Pressable>
+          <View style={styles.statCard}>
+            <Text style={styles.statNumber}>{stats.pending}</Text>
+            <Text style={styles.statLabel}>Processing</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statNumber}>
+              {stats.avgScore != null ? `${stats.avgScore}%` : "—"}
+            </Text>
+            <Text style={styles.statLabel}>Avg Score</Text>
           </View>
         </View>
 
@@ -474,65 +414,57 @@ const styles = StyleSheet.create({
     gap: AppTheme.spacing.xs,
   },
 
-  // ── Hero ──
-  hero: {
+  // ── Page Header ──
+  pageHeading: {
     paddingHorizontal: AppTheme.spacing.xl,
     paddingTop: AppTheme.spacing.xl,
-    paddingBottom: AppTheme.spacing.xxl,
-    gap: AppTheme.spacing.xl,
+    gap: AppTheme.spacing.s,
+    marginBottom: AppTheme.spacing.xs,
   },
-  heroTop: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
+  pageTitle: {
+    color: AppTheme.colors.textPrimary,
+    ...AppTheme.typography.heading1,
   },
-  greetingLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "rgba(255,255,255,0.8)",
+  pageSubtitle: {
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.body,
   },
-  greetingName: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: AppTheme.colors.surface,
-    letterSpacing: -0.5,
-    marginTop: 2,
-  },
-  schoolName: {
+  pageSubtitleSchool: {
     fontSize: 12,
     fontWeight: "600",
-    color: "rgba(255,255,255,0.65)",
-    marginTop: 4,
+    color: AppTheme.colors.textSecondary,
   },
-  avatarCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: "rgba(255,255,255,0.2)",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.4)",
-  },
-  avatarInitials: {
-    fontSize: 16,
-    fontWeight: "800",
-    color: AppTheme.colors.surface,
+  sectionHeaderMain: {
+    paddingHorizontal: AppTheme.spacing.xl,
+    marginTop: AppTheme.spacing.s,
   },
 
-  // Stats strip
-  statsStrip: {
+  // Stats Grid
+  statsGrid: {
     flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.15)",
-    borderRadius: AppTheme.radius.large,
-    paddingVertical: AppTheme.spacing.m,
-    paddingHorizontal: AppTheme.spacing.l,
+    flexWrap: "wrap",
+    gap: AppTheme.spacing.m,
+    paddingHorizontal: AppTheme.spacing.xl,
   },
-  stripStat:    { flex: 1, alignItems: "center" },
-  stripNum:     { fontSize: 20, fontWeight: "800", color: AppTheme.colors.surface },
-  stripLabel:   { fontSize: 10, fontWeight: "600", color: "rgba(255,255,255,0.7)", marginTop: 2 },
-  stripDivider: { width: 1, height: 30, backgroundColor: "rgba(255,255,255,0.25)" },
+  statCard: {
+    flex: 1,
+    minWidth: "45%",
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
+    paddingVertical: AppTheme.spacing.xl,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+  },
+  statNumber: {
+    color: AppTheme.colors.primary,
+    ...AppTheme.typography.heading1,
+  },
+  statLabel: {
+    marginTop: AppTheme.spacing.xs,
+    color: AppTheme.colors.textSecondary,
+    ...AppTheme.typography.body,
+  },
 
   // ── Sections ──
   section: {
@@ -562,35 +494,6 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.primary,
   },
 
-  // Quick actions
-  actionsRow: {
-    flexDirection: "row",
-    gap: AppTheme.spacing.m,
-  },
-  actionCard: {
-    flex: 1,
-    backgroundColor: AppTheme.colors.surface,
-    borderRadius: AppTheme.radius.large,
-    borderWidth: 1,
-    borderColor: AppTheme.colors.border,
-    alignItems: "center",
-    paddingVertical: AppTheme.spacing.l,
-    gap: AppTheme.spacing.s,
-    ...AppTheme.shadows.subtle,
-  },
-  actionIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: AppTheme.radius.medium,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  actionLabel: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: AppTheme.colors.textPrimary,
-    textAlign: "center",
-  },
 
   // ── Schedule ──
   periodsCol:  { gap: AppTheme.spacing.s },

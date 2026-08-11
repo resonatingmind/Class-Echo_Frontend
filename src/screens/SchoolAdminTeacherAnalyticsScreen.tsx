@@ -2431,30 +2431,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 
-  statusBadge: {
-    borderRadius: AppTheme.radius.medium,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-
-  completedBadge: {
-    backgroundColor: "#DCFCE7",
-  },
-
-  processingBadge: {
-    backgroundColor: "#FEF3C7",
-  },
-
-  pendingBadge: {
-    backgroundColor: "#DBEAFE",
-  },
-
-  failedBadge: {
-    backgroundColor: "#FEE2E2",
-  },
-
-  statusText: {
-    fontWeight: "700",
-    fontSize: 13,
-  },
 });

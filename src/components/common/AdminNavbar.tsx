@@ -9,9 +9,10 @@ type Props = {
   title: string;
   rightActions?: React.ReactNode;
   onBack?: () => void;
+  onProfilePress?: () => void;
 };
 
-export function AdminNavbar({ title, rightActions, onBack }: Props) {
+export function AdminNavbar({ title, rightActions, onBack, onProfilePress }: Props) {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
   const navigation = useNavigation();
@@ -30,7 +31,7 @@ export function AdminNavbar({ title, rightActions, onBack }: Props) {
       <Text style={styles.headerTitle} numberOfLines={1}>{isMobile ? "" : title}</Text>
       <View style={styles.headerRight}>
         {rightActions}
-        <Pressable onPress={() => navigation.navigate("SchoolAdminProfile" as never)} style={styles.iconBtn}>
+        <Pressable onPress={() => onProfilePress ? onProfilePress() : navigation.navigate("SchoolAdminProfile" as never)} style={styles.iconBtn}>
           <Ionicons color={AppTheme.colors.textPrimary} name="person-circle-outline" size={28} />
         </Pressable>
       </View>

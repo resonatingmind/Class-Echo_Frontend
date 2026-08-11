@@ -40,6 +40,7 @@ import { StudentSubjectDetailScreen } from "../screens/StudentSubjectDetailScree
 import { RecordingDetailScreen } from "../screens/RecordingDetailScreen";
 import { RecordingScreen } from "../screens/RecordingScreen";
 import { TeacherSubjectWorkspaceScreen } from "../screens/TeacherSubjectWorkspaceScreen";
+import { TeacherProfileScreen } from "../screens/TeacherProfileScreen";
 import { TeacherTabNavigator } from "./TeacherTabNavigator";
 
 export type RootStackParamList = {
@@ -108,6 +109,7 @@ export type RootStackParamList = {
     subjectId?: number;
     openUpload?: boolean;
   };
+  TeacherProfile: undefined;
   TeacherTabs: undefined;
 
   TeacherSubjectWorkspace: {
@@ -274,6 +276,10 @@ export function AppNavigator() {
           <Stack.Screen
             name="RecordingDetail"
             component={RecordingDetailScreen}
+          />
+          <Stack.Screen
+            name="TeacherProfile"
+            component={TeacherProfileScreen}
           />
         </>
       ) : (

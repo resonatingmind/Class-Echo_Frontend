@@ -471,6 +471,7 @@ const styles = StyleSheet.create({
   centerContainer: {
     flex: 1,
     alignItems: 'center',
+    width: '100%',
     paddingHorizontal: AppTheme.spacing.l,
     paddingVertical: AppTheme.spacing.xl,
   },

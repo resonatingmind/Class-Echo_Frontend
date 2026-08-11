@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -152,6 +153,8 @@ const statStyles = StyleSheet.create({
 export function SchoolAdminTimetableScreen({ navigation }: Props) {
   const { session } = useAuth();
   const token = session?.token as string;
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
 
   const [classes, setClasses] = useState<ClassOut[]>([]);
   const [teachers, setTeachers] = useState<TeacherOut[]>([]);
@@ -239,9 +242,10 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
 
   // ─── Derived ──────────────────────────────────────────────────────────────
   const periodNumbers = useMemo(() => {
-    const nums = entries.filter((e) => e.day_of_week === selectedDay).map((e) => e.period_number);
-    return [...new Set(nums)].sort((a, b) => a - b);
-  }, [entries, selectedDay]);
+    const configuredNums = periodSlots.map((s) => s.number);
+    const entryNums = entries.filter((e) => e.day_of_week === selectedDay).map((e) => e.period_number);
+    return [...new Set([...configuredNums, ...entryNums])].sort((a, b) => a - b);
+  }, [entries, selectedDay, periodSlots]);
 
   const classGroups = useMemo((): [string, ClassOut[]][] => {
     const map = new Map<string, ClassOut[]>();
@@ -408,6 +412,73 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
     );
   };
 
+  const renderMobileCell = (classId: number, periodNumber: number) => {
+    const entry = entryMap[classId]?.[periodNumber];
+    const subjectName = entry ? getSubjectName(entry) : "";
+    const colorIdx = entry ? subjectColorIndex(subjectName) : 0;
+    const palette = SUBJECT_COLORS[colorIdx];
+    const teacherName = entry ? getTeacherName(entry, teachers) : "";
+
+    return (
+      <View key={periodNumber} style={styles.mobilePeriodWrapper}>
+        <View style={styles.mobilePeriodHeader}>
+          <Text style={styles.mobilePeriodLabel}>Period {periodNumber}</Text>
+          <Text style={styles.mobilePeriodTime}>{periodLabel(periodNumber)}</Text>
+        </View>
+        <Pressable
+          style={({ pressed }) => [
+            styles.mobileCell,
+            entry && { backgroundColor: palette.bg, borderColor: palette.accent + "44" },
+            pressed && styles.cellPressed,
+          ]}
+          onPress={() => handleCellPress(classId, periodNumber)}
+          onLongPress={() => entry && setDeleteTarget(entry)}
+          delayLongPress={400}
+        >
+          {entry ? (
+            <View style={styles.cellContent}>
+              <View style={[styles.cellAccentBar, { backgroundColor: palette.accent }]} />
+              <View style={styles.cellInner}>
+                <Text style={[styles.cellSubject, { color: palette.text, fontSize: 13 }]} numberOfLines={2}>
+                  {subjectName}
+                </Text>
+                <View style={styles.cellTeacherRow}>
+                  <Ionicons name="person-outline" size={11} color={AppTheme.colors.textSecondary} />
+                  <Text style={[styles.cellTeacher, { fontSize: 11 }]} numberOfLines={1}>
+                    {teacherName}
+                  </Text>
+                </View>
+                <View style={styles.cellActions}>
+                  <Pressable
+                    style={[styles.cellActionBtn, { borderColor: palette.accent + "44" }]}
+                    hitSlop={10}
+                    onPress={() => handleCellPress(classId, periodNumber)}
+                  >
+                    <Ionicons name="pencil-outline" size={12} color={palette.text} />
+                  </Pressable>
+                  <Pressable
+                    style={[styles.cellActionBtn, { borderColor: "#EF444444" }]}
+                    hitSlop={10}
+                    onPress={() => setDeleteTarget(entry)}
+                  >
+                    <Ionicons name="trash-outline" size={12} color="#EF4444" />
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.mobileEmptyCell}>
+              <View style={styles.emptyAddIcon}>
+                <Ionicons name="add" size={18} color={AppTheme.colors.primary} />
+              </View>
+              <Text style={styles.mobileEmptyText}>Add</Text>
+            </View>
+          )}
+        </Pressable>
+      </View>
+    );
+  };
+
   // ─── UI ───────────────────────────────────────────────────────────────────
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
@@ -441,8 +512,8 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
               <View style={styles.heroCircle2} />
 
               {/* Title + action buttons */}
-              <View style={styles.heroTopRow}>
-                <View style={{ flex: 1 }}>
+              <View style={[styles.heroTopRow, isMobile && styles.heroTopRowMobile]}>
+                <View style={isMobile ? { width: "100%", marginBottom: 12 } : { flex: 1 }}>
                   <View style={styles.heroLabelRow}>
                     <Ionicons name="calendar-outline" size={13} color="rgba(255,255,255,0.8)" />
                     <Text style={styles.heroLabel}>SCHOOL TIMETABLE</Text>
@@ -451,7 +522,7 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
                   <Text style={styles.heroSubtitle}>Manage weekly class timetables</Text>
                 </View>
 
-                <View style={styles.heroActions}>
+                <View style={[styles.heroActions, isMobile && styles.heroActionsMobile]}>
                   {/* Add Period */}
                   {!loading && classes.length > 0 && (
                     <Pressable
@@ -519,6 +590,42 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
                 title="Add a class first"
                 body="Create at least one class before building its timetable."
               />
+            ) : isMobile ? (
+              <View style={styles.mobileListWrapper}>
+                {classGroups.map(([grade, sections]) => (
+                  <View key={grade} style={styles.mobileGradeSection}>
+                    <View style={styles.mobileGradeHeader}>
+                      <Text style={styles.mobileGradeTitle}>Grade {grade}</Text>
+                    </View>
+                    {sections.map((cls) => (
+                      <View key={cls.id} style={styles.mobileClassCard}>
+                        <View style={styles.mobileClassHeader}>
+                          <View style={styles.mobileClassTitleRow}>
+                            <Ionicons name="people-circle-outline" size={20} color={AppTheme.colors.primary} />
+                            <Text style={styles.mobileClassTitle}>Section {sectionOf(cls)}</Text>
+                          </View>
+                        </View>
+                        <View style={styles.mobileClassPeriods}>
+                          {periodNumbers.length === 0 ? (
+                            <View style={styles.mobileNoPeriodContainer}>
+                              <Ionicons name="calendar-outline" size={24} color={AppTheme.colors.textSecondary} style={{marginBottom: 8}} />
+                              <Text style={styles.noPeriodText}>No periods on {selectedDay}</Text>
+                            </View>
+                          ) : (
+                            <ScrollView
+                              horizontal
+                              showsHorizontalScrollIndicator={false}
+                              contentContainerStyle={styles.mobilePeriodsScroll}
+                            >
+                              {periodNumbers.map((n) => renderMobileCell(cls.id, n))}
+                            </ScrollView>
+                          )}
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                ))}
+              </View>
             ) : (
               /* Horizontal-only scroll wrapper for the table */
               <ScrollView
@@ -710,6 +817,9 @@ const styles = StyleSheet.create({
     gap: 10,
     flexWrap: "wrap",
   },
+  heroTopRowMobile: {
+    flexDirection: "column",
+  },
   heroLabelRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -739,6 +849,10 @@ const styles = StyleSheet.create({
     gap: 6,
     alignItems: "center",
     justifyContent: "flex-end",
+  },
+  heroActionsMobile: {
+    justifyContent: "flex-start",
+    width: "100%",
   },
   heroAddBtn: {
     flexDirection: "row",
@@ -968,5 +1082,105 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: AppTheme.colors.primary + "22",
+  },
+
+  // ── Mobile Layout ───────────────────────────────────────────────
+  mobileListWrapper: {
+    paddingHorizontal: AppTheme.spacing.l,
+    gap: 20,
+  },
+  mobileGradeSection: {
+    gap: 12,
+  },
+  mobileGradeHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  mobileGradeTitle: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: AppTheme.colors.text,
+  },
+  mobileClassCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: AppTheme.radius.large,
+    borderWidth: 1,
+    borderColor: BORDER_COLOR,
+    overflow: "hidden",
+    ...AppTheme.shadows.small,
+  },
+  mobileClassHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 12,
+    backgroundColor: GRADE_BG,
+    borderBottomWidth: 1,
+    borderColor: BORDER_COLOR,
+  },
+  mobileClassTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  mobileClassTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: AppTheme.colors.primaryDark,
+  },
+  mobileClassPeriods: {
+    paddingVertical: 12,
+    backgroundColor: "#FAFCFF",
+  },
+  mobileNoPeriodContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 20,
+  },
+  mobilePeriodsScroll: {
+    paddingHorizontal: 12,
+    gap: 12,
+  },
+  mobilePeriodWrapper: {
+    width: 150,
+    gap: 8,
+  },
+  mobilePeriodHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 4,
+  },
+  mobilePeriodLabel: {
+    fontSize: 12,
+    fontWeight: "800",
+    color: AppTheme.colors.primary,
+  },
+  mobilePeriodTime: {
+    fontSize: 10,
+    color: AppTheme.colors.textSecondary,
+    fontWeight: "600",
+  },
+  mobileCell: {
+    backgroundColor: CELL_BG,
+    borderWidth: 1,
+    borderColor: BORDER_COLOR,
+    borderRadius: 12,
+    height: 100,
+    overflow: "hidden",
+    ...AppTheme.shadows.small,
+  },
+  mobileEmptyCell: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: "#F9FAFB",
+  },
+  mobileEmptyText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: AppTheme.colors.textSecondary,
   },
 });

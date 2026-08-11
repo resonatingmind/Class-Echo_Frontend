@@ -10,8 +10,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { AdminNavbar } from "../components/common/AdminNavbar";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../context/AuthContext";
 
@@ -30,9 +31,17 @@ import {
   deleteTeacherChapter,
   getTeacherSubjectRecordings,
   getTeacherLearningPlans,
+  createTeacherLearningPlan,
   getTeacherSubjectStudents,
 } from "../lib/api";
-import { ChapterOut, LearningPlanOut, RecordingWithReport, StudentOut } from "../types/api";
+import {
+  ChapterOut,
+  LearningPlanCreatePayload,
+  LearningPlanOut,
+  RecordingWithReport,
+  StudentOut,
+} from "../types/api";
+import { ChapterLearningPlanModal } from "../components/teacher/ChapterLearningPlanModal";
 import { getTeacherStatusStyle } from "../components/teacher/teacherStatusStyles";
 import { ExpandedChapterDetailView } from "../components/ExpandedChapterDetailView";
 
@@ -44,8 +53,6 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
   const token = session?.token ?? "";
 
   const [chapters, setChapters] = useState<ChapterOut[]>([]);
-  const [students, setStudents] = useState<StudentOut[]>([]);
-  const [activeTab, setActiveTab] = useState<"chapters" | "students">("chapters");
   const [loading, setLoading] = useState(true);
   const [importModalVisible, setImportModalVisible] = useState(false);
   const [editorVisible, setEditorVisible] = useState(false);
@@ -60,26 +67,66 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
   const [filter, setFilter] = useState<"all" | "withPdf" | "withoutPdf">("all");
 
   const [expandedChapterId, setExpandedChapterId] = useState<number | null>(null);
+  // Kept in a ref so the focus refresh doesn't re-run every time a row is expanded.
+  const expandedChapterIdRef = useRef<number | null>(null);
   const [expandedRecordings, setExpandedRecordings] = useState<Record<number, RecordingWithReport[]>>({});
   const [expandedLps, setExpandedLps] = useState<Record<number, LearningPlanOut[]>>({});
   const [loadingExpandedId, setLoadingExpandedId] = useState<number | null>(null);
+
+  const [lectureModalVisible, setLectureModalVisible] = useState(false);
+  const [lectureChapter, setLectureChapter] = useState<ChapterOut | null>(null);
+  const [savingLecture, setSavingLecture] = useState(false);
+
+  /* Lectures and recordings are fetched independently: a failing recordings call
+     must never leave the lecture list empty (and vice versa), otherwise a lecture
+     that exists on the server looks like it was never created. */
+  const loadExpandedChapter = useCallback(
+    async (chapId: number, showSpinner = true) => {
+      if (!token) return;
+      if (showSpinner) setLoadingExpandedId(chapId);
+      const [recsResult, lpsResult] = await Promise.allSettled([
+        getTeacherSubjectRecordings(token, subjectId, chapId),
+        getTeacherLearningPlans(token, subjectId, chapId),
+      ]);
+
+      if (recsResult.status === "fulfilled") {
+        setExpandedRecordings((prev) => ({ ...prev, [chapId]: recsResult.value }));
+      } else {
+        console.error("Could not load recordings for chapter", chapId, recsResult.reason);
+      }
+
+      if (lpsResult.status === "fulfilled") {
+        setExpandedLps((prev) => ({ ...prev, [chapId]: lpsResult.value }));
+      } else {
+        console.error("Could not load lectures for chapter", chapId, lpsResult.reason);
+      }
+
+      if (showSpinner) setLoadingExpandedId(null);
+    },
+    [token, subjectId],
+  );
 
   const loadData = useCallback(async () => {
     if (!token) return;
     try {
       setLoading(true);
-      const [chaptersData, studentsData] = await Promise.all([
-        getTeacherChapters(token, subjectId),
-        getTeacherSubjectStudents(token, subjectId),
-      ]);
+      const chaptersData = await getTeacherChapters(token, subjectId);
       setChapters(chaptersData);
-      setStudents(studentsData);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
-  }, [token, subjectId]);
+
+    // Cached lecture/recording lists go stale the moment a lecture is added on
+    // another screen, so drop everything and refill the row that is open.
+    const openChapterId = expandedChapterIdRef.current;
+    setExpandedRecordings((prev) => (Object.keys(prev).length ? {} : prev));
+    setExpandedLps((prev) => (Object.keys(prev).length ? {} : prev));
+    if (openChapterId) {
+      await loadExpandedChapter(openChapterId, false);
+    }
+  }, [token, subjectId, loadExpandedChapter]);
 
   useFocusEffect(
     useCallback(() => {
@@ -90,24 +137,36 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
   const toggleExpandChapter = async (chapId: number) => {
     if (expandedChapterId === chapId) {
       setExpandedChapterId(null);
+      expandedChapterIdRef.current = null;
       return;
     }
     setExpandedChapterId(chapId);
-    if (!token) return;
-    setLoadingExpandedId(chapId);
-    try {
-      const [recs, lps] = await Promise.all([
-        getTeacherSubjectRecordings(token, subjectId, chapId),
-        getTeacherLearningPlans(token, subjectId, chapId),
-      ]);
-      setExpandedRecordings((prev) => ({ ...prev, [chapId]: recs }));
-      setExpandedLps((prev) => ({ ...prev, [chapId]: lps }));
-    } catch (err) {
-      console.error("Could not load expanded details", err);
-    } finally {
-      setLoadingExpandedId(null);
-    }
+    expandedChapterIdRef.current = chapId;
+    await loadExpandedChapter(chapId);
   };
+
+  const handleCreateLecture = useCallback(
+    async (payload: LearningPlanCreatePayload) => {
+      if (!token || !lectureChapter) return;
+      try {
+        setSavingLecture(true);
+        await createTeacherLearningPlan(token, subjectId, lectureChapter.id, payload);
+        setLectureModalVisible(false);
+        // Refresh the row that is open so the new lecture is visible right away.
+        await loadExpandedChapter(lectureChapter.id, false);
+        setLectureChapter(null);
+      } catch (err) {
+        console.error(err);
+        Alert.alert(
+          "Unable to add lecture",
+          err instanceof Error ? err.message : "Could not create the lecture.",
+        );
+      } finally {
+        setSavingLecture(false);
+      }
+    },
+    [token, subjectId, lectureChapter, loadExpandedChapter],
+  );
 
   const handleCreateChapter = useCallback(
     async (data: { name: string; description: string }) => {
@@ -188,59 +247,22 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
 
   return (
     <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
-      {/* ── Header ── */}
-      <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={22} color={AppTheme.colors.textPrimary} />
-        </Pressable>
-        <View style={styles.headerTextWrapper}>
-          <Text style={styles.subject} numberOfLines={1}>{subjectName}</Text>
-          <Text style={styles.subtitle}>
-            Class {className} · Section {section}
-          </Text>
-        </View>
-      </View>
+      <AdminNavbar title="Workspace" onBack={() => navigation.goBack()} />
+      <View style={styles.flex}>
+        <ScrollView
+          style={styles.content}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.centerContainer}>
+            <View style={styles.body}>
+              <View style={styles.pageHeading}>
+                <Text style={styles.pageTitle}>{subjectName}</Text>
+                <Text style={styles.pageSubtitle}>Class {className} · Section {section}</Text>
+              </View>
 
-      {/* ── Main scroll ── */}
-      <ScrollView
-        style={styles.content}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Tab bar */}
-        <View style={styles.tabBar}>
-          <Pressable
-            style={[styles.tabButton, activeTab === "chapters" && styles.tabButtonActive]}
-            onPress={() => setActiveTab("chapters")}
-          >
-            <Ionicons
-              name={activeTab === "chapters" ? "layers" : "layers-outline"}
-              size={15}
-              color={activeTab === "chapters" ? AppTheme.colors.primaryDark : AppTheme.colors.textSecondary}
-            />
-            <Text style={[styles.tabLabel, activeTab === "chapters" && styles.tabLabelActive]}>
-              Chapters
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[styles.tabButton, activeTab === "students" && styles.tabButtonActive]}
-            onPress={() => setActiveTab("students")}
-          >
-            <Ionicons
-              name={activeTab === "students" ? "people" : "people-outline"}
-              size={15}
-              color={activeTab === "students" ? AppTheme.colors.primaryDark : AppTheme.colors.textSecondary}
-            />
-            <Text style={[styles.tabLabel, activeTab === "students" && styles.tabLabelActive]}>
-              Students
-            </Text>
-          </Pressable>
-        </View>
-
-        {/* ── Workspace card ── */}
-        <View style={styles.workspaceCard}>
-          {activeTab === "chapters" ? (
-            <>
+              {/* ── Workspace card ── */}
+              <View style={styles.workspaceCard}>
               {/* Search */}
               <TextInput
                 placeholder="Search chapter..."
@@ -295,13 +317,14 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
               </View>
 
               {/* Table */}
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={{ width: "100%" }}
-                contentContainerStyle={{ minWidth: "100%" }}
-              >
-                <View style={[styles.tableWrapper, { width: "100%" }]}>
+              <View style={styles.card}>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  style={{ width: "100%" }}
+                  contentContainerStyle={{ minWidth: "100%" }}
+                >
+                  <View style={[styles.tableWrapper, { width: "100%" }]}>
                   {/* Table header */}
                   <View style={styles.tableHeader}>
                     <Text style={[styles.headerCell, styles.colChapter]}>Chapter</Text>
@@ -427,22 +450,20 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
                               learningPlans={lps}
                               loading={isExLoading}
                               role="teacher"
-                              onAddRecording={() => {
+                              onAddRecording={(learningPlanId?: number, lectureTitle?: string) => {
                                 navigation.navigate("TeacherRecording", {
                                   subjectId,
                                   subjectName,
                                   existingChapters: chapters.map((c) => c.name),
                                   chapterId: item.id,
                                   chapterName: item.name,
+                                  learningPlanId,
+                                  lectureTitle,
                                 });
                               }}
                               onAddLearningPlan={() => {
-                                navigation.navigate("TeacherChapterDetail", {
-                                  chapterId: item.id,
-                                  chapterName: item.name,
-                                  subjectName,
-                                  subjectId,
-                                });
+                                setLectureChapter(item);
+                                setLectureModalVisible(true);
                               }}
                               onAddDocument={() => {
                                 navigation.navigate("TeacherChapterDetail", {
@@ -475,46 +496,12 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
                   )}
                 </View>
               </ScrollView>
-            </>
-          ) : (
-            /* ── Students tab ── */
-            <View style={{ width: "100%" }}>
-              {students.length === 0 ? (
-                <View style={styles.emptyRow}>
-                  <Ionicons name="people-outline" size={40} color={AppTheme.colors.hint} />
-                  <Text style={styles.emptyTitle}>No students enrolled</Text>
-                  <Text style={styles.emptyText}>Students in this class will appear here.</Text>
-                </View>
-              ) : (
-                <View style={styles.studentList}>
-                  <Text style={styles.rosterTitle}>
-                    Class Roster ({students.length})
-                  </Text>
-                  {students.map((student) => {
-                    const initials = student.name
-                      .split(" ")
-                      .map((word) => word[0] ?? "")
-                      .join("")
-                      .toUpperCase()
-                      .slice(0, 2);
-                    return (
-                      <View key={student.id} style={styles.studentRow}>
-                        <View style={styles.studentAvatar}>
-                          <Text style={styles.studentInitials}>{initials}</Text>
-                        </View>
-                        <View style={styles.studentInfo}>
-                          <Text style={styles.studentName}>{student.name}</Text>
-                          <Text style={styles.studentEmail}>{student.email}</Text>
-                        </View>
-                      </View>
-                    );
-                  })}
-                </View>
-              )}
             </View>
-          )}
+          </View>
         </View>
-      </ScrollView>
+      </View>
+        </ScrollView>
+      </View>
 
       {/* ── Modals ── */}
       <ImportLearningPlansModal
@@ -538,6 +525,18 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
           setEditing(false);
         }}
         onSave={editing ? handleUpdateChapter : handleCreateChapter}
+      />
+
+      <ChapterLearningPlanModal
+        visible={lectureModalVisible}
+        chapterName={lectureChapter?.name ?? ""}
+        initialItem={null}
+        loading={savingLecture}
+        onClose={() => {
+          setLectureModalVisible(false);
+          setLectureChapter(null);
+        }}
+        onSave={handleCreateLecture}
       />
 
       <ChapterActionSheet
@@ -588,57 +587,45 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: AppTheme.colors.background,
   },
-
-  // ── Header ──
-  header: {
-    backgroundColor: AppTheme.colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: AppTheme.colors.border,
-    paddingHorizontal: AppTheme.spacing.xxl,
-    paddingVertical: AppTheme.spacing.l,
-    flexDirection: "row",
+  flex: { flex: 1 },
+  centerContainer: {
+    flex: 1,
     alignItems: "center",
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: AppTheme.spacing.xl,
+  },
+  body: {
+    width: "100%",
+    maxWidth: 800,
     gap: AppTheme.spacing.l,
   },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: AppTheme.radius.medium,
-    backgroundColor: AppTheme.colors.background,
-    justifyContent: "center",
-    alignItems: "center",
+  pageHeading: {
+    gap: AppTheme.spacing.s,
+    marginBottom: AppTheme.spacing.xs,
   },
-  headerTextWrapper: { flex: 1 },
-  subject: {
-    fontSize: 20,
-    fontWeight: "800",
+  pageTitle: {
     color: AppTheme.colors.textPrimary,
-    letterSpacing: -0.3,
+    ...AppTheme.typography.heading1,
   },
-  subtitle: {
-    marginTop: 2,
-    fontSize: 13,
+  pageSubtitle: {
     color: AppTheme.colors.textSecondary,
-    fontWeight: "500",
+    ...AppTheme.typography.body,
   },
 
   // ── Scroll ──
   content: { flex: 1 },
   scrollContent: {
-    padding: AppTheme.spacing.xxl,
-    paddingBottom: AppTheme.spacing.giant,
-    gap: AppTheme.spacing.l,
-    alignItems: "center",
+    flexGrow: 1,
   },
 
   // ── Tab bar ──
   tabBar: {
     flexDirection: "row",
     width: "100%",
-    maxWidth: 1280,
     backgroundColor: AppTheme.colors.surfaceMuted,
     borderRadius: AppTheme.radius.large,
-    padding: 4,
+    padding: 6,
+    gap: 6,
   },
   tabButton: {
     flex: 1,
@@ -665,14 +652,8 @@ const styles = StyleSheet.create({
 
   // ── Workspace card ──
   workspaceCard: {
-    backgroundColor: AppTheme.colors.surface,
-    borderRadius: AppTheme.radius.large,
-    padding: AppTheme.spacing.xxl,
-    borderWidth: 1,
-    borderColor: AppTheme.colors.border,
     width: "100%",
-    maxWidth: 1280,
-    ...AppTheme.shadows.subtle,
+    gap: AppTheme.spacing.l,
   },
 
   // ── Search & Toolbar ──
@@ -745,10 +726,15 @@ const styles = StyleSheet.create({
   },
 
   // ── Table ──
-  tableWrapper: {
-    borderRadius: AppTheme.radius.medium,
+  card: {
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
     borderWidth: 1,
     borderColor: AppTheme.colors.border,
+    paddingVertical: AppTheme.spacing.m,
+  },
+  tableWrapper: {
+    borderWidth: 0,
     overflow: "hidden",
   },
   tableHeader: {

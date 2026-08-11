@@ -20,7 +20,7 @@ type Props = {
   learningPlans: LearningPlanOut[];
   loading?: boolean;
   role?: "teacher" | "school_admin";
-  onAddRecording?: () => void;
+  onAddRecording?: (learningPlanId?: number, lectureTitle?: string) => void;
   onAddLearningPlan?: () => void;
   onAddDocument?: () => void;
   onViewRecordingReport?: (rec: RecordingWithReport) => void;
@@ -35,8 +35,8 @@ function getScoreColor(score: number | undefined | null) {
   return "#B42318";
 }
 
-function getStatusStyle(status: string) {
-  const norm = status.toLowerCase();
+function getStatusStyle(status?: string | null) {
+  const norm = (status || "").toLowerCase();
   if (norm === "completed" || norm === "analysed") {
     return { bg: "#E8F7EE", text: "#127A40", label: "Analysed" };
   } else if (norm === "processing") {
@@ -72,28 +72,27 @@ export function ExpandedChapterDetailView({
     );
   }
 
-  // Match recordings to Lecture Planner topics
+  // Match recordings to lectures (Lecture Planner sub-topics).
+  // A recording bound to a lecture via learning_plan_id belongs to that lecture only;
+  // title matching is a fallback for older recordings that were never bound.
   const assignedRecordingIds = new Set<number>();
 
   const titleRows = learningPlans.map((lp) => {
     const matchingRecs = recordings.filter((r) => {
-      if (r.learning_plan_id === lp.id) return true;
-      if (
+      if (assignedRecordingIds.has(r.id)) return false;
+      if (r.learning_plan_id != null) return r.learning_plan_id === lp.id;
+      return Boolean(
         r.lecture_title &&
-        lp.sub_topic &&
-        r.lecture_title.toLowerCase().trim() === lp.sub_topic.toLowerCase().trim()
-      ) {
-        return true;
-      }
-      return false;
+          lp.sub_topic &&
+          r.lecture_title.toLowerCase().trim() === lp.sub_topic.toLowerCase().trim()
+      );
     });
 
     matchingRecs.forEach((r) => assignedRecordingIds.add(r.id));
 
     return {
       learningPlan: lp,
-      recording: matchingRecs[0] ?? null,
-      additionalRecordings: matchingRecs.slice(1),
+      recordings: matchingRecs,
     };
   });
 
@@ -135,16 +134,17 @@ export function ExpandedChapterDetailView({
             Add a chapter entry or display title to populate this lecture table.
           </Text>
           <View style={styles.emptyBtnRow}>
-            {role === "teacher" && onAddRecording ? (
-              <Pressable style={styles.inlineAddBtn} onPress={onAddRecording}>
-                <Ionicons name="mic-outline" size={14} color="#0284C7" />
-                <Text style={styles.inlineAddText}>Record First Lecture</Text>
+            {/* Audio belongs to a lecture, so a lecture has to exist first. */}
+            {role === "teacher" && onAddLearningPlan ? (
+              <Pressable style={styles.inlineAddBtn} onPress={onAddLearningPlan}>
+                <Ionicons name="add-circle-outline" size={14} color="#0284C7" />
+                <Text style={styles.inlineAddText}>Create Lecture Title</Text>
               </Pressable>
             ) : null}
             {onOpenChapterDetail ? (
               <Pressable style={styles.inlineAddBtn} onPress={onOpenChapterDetail}>
                 <Ionicons name="calendar-outline" size={14} color="#0284C7" />
-                <Text style={styles.inlineAddText}>Create Lecture Title</Text>
+                <Text style={styles.inlineAddText}>Open Lecture Planner</Text>
               </Pressable>
             ) : null}
           </View>
@@ -161,39 +161,85 @@ export function ExpandedChapterDetailView({
           {/* Sub-Table Rows */}
           {titleRows.map((row, idx) => {
             const lp = row.learningPlan;
-            const rec = row.recording;
-            const actualTitle = rec?.lecture_title?.trim();
-            const activeTitle = actualTitle || lp.sub_topic || lp.topic_name;
-            const statusStyle = getStatusStyle(rec?.status ?? "no_video");
-            const score = rec?.report?.overall_score;
-            const scoreCol = getScoreColor(score);
-            const isProcessed = rec && (rec.status.toLowerCase() === "completed" || rec.status.toLowerCase() === "analysed");
+            const lectureName = lp.sub_topic || lp.topic_name;
+            const recs = row.recordings;
 
-             return (
-              <View key={lp.id || idx} style={styles.subTableRow}>
-                {/* Column 1: Lecture Title / Display Title */}
-                <View style={[{ flex: 3 }, styles.cellCol]}>
-                  <Text style={styles.subTopicTitle} numberOfLines={2}>
-                    {activeTitle}
-                  </Text>
-                  {lp.date ? (
-                    <View style={styles.titleMetaBadgeRow}>
-                      <Text style={styles.subDateText}>📅 {lp.date}</Text>
+            /* The lecture row itself always stays visible — its title is the
+               lecture's own name and is never replaced by a recording title. */
+            const renderLectureCell = () => (
+              <View style={[{ flex: 3 }, styles.cellCol]}>
+                <Text style={styles.subTopicTitle} numberOfLines={2}>
+                  {lectureName}
+                </Text>
+                {lp.date ? (
+                  <View style={styles.titleMetaBadgeRow}>
+                    <Text style={styles.subDateText}>📅 {lp.date}</Text>
+                  </View>
+                ) : null}
+              </View>
+            );
+
+            if (recs.length === 0) {
+              const statusStyle = getStatusStyle("no_video");
+              return (
+                <View key={lp.id || idx} style={styles.subTableRow}>
+                  {renderLectureCell()}
+
+                  <View style={[{ flex: 0.8, alignItems: "center" }, styles.cellCol]}>
+                    <Text style={[styles.subScoreText, { color: getScoreColor(null) }]}>—</Text>
+                  </View>
+
+                  <View style={[{ flex: 1.2, alignItems: "center" }, styles.cellCol]}>
+                    {role === "teacher" && onAddRecording ? (
+                      <Pressable
+                        style={styles.attachVideoSmallBtn}
+                        onPress={() => onAddRecording(lp.id, lectureName)}
+                      >
+                        <Ionicons name="mic-outline" size={13} color="#0284C7" />
+                        <Text style={styles.attachVideoSmallText}>+ Audio</Text>
+                      </Pressable>
+                    ) : (
+                      <View style={[styles.badgePill, { backgroundColor: statusStyle.bg }]}>
+                        <Text style={[styles.badgePillText, { color: statusStyle.text }]}>
+                          {statusStyle.label}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+              );
+            }
+
+            /* One row per recording of this lecture, so an extra upload never
+               hides the ones already attached to it. */
+            return recs.map((rec, recIdx) => {
+              const statusStyle = getStatusStyle(rec.status);
+              const score = rec.report?.overall_score;
+              const scoreCol = getScoreColor(score);
+              const recStatus = (rec.status || "").toLowerCase();
+              const isProcessed = recStatus === "completed" || recStatus === "analysed";
+              const recTitle = rec.lecture_title?.trim();
+
+              return (
+                <View key={`${lp.id || idx}-${rec.id}`} style={styles.subTableRow}>
+                  {recIdx === 0 ? (
+                    renderLectureCell()
+                  ) : (
+                    <View style={[{ flex: 3 }, styles.cellCol]}>
+                      <Text style={styles.subTopicTitle} numberOfLines={2}>
+                        {`↳ ${recTitle || `Audio #${rec.id}`}`}
+                      </Text>
                     </View>
-                  ) : null}
-                </View>
+                  )}
 
-                {/* Column 2: Score */}
-                <View style={[{ flex: 0.8, alignItems: "center" }, styles.cellCol]}>
-                  <Text style={[styles.subScoreText, { color: scoreCol }]}>
-                    {score != null ? `${Math.round(score)}%` : "—"}
-                  </Text>
-                </View>
+                  <View style={[{ flex: 0.8, alignItems: "center" }, styles.cellCol]}>
+                    <Text style={[styles.subScoreText, { color: scoreCol }]}>
+                      {score != null ? `${Math.round(score)}%` : "—"}
+                    </Text>
+                  </View>
 
-                {/* Column 3: Status */}
-                <View style={[{ flex: 1.2, alignItems: "center" }, styles.cellCol]}>
-                  {rec ? (
-                    isProcessed && onViewRecordingReport ? (
+                  <View style={[{ flex: 1.2, alignItems: "center" }, styles.cellCol]}>
+                    {isProcessed && onViewRecordingReport ? (
                       <Pressable
                         onPress={() => onViewRecordingReport(rec)}
                         style={[styles.badgePill, { backgroundColor: "#E8F7EE", borderWidth: 1, borderColor: "#81C784" }]}
@@ -208,27 +254,11 @@ export function ExpandedChapterDetailView({
                           {statusStyle.label}
                         </Text>
                       </View>
-                    )
-                  ) : (
-                    role === "teacher" && onAddRecording ? (
-                      <Pressable
-                        style={styles.attachVideoSmallBtn}
-                        onPress={onAddRecording}
-                      >
-                        <Ionicons name="mic-outline" size={13} color="#0284C7" />
-                        <Text style={styles.attachVideoSmallText}>+ Audio</Text>
-                      </Pressable>
-                    ) : (
-                      <View style={[styles.badgePill, { backgroundColor: statusStyle.bg }]}>
-                        <Text style={[styles.badgePillText, { color: statusStyle.text }]}>
-                          {statusStyle.label}
-                        </Text>
-                      </View>
-                    )
-                  )}
+                    )}
+                  </View>
                 </View>
-              </View>
-            );
+              );
+            });
           })}
 
           {/* Unassigned recordings */}
@@ -237,7 +267,7 @@ export function ExpandedChapterDetailView({
             const score = rec.report?.overall_score;
             const scoreCol = getScoreColor(score);
             const displayTitle = rec.lecture_title?.trim() || `Lecture Video #${rec.id}`;
-            const isProcessed = rec.status.toLowerCase() === "completed" || rec.status.toLowerCase() === "analysed";
+            const isProcessed = (rec.status || "").toLowerCase() === "completed" || (rec.status || "").toLowerCase() === "analysed";
 
             return (
               <View key={rec.id} style={styles.subTableRow}>
@@ -277,6 +307,14 @@ export function ExpandedChapterDetailView({
           })}
         </View>
       )}
+
+      {/* Add another lecture without leaving the chapter row */}
+      {role === "teacher" && onAddLearningPlan && titleRows.length > 0 ? (
+        <Pressable style={styles.addPlanSmallBtn} onPress={onAddLearningPlan}>
+          <Ionicons name="add" size={14} color="#0284C7" />
+          <Text style={styles.addPlanSmallText}>Add lecture</Text>
+        </Pressable>
+      ) : null}
 
       {/* Footer Row */}
       <View style={styles.footerRow}>

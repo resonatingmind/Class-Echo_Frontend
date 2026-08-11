@@ -28,7 +28,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import { AudioWaveform } from '../components/AudioWaveform';
 import { useAuth } from '../context/AuthContext';
 import { formatAudioTime, inferMimeTypeFromUri, normalizeMeteringValue } from '../lib/audio';
-import { uploadRecording, getTeacherLearningPlans } from '../lib/api';
+import { uploadRecording, getTeacherLearningPlans, createTeacherLearningPlan } from '../lib/api';
 import { LearningPlanOut } from '../types/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
@@ -52,7 +52,7 @@ function safelyPausePlayer(player: { pause: () => void }) {
 
 export function RecordingScreen({ navigation, route }: Props) {
   const { session } = useAuth();
-  const { subjectId, subjectName, existingChapters = [], chapterId, chapterName: paramChapterName } = route.params;
+  const { subjectId, subjectName, existingChapters = [], chapterId, chapterName: paramChapterName, learningPlanId, lectureTitle: paramLectureTitle } = route.params;
 
   const recorder = useAudioRecorder(RECORDER_OPTIONS);
   const recorderState = useAudioRecorderState(recorder, 120);
@@ -60,7 +60,7 @@ export function RecordingScreen({ navigation, route }: Props) {
   const previewStatus = useAudioPlayerStatus(previewPlayer);
 
   const [state, setState] = useState<RecordState>('idle');
-  const [lectureTitle, setLectureTitle] = useState('');
+  const [lectureTitle, setLectureTitle] = useState(paramLectureTitle || '');
   const [lectureTitleError, setLectureTitleError] = useState<string | null>(null);
   const [transcription, setTranscription] = useState('');
   const [description, setDescription] = useState('');
@@ -71,7 +71,10 @@ export function RecordingScreen({ navigation, route }: Props) {
   const [meterBars, setMeterBars] = useState<number[]>([]);
 
   const [learningPlans, setLearningPlans] = useState<LearningPlanOut[]>([]);
-  const [selectedLearningPlanId, setSelectedLearningPlanId] = useState<number | undefined>(undefined);
+  const [selectedLearningPlanId, setSelectedLearningPlanId] = useState<number | undefined>(learningPlanId);
+  // Audio always belongs to one lecture: either an existing sub-topic or a brand new one.
+  const [creatingNewLecture, setCreatingNewLecture] = useState(!learningPlanId);
+  const [lectureSelectError, setLectureSelectError] = useState<string | null>(null);
 
   useEffect(() => {
     if (session && subjectId && chapterId) {
@@ -80,6 +83,24 @@ export function RecordingScreen({ navigation, route }: Props) {
         .catch(() => setLearningPlans([]));
     }
   }, [session, subjectId, chapterId]);
+
+  const selectedLearningPlan = useMemo(
+    () => learningPlans.find((lp) => lp.id === selectedLearningPlanId) ?? null,
+    [learningPlans, selectedLearningPlanId],
+  );
+
+  const selectExistingLecture = (lp: LearningPlanOut) => {
+    setSelectedLearningPlanId(lp.id);
+    setCreatingNewLecture(false);
+    setLectureSelectError(null);
+    setLectureTitleError(null);
+  };
+
+  const selectNewLecture = () => {
+    setSelectedLearningPlanId(undefined);
+    setCreatingNewLecture(true);
+    setLectureSelectError(null);
+  };
 
   const [isDictatingEnabled, setIsDictatingEnabled] = useState(true);
   const [liveTranscript, setLiveTranscript] = useState('');
@@ -278,7 +299,9 @@ export function RecordingScreen({ navigation, route }: Props) {
         const file = res.assets[0];
         setRecordedUri(file.uri);
         setRecordedDuration(0);
-        if (file.name) {
+        // Only suggest a title while creating a new lecture — never overwrite the
+        // title of a lecture that was already picked.
+        if (file.name && creatingNewLecture && !lectureTitle.trim()) {
           const cleanName = file.name.replace(/\.[^/.]+$/, "");
           setLectureTitle(cleanName);
         }
@@ -303,8 +326,11 @@ export function RecordingScreen({ navigation, route }: Props) {
     setRecordedUri(null);
     setRecordedDuration(0);
     setMeterBars([]);
-    setLectureTitle('');
+    setLectureTitle(paramLectureTitle || '');
     setLectureTitleError(null);
+    setLectureSelectError(null);
+    setSelectedLearningPlanId(learningPlanId);
+    setCreatingNewLecture(!learningPlanId);
     setTranscription('');
     setDescription('');
     setLiveTranscript('');
@@ -334,8 +360,13 @@ export function RecordingScreen({ navigation, route }: Props) {
       return;
     }
     let hasError = false;
-    if (!lectureTitle.trim()) {
-      setLectureTitleError('Lecture title is required.');
+    if (creatingNewLecture) {
+      if (!lectureTitle.trim()) {
+        setLectureTitleError('Lecture title is required.');
+        hasError = true;
+      }
+    } else if (!selectedLearningPlanId) {
+      setLectureSelectError('Choose the lecture this audio belongs to.');
       hasError = true;
     }
     if (hasError) {
@@ -353,23 +384,42 @@ export function RecordingScreen({ navigation, route }: Props) {
       uploadUri,
       resolvedMime,
       chapterId,
-      lectureTitle: lectureTitle.trim(),
+      creatingNewLecture,
       hasDescription: Boolean(description.trim()),
       hasTranscription: Boolean(transcription.trim()),
     });
     try {
+      // Resolve the lecture this audio belongs to. A new lecture becomes a real
+      // planner sub-topic so it shows up in the chapter's lecture list too.
+      let targetLearningPlanId = selectedLearningPlanId;
+      let targetLectureTitle = selectedLearningPlan?.sub_topic ?? '';
+
+      if (creatingNewLecture) {
+        targetLectureTitle = lectureTitle.trim();
+        const createdPlan = await createTeacherLearningPlan(
+          session.token,
+          subjectId,
+          chapterId,
+          {
+            topic_name: paramChapterName || targetLectureTitle,
+            sub_topic: targetLectureTitle,
+          },
+        );
+        targetLearningPlanId = createdPlan.id;
+      }
+
       await uploadRecording(
         session.token,
         subjectId,
         recordedUri,
         resolvedMime,
         chapterId,
-        lectureTitle.trim(),
+        targetLectureTitle,
         description.trim() || undefined,
         transcription.trim() || undefined,
         recordedDuration,
         setUploadProgress,
-        selectedLearningPlanId,
+        targetLearningPlanId,
       );
       console.log('[recording] upload:success', {
         subjectId,
@@ -575,75 +625,86 @@ export function RecordingScreen({ navigation, route }: Props) {
                 </Text>
               </View>
 
-              {learningPlans.length > 0 ? (
-                <View style={{ marginBottom: 14 }}>
-                  <Text style={styles.metaLabel}>LECTURE PLANNER TOPIC / SUB-TOPIC</Text>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 6, marginBottom: 4 }}>
-                    <View style={{ flexDirection: 'row', gap: 8 }}>
-                      <Pressable
-                        onPress={() => setSelectedLearningPlanId(undefined)}
-                        style={{
-                          paddingHorizontal: 12,
-                          paddingVertical: 8,
-                          borderRadius: AppTheme.radius.medium,
-                          borderWidth: 1,
-                          borderColor: selectedLearningPlanId === undefined ? "#0284C7" : AppTheme.colors.border,
-                          backgroundColor: selectedLearningPlanId === undefined ? "#E0F2FE" : AppTheme.colors.surface,
-                        }}
-                      >
-                        <Text style={{ fontSize: 13, color: selectedLearningPlanId === undefined ? "#0369A1" : AppTheme.colors.textSecondary, fontWeight: '600' }}>
-                          None (General Chapter)
-                        </Text>
-                      </Pressable>
-                      {learningPlans.map((lp) => {
-                        const isSel = selectedLearningPlanId === lp.id;
-                        return (
-                          <Pressable
-                            key={lp.id}
-                            onPress={() => setSelectedLearningPlanId(lp.id)}
-                            style={{
-                              paddingHorizontal: 12,
-                              paddingVertical: 8,
-                              borderRadius: AppTheme.radius.medium,
-                              borderWidth: 1,
-                              borderColor: isSel ? "#0284C7" : AppTheme.colors.border,
-                              backgroundColor: isSel ? "#E0F2FE" : AppTheme.colors.surface,
-                            }}
-                          >
-                            <Text style={{ fontSize: 13, color: isSel ? "#0369A1" : AppTheme.colors.textPrimary, fontWeight: '700' }}>
-                              {lp.sub_topic}
+              <View style={{ marginBottom: 14 }}>
+                <Text style={styles.metaLabel}>LECTURE (SUB-TOPIC) *</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 6, marginBottom: 4 }}>
+                  <View style={{ flexDirection: 'row', gap: 8 }}>
+                    {learningPlans.map((lp) => {
+                      const isSel = !creatingNewLecture && selectedLearningPlanId === lp.id;
+                      return (
+                        <Pressable
+                          key={lp.id}
+                          onPress={() => selectExistingLecture(lp)}
+                          style={{
+                            paddingHorizontal: 12,
+                            paddingVertical: 8,
+                            borderRadius: AppTheme.radius.medium,
+                            borderWidth: 1,
+                            borderColor: isSel ? "#0284C7" : AppTheme.colors.border,
+                            backgroundColor: isSel ? "#E0F2FE" : AppTheme.colors.surface,
+                          }}
+                        >
+                          <Text style={{ fontSize: 13, color: isSel ? "#0369A1" : AppTheme.colors.textPrimary, fontWeight: '700' }}>
+                            {lp.sub_topic}
+                          </Text>
+                          {lp.topic_name ? (
+                            <Text style={{ fontSize: 11, color: isSel ? "#0284C7" : AppTheme.colors.textSecondary }}>
+                              {lp.topic_name} {lp.date ? `(${lp.date})` : ''}
                             </Text>
-                            {lp.topic_name ? (
-                              <Text style={{ fontSize: 11, color: isSel ? "#0284C7" : AppTheme.colors.textSecondary }}>
-                                {lp.topic_name} {lp.date ? `(${lp.date})` : ''}
-                              </Text>
-                            ) : null}
-                          </Pressable>
-                        );
-                      })}
-                    </View>
-                  </ScrollView>
-                </View>
-              ) : null}
+                          ) : null}
+                        </Pressable>
+                      );
+                    })}
+                    <Pressable
+                      onPress={selectNewLecture}
+                      style={{
+                        paddingHorizontal: 12,
+                        paddingVertical: 8,
+                        borderRadius: AppTheme.radius.medium,
+                        borderWidth: 1,
+                        borderStyle: 'dashed',
+                        borderColor: creatingNewLecture ? "#0284C7" : AppTheme.colors.border,
+                        backgroundColor: creatingNewLecture ? "#E0F2FE" : AppTheme.colors.surface,
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Text style={{ fontSize: 13, color: creatingNewLecture ? "#0369A1" : AppTheme.colors.textSecondary, fontWeight: '700' }}>
+                        + New lecture
+                      </Text>
+                    </Pressable>
+                  </View>
+                </ScrollView>
+                {lectureSelectError ? (
+                  <Text style={{ color: '#E53935', fontSize: 12, marginTop: 4, fontWeight: '600' }}>
+                    {lectureSelectError}
+                  </Text>
+                ) : null}
+              </View>
 
-              <Text style={styles.metaLabel}>LECTURE TITLE *</Text>
-              <TextInput
-                autoCapitalize="words"
-                onChangeText={(val) => {
-                  setLectureTitle(val);
-                  if (val.trim()) {
-                    setLectureTitleError(null);
-                  }
-                }}
-                placeholder="Enter lecture title"
-                placeholderTextColor={AppTheme.colors.textPlaceholder}
-                style={[styles.input, lectureTitleError && { borderColor: '#E53935' }]}
-                value={lectureTitle}
-              />
-              {lectureTitleError ? (
-                <Text style={{ color: '#E53935', fontSize: 12, marginTop: 4, marginBottom: 4, fontWeight: '600' }}>
-                  {lectureTitleError}
-                </Text>
+              {/* Title is only asked for when a brand new lecture is being created —
+                  an existing sub-topic already carries its own title. */}
+              {creatingNewLecture ? (
+                <>
+                  <Text style={styles.metaLabel}>NEW LECTURE TITLE *</Text>
+                  <TextInput
+                    autoCapitalize="words"
+                    onChangeText={(val) => {
+                      setLectureTitle(val);
+                      if (val.trim()) {
+                        setLectureTitleError(null);
+                      }
+                    }}
+                    placeholder="Enter lecture title"
+                    placeholderTextColor={AppTheme.colors.textPlaceholder}
+                    style={[styles.input, lectureTitleError && { borderColor: '#E53935' }]}
+                    value={lectureTitle}
+                  />
+                  {lectureTitleError ? (
+                    <Text style={{ color: '#E53935', fontSize: 12, marginTop: 4, marginBottom: 4, fontWeight: '600' }}>
+                      {lectureTitleError}
+                    </Text>
+                  ) : null}
+                </>
               ) : null}
 
               <Text style={styles.metaLabel}>DESCRIPTION</Text>

@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
 import * as DocumentPicker from 'expo-document-picker';
+import { LinearGradient } from 'expo-linear-gradient';
 import {
   ActivityIndicator,
   Alert,
@@ -121,7 +122,12 @@ export function StudentProfileScreen({ navigation }: Props) {
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-          <View style={styles.hero}>
+          <LinearGradient
+            colors={[AppTheme.colors.primary, AppTheme.colors.primaryLight]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.hero}
+          >
             <Pressable onPress={() => void handleAvatarPick()} style={styles.avatarWrap}>
               {profile?.profile_image_url ? (
                 <Image source={{ uri: profile.profile_image_url }} style={styles.avatarImage} />
@@ -139,7 +145,7 @@ export function StudentProfileScreen({ navigation }: Props) {
               </View>
             </Pressable>
             <Text style={styles.roleBadge}>Student</Text>
-          </View>
+          </LinearGradient>
 
           <View style={styles.card}>
             <View style={styles.cardHeader}>
@@ -231,85 +237,121 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: AppTheme.colors.background },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   scroll: { padding: 20, paddingBottom: 32, gap: 18 },
-  hero: { alignItems: 'center', gap: 12 },
-  avatarWrap: { position: 'relative' },
+  hero: { 
+    alignItems: 'center', 
+    gap: 12, 
+    paddingVertical: 32, 
+    borderRadius: 24, 
+    marginHorizontal: 0,
+    marginBottom: 8,
+    shadowColor: AppTheme.colors.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  avatarWrap: { 
+    position: 'relative',
+    padding: 4,
+    backgroundColor: '#fff',
+    borderRadius: 60,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
   avatarImage: { width: 104, height: 104, borderRadius: 52 },
   avatarFallback: {
     width: 104,
     height: 104,
     borderRadius: 52,
-    backgroundColor: AppTheme.colors.primaryLight,
+    backgroundColor: '#F3F4F6',
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarFallbackText: { fontSize: 34, fontWeight: '800', color: AppTheme.colors.primaryDark },
   cameraBadge: {
     position: 'absolute',
-    right: 2,
-    bottom: 2,
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: AppTheme.colors.primary,
+    right: 4,
+    bottom: 4,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: AppTheme.colors.primaryDark,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
   },
   roleBadge: {
-    paddingHorizontal: 12,
+    marginTop: 4,
+    paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 999,
-    backgroundColor: AppTheme.colors.primaryLight,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     color: AppTheme.colors.primaryDark,
-    fontWeight: '700',
+    fontWeight: '800',
     overflow: 'hidden',
+    fontSize: 13,
+    letterSpacing: 0.5,
   },
   card: {
     backgroundColor: AppTheme.colors.surface,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: AppTheme.colors.border,
-    padding: 20,
-    gap: 10,
+    borderRadius: 24,
+    padding: 24,
+    gap: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.03,
+    shadowRadius: 16,
+    elevation: 2,
   },
   cardHeader: { flexDirection: 'row', alignItems: 'center' },
   cardTitle: { flex: 1, fontSize: 18, fontWeight: '800', color: AppTheme.colors.textPrimary },
   linkText: { color: AppTheme.colors.primaryDark, fontSize: 14, fontWeight: '700' },
-  label: { fontSize: 11, letterSpacing: 1, color: AppTheme.colors.textSecondary, fontWeight: '700', marginTop: 4 },
+  label: { fontSize: 11, letterSpacing: 1.2, color: AppTheme.colors.textSecondary, fontWeight: '800', marginTop: 4 },
   value: { fontSize: 16, color: AppTheme.colors.textPrimary, fontWeight: '600' },
   input: {
-    minHeight: 48,
-    borderRadius: AppTheme.radius.large,
+    minHeight: 52,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
-    backgroundColor: AppTheme.colors.background,
-    paddingHorizontal: 14,
-    fontSize: 15,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#F9FAFB',
+    paddingHorizontal: 16,
+    fontSize: 16,
     color: AppTheme.colors.textPrimary,
   },
   primaryButton: {
-    marginTop: 8,
-    height: 50,
-    borderRadius: AppTheme.radius.large,
+    marginTop: 12,
+    height: 52,
+    borderRadius: 16,
     backgroundColor: AppTheme.colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
+    shadowColor: AppTheme.colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  primaryButtonText: { color: '#fff', fontSize: 15, fontWeight: '700' },
-  buttonDisabled: { opacity: 0.6 },
+  primaryButtonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  buttonDisabled: { opacity: 0.5 },
   signOutButton: {
+    marginTop: 12,
     height: 52,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#FEE2E2',
-    backgroundColor: '#FFF5F5',
+    backgroundColor: '#FEF2F2',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
+    borderWidth: 1,
+    borderColor: '#FCA5A5',
   },
-  signOutText: { color: '#EF4444', fontSize: 15, fontWeight: '700' },
+  signOutText: { color: '#DC2626', fontSize: 16, fontWeight: '700' },
 });
 
 

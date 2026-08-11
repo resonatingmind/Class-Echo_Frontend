@@ -3,6 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "@react-navigation/native";
 import * as DocumentPicker from "expo-document-picker";
+import { LinearGradient } from "expo-linear-gradient";
 import {
   ActivityIndicator,
   Alert,
@@ -185,7 +186,12 @@ export function SchoolAdminProfileScreen({ navigation }: Props) {
                   </Text>
                 </View>
 
-                <View style={styles.hero}>
+                <LinearGradient
+                  colors={[AppTheme.colors.primary, AppTheme.colors.primaryLight]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.hero}
+                >
                   <Pressable
                     onPress={() => void handleAvatarUpload()}
                     style={styles.avatarWrap}
@@ -209,7 +215,7 @@ export function SchoolAdminProfileScreen({ navigation }: Props) {
                     </View>
                   </Pressable>
                   <Text style={styles.roleBadge}>School Administrator</Text>
-                </View>
+                </LinearGradient>
 
                 <View style={styles.card}>
                   <View style={styles.cardHeader}>
@@ -415,14 +421,36 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
   },
-  hero: { alignItems: "center", gap: AppTheme.spacing.m, marginBottom: AppTheme.spacing.m },
-  avatarWrap: { position: "relative" },
+  hero: { 
+    alignItems: "center", 
+    gap: AppTheme.spacing.m, 
+    marginBottom: AppTheme.spacing.m,
+    paddingVertical: 32, 
+    borderRadius: 24, 
+    marginHorizontal: 0,
+    shadowColor: AppTheme.colors.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  avatarWrap: { 
+    position: 'relative',
+    padding: 4,
+    backgroundColor: '#fff',
+    borderRadius: 60,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
   avatarImage: { width: 104, height: 104, borderRadius: 52 },
   avatarFallback: {
     width: 104,
     height: 104,
     borderRadius: 52,
-    backgroundColor: AppTheme.colors.primaryLight,
+    backgroundColor: '#F3F4F6',
     alignItems: "center",
     justifyContent: "center",
   },
@@ -432,34 +460,39 @@ const styles = StyleSheet.create({
   },
   cameraBadge: {
     position: "absolute",
-    right: 2,
-    bottom: 2,
+    right: 4,
+    bottom: 4,
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: AppTheme.colors.primary,
+    backgroundColor: AppTheme.colors.primaryDark,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: AppTheme.colors.surface,
+    borderColor: '#fff',
   },
   roleBadge: {
+    marginTop: 4,
     paddingHorizontal: AppTheme.spacing.m,
     paddingVertical: AppTheme.spacing.xs,
     borderRadius: AppTheme.radius.pill,
-    backgroundColor: AppTheme.colors.primaryLight,
-    color: AppTheme.colors.primary,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    color: AppTheme.colors.primaryDark,
     ...AppTheme.typography.caption,
-    fontWeight: "700",
+    fontWeight: "800",
     overflow: "hidden",
+    letterSpacing: 0.5,
   },
   card: {
     backgroundColor: AppTheme.colors.surface,
-    borderRadius: AppTheme.radius.large,
-    borderWidth: 1,
-    borderColor: AppTheme.colors.border,
-    padding: AppTheme.spacing.xl,
-    gap: AppTheme.spacing.m,
+    borderRadius: 24,
+    padding: 24,
+    gap: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.03,
+    shadowRadius: 16,
+    elevation: 2,
   },
   cardHeader: { flexDirection: "row", alignItems: "center", marginBottom: AppTheme.spacing.xs },
   cardTitle: {
@@ -470,18 +503,19 @@ const styles = StyleSheet.create({
   linkText: { color: AppTheme.colors.primary, ...AppTheme.typography.button, fontSize: 14 },
   label: {
     ...AppTheme.typography.caption,
-    letterSpacing: 1,
+    letterSpacing: 1.2,
     color: AppTheme.colors.textSecondary,
+    fontWeight: '800',
     marginTop: AppTheme.spacing.xs,
   },
   value: { ...AppTheme.typography.bodyLarge, color: AppTheme.colors.textPrimary, fontWeight: "600" },
   subtleValue: { ...AppTheme.typography.body, color: AppTheme.colors.textSecondary },
   input: {
-    minHeight: 48,
-    borderRadius: AppTheme.radius.medium,
+    minHeight: 52,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: AppTheme.colors.border,
-    backgroundColor: AppTheme.colors.background,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#F9FAFB',
     paddingHorizontal: AppTheme.spacing.m,
     ...AppTheme.typography.body,
     color: AppTheme.colors.textPrimary,
@@ -492,14 +526,19 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   primaryButton: {
-    marginTop: AppTheme.spacing.s,
-    height: 50,
-    borderRadius: AppTheme.radius.medium,
+    marginTop: 12,
+    height: 52,
+    borderRadius: 16,
     backgroundColor: AppTheme.colors.primary,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: AppTheme.spacing.s,
+    shadowColor: AppTheme.colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   primaryButtonText: { color: "#fff", ...AppTheme.typography.button },
   buttonDisabled: { opacity: 0.6 },
@@ -518,16 +557,16 @@ const styles = StyleSheet.create({
   logoInfo: { flex: 1, gap: 4 },
   signOutButton: {
     height: 52,
-    borderRadius: AppTheme.radius.large,
-    borderWidth: 1,
-    borderColor: "#FEE2E2",
-    backgroundColor: "#FFF5F5",
+    borderRadius: 16,
+    backgroundColor: '#FEF2F2',
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: AppTheme.spacing.s,
     marginTop: AppTheme.spacing.m,
+    borderWidth: 1,
+    borderColor: '#FCA5A5',
   },
-  signOutText: { color: AppTheme.colors.error, ...AppTheme.typography.button },
+  signOutText: { color: "#DC2626", ...AppTheme.typography.button, fontWeight: '700' },
 });
 

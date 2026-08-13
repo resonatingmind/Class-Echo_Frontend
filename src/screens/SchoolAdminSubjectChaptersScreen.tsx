@@ -379,9 +379,21 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
               setSubjectDeletePassword('');
               setSubjectDeleteError(null);
             }}
-            style={{ marginRight: 8, padding: 4 }}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 6,
+              paddingHorizontal: 10,
+              paddingVertical: 6,
+              borderRadius: 8,
+              backgroundColor: '#FEF2F2',
+              borderWidth: 1,
+              borderColor: '#FCA5A5',
+              marginRight: 4,
+            }}
           >
-            <Ionicons name="trash-outline" size={22} color="#B42318" />
+            <Ionicons name="trash-outline" size={16} color="#B42318" />
+            <Text style={{ fontSize: 12, fontWeight: '700', color: '#B42318' }}>Delete Subject</Text>
           </Pressable>
         }
       />
@@ -482,6 +494,12 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
               const lps = expandedLps[chapter.id] || [];
               const isExLoading = loadingExpandedId === chapter.id;
 
+              const isJustGenericChapter = chapter.name.toLowerCase().trim() === 'chapter';
+              const displayName = isJustGenericChapter
+                ? `Chapter ${chapter.description?.trim() || ''}`.trim()
+                : chapter.name;
+              const displayDesc = isJustGenericChapter ? null : chapter.description;
+
               return (
                 <View key={chapter.id} style={styles.chapterCardContainer}>
                   <Pressable
@@ -490,10 +508,10 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                   >
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
                       <View style={styles.chapterInfoWrap}>
-                        <Text style={styles.chapterName}>{chapter.name}</Text>
-                        {chapter.description ? (
+                        <Text style={styles.chapterName}>{displayName}</Text>
+                        {displayDesc ? (
                           <Text style={styles.chapterDesc} numberOfLines={2}>
-                            {chapter.description}
+                            {displayDesc}
                           </Text>
                         ) : (
                           <Text style={[styles.chapterDesc, { fontStyle: 'italic' }]}>

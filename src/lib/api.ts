@@ -1274,6 +1274,27 @@ export async function updateTeacherLearningPlan(
   );
 }
 
+export async function importTeacherChapterLearningPlansPhoto(
+  token: string,
+  subjectId: number,
+  chapterId: number,
+  fileUri: string,
+  mimeType: string,
+  fileName: string,
+) {
+  const form = new FormData();
+  await appendFile(form, "file", fileUri, mimeType, fileName);
+  return request<LearningPlanOut[]>(
+    `/teacher/subjects/${subjectId}/chapters/${chapterId}/learning-plans/import-photo`,
+    {
+      method: "POST",
+      body: form,
+      headers: {},
+    },
+    token,
+  );
+}
+
 export async function deleteTeacherLearningPlan(token: string, planId: number) {
   return request<void>(
     `/teacher/learning-plans/${planId}`,
@@ -1309,6 +1330,27 @@ export async function createSchoolLearningPlan(
     {
       method: "POST",
       body: JSON.stringify(payload),
+    },
+    token,
+  );
+}
+
+export async function importSchoolChapterLearningPlansPhoto(
+  token: string,
+  subjectId: number,
+  chapterId: number,
+  fileUri: string,
+  mimeType: string,
+  fileName: string,
+) {
+  const form = new FormData();
+  await appendFile(form, "file", fileUri, mimeType, fileName);
+  return request<LearningPlanOut[]>(
+    `/school/subjects/${subjectId}/chapters/${chapterId}/learning-plans/import-photo`,
+    {
+      method: "POST",
+      body: form,
+      headers: {},
     },
     token,
   );
@@ -1804,6 +1846,29 @@ export async function importSchoolSubjectLearningPlans(
   );
 }
 
+export async function importSchoolSubjectLearningPlansPhoto(
+  token: string,
+  subjectId: number,
+  fileUri: string,
+  mimeType: string,
+  fileName: string,
+): Promise<LearningPlanOut[]> {
+  const form = new FormData();
+  await appendFile(
+    form,
+    "file",
+    fileUri,
+    mimeType,
+    fileName,
+  );
+
+  return request<LearningPlanOut[]>(
+    `/school/subjects/${subjectId}/learning-plans/import-photo`,
+    { method: "POST", body: form },
+    token,
+  );
+}
+
 export async function importTeacherSubjectLearningPlans(
   token: string,
   subjectId: number,
@@ -1822,6 +1887,29 @@ export async function importTeacherSubjectLearningPlans(
 
   return request<LearningPlanOut[]>(
     `/teacher/subjects/${subjectId}/learning-plans/import`,
+    { method: "POST", body: form },
+    token,
+  );
+}
+
+export async function importTeacherSubjectLearningPlansPhoto(
+  token: string,
+  subjectId: number,
+  fileUri: string,
+  mimeType: string,
+  fileName: string,
+): Promise<LearningPlanOut[]> {
+  const form = new FormData();
+  await appendFile(
+    form,
+    "file",
+    fileUri,
+    mimeType,
+    fileName,
+  );
+
+  return request<LearningPlanOut[]>(
+    `/teacher/subjects/${subjectId}/learning-plans/import-photo`,
     { method: "POST", body: form },
     token,
   );

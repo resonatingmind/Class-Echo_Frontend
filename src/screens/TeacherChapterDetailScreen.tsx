@@ -27,6 +27,7 @@ import {
   createTeacherLearningPlan,
   updateTeacherLearningPlan,
   deleteTeacherLearningPlan,
+  importTeacherChapterLearningPlansPhoto,
 } from "../lib/api";
 
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -263,15 +264,7 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
     }
   };
 
-  useEffect(() => {
-    if (!openUpload) return;
 
-    const timer = setTimeout(() => {
-      handlePickDocument();
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [openUpload, handlePickDocument]);
 
   const handleDeleteDocument = (doc: ChapterDocumentOut) => {
     Alert.alert(
@@ -473,16 +466,16 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
                       {learningPlans.length} {learningPlans.length === 1 ? 'lecture' : 'lectures'} total
                     </Text>
                   </View>
-              <Pressable
-                style={styles.addPlanBtn}
-                onPress={() => {
-                  setSelectedLpItem(null);
-                  setLpModalVisible(true);
-                }}
-              >
-                <Ionicons name="add" size={16} color="#fff" />
-                <Text style={styles.addPlanText}>Add Entry</Text>
-              </Pressable>
+                  <Pressable
+                    style={styles.addPlanBtn}
+                    onPress={() => {
+                      setSelectedLpItem(null);
+                      setLpModalVisible(true);
+                    }}
+                  >
+                    <Ionicons name="add" size={16} color="#fff" />
+                    <Text style={styles.addPlanText}>Add Entry</Text>
+                  </Pressable>
                 </View>
 
                 <LearningPlanList
@@ -771,6 +764,22 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: AppTheme.colors.textSecondary,
     marginTop: 2,
+  },
+  importPhotoBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F0F9FF",
+    borderWidth: 1,
+    borderColor: "#BAE6FD",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: AppTheme.radius.small,
+    gap: 6,
+  },
+  importPhotoText: {
+    color: "#0284C7",
+    fontFamily: AppTheme.typography.family.bold,
+    fontSize: 13,
   },
   addPlanBtn: {
     flexDirection: "row",

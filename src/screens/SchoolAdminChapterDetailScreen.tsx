@@ -27,6 +27,7 @@ import {
   createSchoolLearningPlan,
   updateSchoolLearningPlan,
   deleteSchoolLearningPlan,
+  importSchoolChapterLearningPlansPhoto,
   getSchoolAdminMe,
   login,
 } from "../lib/api";
@@ -275,15 +276,7 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
     }
   };
 
-  useEffect(() => {
-    if (!openUpload) return;
 
-    const timer = setTimeout(() => {
-      handlePickDocument();
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [openUpload]);
 
   const handleDeleteDocument = (doc: ChapterDocumentOut) => {
     Alert.alert(
@@ -715,6 +708,22 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: AppTheme.colors.textSecondary,
     marginTop: 2,
+  },
+  importPhotoBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F0F9FF",
+    borderWidth: 1,
+    borderColor: "#BAE6FD",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: AppTheme.radius.small,
+    gap: 6,
+  },
+  importPhotoText: {
+    color: "#0284C7",
+    fontFamily: AppTheme.typography.family.bold,
+    fontSize: 13,
   },
   addPlanBtn: {
     flexDirection: "row",

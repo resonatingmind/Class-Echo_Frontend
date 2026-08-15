@@ -32,6 +32,7 @@ import {
   getTeacherSubjectRecordings,
   getTeacherLearningPlans,
   createTeacherLearningPlan,
+  updateTeacherLearningPlan,
   retryRecording,
   getTeacherSubjectStudents,
 } from "../lib/api";
@@ -84,6 +85,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
 
   const [lectureModalVisible, setLectureModalVisible] = useState(false);
   const [lectureChapter, setLectureChapter] = useState<ChapterOut | null>(null);
+  const [editingLecture, setEditingLecture] = useState<LearningPlanOut | null>(null);
   const [savingLecture, setSavingLecture] = useState(false);
 
   /* Lectures and recordings are fetched independently: a failing recordings call
@@ -188,27 +190,34 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
     [token, loadExpandedChapter],
   );
 
-  const handleCreateLecture = useCallback(
+  const handleSaveLecture = useCallback(
     async (payload: LearningPlanCreatePayload) => {
       if (!token || !lectureChapter) return;
       try {
         setSavingLecture(true);
-        await createTeacherLearningPlan(token, subjectId, lectureChapter.id, payload);
+        if (editingLecture) {
+          await updateTeacherLearningPlan(token, editingLecture.id, payload);
+          Alert.alert("Success", "Lecture updated successfully.");
+        } else {
+          await createTeacherLearningPlan(token, subjectId, lectureChapter.id, payload);
+          Alert.alert("Success", "Lecture created successfully.");
+        }
         setLectureModalVisible(false);
-        // Refresh the row that is open so the new lecture is visible right away.
+        // Refresh the row that is open so the new/edited lecture is visible right away.
         await loadExpandedChapter(lectureChapter.id, false);
+        setEditingLecture(null);
         setLectureChapter(null);
       } catch (err) {
         console.error(err);
         Alert.alert(
-          "Unable to add lecture",
-          err instanceof Error ? err.message : "Could not create the lecture.",
+          editingLecture ? "Unable to update lecture" : "Unable to add lecture",
+          err instanceof Error ? err.message : "Could not save the lecture.",
         );
       } finally {
         setSavingLecture(false);
       }
     },
-    [token, subjectId, lectureChapter, loadExpandedChapter],
+    [token, subjectId, lectureChapter, editingLecture, loadExpandedChapter],
   );
 
   const handleCreateChapter = useCallback(
@@ -501,6 +510,12 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
                               }}
                               onAddLearningPlan={() => {
                                 setLectureChapter(item);
+                                setEditingLecture(null);
+                                setLectureModalVisible(true);
+                              }}
+                              onEditLearningPlan={(lp) => {
+                                setLectureChapter(item);
+                                setEditingLecture(lp);
                                 setLectureModalVisible(true);
                               }}
                               onAddDocument={() => {
@@ -571,13 +586,14 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
       <ChapterLearningPlanModal
         visible={lectureModalVisible}
         chapterName={lectureChapter?.name ?? ""}
-        initialItem={null}
+        initialItem={editingLecture}
         loading={savingLecture}
         onClose={() => {
           setLectureModalVisible(false);
+          setEditingLecture(null);
           setLectureChapter(null);
         }}
-        onSave={handleCreateLecture}
+        onSave={handleSaveLecture}
       />
 
       <ChapterActionSheet

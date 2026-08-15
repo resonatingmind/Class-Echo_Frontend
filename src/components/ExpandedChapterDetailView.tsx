@@ -22,6 +22,7 @@ type Props = {
   role?: "teacher" | "school_admin";
   onAddRecording?: (learningPlanId?: number, lectureTitle?: string) => void;
   onAddLearningPlan?: () => void;
+  onEditLearningPlan?: (lp: LearningPlanOut) => void;
   onAddDocument?: () => void;
   onViewRecordingReport?: (rec: RecordingWithReport) => void;
   onSelectLearningPlan?: (lp: LearningPlanOut) => void;
@@ -59,6 +60,7 @@ export function ExpandedChapterDetailView({
   role = "teacher",
   onAddRecording,
   onAddLearningPlan,
+  onEditLearningPlan,
   onAddDocument,
   onViewRecordingReport,
   onSelectLearningPlan,
@@ -155,9 +157,10 @@ export function ExpandedChapterDetailView({
           <View style={[styles.subTableWrapper, { width: "100%" }]}>
           {/* Sub-Table Header */}
           <View style={styles.subTableHeader}>
-            <Text style={[styles.subHeaderCell, { flex: 3 }]}>LECTURE TITLE</Text>
+            <Text style={[styles.subHeaderCell, { flex: 2.8 }]}>LECTURE TITLE</Text>
             <Text style={[styles.subHeaderCell, { flex: 0.8, textAlign: "center" }]}>SCORE</Text>
-            <Text style={[styles.subHeaderCell, { flex: 1.2, textAlign: "center" }]}>STATUS</Text>
+            <Text style={[styles.subHeaderCell, { flex: 1.1, textAlign: "center" }]}>STATUS</Text>
+            <Text style={[styles.subHeaderCell, { flex: 0.8, textAlign: "center" }]}>ACTION</Text>
           </View>
 
           {/* Sub-Table Rows */}
@@ -184,7 +187,7 @@ export function ExpandedChapterDetailView({
               return (
                 <View key={lp.id || idx} style={styles.subTableRow}>
                   <Pressable
-                    style={[{ flex: 3 }, styles.cellCol, canClick && styles.clickableCell]}
+                    style={[{ flex: 2.8 }, styles.cellCol, canClick && styles.clickableCell]}
                     onPress={canClick ? handlePress : undefined}
                     disabled={!canClick}
                   >
@@ -205,12 +208,26 @@ export function ExpandedChapterDetailView({
                     <Text style={[styles.subScoreText, { color: getScoreColor(null) }]}>—</Text>
                   </View>
 
-                  <View style={[{ flex: 1.2, alignItems: "center" }, styles.cellCol]}>
+                  <View style={[{ flex: 1.1, alignItems: "center" }, styles.cellCol]}>
                     <View style={[styles.badgePill, { backgroundColor: statusStyle.bg }]}>
                       <Text style={[styles.badgePillText, { color: statusStyle.text }]}>
                         {statusStyle.label}
                       </Text>
                     </View>
+                  </View>
+
+                  <View style={[{ flex: 0.8, alignItems: "center", justifyContent: "center" }, styles.cellCol]}>
+                    {onEditLearningPlan ? (
+                      <Pressable
+                        style={styles.actionIconBtn}
+                        onPress={() => onEditLearningPlan(lp)}
+                        hitSlop={8}
+                      >
+                        <Ionicons name="create-outline" size={15} color="#0284C7" />
+                      </Pressable>
+                    ) : (
+                      <Text style={styles.emptyActionText}>—</Text>
+                    )}
                   </View>
                 </View>
               );
@@ -233,7 +250,7 @@ export function ExpandedChapterDetailView({
               return (
                 <View key={`${lp.id || idx}-${rec.id}`} style={styles.subTableRow}>
                   <Pressable
-                    style={[{ flex: 3 }, styles.cellCol, canClick && styles.clickableCell]}
+                    style={[{ flex: 2.8 }, styles.cellCol, canClick && styles.clickableCell]}
                     onPress={canClick ? handlePress : undefined}
                     disabled={!canClick}
                   >
@@ -256,12 +273,26 @@ export function ExpandedChapterDetailView({
                     </Text>
                   </View>
 
-                  <View style={[{ flex: 1.2, alignItems: "center" }, styles.cellCol]}>
+                  <View style={[{ flex: 1.1, alignItems: "center" }, styles.cellCol]}>
                     <View style={[styles.badgePill, { backgroundColor: statusStyle.bg }]}>
                       <Text style={[styles.badgePillText, { color: statusStyle.text }]}>
                         {statusStyle.label}
                       </Text>
                     </View>
+                  </View>
+
+                  <View style={[{ flex: 0.8, alignItems: "center", justifyContent: "center" }, styles.cellCol]}>
+                    {recIdx === 0 && onEditLearningPlan ? (
+                      <Pressable
+                        style={styles.actionIconBtn}
+                        onPress={() => onEditLearningPlan(lp)}
+                        hitSlop={8}
+                      >
+                        <Ionicons name="create-outline" size={15} color="#0284C7" />
+                      </Pressable>
+                    ) : (
+                      <Text style={styles.emptyActionText}>—</Text>
+                    )}
                   </View>
                 </View>
               );
@@ -279,7 +310,7 @@ export function ExpandedChapterDetailView({
             return (
               <View key={rec.id} style={styles.subTableRow}>
                 <Pressable
-                  style={[{ flex: 3 }, styles.cellCol, canClick && styles.clickableCell]}
+                  style={[{ flex: 2.8 }, styles.cellCol, canClick && styles.clickableCell]}
                   onPress={canClick ? () => onViewRecordingReport!(rec) : undefined}
                   disabled={!canClick}
                 >
@@ -297,12 +328,16 @@ export function ExpandedChapterDetailView({
                   </Text>
                 </View>
 
-                <View style={[{ flex: 1.2, alignItems: "center" }, styles.cellCol]}>
+                <View style={[{ flex: 1.1, alignItems: "center" }, styles.cellCol]}>
                   <View style={[styles.badgePill, { backgroundColor: statusStyle.bg }]}>
                     <Text style={[styles.badgePillText, { color: statusStyle.text }]}>
                       {statusStyle.label}
                     </Text>
                   </View>
+                </View>
+
+                <View style={[{ flex: 0.8, alignItems: "center", justifyContent: "center" }, styles.cellCol]}>
+                  <Text style={styles.emptyActionText}>—</Text>
                 </View>
               </View>
             );
@@ -593,6 +628,22 @@ const styles = StyleSheet.create({
   badgePillText: {
     fontSize: 10,
     fontWeight: "700",
+  },
+  actionIconBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 6,
+    backgroundColor: "#F0F9FF",
+    borderWidth: 1,
+    borderColor: "#BAE6FD",
+    alignItems: "center",
+    justifyContent: "center",
+    // @ts-ignore
+    cursor: "pointer",
+  },
+  emptyActionText: {
+    fontSize: 12,
+    color: "#94A3B8",
   },
   subReportBtn: {
     flexDirection: "row",

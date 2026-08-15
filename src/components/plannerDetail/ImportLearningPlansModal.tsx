@@ -127,8 +127,8 @@ export function ImportLearningPlansModal({
                   Upload an Excel sheet (.xlsx or .xls) to populate this subject's lecture planner.
                   {"\n\n"}
                   The spreadsheet must contain the following columns:
-                  {"\n"}• <Text style={{ fontWeight: '700' }}>Topic Name</Text> (Required - Acts as the Chapter Name, auto-creating chapters if missing)
-                  {"\n"}• <Text style={{ fontWeight: '700' }}>Sub Topic</Text> (Required)
+                  {"\n"}• <Text style={{ fontWeight: '700' }}>Chapter Name</Text> (Required - Auto-creates chapters if missing)
+                  {"\n"}• <Text style={{ fontWeight: '700' }}>Lecture Title</Text> (Required)
                   {"\n"}• <Text style={{ fontWeight: '600' }}>Date</Text> (Optional)
                   {"\n"}• <Text style={{ fontWeight: '600' }}>Classwork Activities</Text> (Optional)
                   {"\n"}• <Text style={{ fontWeight: '600' }}>Assessment Task</Text> (Optional)

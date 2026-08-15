@@ -212,7 +212,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
   );
 
   const handleCreateChapter = useCallback(
-    async (data: { name: string; description: string }) => {
+    async (data: { name: string; description?: string }) => {
       if (!token) return;
       try {
         setCreating(true);
@@ -220,13 +220,17 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
           name: data.name,
           description: data.description || null,
         });
+        setEditorVisible(false);
         setEditing(false);
         setSelectedChapter(null);
         await loadData();
-      } catch {
+        Alert.alert("Success", "Chapter created successfully.");
+      } catch (err) {
         Alert.alert(
           "Unable to create chapter",
-          "A chapter with this name already exists or something went wrong.",
+          err instanceof Error
+            ? err.message
+            : "A chapter with this name already exists or something went wrong.",
         );
       } finally {
         setCreating(false);
@@ -236,7 +240,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
   );
 
   const handleUpdateChapter = useCallback(
-    async (data: { name: string; description: string }) => {
+    async (data: { name: string; description?: string }) => {
       if (!token || !selectedChapter) return;
       try {
         setCreating(true);
@@ -244,9 +248,18 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
           name: data.name,
           description: data.description || null,
         });
-        setEditing(false);
         setEditorVisible(false);
+        setEditing(false);
+        setSelectedChapter(null);
         await loadData();
+        Alert.alert("Success", "Chapter updated successfully.");
+      } catch (err) {
+        Alert.alert(
+          "Unable to update chapter",
+          err instanceof Error
+            ? err.message
+            : "Could not update the chapter.",
+        );
       } finally {
         setCreating(false);
       }

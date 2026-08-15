@@ -368,7 +368,7 @@ export function SchoolAdminTeacherAnalyticsScreen({
 
             <TextInput
               style={styles.searchInput}
-              placeholder="Search by lecture title, chapter or topic..."
+              placeholder="Search by lecture title or chapter..."
               placeholderTextColor={AppTheme.colors.textSecondary}
               value={searchQuery}
               onChangeText={setSearchQuery}

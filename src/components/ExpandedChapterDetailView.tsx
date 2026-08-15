@@ -24,6 +24,7 @@ type Props = {
   onAddLearningPlan?: () => void;
   onAddDocument?: () => void;
   onViewRecordingReport?: (rec: RecordingWithReport) => void;
+  onSelectLearningPlan?: (lp: LearningPlanOut) => void;
   onRetryRecording?: (rec: RecordingWithReport) => void;
   onOpenChapterDetail?: () => void;
 };
@@ -60,6 +61,7 @@ export function ExpandedChapterDetailView({
   onAddLearningPlan,
   onAddDocument,
   onViewRecordingReport,
+  onSelectLearningPlan,
   onRetryRecording,
   onOpenChapterDetail,
 }: Props) {
@@ -131,7 +133,7 @@ export function ExpandedChapterDetailView({
           <Ionicons name="folder-open-outline" size={32} color="#94A3B8" />
           <Text style={styles.emptyTitle}>No Lecture Titles Added Yet</Text>
           <Text style={styles.emptyText}>
-            Add a chapter entry or display title to populate this lecture table.
+            Add a lecture title to populate this lecture table.
           </Text>
           <View style={styles.emptyBtnRow}>
             {/* Audio belongs to a lecture, so a lecture has to exist first. */}
@@ -164,80 +166,89 @@ export function ExpandedChapterDetailView({
             const lectureName = lp.sub_topic || lp.topic_name;
             const recs = row.recordings;
 
-            /* The lecture row itself always stays visible — its title is the
-               lecture's own name and is never replaced by a recording title. */
-            const renderLectureCell = () => (
-              <View style={[{ flex: 3 }, styles.cellCol]}>
-                <Text style={styles.subTopicTitle} numberOfLines={2}>
-                  {lectureName}
-                </Text>
-                {lp.date ? (
-                  <View style={styles.titleMetaBadgeRow}>
-                    <Text style={styles.subDateText}>📅 {lp.date}</Text>
-                  </View>
-                ) : null}
-              </View>
-            );
-
             if (recs.length === 0) {
               const statusStyle = getStatusStyle("no_video");
+              const canClick = Boolean(
+                onSelectLearningPlan ||
+                (role === "teacher" && onAddRecording)
+              );
+
+              const handlePress = () => {
+                if (onSelectLearningPlan) {
+                  onSelectLearningPlan(lp);
+                } else if (role === "teacher" && onAddRecording) {
+                  onAddRecording(lp.id, lectureName);
+                }
+              };
+
               return (
                 <View key={lp.id || idx} style={styles.subTableRow}>
-                  {renderLectureCell()}
+                  <Pressable
+                    style={[{ flex: 3 }, styles.cellCol, canClick && styles.clickableCell]}
+                    onPress={canClick ? handlePress : undefined}
+                    disabled={!canClick}
+                  >
+                    <Text
+                      style={[styles.subTopicTitle, canClick && styles.clickableTitle]}
+                      numberOfLines={2}
+                    >
+                      {lectureName}
+                    </Text>
+                    {lp.date ? (
+                      <View style={styles.titleMetaBadgeRow}>
+                        <Text style={styles.subDateText}>📅 {lp.date}</Text>
+                      </View>
+                    ) : null}
+                  </Pressable>
 
                   <View style={[{ flex: 0.8, alignItems: "center" }, styles.cellCol]}>
                     <Text style={[styles.subScoreText, { color: getScoreColor(null) }]}>—</Text>
                   </View>
 
                   <View style={[{ flex: 1.2, alignItems: "center" }, styles.cellCol]}>
-                    {role === "teacher" && onAddRecording ? (
-                      <View style={{ alignItems: "center", gap: 6 }}>
-                        <View style={[styles.badgePill, { backgroundColor: statusStyle.bg }]}>
-                          <Text style={[styles.badgePillText, { color: statusStyle.text }]}>
-                            {statusStyle.label}
-                          </Text>
-                        </View>
-                        <Pressable
-                          style={styles.attachVideoSmallBtn}
-                          onPress={() => onAddRecording(lp.id, lectureName)}
-                        >
-                          <Ionicons name="mic-outline" size={13} color="#0284C7" />
-                          <Text style={styles.attachVideoSmallText}>+ Audio</Text>
-                        </Pressable>
-                      </View>
-                    ) : (
-                      <View style={[styles.badgePill, { backgroundColor: statusStyle.bg }]}>
-                        <Text style={[styles.badgePillText, { color: statusStyle.text }]}>
-                          {statusStyle.label}
-                        </Text>
-                      </View>
-                    )}
+                    <View style={[styles.badgePill, { backgroundColor: statusStyle.bg }]}>
+                      <Text style={[styles.badgePillText, { color: statusStyle.text }]}>
+                        {statusStyle.label}
+                      </Text>
+                    </View>
                   </View>
                 </View>
               );
             }
 
-            /* One row per recording of this lecture, so an extra upload never
-               hides the ones already attached to it. */
+            /* One row per recording of this lecture */
             return recs.map((rec, recIdx) => {
               const statusStyle = getStatusStyle(rec.status);
               const score = rec.report?.overall_score;
               const scoreCol = getScoreColor(score);
-              const recStatus = (rec.status || "").toLowerCase();
-              const isProcessed = recStatus === "completed" || recStatus === "analysed";
               const recTitle = rec.lecture_title?.trim();
+              const canClick = Boolean(onViewRecordingReport);
+
+              const handlePress = () => {
+                if (onViewRecordingReport) {
+                  onViewRecordingReport(rec);
+                }
+              };
 
               return (
                 <View key={`${lp.id || idx}-${rec.id}`} style={styles.subTableRow}>
-                  {recIdx === 0 ? (
-                    renderLectureCell()
-                  ) : (
-                    <View style={[{ flex: 3 }, styles.cellCol]}>
-                      <Text style={styles.subTopicTitle} numberOfLines={2}>
-                        {`↳ ${recTitle || `Audio #${rec.id}`}`}
-                      </Text>
-                    </View>
-                  )}
+                  <Pressable
+                    style={[{ flex: 3 }, styles.cellCol, canClick && styles.clickableCell]}
+                    onPress={canClick ? handlePress : undefined}
+                    disabled={!canClick}
+                  >
+                    <Text
+                      style={[styles.subTopicTitle, canClick && styles.clickableTitle]}
+                      numberOfLines={2}
+                    >
+                      {recIdx === 0 ? lectureName : `↳ ${recTitle || `Audio #${rec.id}`}`}
+                    </Text>
+                    {recIdx === 0 && lp.date ? (
+                      <View style={styles.titleMetaBadgeRow}>
+                        <Text style={styles.subDateText}>📅 {lp.date}</Text>
+                      </View>
+                    ) : null}
+                  </Pressable>
 
                   <View style={[{ flex: 0.8, alignItems: "center" }, styles.cellCol]}>
                     <Text style={[styles.subScoreText, { color: scoreCol }]}>
@@ -246,35 +257,11 @@ export function ExpandedChapterDetailView({
                   </View>
 
                   <View style={[{ flex: 1.2, alignItems: "center" }, styles.cellCol]}>
-                    {isProcessed && onViewRecordingReport ? (
-                      <Pressable
-                        onPress={() => onViewRecordingReport(rec)}
-                        style={[styles.badgePill, { backgroundColor: "#E8F7EE", borderWidth: 1, borderColor: "#81C784" }]}
-                      >
-                        <Text style={[styles.badgePillText, { color: "#127A40" }]}>
-                          Report
-                        </Text>
-                      </Pressable>
-                    ) : (
-                      <View style={{ alignItems: "center", gap: 6 }}>
-                        <View style={[styles.badgePill, { backgroundColor: statusStyle.bg }]}>
-                          <Text style={[styles.badgePillText, { color: statusStyle.text }]}>
-                            {statusStyle.label}
-                          </Text>
-                        </View>
-                        {/* An evaluation can stall (worker restart, LLM rate limit) —
-                            without this the lecture has no way back to a report. */}
-                        {role === "teacher" && onRetryRecording ? (
-                          <Pressable
-                            style={styles.attachVideoSmallBtn}
-                            onPress={() => onRetryRecording(rec)}
-                          >
-                            <Ionicons name="refresh-outline" size={13} color="#0284C7" />
-                            <Text style={styles.attachVideoSmallText}>Retry</Text>
-                          </Pressable>
-                        ) : null}
-                      </View>
-                    )}
+                    <View style={[styles.badgePill, { backgroundColor: statusStyle.bg }]}>
+                      <Text style={[styles.badgePillText, { color: statusStyle.text }]}>
+                        {statusStyle.label}
+                      </Text>
+                    </View>
                   </View>
                 </View>
               );
@@ -286,17 +273,23 @@ export function ExpandedChapterDetailView({
             const statusStyle = getStatusStyle(rec.status);
             const score = rec.report?.overall_score;
             const scoreCol = getScoreColor(score);
-            const displayTitle = rec.lecture_title?.trim() || `Lecture Video #${rec.id}`;
-            const isProcessed = (rec.status || "").toLowerCase() === "completed" || (rec.status || "").toLowerCase() === "analysed";
+            const displayTitle = rec.lecture_title?.trim() || `Lecture Audio #${rec.id}`;
+            const canClick = Boolean(onViewRecordingReport);
 
             return (
               <View key={rec.id} style={styles.subTableRow}>
-                <View style={[{ flex: 3 }, styles.cellCol]}>
-                  <Text style={styles.subTopicTitle} numberOfLines={2}>
+                <Pressable
+                  style={[{ flex: 3 }, styles.cellCol, canClick && styles.clickableCell]}
+                  onPress={canClick ? () => onViewRecordingReport!(rec) : undefined}
+                  disabled={!canClick}
+                >
+                  <Text
+                    style={[styles.subTopicTitle, canClick && styles.clickableTitle]}
+                    numberOfLines={2}
+                  >
                     {displayTitle}
                   </Text>
-
-                </View>
+                </Pressable>
 
                 <View style={[{ flex: 0.8, alignItems: "center" }, styles.cellCol]}>
                   <Text style={[styles.subScoreText, { color: scoreCol }]}>
@@ -305,22 +298,11 @@ export function ExpandedChapterDetailView({
                 </View>
 
                 <View style={[{ flex: 1.2, alignItems: "center" }, styles.cellCol]}>
-                  {isProcessed && onViewRecordingReport ? (
-                    <Pressable
-                      onPress={() => onViewRecordingReport(rec)}
-                      style={[styles.badgePill, { backgroundColor: "#E8F7EE", borderWidth: 1, borderColor: "#81C784" }]}
-                    >
-                      <Text style={[styles.badgePillText, { color: "#127A40" }]}>
-                        Report
-                      </Text>
-                    </Pressable>
-                  ) : (
-                    <View style={[styles.badgePill, { backgroundColor: statusStyle.bg }]}>
-                      <Text style={[styles.badgePillText, { color: statusStyle.text }]}>
-                        {statusStyle.label}
-                      </Text>
-                    </View>
-                  )}
+                  <View style={[styles.badgePill, { backgroundColor: statusStyle.bg }]}>
+                    <Text style={[styles.badgePillText, { color: statusStyle.text }]}>
+                      {statusStyle.label}
+                    </Text>
+                  </View>
                 </View>
               </View>
             );
@@ -516,10 +498,17 @@ const styles = StyleSheet.create({
   cellCol: {
     paddingRight: 6,
   },
+  clickableCell: {
+    // @ts-ignore
+    cursor: "pointer",
+  },
   subTopicTitle: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: "700",
     color: "#0F172A",
+  },
+  clickableTitle: {
+    color: "#0284C7",
   },
   titleMetaBadgeRow: {
     flexDirection: "row",

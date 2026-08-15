@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Modal,
   Pressable,
   StyleSheet,
@@ -12,20 +13,13 @@ import { AppTheme } from "../../theme/AppTheme";
 
 type Props = {
   visible: boolean;
-
   title: string;
-
   submitText?: string;
-
   loading?: boolean;
-
   initialName?: string;
-
   initialDescription?: string;
-
   onClose: () => void;
-
-  onSave: (data: { name: string; description: string }) => void;
+  onSave: (data: { name: string; description?: string }) => void;
 };
 
 export function ChapterEditorModal({
@@ -39,57 +33,78 @@ export function ChapterEditorModal({
   onSave,
 }: Props) {
   const [name, setName] = useState(initialName);
-  const [description, setDescription] = useState(initialDescription);
 
   useEffect(() => {
     if (visible) {
       setName(initialName);
-      setDescription(initialDescription);
     }
-  }, [visible, initialName, initialDescription]);
+  }, [visible, initialName]);
+
+  const handleSave = () => {
+    if (!name.trim() || loading) return;
+    onSave({
+      name: name.trim(),
+      description: initialDescription,
+    });
+  };
 
   return (
-    <Modal visible={visible} transparent animationType="fade">
-      <View style={styles.overlay}>
-        <View style={styles.card}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
+      <Pressable onPress={onClose} style={styles.overlay}>
+        <Pressable onPress={(e) => e.stopPropagation()} style={styles.card}>
           <Text style={styles.title}>{title}</Text>
+          <Text style={styles.subtitle}>
+            Enter the chapter name to organize your lectures and recordings.
+          </Text>
 
-          <TextInput
-            placeholder="Chapter Name (e.g. Coordinate Geometry)"
-            value={name}
-            onChangeText={setName}
-            style={styles.input}
-          />
-
-          <TextInput
-            placeholder="Display Title (Optional, e.g. Intro & Distance Formula)"
-            value={description}
-            onChangeText={setDescription}
-            style={styles.input}
-          />
+          <View style={styles.field}>
+            <Text style={styles.fieldLabel}>CHAPTER NAME</Text>
+            <TextInput
+              autoFocus
+              autoCapitalize="words"
+              placeholder="e.g. Coordinate Geometry, Chemical Reactions…"
+              placeholderTextColor={AppTheme.colors.hint}
+              value={name}
+              onChangeText={setName}
+              style={styles.input}
+              // @ts-ignore
+              outlineStyle="none"
+              returnKeyType="done"
+              onSubmitEditing={handleSave}
+            />
+          </View>
 
           <View style={styles.actions}>
-            <Pressable style={styles.cancelButton} onPress={onClose}>
-              <Text>Cancel</Text>
+            <Pressable
+              disabled={loading}
+              style={styles.cancelButton}
+              onPress={onClose}
+            >
+              <Text style={styles.cancelText}>Cancel</Text>
             </Pressable>
 
             <Pressable
               disabled={loading || !name.trim()}
-              style={styles.saveButton}
-              onPress={() =>
-                onSave({
-                  name: name.trim(),
-                  description: description.trim(),
-                })
-              }
+              style={[
+                styles.saveButton,
+                (loading || !name.trim()) && styles.saveButtonDisabled,
+              ]}
+              onPress={handleSave}
             >
-              <Text style={styles.saveText}>
-                {loading ? "Saving..." : submitText}
-              </Text>
+              {loading ? (
+                <ActivityIndicator color="#fff" size="small" />
+              ) : (
+                <Text style={styles.saveText}>{submitText}</Text>
+              )}
             </Pressable>
           </View>
-        </View>
-      </View>
+        </Pressable>
+      </Pressable>
     </Modal>
   );
 }
@@ -99,59 +114,88 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,.35)",
+    backgroundColor: "rgba(0, 0, 0, 0.45)",
+    padding: AppTheme.spacing.l,
   },
-
   card: {
-    width: "90%",
-    backgroundColor: "#fff",
-    borderRadius: 18,
-    padding: 20,
+    width: "100%",
+    maxWidth: 480,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.xlarge,
+    padding: AppTheme.spacing.xl,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 8,
   },
-
   title: {
     fontSize: 20,
-    fontWeight: "700",
-    marginBottom: 20,
+    fontWeight: "800",
     color: AppTheme.colors.textPrimary,
+    marginBottom: 6,
   },
-
+  subtitle: {
+    ...AppTheme.typography.body,
+    color: AppTheme.colors.textSecondary,
+    marginBottom: AppTheme.spacing.l,
+  },
+  field: {
+    gap: 6,
+    marginBottom: AppTheme.spacing.l,
+  },
+  fieldLabel: {
+    ...AppTheme.typography.caption,
+    fontWeight: "800",
+    color: AppTheme.colors.textSecondary,
+    letterSpacing: 1.1,
+  },
   input: {
+    height: 48,
     borderWidth: 1,
     borderColor: AppTheme.colors.border,
     borderRadius: AppTheme.radius.medium,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    marginBottom: 14,
-    backgroundColor: "#fff",
+    paddingHorizontal: AppTheme.spacing.m,
+    backgroundColor: AppTheme.colors.background,
+    fontSize: 15,
+    color: AppTheme.colors.textPrimary,
   },
-
-  description: {
-    minHeight: 90,
-    textAlignVertical: "top",
-  },
-
   actions: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    marginTop: 10,
+    alignItems: "center",
+    gap: AppTheme.spacing.m,
   },
-
   cancelButton: {
-    paddingHorizontal: 18,
-    justifyContent: "center",
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingVertical: 12,
+    borderRadius: AppTheme.radius.medium,
   },
-
+  cancelText: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: AppTheme.colors.textSecondary,
+  },
   saveButton: {
     backgroundColor: AppTheme.colors.primary,
     borderRadius: AppTheme.radius.medium,
-    paddingHorizontal: 22,
+    paddingHorizontal: AppTheme.spacing.xl,
     paddingVertical: 12,
-    marginLeft: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 100,
+    shadowColor: AppTheme.colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 3,
   },
-
+  saveButtonDisabled: {
+    opacity: 0.5,
+  },
   saveText: {
     color: "#fff",
+    fontSize: 15,
     fontWeight: "700",
   },
 });

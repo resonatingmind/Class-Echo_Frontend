@@ -77,7 +77,7 @@ export function ChapterLearningPlanModal({
 
   const handleSubmit = () => {
     if (!subTopic.trim()) {
-      setError("Sub Topic is required.");
+      setError("Lecture Title is required.");
       return;
     }
 
@@ -173,17 +173,17 @@ export function ChapterLearningPlanModal({
             </View>
 
             <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Topic Name</Text>
+              <Text style={styles.label}>Chapter Name</Text>
               <View style={[styles.input, styles.disabledInput]}>
                 <Text style={styles.disabledText}>{chapterName}</Text>
               </View>
             </View>
 
             <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Sub Topic *</Text>
+              <Text style={styles.label}>Lecture Title *</Text>
               <TextInput
                 style={styles.input}
-                placeholder="e.g. Section Formula"
+                placeholder="e.g. Introduction & Distance Formula"
                 placeholderTextColor="#94A3B8"
                 value={subTopic}
                 onChangeText={setSubTopic}

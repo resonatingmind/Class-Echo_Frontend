@@ -657,7 +657,7 @@ export function RecordingScreen({ navigation, route }: Props) {
               </View>
 
               <View style={{ marginBottom: 14 }}>
-                <Text style={styles.metaLabel}>LECTURE (SUB-TOPIC) *</Text>
+                <Text style={styles.metaLabel}>LECTURE *</Text>
                 {/* Wraps instead of scrolling sideways — a horizontal strip hides
                     lectures past the edge and a mouse wheel can't reach them. */}
                 <View style={{ marginTop: 6, marginBottom: 4 }}>

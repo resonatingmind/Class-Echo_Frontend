@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { AppLogo } from "../ui/AppLogo";
 import { AppTheme } from "../../theme/AppTheme";
+import { useAuth } from "../../context/AuthContext";
 
 type Props = {
   title: string;
@@ -16,6 +17,19 @@ export function AdminNavbar({ title, rightActions, onBack, onProfilePress }: Pro
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
   const navigation = useNavigation();
+  const { session } = useAuth();
+
+  const handleProfilePress = () => {
+    if (onProfilePress) {
+      onProfilePress();
+    } else if (session?.role === "teacher") {
+      navigation.navigate("TeacherProfile" as never);
+    } else if (session?.role === "student") {
+      navigation.navigate("StudentProfile" as never);
+    } else {
+      navigation.navigate("SchoolAdminProfile" as never);
+    }
+  };
 
   return (
     <View style={styles.header}>
@@ -31,7 +45,7 @@ export function AdminNavbar({ title, rightActions, onBack, onProfilePress }: Pro
       <Text style={styles.headerTitle} numberOfLines={1}>{isMobile ? "" : title}</Text>
       <View style={styles.headerRight}>
         {rightActions}
-        <Pressable onPress={() => onProfilePress ? onProfilePress() : navigation.navigate("SchoolAdminProfile" as never)} style={styles.iconBtn}>
+        <Pressable onPress={handleProfilePress} style={styles.iconBtn}>
           <Ionicons color={AppTheme.colors.textPrimary} name="person-circle-outline" size={28} />
         </Pressable>
       </View>

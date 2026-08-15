@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useFocusEffect } from '@react-navigation/native';
 import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import {
   ActivityIndicator,
@@ -24,11 +25,19 @@ import {
   LearningPlanInfoCard,
 } from '../components/RAGReportSections';
 import { useAuth } from '../context/AuthContext';
-import { API_BASE_URL, archiveTeacherRecording, deleteTeacherRecording, retryRecording, updateTeacherRecording } from '../lib/api';
+import {
+  API_BASE_URL,
+  archiveTeacherRecording,
+  deleteTeacherRecording,
+  getSchoolRecordingDetail,
+  getTeacherRecordingDetail,
+  retryRecording,
+  updateTeacherRecording,
+} from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { AppTheme } from '../theme/AppTheme';
 import { AppLogo } from '../components/ui/AppLogo';
-import { DimensionScore, QuantitativeMetrics, RecordingStatus, ScoreBreakdown } from '../types/api';
+import { DimensionScore, QuantitativeMetrics, RecordingStatus, ScoreBreakdown, RecordingWithReport } from '../types/api';
 import { buildWaveformBars, formatAudioTime } from '../lib/audio';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'RecordingDetail'>;
@@ -277,7 +286,38 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
   const [editDescription, setEditDescription] = useState(initialRecording.description || '');
   const [updatingDetails, setUpdatingDetails] = useState(false);
 
-  // const player = useAudioPlayer(recordingDetails.cloudinary_url, { updateInterval: 200 });
+  const fetchDetails = useCallback(async () => {
+    if (!session) return;
+    try {
+      let updated: RecordingWithReport | null = null;
+      if (session.role === 'school_admin') {
+        updated = await getSchoolRecordingDetail(session.token, recordingDetails.id);
+      } else {
+        updated = await getTeacherRecordingDetail(session.token, recordingDetails.id);
+      }
+      if (updated) {
+        setRecordingDetails(updated);
+        setStatus(updated.status);
+      }
+    } catch {
+      // ignore
+    }
+  }, [session, recordingDetails.id]);
+
+  useFocusEffect(
+    useCallback(() => {
+      void fetchDetails();
+    }, [fetchDetails])
+  );
+
+  // Poll if status is pending or processing
+  useEffect(() => {
+    if (status !== 'pending' && status !== 'processing') return;
+    const interval = setInterval(() => {
+      void fetchDetails();
+    }, 3500);
+    return () => clearInterval(interval);
+  }, [status, fetchDetails]);
 
   // Relative storage paths have to resolve against whichever backend this build
   // points at — a hardcoded localhost never works in a packaged APK.
@@ -296,6 +336,29 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
   useEffect(() => {
     void setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true });
   }, []);
+
+  useEffect(() => {
+    if (audioUrl && player) {
+      try {
+        player.replace(audioUrl);
+      } catch {
+        // ignore
+      }
+    }
+  }, [audioUrl, player]);
+
+  const handleNavigateToReplaceAudio = () => {
+    setShowOptionsSheet(false);
+    navigation.navigate('TeacherRecording', {
+      subjectId: recordingDetails.subject_id,
+      subjectName,
+      chapterId: recordingDetails.chapter_id || undefined,
+      chapterName: recordingDetails.chapter_name || undefined,
+      learningPlanId: recordingDetails.learning_plan_id || undefined,
+      lectureTitle: recordingDetails.lecture_title || undefined,
+      replaceRecordingId: recordingDetails.id,
+    });
+  };
 
   const progress =
     playerStatus.duration > 0
@@ -457,7 +520,28 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
         {/* Playback card */}
         <View style={styles.card}>
           <View style={styles.cardHeaderRow}>
-            <Text style={styles.cardHeading}>Audio Playback</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Text style={styles.cardHeading}>Audio Playback</Text>
+              {session?.role === 'teacher' ? (
+                <Pressable
+                  onPress={handleNavigateToReplaceAudio}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 4,
+                    paddingHorizontal: 8,
+                    paddingVertical: 3,
+                    borderRadius: 6,
+                    backgroundColor: '#E0F2FE',
+                  }}
+                >
+                  <Ionicons name="refresh" size={12} color="#0284C7" />
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#0284C7' }}>
+                    Replace Audio
+                  </Text>
+                </Pressable>
+              ) : null}
+            </View>
             <Text style={styles.playerTime}>
               {formatAudioTime(playerStatus.currentTime)} /{' '}
               {formatAudioTime(playerStatus.duration || recording.duration_seconds)}
@@ -618,20 +702,31 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
                   : 'Analysis is queued and will start soon.'}
               </Text>
               {status === 'failed' ? (
-                <Pressable
-                  disabled={retrying}
-                  onPress={() => void handleRetry()}
-                  style={styles.retryButton}
-                >
-                  {retrying ? (
-                    <ActivityIndicator color="#fff" size="small" />
-                  ) : (
-                    <Ionicons color="#fff" name="refresh-outline" size={14} />
-                  )}
-                  <Text style={styles.retryButtonText}>
-                    {retrying ? 'Queuing…' : 'Retry Analysis'}
-                  </Text>
-                </Pressable>
+                <View style={{ flexDirection: 'row', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+                  {session?.role === 'teacher' ? (
+                    <Pressable
+                      onPress={handleNavigateToReplaceAudio}
+                      style={[styles.retryButton, { backgroundColor: '#0284C7' }]}
+                    >
+                      <Ionicons color="#fff" name="mic-outline" size={14} />
+                      <Text style={styles.retryButtonText}>Re-record / Upload New Audio</Text>
+                    </Pressable>
+                  ) : null}
+                  <Pressable
+                    disabled={retrying}
+                    onPress={() => void handleRetry()}
+                    style={[styles.retryButton, { backgroundColor: '#475569' }]}
+                  >
+                    {retrying ? (
+                      <ActivityIndicator color="#fff" size="small" />
+                    ) : (
+                      <Ionicons color="#fff" name="refresh-outline" size={14} />
+                    )}
+                    <Text style={styles.retryButtonText}>
+                      {retrying ? 'Queuing…' : 'Retry Same Audio'}
+                    </Text>
+                  </Pressable>
+                </View>
               ) : null}
             </View>
           </View>
@@ -647,7 +742,24 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
           <View style={styles.sheet}>
             <View style={styles.sheetHandle} />
             <Text style={styles.sheetTitle}>Lecture Options</Text>
-            <Text style={styles.sheetSubtitle}>Manage details, archive, or permanently delete this lecture.</Text>
+            <Text style={styles.sheetSubtitle}>Manage details, re-record audio, archive, or permanently delete this lecture.</Text>
+
+            {session?.role === 'teacher' ? (
+              <Pressable
+                onPress={handleNavigateToReplaceAudio}
+                style={styles.sheetOption}
+              >
+                <View style={styles.sheetOptionIcon}>
+                  <Ionicons color={AppTheme.colors.primary} name="mic-outline" size={20} />
+                </View>
+                <View style={styles.sheetOptionBody}>
+                  <Text style={styles.sheetOptionTitle}>Re-record / Replace Audio</Text>
+                  <Text style={styles.sheetOptionText}>
+                    Upload or record a new audio to regenerate the AI performance report.
+                  </Text>
+                </View>
+              </Pressable>
+            ) : null}
 
             <Pressable
               onPress={() => {

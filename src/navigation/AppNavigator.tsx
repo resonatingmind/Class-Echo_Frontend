@@ -127,6 +127,7 @@ export type RootStackParamList = {
     chapterName?: string;
     learningPlanId?: number;
     lectureTitle?: string;
+    replaceRecordingId?: number;
   };
 
   // Student

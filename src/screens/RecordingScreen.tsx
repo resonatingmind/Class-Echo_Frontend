@@ -62,7 +62,16 @@ function safelyPausePlayer(player: { pause: () => void }) {
 
 export function RecordingScreen({ navigation, route }: Props) {
   const { session } = useAuth();
-  const { subjectId, subjectName, existingChapters = [], chapterId, chapterName: paramChapterName, learningPlanId, lectureTitle: paramLectureTitle } = route.params;
+  const {
+    subjectId,
+    subjectName,
+    existingChapters = [],
+    chapterId,
+    chapterName: paramChapterName,
+    learningPlanId,
+    lectureTitle: paramLectureTitle,
+    replaceRecordingId,
+  } = route.params;
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
 
@@ -87,7 +96,7 @@ export function RecordingScreen({ navigation, route }: Props) {
   const [learningPlans, setLearningPlans] = useState<LearningPlanOut[]>([]);
   const [selectedLearningPlanId, setSelectedLearningPlanId] = useState<number | undefined>(learningPlanId);
   // Audio always belongs to one lecture: either an existing sub-topic or a brand new one.
-  const [creatingNewLecture, setCreatingNewLecture] = useState(!learningPlanId);
+  const [creatingNewLecture, setCreatingNewLecture] = useState(!learningPlanId && !replaceRecordingId);
   const [lectureSelectError, setLectureSelectError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -344,7 +353,7 @@ export function RecordingScreen({ navigation, route }: Props) {
     setLectureTitleError(null);
     setLectureSelectError(null);
     setSelectedLearningPlanId(learningPlanId);
-    setCreatingNewLecture(!learningPlanId);
+    setCreatingNewLecture(!learningPlanId && !replaceRecordingId);
     setTranscription('');
     setDescription('');
     setLiveTranscript('');
@@ -379,7 +388,7 @@ export function RecordingScreen({ navigation, route }: Props) {
         setLectureTitleError('Lecture title is required.');
         hasError = true;
       }
-    } else if (!selectedLearningPlanId) {
+    } else if (!selectedLearningPlanId && !replaceRecordingId) {
       setLectureSelectError('Choose the lecture this audio belongs to.');
       hasError = true;
     }
@@ -401,6 +410,7 @@ export function RecordingScreen({ navigation, route }: Props) {
       resolvedMime,
       chapterId,
       creatingNewLecture,
+      replaceRecordingId,
       hasDescription: Boolean(description.trim()),
       hasTranscription: Boolean(transcription.trim()),
     });
@@ -433,7 +443,7 @@ export function RecordingScreen({ navigation, route }: Props) {
         recordedUri,
         resolvedMime,
         chapterId,
-        targetLectureTitle,
+        targetLectureTitle || paramLectureTitle || undefined,
         description.trim() || undefined,
         transcription.trim() || undefined,
         recordedDuration,
@@ -444,6 +454,7 @@ export function RecordingScreen({ navigation, route }: Props) {
           if (pct >= 100) setUploadPhase('finalizing');
         },
         targetLearningPlanId,
+        replaceRecordingId,
       );
       console.log('[recording] upload:success', {
         subjectId,
@@ -496,15 +507,45 @@ export function RecordingScreen({ navigation, route }: Props) {
       <ScrollView contentContainerStyle={styles.scrollBody} style={styles.body}>
         <View style={styles.centerContainer}>
           <View style={styles.contentBody}>
+        {replaceRecordingId ? (
+          <View
+            style={{
+              backgroundColor: '#EFF6FF',
+              borderColor: '#BFDBFE',
+              borderWidth: 1,
+              borderRadius: AppTheme.radius.medium,
+              padding: 12,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 10,
+              marginBottom: 16,
+            }}
+          >
+            <Ionicons name="refresh-circle" size={24} color="#0284C7" />
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: '#0369A1' }}>
+                Replacing Lecture Audio
+              </Text>
+              <Text style={{ fontSize: 12, color: '#0284C7', marginTop: 2, lineHeight: 16 }}>
+                Recording or uploading a new audio file will replace the previous recording and trigger a fresh AI evaluation.
+              </Text>
+            </View>
+          </View>
+        ) : null}
+
         {state === 'idle' ? (
           <>
             <View style={styles.hero}>
               <View style={styles.micRing}>
                 <Ionicons color={AppTheme.colors.primary} name="mic" size={52} />
               </View>
-              <Text style={styles.idleTitle}>Start Classroom Recording</Text>
+              <Text style={styles.idleTitle}>
+                {replaceRecordingId ? 'Replace Lecture Recording' : 'Start Classroom Recording'}
+              </Text>
               <Text style={styles.idleSubtitle}>
-                Record the session, review the audio, and upload it with the chapter details when you are ready.
+                {replaceRecordingId
+                  ? 'Record or upload new audio for this lecture to replace the previous recording and regenerate the report.'
+                  : 'Record the session, review the audio, and upload it with the chapter details when you are ready.'}
               </Text>
             </View>
 

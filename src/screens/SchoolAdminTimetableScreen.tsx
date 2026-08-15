@@ -241,11 +241,53 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
   );
 
   // ─── Derived ──────────────────────────────────────────────────────────────
-  const periodNumbers = useMemo(() => {
-    const configuredNums = periodSlots.map((s) => s.number);
-    const entryNums = entries.filter((e) => e.day_of_week === selectedDay).map((e) => e.period_number);
-    return [...new Set([...configuredNums, ...entryNums])].sort((a, b) => a - b);
+  type DisplayColumn = {
+    key: string;
+    slotNumber: number;
+    isBreak: boolean;
+    periodNumber: number;
+    label?: string;
+    startTime?: string;
+    endTime?: string;
+  };
+
+  const displayColumns = useMemo((): DisplayColumn[] => {
+    if (periodSlots.length > 0) {
+      return periodSlots.map((s, idx) => ({
+        key: `slot-${s.number}-${idx}`,
+        slotNumber: s.number,
+        isBreak: Boolean(s.isBreak),
+        periodNumber: s.periodNumber ?? s.number,
+        label: s.label,
+        startTime: s.startTime,
+        endTime: s.endTime,
+      }));
+    }
+
+    const entryNums = [
+      ...new Set(entries.filter((e) => e.day_of_week === selectedDay).map((e) => e.period_number)),
+    ].sort((a, b) => a - b);
+
+    if (entryNums.length > 0) {
+      return entryNums.map((n) => ({
+        key: `entry-${n}`,
+        slotNumber: n,
+        isBreak: false,
+        periodNumber: n,
+      }));
+    }
+
+    return [];
   }, [entries, selectedDay, periodSlots]);
+
+  const teachingSlotCount = useMemo(
+    () => periodSlots.filter((s) => !s.isBreak).length,
+    [periodSlots],
+  );
+  const breakSlotCount = useMemo(
+    () => periodSlots.filter((s) => s.isBreak).length,
+    [periodSlots],
+  );
 
   const classGroups = useMemo((): [string, ClassOut[]][] => {
     const map = new Map<string, ClassOut[]>();
@@ -278,17 +320,17 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
     [entries, selectedDay],
   );
 
-  const periodLabel = (n: number) => {
-    const configured = periodSlots.find((s) => s.number === n);
-    if (configured) {
+  const formatTimeSpan = (startTime?: string, endTime?: string, defaultNum?: number) => {
+    if (startTime && endTime) {
       const fmt = (t: string) => {
         const [h, m] = t.split(":").map(Number);
         const ampm = h >= 12 ? "PM" : "AM";
         const hour = h % 12 || 12;
         return `${hour}:${String(m).padStart(2, "0")} ${ampm}`;
       };
-      return `${fmt(configured.startTime)} – ${fmt(configured.endTime)}`;
+      return `${fmt(startTime)} – ${fmt(endTime)}`;
     }
+    const n = defaultNum ?? 1;
     const startH = 7 + n;
     const endH = startH + 1;
     const fmt = (h: number) => (h >= 12 ? `${h === 12 ? 12 : h - 12}:00 PM` : `${h}:00 AM`);
@@ -412,18 +454,21 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
     );
   };
 
-  const renderMobileCell = (classId: number, periodNumber: number) => {
+  const renderMobileCell = (classId: number, periodNumber: number, col?: DisplayColumn) => {
     const entry = entryMap[classId]?.[periodNumber];
     const subjectName = entry ? getSubjectName(entry) : "";
     const colorIdx = entry ? subjectColorIndex(subjectName) : 0;
     const palette = SUBJECT_COLORS[colorIdx];
     const teacherName = entry ? getTeacherName(entry, teachers) : "";
+    const timeLabel = col
+      ? formatTimeSpan(col.startTime, col.endTime, periodNumber)
+      : formatTimeSpan(undefined, undefined, periodNumber);
 
     return (
-      <View key={periodNumber} style={styles.mobilePeriodWrapper}>
+      <View key={`mob-${periodNumber}`} style={styles.mobilePeriodWrapper}>
         <View style={styles.mobilePeriodHeader}>
           <Text style={styles.mobilePeriodLabel}>Period {periodNumber}</Text>
-          <Text style={styles.mobilePeriodTime}>{periodLabel(periodNumber)}</Text>
+          <Text style={styles.mobilePeriodTime}>{timeLabel}</Text>
         </View>
         <Pressable
           style={({ pressed }) => [
@@ -519,7 +564,7 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
                     <Text style={styles.heroLabel}>SCHOOL TIMETABLE</Text>
                   </View>
                   <Text style={styles.heroTitle}>Class Schedules</Text>
-                  <Text style={styles.heroSubtitle}>Manage weekly class timetables</Text>
+                  <Text style={styles.heroSubtitle}>Manage weekly class timetables & breaks</Text>
                 </View>
 
                 <View style={[styles.heroActions, isMobile && styles.heroActionsMobile]}>
@@ -541,7 +586,11 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
                   >
                     <Ionicons name="settings-outline" size={13} color="rgba(255,255,255,0.9)" />
                     <Text style={styles.heroGlassBtnText}>
-                      {periodSlots.length > 0 ? `${periodSlots.length} Periods` : "Set Up Periods"}
+                      {periodSlots.length > 0
+                        ? breakSlotCount > 0
+                          ? `${teachingSlotCount}P + ${breakSlotCount}B`
+                          : `${teachingSlotCount} Periods`
+                        : "Set Up Periods"}
                     </Text>
                   </Pressable>
 
@@ -562,7 +611,15 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
                 <StatChip icon="today-outline" label="Periods Today" value={totalPeriodsToday} />
                 <StatChip icon="grid-outline" label="Total Entries" value={entries.length} />
                 {periodSlots.length > 0 && (
-                  <StatChip icon="time-outline" label="Period Slots" value={periodSlots.length} />
+                  <StatChip
+                    icon="time-outline"
+                    label="Schedule"
+                    value={
+                      breakSlotCount > 0
+                        ? `${teachingSlotCount} Periods • ${breakSlotCount} ${breakSlotCount === 1 ? "Break" : "Breaks"}`
+                        : `${teachingSlotCount} Periods`
+                    }
+                  />
                 )}
               </ScrollView>
             </LinearGradient>
@@ -606,7 +663,7 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
                           </View>
                         </View>
                         <View style={styles.mobileClassPeriods}>
-                          {periodNumbers.length === 0 ? (
+                          {displayColumns.length === 0 ? (
                             <View style={styles.mobileNoPeriodContainer}>
                               <Ionicons name="calendar-outline" size={24} color={AppTheme.colors.textSecondary} style={{marginBottom: 8}} />
                               <Text style={styles.noPeriodText}>No periods on {selectedDay}</Text>
@@ -617,7 +674,30 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
                               showsHorizontalScrollIndicator={false}
                               contentContainerStyle={styles.mobilePeriodsScroll}
                             >
-                              {periodNumbers.map((n) => renderMobileCell(cls.id, n))}
+                              {displayColumns.map((col) => {
+                                if (col.isBreak) {
+                                  return (
+                                    <View key={col.key} style={styles.mobileBreakWrapper}>
+                                      <View style={styles.mobileBreakHeader}>
+                                        <Ionicons name="cafe" size={13} color="#C2410C" />
+                                        <Text style={styles.mobileBreakLabel} numberOfLines={1}>
+                                          {col.label || "Break"}
+                                        </Text>
+                                      </View>
+                                      <View style={styles.mobileBreakCard}>
+                                        <Text style={styles.mobileBreakCardTime}>
+                                          {formatTimeSpan(col.startTime, col.endTime, col.slotNumber)}
+                                        </Text>
+                                        <Text style={styles.mobileBreakCardSub}>
+                                          School Break
+                                        </Text>
+                                      </View>
+                                    </View>
+                                  );
+                                }
+
+                                return renderMobileCell(cls.id, col.periodNumber, col);
+                              })}
                             </ScrollView>
                           )}
                         </View>
@@ -650,23 +730,55 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
                     </View>
 
                     {/* Period headers */}
-                    {periodNumbers.length === 0 ? (
+                    {displayColumns.length === 0 ? (
                       <View style={[styles.headerCell, { width: PERIOD_COL_WIDTH * 3, height: HEADER_HEIGHT }]}>
                         <Ionicons name="calendar-outline" size={16} color={AppTheme.colors.textSecondary} />
                         <Text style={styles.noPeriodText}>No periods on {selectedDay}</Text>
                       </View>
                     ) : (
-                      periodNumbers.map((n) => (
-                        <View
-                          key={n}
-                          style={[styles.headerCell, { width: PERIOD_COL_WIDTH, height: HEADER_HEIGHT }]}
-                        >
-                          <View style={styles.periodBadge}>
-                            <Text style={styles.periodBadgeText}>{n}</Text>
+                      displayColumns.map((col) => {
+                        if (col.isBreak) {
+                          return (
+                            <View
+                              key={col.key}
+                              style={[
+                                styles.headerCell,
+                                styles.breakHeaderCell,
+                                { width: PERIOD_COL_WIDTH, height: HEADER_HEIGHT },
+                              ]}
+                            >
+                              <View style={styles.breakBadgeHeader}>
+                                <Ionicons name="cafe" size={13} color="#C2410C" />
+                              </View>
+                              <Text style={styles.breakHeaderTitle} numberOfLines={1}>
+                                {col.label || "Break"}
+                              </Text>
+                              <Text style={styles.breakHeaderTime}>
+                                {formatTimeSpan(col.startTime, col.endTime, col.slotNumber)}
+                              </Text>
+                            </View>
+                          );
+                        }
+
+                        return (
+                          <View
+                            key={col.key}
+                            style={[styles.headerCell, { width: PERIOD_COL_WIDTH, height: HEADER_HEIGHT }]}
+                          >
+                            <View style={styles.periodBadge}>
+                              <Text style={styles.periodBadgeText}>P{col.periodNumber}</Text>
+                            </View>
+                            {col.label ? (
+                              <Text style={styles.headerPeriodLabel} numberOfLines={1}>
+                                {col.label}
+                              </Text>
+                            ) : null}
+                            <Text style={styles.headerPeriodTime}>
+                              {formatTimeSpan(col.startTime, col.endTime, col.periodNumber)}
+                            </Text>
                           </View>
-                          <Text style={styles.headerPeriodTime}>{periodLabel(n)}</Text>
-                        </View>
-                      ))
+                        );
+                      })
                     )}
                   </View>
 
@@ -690,14 +802,39 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
                           </View>
 
                           {/* Period cells */}
-                          {periodNumbers.length === 0 ? (
+                          {displayColumns.length === 0 ? (
                             <View style={[styles.cell, { width: PERIOD_COL_WIDTH * 3, height: ROW_HEIGHT }]}>
                               <Text style={styles.cellEmpty}>—</Text>
                             </View>
                           ) : (
-                            periodNumbers.map((n) => (
-                              <View key={n}>{renderCell(cls.id, n)}</View>
-                            ))
+                            displayColumns.map((col) => {
+                              if (col.isBreak) {
+                                return (
+                                  <View
+                                    key={col.key}
+                                    style={[
+                                      styles.cell,
+                                      styles.breakDataCell,
+                                      { width: PERIOD_COL_WIDTH, height: ROW_HEIGHT },
+                                    ]}
+                                  >
+                                    <View style={styles.breakDataInner}>
+                                      <Ionicons name="cafe-outline" size={13} color="#EA580C" />
+                                      <Text style={styles.breakDataTitle} numberOfLines={1}>
+                                        {col.label || "Break"}
+                                      </Text>
+                                    </View>
+                                    <Text style={styles.breakDataSub}>No Class Scheduled</Text>
+                                  </View>
+                                );
+                              }
+
+                              return (
+                                <View key={col.key}>
+                                  {renderCell(cls.id, col.periodNumber)}
+                                </View>
+                              );
+                            })
                           )}
                         </View>
                       ))}
@@ -975,6 +1112,40 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     gap: 4,
   },
+  breakHeaderCell: {
+    backgroundColor: "#FFF7ED",
+    borderBottomWidth: 2,
+    borderBottomColor: "#FDBA74",
+  },
+  breakBadgeHeader: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "#FFEDD5",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 2,
+    borderWidth: 1,
+    borderColor: "#FDBA74",
+  },
+  breakHeaderTitle: {
+    fontSize: 11,
+    fontWeight: "800",
+    color: "#C2410C",
+    textAlign: "center",
+  },
+  breakHeaderTime: {
+    fontSize: 10,
+    color: "#9A3412",
+    fontWeight: "600",
+    textAlign: "center",
+  },
+  headerPeriodLabel: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: AppTheme.colors.textSecondary,
+    marginBottom: 1,
+  },
   periodBadge: {
     backgroundColor: AppTheme.colors.primary,
     width: 26,
@@ -1042,6 +1213,34 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   cellPressed: { opacity: 0.85 },
+
+  breakDataCell: {
+    backgroundColor: "#FFFBF7",
+    borderRightWidth: 1,
+    borderRightColor: "#FED7AA",
+    borderBottomWidth: 1,
+    borderBottomColor: "#FED7AA",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 6,
+  },
+  breakDataInner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  breakDataTitle: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#C2410C",
+    textAlign: "center",
+  },
+  breakDataSub: {
+    fontSize: 9,
+    color: "#9A3412",
+    marginTop: 2,
+    textAlign: "center",
+  },
 
   cellContent: { flex: 1, flexDirection: "row" },
   cellAccentBar: { width: 4, alignSelf: "stretch", opacity: 0.85 },
@@ -1182,5 +1381,45 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
     color: AppTheme.colors.textSecondary,
+  },
+
+  // Mobile Break Styles
+  mobileBreakWrapper: {
+    width: 130,
+    gap: 8,
+  },
+  mobileBreakHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 4,
+  },
+  mobileBreakLabel: {
+    fontSize: 12,
+    fontWeight: "800",
+    color: "#C2410C",
+  },
+  mobileBreakCard: {
+    backgroundColor: "#FFF7ED",
+    borderWidth: 1,
+    borderColor: "#FDBA74",
+    borderStyle: "dashed",
+    borderRadius: 12,
+    height: 100,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 8,
+  },
+  mobileBreakCardTime: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: "#C2410C",
+    textAlign: "center",
+  },
+  mobileBreakCardSub: {
+    fontSize: 10,
+    color: "#9A3412",
+    marginTop: 4,
+    textAlign: "center",
   },
 });

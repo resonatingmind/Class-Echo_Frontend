@@ -20,7 +20,7 @@ type Props = {
   learningPlans: LearningPlanOut[];
   loading?: boolean;
   role?: "teacher" | "school_admin";
-  onAddRecording?: (learningPlanId?: number, lectureTitle?: string) => void;
+  onAddRecording?: (learningPlanId?: number, lectureTitle?: string, replaceRecordingId?: number) => void;
   onAddLearningPlan?: () => void;
   onEditLearningPlan?: (lp: LearningPlanOut) => void;
   onAddDocument?: () => void;
@@ -46,8 +46,10 @@ function getStatusStyle(status?: string | null) {
     return { bg: "#FFF4E0", text: "#92400E", label: "Processing" };
   } else if (norm === "pending") {
     return { bg: AppTheme.colors.surfaceMuted, text: AppTheme.colors.textSecondary, label: "Pending" };
+  } else if (norm === "failed") {
+    return { bg: "#FFF1F1", text: "#B42318", label: "Failed" };
   } else {
-    return { bg: "#FFF1F1", text: "#B42318", label: "No Audio" };
+    return { bg: "#F1F5F9", text: "#64748B", label: "No Audio" };
   }
 }
 

@@ -799,12 +799,14 @@ export async function uploadRecording(
   durationSeconds?: number,
   onProgress?: (pct: number) => void,
   learningPlanId?: number,
+  replaceRecordingId?: number,
 ): Promise<RecordingWithReport> {
   const form = new FormData();
   const normalizedType = normalizeMimeType(fileUri, mimeType);
   await appendFile(form, "file", fileUri, normalizedType, "recording");
   form.append("chapter_id", String(chapterId));
   if (learningPlanId) form.append("learning_plan_id", String(learningPlanId));
+  if (replaceRecordingId) form.append("replace_recording_id", String(replaceRecordingId));
   if (lectureTitle) form.append("lecture_title", lectureTitle);
   if (description) form.append("description", description);
   if (transcription) form.append("transcription", transcription);
@@ -846,6 +848,17 @@ export async function uploadRecording(
 
     xhr.send(form);
   });
+}
+
+export async function getTeacherRecordingDetail(
+  token: string,
+  recordingId: number,
+): Promise<RecordingWithReport> {
+  return request<RecordingWithReport>(
+    `/teacher/recordings/${recordingId}`,
+    {},
+    token,
+  );
 }
 
 export async function getTeacherRecordingReport(

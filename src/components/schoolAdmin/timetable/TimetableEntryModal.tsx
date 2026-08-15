@@ -31,6 +31,8 @@ export type PeriodSlot = {
   startTime: string;
   endTime: string;
   label?: string;
+  isBreak?: boolean;
+  periodNumber?: number;
 };
 
 type Props = {
@@ -98,16 +100,19 @@ export function TimetableEntryModal({
     if (initialEntry) {
       // Editing an existing entry — pre-fill all fields
       setClassId(initialEntry.class_id);
-      const matchingSlot = periodSlots.find((s) => s.number === initialEntry.period_number);
+      const matchingSlot = periodSlots.find(
+        (s) => (s.periodNumber ?? s.number) === initialEntry.period_number && !s.isBreak
+      ) || periodSlots.find((s) => s.number === initialEntry.period_number);
       setSelectedSlot(matchingSlot ?? null);
       setSubjectId(initialEntry.subject_id);
       setTeacherId(initialEntry.teacher_id);
       setRoom(initialEntry.room ?? "");
     } else {
-      // New entry — default to first class, first slot
+      // New entry — default to first class, first non-break slot
       const defaultClassId = classes[0]?.id ?? 0;
       setClassId(defaultClassId);
-      setSelectedSlot(periodSlots[0] ?? null);
+      const firstTeachingSlot = periodSlots.find((s) => !s.isBreak) ?? periodSlots[0] ?? null;
+      setSelectedSlot(firstTeachingSlot);
       setSubjectId(null);
       setTeacherId(null);
       setRoom("");
@@ -190,7 +195,7 @@ export function TimetableEntryModal({
     const payload: TimetableEntryPayload = {
       class_id: classId,
       day_of_week: dayOfWeek,
-      period_number: selectedSlot.number,
+      period_number: selectedSlot.periodNumber ?? selectedSlot.number,
       start_time: selectedSlot.startTime,
       end_time: selectedSlot.endTime,
       subject_id: subjectId,
@@ -257,7 +262,28 @@ export function TimetableEntryModal({
                     contentContainerStyle={styles.slotRow}
                   >
                     {periodSlots.map((slot) => {
-                      const active = selectedSlot?.number === slot.number;
+                      if (slot.isBreak) {
+                        return (
+                          <View
+                            key={`break-${slot.number}`}
+                            style={[
+                              styles.slotChip,
+                              { backgroundColor: "#FFF7ED", borderColor: "#FDBA74", opacity: 0.85 },
+                            ]}
+                          >
+                            <Text style={[styles.slotChipNum, { color: "#C2410C", fontSize: 11 }]}>
+                              ☕ {slot.label || "Break"}
+                            </Text>
+                            <Text style={[styles.slotChipTime, { color: "#9A3412" }]}>
+                              {fmt12(slot.startTime)}
+                            </Text>
+                          </View>
+                        );
+                      }
+                      const pNum = slot.periodNumber ?? slot.number;
+                      const active =
+                        (selectedSlot?.periodNumber ?? selectedSlot?.number) === pNum &&
+                        !selectedSlot?.isBreak;
                       return (
                         <Pressable
                           key={slot.number}
@@ -265,7 +291,7 @@ export function TimetableEntryModal({
                           style={[styles.slotChip, active && styles.slotChipActive]}
                         >
                           <Text style={[styles.slotChipNum, active && styles.slotChipNumActive]}>
-                            P{slot.number}
+                            P{pNum}
                           </Text>
                           <Text style={[styles.slotChipTime, active && styles.slotChipTimeActive]}>
                             {fmt12(slot.startTime)}
@@ -285,7 +311,7 @@ export function TimetableEntryModal({
                   <View style={styles.selectedSlotPill}>
                     <Ionicons name="time-outline" size={13} color={AppTheme.colors.primary} />
                     <Text style={styles.selectedSlotText}>
-                      Period {selectedSlot.number} · {fmt12(selectedSlot.startTime)} – {fmt12(selectedSlot.endTime)}
+                      Period {selectedSlot.periodNumber ?? selectedSlot.number} · {fmt12(selectedSlot.startTime)} – {fmt12(selectedSlot.endTime)}
                     </Text>
                   </View>
                 )}

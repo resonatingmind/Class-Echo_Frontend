@@ -497,7 +497,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
                               learningPlans={lps}
                               loading={isExLoading}
                               role="teacher"
-                              onAddRecording={(learningPlanId?: number, lectureTitle?: string) => {
+                              onAddRecording={(learningPlanId?: number, lectureTitle?: string, replaceRecordingId?: number) => {
                                 navigation.navigate("TeacherRecording", {
                                   subjectId,
                                   subjectName,
@@ -506,6 +506,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
                                   chapterName: item.name,
                                   learningPlanId,
                                   lectureTitle,
+                                  replaceRecordingId,
                                 });
                               }}
                               onAddLearningPlan={() => {

@@ -290,7 +290,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
     if (!session) return;
     try {
       let updated: RecordingWithReport | null = null;
-      if (session.role === 'school_admin') {
+      if (session.role === 'school_admin' || session.role === 'admin') {
         updated = await getSchoolRecordingDetail(session.token, recordingDetails.id);
       } else {
         updated = await getTeacherRecordingDetail(session.token, recordingDetails.id);
@@ -303,6 +303,10 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
       // ignore
     }
   }, [session, recordingDetails.id]);
+
+  useEffect(() => {
+    void fetchDetails();
+  }, [fetchDetails]);
 
   useFocusEffect(
     useCallback(() => {
@@ -466,6 +470,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
 
   const recording = { ...recordingDetails, status };
   const report = recording.report;
+  const overallScore = report?.overall_score ?? (recording as any).overall_score;
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.safe}>
@@ -583,21 +588,21 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
         ) : null}
 
         {/* Report */}
-        {recording.status === 'completed' && report ? (
+        {recording.status === 'completed' && (report || overallScore != null) ? (
           <View style={styles.reportWrap}>
             {/* Header + score */}
             <View style={styles.card}>
               <Text style={styles.cardHeading}>AI Performance Report</Text>
-              {report.overall_score != null ? (
-                <ScoreRing score={report.overall_score} />
+              {overallScore != null ? (
+                <ScoreRing score={overallScore} />
               ) : null}
-              {report.teaching_quality_notes ? (
+              {report?.teaching_quality_notes ? (
                 <Text style={styles.overallNotes}>{report.teaching_quality_notes}</Text>
               ) : null}
             </View>
 
             {/* Quantitative metrics */}
-            {report.quantitative_metrics ? (
+            {report?.quantitative_metrics ? (
               <View style={styles.card}>
                 <Text style={styles.sectionLabel}>KEY METRICS</Text>
                 <MetricsStrip q={report.quantitative_metrics} />
@@ -618,7 +623,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
             ) : null}
 
             {/* Per-dimension scores */}
-            {report.score_breakdown ? (
+            {report?.score_breakdown ? (
               <View style={styles.card}>
                 <Text style={styles.sectionLabel}>DIMENSION BREAKDOWN</Text>
                 {DIMENSIONS.map((dim) => {
@@ -631,27 +636,27 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
             ) : null}
 
             {/* Strengths + improvements */}
-            {report.quantitative_metrics &&
+            {report?.quantitative_metrics &&
             (report.quantitative_metrics.top_strengths.length > 0 ||
               report.quantitative_metrics.priority_improvements.length > 0) ? (
               <View style={styles.card}>
                 <BulletList
                   color="#127A40"
                   icon="checkmark-circle-outline"
-                  items={report.quantitative_metrics.top_strengths}
+                  items={report?.quantitative_metrics?.top_strengths || []}
                   title="Top Strengths"
                 />
                 <BulletList
                    color={AppTheme.colors.warning}
                   icon="arrow-up-circle-outline"
-                  items={report.quantitative_metrics.priority_improvements}
+                  items={report?.quantitative_metrics?.priority_improvements || []}
                   title="Priority Improvements"
                 />
               </View>
             ) : null}
 
             {/* ── RAG Evaluation Section ── */}
-            {(report.chapter_info || report.curriculum_coverage || report.accuracy_analysis || report.learning_objectives_achievement) ? (
+            {report && (report.chapter_info || report.curriculum_coverage || report.accuracy_analysis || report.learning_objectives_achievement) ? (
               <View style={styles.card}>
                 <Text style={styles.sectionLabel}>RAG-BASED EVALUATION</Text>
 

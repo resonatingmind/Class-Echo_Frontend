@@ -450,7 +450,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
                                     chapterName: item.name,
                                     subjectName,
                                     subjectId,
-                                    openUpload: item.document_count === 0,
+                                    initialTab: "documents",
                                   });
                                 }}
                               >
@@ -525,7 +525,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
                                   chapterName: item.name,
                                   subjectName,
                                   subjectId,
-                                  openUpload: true,
+                                  initialTab: "documents",
                                 });
                               }}
                               onViewRecordingReport={(rec) => {

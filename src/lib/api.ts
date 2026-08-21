@@ -1817,6 +1817,29 @@ export async function importSchoolSubjectLearningPlans(
   );
 }
 
+export async function importSchoolSubjectLearningPlansPhoto(
+  token: string,
+  subjectId: number,
+  fileUri: string,
+  mimeType: string,
+  fileName: string,
+): Promise<LearningPlanOut[]> {
+  const form = new FormData();
+  await appendFile(
+    form,
+    "file",
+    fileUri,
+    mimeType,
+    fileName,
+  );
+
+  return request<LearningPlanOut[]>(
+    `/school/subjects/${subjectId}/learning-plans/import-photo`,
+    { method: "POST", body: form },
+    token,
+  );
+}
+
 export async function importTeacherSubjectLearningPlans(
   token: string,
   subjectId: number,
@@ -1835,6 +1858,29 @@ export async function importTeacherSubjectLearningPlans(
 
   return request<LearningPlanOut[]>(
     `/teacher/subjects/${subjectId}/learning-plans/import`,
+    { method: "POST", body: form },
+    token,
+  );
+}
+
+export async function importTeacherSubjectLearningPlansPhoto(
+  token: string,
+  subjectId: number,
+  fileUri: string,
+  mimeType: string,
+  fileName: string,
+): Promise<LearningPlanOut[]> {
+  const form = new FormData();
+  await appendFile(
+    form,
+    "file",
+    fileUri,
+    mimeType,
+    fileName,
+  );
+
+  return request<LearningPlanOut[]>(
+    `/teacher/subjects/${subjectId}/learning-plans/import-photo`,
     { method: "POST", body: form },
     token,
   );

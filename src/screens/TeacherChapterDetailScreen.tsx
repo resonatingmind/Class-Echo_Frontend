@@ -66,7 +66,6 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
     chapterId,
     chapterName,
     subjectName,
-    openUpload,
     initialTab,
   } = route.params;
 
@@ -81,7 +80,7 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
   const [deletingLp, setDeletingLp] = useState(false);
 
   const [activeTab, setActiveTab] = useState<ActiveTab>(
-    initialTab || (openUpload ? "documents" : "planner"),
+    initialTab || "planner",
   );
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -263,15 +262,7 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
     }
   };
 
-  useEffect(() => {
-    if (!openUpload) return;
 
-    const timer = setTimeout(() => {
-      handlePickDocument();
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [openUpload, handlePickDocument]);
 
   const handleDeleteDocument = (doc: ChapterDocumentOut) => {
     Alert.alert(

@@ -68,7 +68,6 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
     chapterId,
     chapterName,
     subjectName,
-    openUpload,
   } = route.params;
 
   const [chapter, setChapter] = useState<ChapterOut | null>(null);
@@ -84,9 +83,7 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
   const [deletingLp, setDeletingLp] = useState(false);
   const [adminEmail, setAdminEmail] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<ActiveTab>(
-    openUpload ? "documents" : "planner",
-  );
+  const [activeTab, setActiveTab] = useState<ActiveTab>("planner");
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -275,15 +272,7 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
     }
   };
 
-  useEffect(() => {
-    if (!openUpload) return;
 
-    const timer = setTimeout(() => {
-      handlePickDocument();
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [openUpload]);
 
   const handleDeleteDocument = (doc: ChapterDocumentOut) => {
     Alert.alert(

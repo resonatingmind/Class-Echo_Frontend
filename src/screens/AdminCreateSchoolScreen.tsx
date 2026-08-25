@@ -22,6 +22,10 @@ import { AppLogo } from '../components/ui/AppLogo';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AdminCreateSchool'>;
 
+const EMAIL_RE = /\S+@\S+\.\S+/;
+
+type TeacherDraft = { key: string; name: string; email: string };
+
 function SectionLabel({ children }: { children: string }) {
   return (
     <View style={styles.sectionLabelRow}>
@@ -104,16 +108,44 @@ export function AdminCreateSchoolScreen({ navigation }: Props) {
   const [address, setAddress] = useState('');
   const [adminName, setAdminName] = useState('');
   const [adminEmail, setAdminEmail] = useState('');
-  const [adminPassword, setAdminPassword] = useState('');
+  // Teachers seeded at creation time. Each row is invited by email alongside
+  // the school admin, so an organisation can be stood up in one step.
+  const [teachers, setTeachers] = useState<TeacherDraft[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const emailValid = /\S+@\S+\.\S+/.test(adminEmail.trim());
+  const emailValid = EMAIL_RE.test(adminEmail.trim());
+
+  // Blank rows are ignored on submit, so only rows the admin actually filled in
+  // are allowed to block the button.
+  const filledTeachers = teachers.filter(
+    (t) => t.name.trim().length > 0 || t.email.trim().length > 0,
+  );
+  const teachersValid = filledTeachers.every(
+    (t) => t.name.trim().length > 1 && EMAIL_RE.test(t.email.trim()),
+  );
+  const duplicateEmail = (() => {
+    const all = [adminEmail, ...filledTeachers.map((t) => t.email)]
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean);
+    return new Set(all).size !== all.length;
+  })();
+
   const isValid =
     name.trim().length > 1 &&
     adminName.trim().length > 1 &&
     emailValid &&
-    adminPassword.length >= 6;
+    teachersValid &&
+    !duplicateEmail;
+
+  const addTeacherRow = () =>
+    setTeachers((rows) => [...rows, { key: `t${rows.length}-${rows.length + Date.now()}`, name: '', email: '' }]);
+
+  const updateTeacherRow = (key: string, patch: Partial<TeacherDraft>) =>
+    setTeachers((rows) => rows.map((r) => (r.key === key ? { ...r, ...patch } : r)));
+
+  const removeTeacherRow = (key: string) =>
+    setTeachers((rows) => rows.filter((r) => r.key !== key));
 
   const handleCreate = async () => {
     if (!session || !isValid || isSubmitting) return;
@@ -125,7 +157,10 @@ export function AdminCreateSchoolScreen({ navigation }: Props) {
         address: address.trim() || null,
         admin_name: adminName.trim(),
         admin_email: adminEmail.trim(),
-        admin_password: adminPassword,
+        teachers: filledTeachers.map((t) => ({
+          name: t.name.trim(),
+          email: t.email.trim(),
+        })),
       });
       navigation.replace('AdminSchoolDetail', { schoolId: school.id });
     } catch (err) {
@@ -217,7 +252,8 @@ export function AdminCreateSchoolScreen({ navigation }: Props) {
               <View style={styles.section}>
                 <SectionLabel>Initial School Admin</SectionLabel>
                 <Text style={styles.sectionHint}>
-                  These credentials will be sent to the school representative for first-time login.
+                  We email an invitation link to this address. The admin sets their
+                  own password when they accept, so no temporary password is needed.
                 </Text>
                 <View style={styles.sectionCard}>
                   <FormField
@@ -245,43 +281,73 @@ export function AdminCreateSchoolScreen({ navigation }: Props) {
                     textContentType="emailAddress"
                     value={adminEmail}
                   />
-                  <View style={styles.fieldDivider} />
-                  <FormField
-                    hint="Minimum 6 characters. Admin should change this on first login."
-                    label="Temporary Password"
-                    onChangeText={setAdminPassword}
-                    placeholder="Set a temporary password"
-                    secureTextEntry
-                    textContentType="newPassword"
-                    value={adminPassword}
-                  />
                 </View>
               </View>
 
-              {/* Password strength indicator */}
-              {adminPassword.length > 0 ? (
-                <View style={styles.strengthRow}>
-                  {[1, 2, 3].map((i) => (
-                    <View
-                      key={i}
-                      style={[
-                        styles.strengthBar,
-                        adminPassword.length >= i * 4 && styles.strengthBarFilled,
-                        adminPassword.length >= 12 && styles.strengthBarStrong,
-                      ]}
-                    />
-                  ))}
-                  <Text style={styles.strengthLabel}>
-                    {adminPassword.length < 6
-                      ? 'Too short'
-                      : adminPassword.length < 8
-                        ? 'Weak'
-                        : adminPassword.length < 12
-                          ? 'Good'
-                          : 'Strong'}
+              {/* Teachers */}
+              <View style={styles.section}>
+                <SectionLabel>Teachers (optional)</SectionLabel>
+                <Text style={styles.sectionHint}>
+                  Each teacher listed here gets their own invitation email. You can
+                  always add more later from the organisation page.
+                </Text>
+
+                {teachers.length > 0 ? (
+                  <View style={styles.sectionCard}>
+                    {teachers.map((row, index) => (
+                      <View key={row.key}>
+                        {index > 0 ? <View style={styles.fieldDivider} /> : null}
+                        <View style={styles.teacherRow}>
+                          <View style={styles.teacherFields}>
+                            <FormField
+                              autoCapitalize="words"
+                              label={`Teacher ${index + 1} name`}
+                              onChangeText={(v) => updateTeacherRow(row.key, { name: v })}
+                              placeholder="e.g. Priya Sharma"
+                              value={row.name}
+                            />
+                            <FormField
+                              autoCapitalize="none"
+                              keyboardType="email-address"
+                              label="Teacher email"
+                              onChangeText={(v) => updateTeacherRow(row.key, { email: v })}
+                              placeholder="teacher@school.edu"
+                              textContentType="emailAddress"
+                              value={row.email}
+                            />
+                          </View>
+                          <Pressable
+                            accessibilityLabel={`Remove teacher ${index + 1}`}
+                            hitSlop={8}
+                            onPress={() => removeTeacherRow(row.key)}
+                            style={styles.removeRowBtn}
+                          >
+                            <Ionicons
+                              color={AppTheme.colors.textSecondary}
+                              name="trash-outline"
+                              size={18}
+                            />
+                          </Pressable>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                ) : null}
+
+                <Pressable onPress={addTeacherRow} style={styles.addRowBtn}>
+                  <Ionicons color={AppTheme.colors.primary} name="add" size={18} />
+                  <Text style={styles.addRowText}>
+                    {teachers.length === 0 ? 'Add a teacher' : 'Add another teacher'}
                   </Text>
-                </View>
-              ) : null}
+                </Pressable>
+
+                {duplicateEmail ? (
+                  <Text style={styles.inlineWarning}>
+                    The same email address is listed more than once.
+                  </Text>
+                ) : null}
+              </View>
+
             </View>
           </View>
         </ScrollView>
@@ -314,6 +380,33 @@ const styles = StyleSheet.create({
   backBtnText: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body, fontWeight: '600' },
   titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 12 },
   flex: { flex: 1 },
+  teacherRow: { flexDirection: 'row', alignItems: 'flex-start', gap: AppTheme.spacing.s },
+  teacherFields: { flex: 1 },
+  removeRowBtn: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: AppTheme.spacing.xl,
+  },
+  addRowBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: AppTheme.spacing.m,
+    borderRadius: AppTheme.radius.medium,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: AppTheme.colors.border,
+    marginTop: AppTheme.spacing.s,
+  },
+  addRowText: { color: AppTheme.colors.primary, ...AppTheme.typography.body, fontWeight: '700' },
+  inlineWarning: {
+    color: '#B42318',
+    ...AppTheme.typography.caption,
+    marginTop: AppTheme.spacing.s,
+  },
   breadcrumb: {
     color: AppTheme.colors.textSecondary,
     fontSize: 10,

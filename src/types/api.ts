@@ -24,13 +24,39 @@ export type SchoolOut = {
   admin?: SchoolAdminOut | null;
 };
 
+export type TeacherInviteEntry = {
+  name: string;
+  email: string;
+};
+
 export type SchoolCreatePayload = {
   name: string;
   address?: string | null;
   logo_url?: string | null;
   admin_name: string;
   admin_email: string;
-  admin_password: string;
+  // The admin sets their own password from the emailed invite link, so no
+  // password is sent from here.
+  teachers?: TeacherInviteEntry[];
+};
+
+export type TeacherInviteResult = {
+  email: string;
+  name: string;
+  outcome: 'invited' | 'reinvited' | 'skipped';
+  teacher_id: number | null;
+  reason: string | null;
+};
+
+export type TeacherBulkInviteResponse = {
+  invited_count: number;
+  skipped_count: number;
+  results: TeacherInviteResult[];
+};
+
+export type AcceptInvitePayload = {
+  token: string;
+  password: string;
 };
 
 export type ClassOut = {
@@ -51,6 +77,8 @@ export type TeacherOut = {
   school_name: string | null;
   created_at: string;
   status: string;
+  email_verified?: boolean;
+  rejected_reason?: string | null;
 };
 
 export type TeacherBrief = {

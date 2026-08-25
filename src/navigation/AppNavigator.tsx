@@ -27,6 +27,7 @@ import { SchoolAdminTimetableScreen } from "../screens/SchoolAdminTimetableScree
 import { SchoolAdminProfileScreen } from "../screens/SchoolAdminProfileScreen";
 
 // Auth screens
+import { AcceptInviteScreen } from "../screens/AcceptInviteScreen";
 import { LoginScreen } from "../screens/LoginScreen";
 import { SignupScreen } from "../screens/SignupScreen";
 import { AwaitingApprovalScreen } from "../screens/AwaitingApprovalScreen";
@@ -47,6 +48,8 @@ export type RootStackParamList = {
   // Auth
   Login: undefined;
   Signup: undefined;
+  // token arrives as the ?token= query string on the emailed invite link.
+  AcceptInvite: { token?: string } | undefined;
   AwaitingApproval: undefined;
   // Super Admin
   AdminSchools: undefined;
@@ -172,6 +175,7 @@ export function AppNavigator() {
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Signup" component={SignupScreen} />
+          <Stack.Screen name="AcceptInvite" component={AcceptInviteScreen} />
         </>
       ) : (session.role === "school_admin" || session.role === "teacher") && session.status !== "active" ? (
         <Stack.Screen name="AwaitingApproval" component={AwaitingApprovalScreen} />

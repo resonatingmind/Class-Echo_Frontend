@@ -44,6 +44,7 @@ const linking = {
     screens: {
       Login: "login",
       Signup: "signup",
+      AcceptInvite: "accept-invite",
       AwaitingApproval: "awaiting-approval",
 
       SchoolAdminTabs: {

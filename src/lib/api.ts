@@ -35,6 +35,9 @@ import {
   TimetableEntryOut,
   TimetableEntryPayload,
   TimetableImportResult,
+  AcceptInvitePayload,
+  TeacherBulkInviteResponse,
+  TeacherInviteEntry,
 } from "../types/api";
 
 import { notifyUnauthorized } from "./authSession";
@@ -341,6 +344,69 @@ export async function createAdminSchool(
     },
     token,
   );
+}
+
+/* ── Organisation onboarding (super admin) ─────────────────────────────────── */
+
+export async function getAdminSchoolTeachers(
+  token: string,
+  schoolId: number,
+  status?: string,
+) {
+  const query = status ? `?status=${encodeURIComponent(status)}` : "";
+  return request<TeacherOut[]>(`/admin/schools/${schoolId}/teachers${query}`, {}, token);
+}
+
+export async function inviteAdminSchoolTeachers(
+  token: string,
+  schoolId: number,
+  teachers: TeacherInviteEntry[],
+) {
+  return request<TeacherBulkInviteResponse>(
+    `/admin/schools/${schoolId}/teachers/invite`,
+    { method: "POST", body: JSON.stringify({ teachers }) },
+    token,
+  );
+}
+
+export async function resendAdminSchoolAdminInvite(token: string, schoolId: number) {
+  return request<{ detail: string }>(
+    `/admin/schools/${schoolId}/admin/resend-invite`,
+    { method: "POST" },
+    token,
+  );
+}
+
+export async function resendAdminTeacherInvite(
+  token: string,
+  schoolId: number,
+  teacherId: number,
+) {
+  return request<{ detail: string }>(
+    `/admin/schools/${schoolId}/teachers/${teacherId}/resend-invite`,
+    { method: "POST" },
+    token,
+  );
+}
+
+export async function revokeAdminTeacherInvite(
+  token: string,
+  schoolId: number,
+  teacherId: number,
+) {
+  return request<void>(
+    `/admin/schools/${schoolId}/teachers/${teacherId}`,
+    { method: "DELETE" },
+    token,
+  );
+}
+
+/** Exchange an emailed invite token for a session by setting a password. */
+export async function acceptInvite(payload: AcceptInvitePayload) {
+  return request<TokenResponse>("/auth/accept-invite", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 }
 
 export async function getAdminSchool(token: string, schoolId: number) {

@@ -20,6 +20,7 @@ import { deleteAdminSchool, getAdminSchool, getAdminSchoolClasses, updateAdminSc
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { AppTheme } from '../theme/AppTheme';
 import { AppLogo } from '../components/ui/AppLogo';
+import { OrganisationTeachersSection } from '../components/admin/OrganisationTeachersSection';
 import { ClassOut, SchoolOut } from '../types/api';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AdminSchoolDetail'>;
@@ -587,6 +588,11 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
 
                   {/* Admin Contact */}
                   <AdminContact school={school} />
+
+                  {/* Teachers in this organisation */}
+                  {session ? (
+                    <OrganisationTeachersSection school={school} token={session.token} />
+                  ) : null}
 
                   {/* Academic Units */}
                   <View style={styles.unitsSection}>

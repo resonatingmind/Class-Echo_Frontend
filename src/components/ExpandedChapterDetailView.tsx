@@ -110,18 +110,29 @@ export function ExpandedChapterDetailView({
   );
 
   // Calculate stats
-  const gradedRecordings = recordings.filter(r => r.report?.overall_score != null);
+  const getRecScore = (r: RecordingWithReport) => r.report?.overall_score ?? (r as any).overall_score;
+  const gradedRecordings = recordings.filter(r => getRecScore(r) != null);
   const averageScore = gradedRecordings.length > 0
-    ? Math.round(gradedRecordings.reduce((sum, r) => sum + (r.report?.overall_score || 0), 0) / gradedRecordings.length)
+    ? Math.round(gradedRecordings.reduce((sum, r) => sum + (getRecScore(r) || 0), 0) / gradedRecordings.length)
     : null;
 
   return (
     <View style={styles.container}>
       <View style={[styles.statsBar, { justifyContent: "space-between" }]}>
-        <View style={styles.statItem}>
-          <Ionicons name="mic-outline" size={14} color="#64748B" />
-          <Text style={styles.statLabel}>Total Lectures:</Text>
-          <Text style={styles.statValue}>{titleRows.length + unassignedRecordings.length}</Text>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
+          <View style={styles.statItem}>
+            <Ionicons name="mic-outline" size={14} color="#64748B" />
+            <Text style={styles.statLabel}>Total Lectures:</Text>
+            <Text style={styles.statValue}>{titleRows.length + unassignedRecordings.length}</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Ionicons name="analytics-outline" size={14} color={getScoreColor(averageScore)} />
+            <Text style={styles.statLabel}>Avg Chapter Score:</Text>
+            <Text style={[styles.statValue, { color: getScoreColor(averageScore) }]}>
+              {averageScore != null ? `${averageScore}%` : "—"}
+            </Text>
+          </View>
         </View>
         {role === "teacher" && onAddLearningPlan ? (
           <Pressable style={styles.secondaryActionBtn} onPress={onAddLearningPlan}>
@@ -227,6 +238,14 @@ export function ExpandedChapterDetailView({
                       >
                         <Ionicons name="create-outline" size={15} color="#0284C7" />
                       </Pressable>
+                    ) : role === "teacher" && onAddRecording ? (
+                      <Pressable
+                        style={styles.subRecordBtn}
+                        onPress={() => onAddRecording(lp.id, lectureName)}
+                      >
+                        <Ionicons name="mic-outline" size={12} color="#ffffff" />
+                        <Text style={styles.subRecordText}>+ Audio</Text>
+                      </Pressable>
                     ) : (
                       <Text style={styles.emptyActionText}>—</Text>
                     )}
@@ -238,7 +257,7 @@ export function ExpandedChapterDetailView({
             /* One row per recording of this lecture */
             return recs.map((rec, recIdx) => {
               const statusStyle = getStatusStyle(rec.status);
-              const score = rec.report?.overall_score;
+              const score = rec.report?.overall_score ?? (rec as any).overall_score;
               const scoreCol = getScoreColor(score);
               const recTitle = rec.lecture_title?.trim();
               const canClick = Boolean(onViewRecordingReport);
@@ -283,8 +302,17 @@ export function ExpandedChapterDetailView({
                     </View>
                   </View>
 
-                  <View style={[{ flex: 0.8, alignItems: "center", justifyContent: "center" }, styles.cellCol]}>
-                    {recIdx === 0 && onEditLearningPlan ? (
+                  <View style={[{ flex: 0.8, alignItems: "center", justifyContent: "center", flexDirection: "row", gap: 4 }, styles.cellCol]}>
+                    {onViewRecordingReport ? (
+                      <Pressable
+                        style={styles.subReportBtn}
+                        onPress={() => onViewRecordingReport(rec)}
+                        hitSlop={6}
+                      >
+                        <Ionicons name="document-text-outline" size={12} color="#0284C7" />
+                        <Text style={styles.subReportText}>Report</Text>
+                      </Pressable>
+                    ) : recIdx === 0 && onEditLearningPlan ? (
                       <Pressable
                         style={styles.actionIconBtn}
                         onPress={() => onEditLearningPlan(lp)}
@@ -304,7 +332,7 @@ export function ExpandedChapterDetailView({
           {/* Unassigned recordings */}
           {unassignedRecordings.map((rec) => {
             const statusStyle = getStatusStyle(rec.status);
-            const score = rec.report?.overall_score;
+            const score = rec.report?.overall_score ?? (rec as any).overall_score;
             const scoreCol = getScoreColor(score);
             const displayTitle = rec.lecture_title?.trim() || `Lecture Audio #${rec.id}`;
             const canClick = Boolean(onViewRecordingReport);
@@ -339,7 +367,18 @@ export function ExpandedChapterDetailView({
                 </View>
 
                 <View style={[{ flex: 0.8, alignItems: "center", justifyContent: "center" }, styles.cellCol]}>
-                  <Text style={styles.emptyActionText}>—</Text>
+                  {onViewRecordingReport ? (
+                    <Pressable
+                      style={styles.subReportBtn}
+                      onPress={() => onViewRecordingReport(rec)}
+                      hitSlop={6}
+                    >
+                      <Ionicons name="document-text-outline" size={12} color="#0284C7" />
+                      <Text style={styles.subReportText}>Report</Text>
+                    </Pressable>
+                  ) : (
+                    <Text style={styles.emptyActionText}>—</Text>
+                  )}
                 </View>
               </View>
             );

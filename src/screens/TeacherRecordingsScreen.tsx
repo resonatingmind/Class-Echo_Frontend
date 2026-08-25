@@ -231,8 +231,8 @@ export function TeacherRecordingsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
-      <AdminNavbar title="Teacher" />
+    <SafeAreaView style={styles.safe} edges={["top"]}>
+      <AdminNavbar title="Recordings" onProfilePress={() => navigation.navigate("TeacherProfile" as never)} />
 
       <ScrollView
         contentContainerStyle={styles.scroll}

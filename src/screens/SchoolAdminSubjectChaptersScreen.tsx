@@ -352,7 +352,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
       if (navigation.canGoBack()) {
         navigation.goBack();
       } else {
-        navigation.navigate("SchoolAdminClasses");
+        navigation.navigate("SchoolAdminTabs", { screen: "SchoolAdminClasses" } as never);
       }
     } catch (e) {
       setSubjectDeleteError(e instanceof Error ? e.message : 'Could not delete subject.');
@@ -369,7 +369,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
           if (navigation.canGoBack()) {
             navigation.goBack();
           } else {
-            navigation.navigate("SchoolAdminClasses");
+            navigation.navigate("SchoolAdminTabs", { screen: "SchoolAdminClasses" } as never);
           }
         }}
         rightActions={

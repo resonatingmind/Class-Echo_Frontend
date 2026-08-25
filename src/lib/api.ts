@@ -41,19 +41,11 @@ import { notifyUnauthorized } from "./authSession";
 import { Platform } from "react-native";
 
 function getDefaultApiBaseUrl() {
-  if (typeof window !== "undefined" && window.location?.hostname) {
-    return `${window.location.protocol}//${window.location.hostname}:8000`;
-  }
-
-  if (Platform.OS === "android") {
-    return "http://10.0.2.2:8000";
-  }
-
-  return "http://localhost:8000";
+  return "https://class-echo-backend.onrender.com";
 }
 
 // Load from environment variable (Expo requires prefixing with EXPO_PUBLIC_)
-// Fall back to the current host on web, or the standard emulator host on Android.
+// Fall back to the deployed production backend.
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || getDefaultApiBaseUrl();
 
 class ApiError extends Error {
@@ -81,33 +73,44 @@ async function appendFile(
   fallbackPrefix: string,
 ) {
   const uploadUri = normalizeUploadUri(fileUri);
+
+  // Web and native need genuinely different bodies: a browser wants a real
+  // Blob, React Native wants a `{ uri, type, name }` descriptor. Branch on
+  // Platform.OS — the old sniff read `window.navigator.userAgent`, which React
+  // Native never defines, so every native upload took the browser branch. On
+  // iOS `fetch('file://…')` actually succeeds there, and the resulting Blob was
+  // then dropped by RN's FormData (it only understands `uri` descriptors),
+  // producing a body with no file at all and a 422 from the API.
+  if (Platform.OS === "web") {
+    try {
+      const response = await fetch(uploadUri);
+      const blob = await response.blob();
+      // The Blob is the only trustworthy source of the real format: a
+      // MediaRecorder clip is webm on Chrome no matter what the caller
+      // guessed, and storing webm bytes under an .m4a name makes the
+      // server-side analysis reject the audio later on.
+      const resolvedType = normalizeMimeType(uploadUri, blob.type || mimeType);
+      const ext = inferFileExtension(uploadUri, resolvedType);
+      const name = `${fallbackPrefix}_${Date.now()}.${ext}`;
+
+      debugLog("appendFile:web", { fieldName, uploadUri, resolvedType, ext });
+      form.append(
+        fieldName,
+        blob.type ? blob : new Blob([blob], { type: resolvedType }),
+        name,
+      );
+      return;
+    } catch (err) {
+      debugError("appendFile:web_fetch_failed", err);
+      throw new ApiError("Could not read the selected file for upload.", 0);
+    }
+  }
+
   const normalizedType = normalizeMimeType(uploadUri, mimeType);
   const ext = inferFileExtension(uploadUri, normalizedType);
   const name = `${fallbackPrefix}_${Date.now()}.${ext}`;
 
-  debugLog("appendFile", {
-    fieldName,
-    originalUri: fileUri,
-    uploadUri,
-    normalizedType,
-    ext,
-  });
-
-  if (
-    uploadUri.startsWith("blob:") ||
-    uploadUri.startsWith("data:") ||
-    (typeof window !== "undefined" &&
-      !window.navigator.userAgent?.includes("ReactNative"))
-  ) {
-    try {
-      const response = await fetch(uploadUri);
-      const blob = await response.blob();
-      form.append(fieldName, blob, name);
-      return;
-    } catch (err) {
-      debugError("appendFile:web_fetch_failed", err);
-    }
-  }
+  debugLog("appendFile:native", { fieldName, uploadUri, normalizedType, ext });
 
   form.append(fieldName, {
     uri: uploadUri,
@@ -165,22 +168,69 @@ function normalizeMimeType(fileUri: string, mimeType?: string | null) {
   }
 }
 
+// Extensions we are willing to trust when they appear on an incoming URI.
+// Sniffing "the text after the last dot" alone is not safe: a `blob:` or
+// `content://` URI has no extension, and its host/path fragment gets mistaken
+// for one.
+const KNOWN_UPLOAD_EXTENSIONS = new Set([
+  "jpg",
+  "jpeg",
+  "png",
+  "webp",
+  "mp3",
+  "mp4",
+  "m4a",
+  "wav",
+  "ogg",
+  "webm",
+  "aac",
+  "flac",
+  "pdf",
+  "docx",
+  "pptx",
+  "txt",
+]);
+
+const EXTENSION_BY_MIME_TYPE: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "audio/mpeg": "mp3",
+  "audio/mp3": "mp3",
+  "audio/mp4": "m4a",
+  "audio/x-m4a": "m4a",
+  "audio/wav": "wav",
+  "audio/x-wav": "wav",
+  "audio/ogg": "ogg",
+  "audio/webm": "webm",
+  "audio/aac": "aac",
+  "audio/flac": "flac",
+  "application/pdf": "pdf",
+  // Office types matter here: their MIME strings contain dots, so the generic
+  // "text after the slash" fallback produced filenames like
+  // "doc.vnd.openxmlformats-officedocument.wordprocessingml.document", which
+  // the server rejected as an unsupported extension.
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+    "docx",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+    "pptx",
+  "application/msword": "docx",
+  "application/vnd.ms-powerpoint": "pptx",
+  "text/plain": "txt",
+};
+
 function inferFileExtension(fileUri: string, mimeType: string) {
-  const fromUri = fileUri.split("?")[0]?.split(".").pop()?.toLowerCase();
-  if (fromUri && fromUri.length <= 5) {
+  const lastSegment = fileUri.split("?")[0]?.split("#")[0]?.split("/").pop() ?? "";
+  const fromUri = lastSegment.includes(".")
+    ? lastSegment.split(".").pop()?.toLowerCase()
+    : undefined;
+  if (fromUri && KNOWN_UPLOAD_EXTENSIONS.has(fromUri)) {
     return fromUri;
   }
 
-  switch (mimeType) {
-    case "image/jpeg":
-      return "jpg";
-    case "audio/mpeg":
-      return "mp3";
-    case "audio/mp4":
-      return "m4a";
-    default:
-      return mimeType.split("/")[1] ?? "bin";
-  }
+  return (
+    EXTENSION_BY_MIME_TYPE[mimeType] ?? mimeType.split("/")[1] ?? "bin"
+  );
 }
 
 async function request<T>(
@@ -1547,6 +1597,35 @@ export async function deleteTeacherChapterDocument(
     },
     token,
   );
+}
+
+/**
+ * Turn a stored media URL into something this client can actually fetch.
+ *
+ * When the backend has no object storage configured it saves uploads to its own
+ * disk and records an absolute loopback URL (`http://127.0.0.1:8000/uploads/…`).
+ * That address means "this device" to a phone or a browser, so playback failed
+ * for every locally stored recording. Loopback hosts are therefore rewritten
+ * onto the API base URL, which is the host actually serving those files.
+ */
+export function resolveMediaUrl(url: string | null | undefined) {
+  if (!url) {
+    return null;
+  }
+
+  const base = API_BASE_URL.replace(/\/+$/, "");
+  const loopback = url.match(
+    /^https?:\/\/(?:127\.0\.0\.1|localhost|0\.0\.0\.0)(?::\d+)?(\/.*)?$/i,
+  );
+  if (loopback) {
+    return `${base}${loopback[1] ?? ""}`;
+  }
+
+  if (/^https?:\/\//i.test(url)) {
+    return url;
+  }
+
+  return `${base}/${url.replace(/^\/+/, "")}`;
 }
 
 export { API_BASE_URL, ApiError };

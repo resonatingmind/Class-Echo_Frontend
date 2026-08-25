@@ -163,8 +163,8 @@ export function TeacherTimetableScreen() {
       : "Set by your school admin";
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
-      <AdminNavbar title="Teacher" />
+    <SafeAreaView style={styles.container} edges={["top"]}>
+      <AdminNavbar title="Timetable" />
 
       <ScrollView
         contentContainerStyle={styles.listContent}

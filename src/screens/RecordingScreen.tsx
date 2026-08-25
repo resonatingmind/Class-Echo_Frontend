@@ -36,7 +36,7 @@ import { colors } from '../theme/colors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'TeacherRecording'>;
 
-type RecordState = 'idle' | 'recording' | 'stopped';
+type RecordState = 'idle' | 'recording' | 'paused' | 'stopped';
 
 const RECORDER_OPTIONS = {
   ...RecordingPresets.HIGH_QUALITY,
@@ -90,6 +90,10 @@ export function RecordingScreen({ navigation, route }: Props) {
   const [uploadPhase, setUploadPhase] = useState<'idle' | 'sending' | 'finalizing' | 'done'>('idle');
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [recordedUri, setRecordedUri] = useState<string | null>(null);
+  // The actual container of the audio we are holding. Never guessed: guessing
+  // "audio/mp4" for a browser's webm clip makes the server store it under the
+  // wrong extension, and the analysis step then rejects the file.
+  const [recordedMimeType, setRecordedMimeType] = useState<string | null>(null);
   const [recordedDuration, setRecordedDuration] = useState(0);
   const [meterBars, setMeterBars] = useState<number[]>([]);
 
@@ -131,6 +135,8 @@ export function RecordingScreen({ navigation, route }: Props) {
   const [dictationError, setDictationError] = useState<string | null>(null);
   
   const recognitionRef = useRef<any>(null);
+  // Survives a failed upload so a retry does not create a second lecture.
+  const createdLearningPlanIdRef = useRef<number | null>(null);
   const isRecordingRef = useRef(false);
   const isDictatingEnabledRef = useRef(isDictatingEnabled);
 
@@ -230,6 +236,7 @@ export function RecordingScreen({ navigation, route }: Props) {
       await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
       setMeterBars([]);
       setRecordedUri(null);
+      setRecordedMimeType(null);
       setRecordedDuration(0);
       setLiveTranscript('');
       setInterimTranscript('');
@@ -252,6 +259,57 @@ export function RecordingScreen({ navigation, route }: Props) {
     }
   };
 
+  /* Pause keeps the same recorder session alive, so resumed audio is appended to
+     the very same file. The teacher ends up with one continuous lecture instead
+     of several clips that would each need their own upload and analysis. */
+  const pauseRecording = () => {
+    if (state !== 'recording') {
+      return;
+    }
+    try {
+      // Cleared before stopping dictation so the recognition 'onend' handler does
+      // not immediately restart it.
+      isRecordingRef.current = false;
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch {
+          // Dictation is best-effort; capturing the audio is what matters.
+        }
+      }
+      recorder.pause();
+      setInterimTranscript('');
+      setState('paused');
+    } catch {
+      Alert.alert('Error', 'Could not pause the recording.');
+    }
+  };
+
+  const resumeRecording = async () => {
+    if (state !== 'paused') {
+      return;
+    }
+    try {
+      // Reasserted because another app - or an incoming call - may have taken the
+      // audio session away while we were paused.
+      await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
+      isRecordingRef.current = true;
+      recorder.record();
+      setState('recording');
+
+      if (isSpeechSupported && isDictatingEnabled && recognitionRef.current) {
+        try {
+          recognitionRef.current.start();
+        } catch (e) {
+          console.error('Failed to restart speech recognition', e);
+        }
+      }
+    } catch {
+      isRecordingRef.current = false;
+      Alert.alert('Error', 'Could not resume the recording.');
+    }
+  };
+
   const stopRecording = async () => {
     try {
       isRecordingRef.current = false;
@@ -271,7 +329,12 @@ export function RecordingScreen({ navigation, route }: Props) {
         throw new Error('Missing recording file');
       }
       setRecordedUri(uri);
-      setRecordedDuration(nextState.durationMillis / 1000);
+      setRecordedMimeType(inferMimeTypeFromUri(uri));
+      // getStatus() reports 0ms once the recorder has been torn down on some
+      // platforms, which showed the finished clip as "0:00". The last polled
+      // state is the reliable figure in that case.
+      const measuredMillis = nextState.durationMillis || recorderState.durationMillis || 0;
+      setRecordedDuration(measuredMillis / 1000);
       try {
         previewPlayer.replace(uri);
       } catch {
@@ -297,7 +360,7 @@ export function RecordingScreen({ navigation, route }: Props) {
           // ignore
         }
       }
-      if (recorderState.isRecording) {
+      if (recorderState.isRecording || state === 'recording' || state === 'paused') {
         await recorder.stop();
       }
       await setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true });
@@ -321,6 +384,9 @@ export function RecordingScreen({ navigation, route }: Props) {
       if (!res.canceled && res.assets && res.assets.length > 0) {
         const file = res.assets[0];
         setRecordedUri(file.uri);
+        // The picker knows the real type; it used to be thrown away and
+        // replaced with a hardcoded guess at upload time.
+        setRecordedMimeType(inferMimeTypeFromUri(file.uri, file.mimeType));
         setRecordedDuration(0);
         // Only suggest a title while creating a new lecture — never overwrite the
         // title of a lecture that was already picked.
@@ -347,8 +413,10 @@ export function RecordingScreen({ navigation, route }: Props) {
     }
     isRecordingRef.current = false;
     setRecordedUri(null);
+    setRecordedMimeType(null);
     setRecordedDuration(0);
     setMeterBars([]);
+    createdLearningPlanIdRef.current = null;
     setLectureTitle(paramLectureTitle || '');
     setLectureTitleError(null);
     setLectureSelectError(null);
@@ -379,7 +447,15 @@ export function RecordingScreen({ navigation, route }: Props) {
   };
 
   const handleUpload = async () => {
-    if (!session || !recordedUri || uploading || !chapterId) {
+    if (!session || !recordedUri || uploading) {
+      return;
+    }
+    // Bailing out silently here left the teacher tapping Upload with nothing
+    // at all happening, and no clue why.
+    if (!chapterId) {
+      setUploadError(
+        'This recording is not linked to a chapter. Go back and start the recording from a chapter so the AI evaluation has something to compare against.',
+      );
       return;
     }
     let hasError = false;
@@ -400,7 +476,7 @@ export function RecordingScreen({ navigation, route }: Props) {
     setUploadError(null);
     setUploadPhase('sending');
     setUploadProgress(0);
-    const resolvedMime = inferMimeTypeFromUri(recordedUri, 'audio/mp4');
+    const resolvedMime = inferMimeTypeFromUri(recordedUri, recordedMimeType);
     const uploadUri = recordedUri.startsWith('/') ? `file://${recordedUri}` : recordedUri;
     console.log('[recording] upload:start', {
       subjectId,
@@ -422,19 +498,27 @@ export function RecordingScreen({ navigation, route }: Props) {
 
       if (creatingNewLecture) {
         targetLectureTitle = lectureTitle.trim();
-        const createdPlan = await createTeacherLearningPlan(
-          session.token,
-          subjectId,
-          chapterId,
-          {
-            // A lecture created straight from an upload happened today, so it
-            // lands in the planner dated instead of blank.
-            date: todayIsoDate(),
-            topic_name: paramChapterName || targetLectureTitle,
-            sub_topic: targetLectureTitle,
-          },
-        );
-        targetLearningPlanId = createdPlan.id;
+        // Reuse the plan from an earlier failed attempt. Creating a new one on
+        // every retry littered the planner with duplicate lectures that the
+        // teacher then had to clean up by hand.
+        if (createdLearningPlanIdRef.current) {
+          targetLearningPlanId = createdLearningPlanIdRef.current;
+        } else {
+          const createdPlan = await createTeacherLearningPlan(
+            session.token,
+            subjectId,
+            chapterId,
+            {
+              // A lecture created straight from an upload happened today, so it
+              // lands in the planner dated instead of blank.
+              date: todayIsoDate(),
+              topic_name: paramChapterName || targetLectureTitle,
+              sub_topic: targetLectureTitle,
+            },
+          );
+          createdLearningPlanIdRef.current = createdPlan.id;
+          targetLearningPlanId = createdPlan.id;
+        }
       }
 
       await uploadRecording(
@@ -489,7 +573,7 @@ export function RecordingScreen({ navigation, route }: Props) {
       <View style={styles.header}>
         <Pressable
           hitSlop={8}
-          onPress={state === 'recording' ? () => void cancelRecording() : () => {
+          onPress={state === 'recording' || state === 'paused' ? () => void cancelRecording() : () => {
             if (navigation.canGoBack()) {
               navigation.goBack();
             } else {
@@ -580,28 +664,30 @@ export function RecordingScreen({ navigation, route }: Props) {
           </>
         ) : null}
 
-        {state === 'recording' ? (
+        {state === 'recording' || state === 'paused' ? (
           <>
             <View style={styles.recordingTop}>
               <View style={styles.liveRow}>
-                <View style={styles.liveDot} />
-                <Text style={styles.liveLabel}>RECORDING</Text>
+                <View style={[styles.liveDot, state === 'paused' && styles.pausedDot]} />
+                <Text style={[styles.liveLabel, state === 'paused' && styles.pausedLabel]}>
+                  {state === 'paused' ? 'PAUSED' : 'RECORDING'}
+                </Text>
               </View>
               <Text style={styles.timerText}>
                 {formatAudioTime(recorderState.durationMillis / 1000)}
               </Text>
             </View>
 
-            <View style={styles.waveformCard}>
+            <View style={[styles.waveformCard, state === 'paused' && styles.waveformCardPaused]}>
               <AudioWaveform
-                activeColor="#E53935"
+                activeColor={state === 'paused' ? '#94A3B8' : '#E53935'}
                 bars={previewBars}
-                inactiveColor="#FAD4D4"
+                inactiveColor={state === 'paused' ? '#E2E8F0' : '#FAD4D4'}
                 progress={1}
               />
             </View>
 
-            {isSpeechSupported && isDictatingEnabled && (
+            {isSpeechSupported && isDictatingEnabled && state === 'recording' && (
               <View style={styles.dictationCard}>
                 <View style={styles.dictationHeader}>
                   <Ionicons name="chatbubble-ellipses" size={16} color={dictationError ? '#E53935' : AppTheme.colors.primary} />
@@ -629,10 +715,34 @@ export function RecordingScreen({ navigation, route }: Props) {
               </View>
             )}
 
+            {state === 'paused' ? (
+              <Text style={styles.pausedHint}>
+                Recording is paused. Resume to continue the same lecture file.
+              </Text>
+            ) : null}
+
             <View style={styles.recordingActions}>
-              <Pressable onPress={() => void cancelRecording()} style={styles.cancelBtn}>
+              {/* Icon-only on phones: three labelled buttons do not fit side by side. */}
+              <Pressable
+                accessibilityLabel="Discard recording"
+                onPress={() => void cancelRecording()}
+                style={[styles.cancelBtn, isMobile && styles.iconOnlyBtn]}
+              >
                 <Ionicons color={AppTheme.colors.textSecondary} name="close" size={22} />
-                <Text style={styles.cancelBtnText}>Discard</Text>
+                {!isMobile ? <Text style={styles.cancelBtnText}>Discard</Text> : null}
+              </Pressable>
+              <Pressable
+                onPress={() => (state === 'paused' ? void resumeRecording() : pauseRecording())}
+                style={[styles.pauseBtn, state === 'paused' && styles.resumeBtn]}
+              >
+                <Ionicons
+                  color={state === 'paused' ? '#fff' : '#B45309'}
+                  name={state === 'paused' ? 'play' : 'pause'}
+                  size={20}
+                />
+                <Text style={[styles.pauseBtnText, state === 'paused' && styles.resumeBtnText]}>
+                  {state === 'paused' ? 'Resume' : 'Pause'}
+                </Text>
               </Pressable>
               <Pressable onPress={() => void stopRecording()} style={styles.stopBtn}>
                 <View style={styles.stopIcon} />
@@ -933,7 +1043,32 @@ const styles = StyleSheet.create({
     borderColor: '#F0D0D0',
     backgroundColor: '#FFF6F6',
   },
+  pausedDot: { backgroundColor: '#B45309' },
+  pausedLabel: { color: '#B45309' },
+  waveformCardPaused: { borderColor: '#E2E8F0', backgroundColor: '#F8FAFC' },
+  pausedHint: {
+    textAlign: 'center',
+    fontSize: 13,
+    color: AppTheme.colors.textSecondary,
+    marginBottom: 4,
+  },
   recordingActions: { flexDirection: 'row', gap: 12 },
+  pauseBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#FCD34D',
+    backgroundColor: '#FFFBEB',
+    paddingVertical: 16,
+  },
+  pauseBtnText: { color: '#B45309', fontSize: 15, fontWeight: '800' },
+  iconOnlyBtn: { flex: 0, paddingHorizontal: 18 },
+  resumeBtn: { borderColor: '#127A40', backgroundColor: '#127A40' },
+  resumeBtnText: { color: '#fff' },
   cancelBtn: {
     flex: 1,
     flexDirection: 'row',

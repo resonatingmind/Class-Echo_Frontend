@@ -324,7 +324,7 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
           if (navigation.canGoBack()) {
             navigation.goBack();
           } else {
-            navigation.navigate("SchoolAdminClasses");
+            navigation.navigate("SchoolAdminTabs", { screen: "SchoolAdminClasses" } as never);
           }
         }}
         rightActions={

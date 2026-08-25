@@ -160,7 +160,8 @@ export function AppNavigator() {
     return null;
   }
   return (
-    <Stack.Navigator id="AppNavigator.tsx" 
+    <Stack.Navigator
+      id="RootStack"
       screenOptions={{
         headerShown: false,
         contentStyle: { backgroundColor: "#FAF9F9" },
@@ -206,22 +207,7 @@ export function AppNavigator() {
             component={SchoolAdminTabNavigator}
           />
 
-          {/* Other Screens */}
-          <Stack.Screen
-            name="SchoolAdminClasses"
-            component={SchoolAdminClassesScreen}
-          />
-
-          <Stack.Screen
-            name="SchoolAdminPlanner"
-            component={SchoolAdminPlannerScreen}
-          />
-
-          <Stack.Screen
-            name="SchoolAdminTimetable"
-            component={SchoolAdminTimetableScreen}
-          />
-
+          {/* Detail & Secondary Screens */}
           <Stack.Screen
             name="SchoolAdminClassDetail"
             component={SchoolAdminClassDetailScreen}

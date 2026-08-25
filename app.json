@@ -3,6 +3,7 @@
     "name": "Class Echo",
     "slug": "class-echo",
     "version": "1.0.0",
+    "scheme": "classecho",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,9 +15,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.iamharry.classecho",
+      "bundleIdentifier": "com.classecho.app",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSMicrophoneUsageDescription": "Class Echo uses the microphone to record your classroom lectures so they can be transcribed and evaluated."
       }
     },
     "android": {
@@ -26,7 +28,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.iamharry.classecho",
+      "package": "com.classecho.app",
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
@@ -35,19 +37,31 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "extra": {
-      "eas": {
-        "projectId": "e3d6e184-4383-4bd2-a542-4dd561d0adb3"
-      }
-    },
-    "owner": "iamharry",
     "plugins": [
-      "expo-audio",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Class Echo uses the microphone to record your classroom lectures so they can be transcribed and evaluated."
+        }
+      ],
       "expo-secure-store",
       "./plugins/withCleartextTraffic",
       "@react-native-community/datetimepicker",
       "expo-font",
       "expo-asset"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "d3ab77a1-01f5-40b7-bce3-173d26fe25f9"
+      }
+    }
   }
 }

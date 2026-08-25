@@ -17,7 +17,8 @@ import { AppNavigator } from './src/navigation/AppNavigator';
 import { colors } from './src/theme/colors';
 import * as Linking from "expo-linking";
 
-SplashScreen.preventAutoHideAsync();
+// Prevent auto hiding the splash screen, catching any possible native startup rejection
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 const navigationTheme = {
   ...DefaultTheme,
@@ -32,118 +33,63 @@ const navigationTheme = {
   },
 };
 
-
-
-// const linking = {
-//   prefixes: [Linking.createURL("/")],
-
-//   config: {
-//     screens: {
-//       Login: "login",
-//       Signup: "signup",
-
-//       SchoolAdminDashboard: "dashboard",
-//       SchoolAdminTeachers: "teachers",
-//       SchoolAdminStudents: "students",
-//       SchoolAdminProfile: "profile",
-
-//       SchoolAdminTeacherDetail: "teacher/:teacherId",
-//       SchoolAdminTeacherAnalytics: "teacher/:teacherId/analytics",
-//       SchoolAdminClassDetail: "class/:classId",
-
-//       TeacherSubjects: "teacher",
-//       StudentHome: "student",
-//     },
-//   },
-// };
-
-// const linking = {
-//   prefixes: [Linking.createURL("/")],
-
-//   config: {
-//     screens: {
-//       Login: "login",
-//       Signup: "signup",
-
-//       SchoolAdminTabs: {
-//         screens: {
-//           SchoolAdminDashboard: "dashboard",
-//           SchoolAdminTeachers: "teachers",
-//           SchoolAdminStudents: "students",
-//           SchoolAdminProfile: "profile",
-//         },
-//       },
-
-//       SchoolAdminTeacherDetail: "teacher/:teacherId",
-//       SchoolAdminTeacherAnalytics: "teacher/:teacherId/analytics",
-//       SchoolAdminTeacherRecordings: "teacher/:teacherId/recordings",
-
-//       SchoolAdminClassDetail: "class/:classId",
-
-//       TeacherSubjects: "teacher",
-//       TeacherProfile: "teacher/profile",
-
-//       StudentHome: "student",
-//       StudentProfile: "student/profile",
-//     },
-//   },
-// };
-
 const linking = {
-  prefixes: [Linking.createURL("/"), window.location.origin],
+  prefixes: [
+    "classecho://",
+    Linking.createURL("/"),
+    ...(typeof window !== "undefined" && window.location?.origin ? [window.location.origin] : []),
+  ],
 
   config: {
     screens: {
       Login: "login",
       Signup: "signup",
+      AwaitingApproval: "awaiting-approval",
 
       SchoolAdminTabs: {
-        path: "",
         screens: {
           SchoolAdminDashboard: "dashboard",
+          SchoolAdminClasses: "classes",
           SchoolAdminTeachers: "teachers",
-          SchoolAdminStudents: "students",
-          SchoolAdminProfile: "profile",
+          SchoolAdminPlanner: "planner",
+          SchoolAdminTimetable: "timetable",
         },
       },
 
-      SchoolAdminClasses: "classes",
+      SchoolAdminClassDetail: "admin/class/:classId",
+      SchoolAdminTeacherDetail: "admin/teacher/:teacherId",
+      SchoolAdminTeacherAnalytics: "admin/teacher/:teacherId/analytics",
+      SchoolAdminTeacherRecordings: "admin/teacher/:teacherId/recordings",
+      SchoolAdminSubjectChapters: "admin/subject/:subjectId/chapters",
+      SchoolAdminChapterDetail: "admin/chapter/:chapterId",
+      SchoolAdminProfile: "admin/profile",
 
-      SchoolAdminClassDetail: "class/:classId",
+      TeacherTabs: {
+        screens: {
+          TeacherDashboard: "teacher/dashboard",
+          TeacherHome: "teacher/subjects",
+          TeacherTimetable: "teacher/timetable",
+          TeacherRecordings: "teacher/recordings",
+        },
+      },
 
-      SchoolAdminTeacherDetail: "teacher/:teacherId",
-
-      SchoolAdminTeacherAnalytics: "teacher/:teacherId/analytics",
-
-      SchoolAdminTeacherRecordings: "teacher/:teacherId/recordings",
-
-      SchoolAdminSubjectDetail: "subject/:subjectId",
-
-      SchoolAdminSubjectChapters: "subject/:subjectId/chapters",
-
-      SchoolAdminChapterDetail: "chapter/:chapterId",
-
-      TeacherSubjects: "teacher",
-
-      TeacherSubjectDetail: "teacher/subject/:subjectId",
-
+      TeacherSubjectWorkspace: "teacher/subject/:subjectId/workspace",
+      TeacherChapterDetail: "teacher/chapter/:chapterId",
       TeacherRecording: "teacher/recording",
-
       TeacherProfile: "teacher/profile",
 
       StudentHome: "student",
-
       StudentSubjectDetail: "student/subject/:subjectId",
-
       StudentProfile: "student/profile",
+
+      RecordingDetail: "recording/detail",
     },
   },
 };
 
-
 export default function App() {
   const navigationRef = useRef<NavigationContainerRef<any>>(null);
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
@@ -153,12 +99,12 @@ export default function App() {
   });
 
   useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
+    if (fontsLoaded || fontError) {
+      SplashScreen.hideAsync().catch(() => {});
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, fontError]);
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded && !fontError) {
     return null;
   }
 
@@ -169,11 +115,6 @@ export default function App() {
           ref={navigationRef}
           theme={navigationTheme}
           linking={linking}
-          onStateChange={() => {
-            console.log(
-              JSON.stringify(navigationRef.current?.getRootState(), null, 2),
-            );
-          }}
         >
           <StatusBar style="dark" />
           <AppNavigator />

@@ -235,7 +235,7 @@ export function TeacherSubjectsScreen({ navigation }: Props) {
   ]);
 
   return (
-    <SafeAreaView edges={["top", "bottom"]} style={styles.safe}>
+    <SafeAreaView edges={["top"]} style={styles.safe}>
       <AdminNavbar title="Subjects" onProfilePress={() => navigation.navigate("TeacherProfile" as never)} />
       <View style={styles.flex}>
 

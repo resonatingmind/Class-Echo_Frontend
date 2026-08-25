@@ -59,7 +59,7 @@ export function SchoolAdminDashboardScreen({ navigation }: Props) {
   };
 
   return (
-    <SafeAreaView edges={["top", "bottom"]} style={styles.safe}>
+    <SafeAreaView edges={["top"]} style={styles.safe}>
       {/* Header */}
       <AdminNavbar title="School Admin" />
 

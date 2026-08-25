@@ -42,7 +42,7 @@ export function AdminNavbar({ title, rightActions, onBack, onProfilePress }: Pro
           <AppLogo showText={false} />
         )}
       </View>
-      <Text style={styles.headerTitle} numberOfLines={1}>{isMobile ? "" : title}</Text>
+      <Text style={[styles.headerTitle, isMobile && styles.headerTitleMobile]} numberOfLines={1}>{title}</Text>
       <View style={styles.headerRight}>
         {rightActions}
         <Pressable onPress={handleProfilePress} style={styles.iconBtn}>
@@ -68,10 +68,14 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   headerTitle: {
-    flex: 2,
+    flex: 3,
     textAlign: "center",
     color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.heading3,
+  },
+  headerTitleMobile: {
+    fontSize: 16,
+    lineHeight: 22,
   },
   headerRight: {
     flex: 1,

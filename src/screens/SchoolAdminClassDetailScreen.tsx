@@ -397,7 +397,7 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
         title={`${className} ${section || ""}`}
         onBack={() => {
           if (navigation.canGoBack()) navigation.goBack();
-          else navigation.navigate("SchoolAdminClasses");
+          else navigation.navigate("SchoolAdminTabs", { screen: "SchoolAdminClasses" } as never);
         }}
       />
 

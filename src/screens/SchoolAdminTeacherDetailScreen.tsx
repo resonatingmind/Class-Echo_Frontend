@@ -163,12 +163,13 @@ try {
   const handleReject = async () => {
     if (!session || !teacher) return;
     const action = () => {
-      let reason: string | null = null;
       if (Platform.OS === "web") {
-        reason = window.prompt("Enter reason for declining:") || null;
+        const reason = typeof window !== "undefined" && window.prompt
+          ? window.prompt("Enter reason for declining:")
+          : null;
         if (reason === null) return; // Cancelled
         void executeReject(reason);
-      } else {
+      } else if (Platform.OS === "ios" && typeof Alert.prompt === "function") {
         Alert.prompt(
           "Decline Request",
           "Enter reason for declining this teacher registration request:",
@@ -181,6 +182,19 @@ try {
             },
           ],
           "plain-text"
+        );
+      } else {
+        Alert.alert(
+          "Decline Request",
+          "Are you sure you want to decline this teacher registration request?",
+          [
+            { text: "Cancel", style: "cancel" },
+            {
+              text: "Decline",
+              style: "destructive",
+              onPress: () => void executeReject("Application declined by administrator"),
+            },
+          ]
         );
       }
     };

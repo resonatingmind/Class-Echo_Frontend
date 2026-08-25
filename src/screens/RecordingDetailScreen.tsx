@@ -26,7 +26,7 @@ import {
 } from '../components/RAGReportSections';
 import { useAuth } from '../context/AuthContext';
 import {
-  API_BASE_URL,
+  resolveMediaUrl,
   archiveTeacherRecording,
   deleteTeacherRecording,
   getSchoolRecordingDetail,
@@ -321,9 +321,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
 
   // Relative storage paths have to resolve against whichever backend this build
   // points at — a hardcoded localhost never works in a packaged APK.
-  const audioUrl = recordingDetails.cloudinary_url.startsWith("http")
-    ? recordingDetails.cloudinary_url
-    : `${API_BASE_URL}/${recordingDetails.cloudinary_url.replace(/^\/+/, "")}`;
+  const audioUrl = resolveMediaUrl(recordingDetails.cloudinary_url) ?? '';
 
   const player = useAudioPlayer(audioUrl, {
     updateInterval: 200,

@@ -17,6 +17,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { EmailDeliveryCard } from "../components/admin/EmailDeliveryCard";
 import { AppLogo } from "../components/ui/AppLogo";
 import { useAuth } from "../context/AuthContext";
 import { getAdminSchools, deleteAdminSchool, suspendAdminSchool, reactivateAdminSchool } from "../lib/api";
@@ -304,6 +305,9 @@ export function SchoolsScreen({ navigation }: Props) {
                   </View>
                 ) : null}
               </View>
+
+              {/* Whether invitations can actually be delivered from here */}
+              {session ? <EmailDeliveryCard token={session.token} /> : null}
 
               {/* Search */}
               <View style={styles.searchBar}>

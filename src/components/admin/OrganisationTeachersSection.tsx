@@ -12,14 +12,17 @@ import {
 } from 'react-native';
 
 import {
+  activateAdminTeacher,
   getAdminSchoolTeachers,
   inviteAdminSchoolTeachers,
   resendAdminSchoolAdminInvite,
   resendAdminTeacherInvite,
   revokeAdminTeacherInvite,
+  setAdminTeacherPassword,
 } from '../../lib/api';
 import { AppTheme } from '../../theme/AppTheme';
 import { SchoolOut, TeacherInviteResult, TeacherOut } from '../../types/api';
+import { SetPasswordModal, SetPasswordSubmit } from './SetPasswordModal';
 
 const EMAIL_RE = /\S+@\S+\.\S+/;
 
@@ -66,6 +69,10 @@ export function OrganisationTeachersSection({
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [inviting, setInviting] = useState(false);
   const [inviteResults, setInviteResults] = useState<TeacherInviteResult[] | null>(null);
+
+  const [passwordTarget, setPasswordTarget] = useState<TeacherOut | null>(null);
+  const [passwordBusy, setPasswordBusy] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setIsLoading(true);
@@ -162,6 +169,40 @@ export function OrganisationTeachersSection({
       await load();
     } catch (err) {
       setLoadError(err instanceof Error ? err.message : 'Could not withdraw the invitation');
+    } finally {
+      setRowBusy(null);
+    }
+  };
+
+  const handleSetPassword = async (values: SetPasswordSubmit) => {
+    if (!passwordTarget) return;
+    setPasswordBusy(true);
+    setPasswordError(null);
+    try {
+      const res = await setAdminTeacherPassword(token, school.id, passwordTarget.id, {
+        new_password: values.newPassword,
+        admin_password: values.adminPassword,
+        activate: values.activate,
+      });
+      setPasswordTarget(null);
+      setNotice(res.detail);
+      await load();
+    } catch (err) {
+      setPasswordError(err instanceof Error ? err.message : 'Could not set the password');
+    } finally {
+      setPasswordBusy(false);
+    }
+  };
+
+  const handleActivate = async (teacher: TeacherOut) => {
+    setRowBusy(teacher.id);
+    setNotice(null);
+    try {
+      const updated = await activateAdminTeacher(token, school.id, teacher.id);
+      setNotice(`${updated.name} is now active.`);
+      await load();
+    } catch (err) {
+      setLoadError(err instanceof Error ? err.message : 'Could not activate this teacher');
     } finally {
       setRowBusy(null);
     }
@@ -269,33 +310,70 @@ export function OrganisationTeachersSection({
                   </Text>
                 </View>
                 <StatusPill status={teacher.status} />
-                {teacher.status === 'invited' ? (
-                  rowBusy === teacher.id ? (
-                    <ActivityIndicator color={AppTheme.colors.primary} size="small" />
-                  ) : (
-                    <View style={styles.rowActions}>
+                {rowBusy === teacher.id ? (
+                  <ActivityIndicator color={AppTheme.colors.primary} size="small" />
+                ) : (
+                  <View style={styles.rowActions}>
+                    {teacher.status === 'invited' ? (
+                      <>
+                        <Pressable
+                          hitSlop={6}
+                          onPress={() => void handleResendTeacher(teacher)}
+                          style={styles.linkBtn}
+                        >
+                          <Text style={styles.linkBtnText}>Resend</Text>
+                        </Pressable>
+                        <Pressable
+                          hitSlop={6}
+                          onPress={() => void handleRevoke(teacher)}
+                          style={styles.linkBtn}
+                        >
+                          <Text style={[styles.linkBtnText, styles.destructive]}>Revoke</Text>
+                        </Pressable>
+                      </>
+                    ) : null}
+                    {/* An invited teacher has no password yet, so activating
+                        them would strand the account — they get a password
+                        instead, which activates them in the same step. */}
+                    {teacher.status !== 'active' && teacher.status !== 'invited' ? (
                       <Pressable
                         hitSlop={6}
-                        onPress={() => void handleResendTeacher(teacher)}
+                        onPress={() => void handleActivate(teacher)}
                         style={styles.linkBtn}
                       >
-                        <Text style={styles.linkBtnText}>Resend</Text>
+                        <Text style={styles.linkBtnText}>Activate</Text>
                       </Pressable>
-                      <Pressable
-                        hitSlop={6}
-                        onPress={() => void handleRevoke(teacher)}
-                        style={styles.linkBtn}
-                      >
-                        <Text style={[styles.linkBtnText, styles.destructive]}>Revoke</Text>
-                      </Pressable>
-                    </View>
-                  )
-                ) : null}
+                    ) : null}
+                    <Pressable
+                      hitSlop={6}
+                      onPress={() => {
+                        setPasswordError(null);
+                        setPasswordTarget(teacher);
+                      }}
+                      style={styles.linkBtn}
+                    >
+                      <Text style={styles.linkBtnText}>
+                        {teacher.status === 'invited' ? 'Set password' : 'Reset password'}
+                      </Text>
+                    </Pressable>
+                  </View>
+                )}
               </View>
             </View>
           ))}
         </View>
       )}
+
+      <SetPasswordModal
+        busy={passwordBusy}
+        canActivate={passwordTarget?.status !== 'active'}
+        error={passwordError}
+        onClose={() => setPasswordTarget(null)}
+        onSubmit={(values) => void handleSetPassword(values)}
+        subjectEmail={passwordTarget?.email ?? ''}
+        subjectName={passwordTarget?.name ?? ''}
+        visible={passwordTarget !== null}
+      />
 
       <Modal animationType="fade" transparent visible={showInvite}>
         <View style={styles.modalBackdrop}>
@@ -510,7 +588,7 @@ const styles = StyleSheet.create({
   rowInfo: { flex: 1, minWidth: 0, gap: 2 },
   rowName: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.label },
   rowEmail: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.caption },
-  rowActions: { flexDirection: 'row', gap: AppTheme.spacing.m },
+  rowActions: { flexDirection: 'row', gap: AppTheme.spacing.m, flexWrap: 'wrap', justifyContent: 'flex-end' },
   pill: {
     paddingHorizontal: AppTheme.spacing.s,
     paddingVertical: 4,

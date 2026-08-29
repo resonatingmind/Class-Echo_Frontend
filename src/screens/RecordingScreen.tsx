@@ -2,15 +2,7 @@ import { AppTheme } from '../theme/AppTheme';
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import {
-  RecordingPresets,
-  requestRecordingPermissionsAsync,
-  setAudioModeAsync,
-  useAudioPlayer,
-  useAudioPlayerStatus,
-  useAudioRecorder,
-  useAudioRecorderState,
-} from 'expo-audio';
+import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import {
   ActivityIndicator,
   Alert,
@@ -29,6 +21,17 @@ import * as DocumentPicker from 'expo-document-picker';
 import { AudioWaveform } from '../components/AudioWaveform';
 import { useAuth } from '../context/AuthContext';
 import { formatAudioTime, inferMimeTypeFromUri, normalizeMeteringValue } from '../lib/audio';
+import { buildAudioBlobUrl, clearAudioChunks } from '../lib/audioChunkStore';
+import {
+  RecordingDraft,
+  RecordingDraftAudio,
+  clearRecordingDraft,
+  createDraftId,
+  draftHasContent,
+  loadRecordingDraft,
+  saveRecordingDraft,
+} from '../lib/recordingDraft';
+import { useLectureRecorder } from '../lib/useLectureRecorder';
 import { uploadRecording, getTeacherLearningPlans, createTeacherLearningPlan } from '../lib/api';
 import { LearningPlanOut } from '../types/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -38,10 +41,12 @@ type Props = NativeStackScreenProps<RootStackParamList, 'TeacherRecording'>;
 
 type RecordState = 'idle' | 'recording' | 'paused' | 'stopped';
 
-const RECORDER_OPTIONS = {
-  ...RecordingPresets.HIGH_QUALITY,
-  isMeteringEnabled: true,
-};
+/* How often the in-progress lecture is mirrored to durable storage. The audio
+   itself is staged continuously by the recorder; this only covers the metadata,
+   the typed fields and the dictation transcript. */
+const DRAFT_AUTOSAVE_MS = 5000;
+/* Older than this and the teacher has moved on; offering it back would be noise. */
+const DRAFT_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
 /* Local calendar day, not UTC — a late-evening class in IST must not be dated
    as the previous day. */
@@ -75,8 +80,8 @@ export function RecordingScreen({ navigation, route }: Props) {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
 
-  const recorder = useAudioRecorder(RECORDER_OPTIONS);
-  const recorderState = useAudioRecorderState(recorder, 120);
+  const recorder = useLectureRecorder();
+  const recorderState = recorder.status;
   const previewPlayer = useAudioPlayer(null, { updateInterval: 180 });
   const previewStatus = useAudioPlayerStatus(previewPlayer);
 
@@ -96,6 +101,11 @@ export function RecordingScreen({ navigation, route }: Props) {
   const [recordedMimeType, setRecordedMimeType] = useState<string | null>(null);
   const [recordedDuration, setRecordedDuration] = useState(0);
   const [meterBars, setMeterBars] = useState<number[]>([]);
+  // Alert.alert is a no-op on web, so recorder failures need an inline home too.
+  const [recorderError, setRecorderError] = useState<string | null>(null);
+  const [recoverableDraft, setRecoverableDraft] = useState<RecordingDraft | null>(null);
+  const [recoveryNotice, setRecoveryNotice] = useState<string | null>(null);
+  const [recovering, setRecovering] = useState(false);
 
   const [learningPlans, setLearningPlans] = useState<LearningPlanOut[]>([]);
   const [selectedLearningPlanId, setSelectedLearningPlanId] = useState<number | undefined>(learningPlanId);
@@ -215,6 +225,8 @@ export function RecordingScreen({ navigation, route }: Props) {
     setMeterBars((current) => [...current.slice(-35), normalizeMeteringValue(recorderState.metering)]);
   }, [recorderState.metering, state]);
 
+  const liveDurationMillis = recorderState.durationMillis;
+
   const previewBars = useMemo(() => {
     if (meterBars.length > 0) {
       return meterBars;
@@ -225,15 +237,184 @@ export function RecordingScreen({ navigation, route }: Props) {
   const previewProgress =
     previewStatus.duration > 0 ? Math.min(1, previewStatus.currentTime / previewStatus.duration) : 0;
 
+  /* ---- crash and refresh recovery ---------------------------------------- */
+
+  const draftIdRef = useRef<string | null>(null);
+  const draftStartedAtRef = useRef(0);
+  /* The autosave timer and the dictation callbacks both outlive the render that
+     created them, so everything they read lives in a ref rather than a closure
+     over state - otherwise a five-minute-old copy of the form gets written. */
+  const liveDurationRef = useRef(0);
+  const liveTranscriptRef = useRef('');
+  const draftFieldsRef = useRef({
+    lectureTitle,
+    description,
+    creatingNewLecture,
+    selectedLearningPlanId,
+  });
+  liveDurationRef.current = liveDurationMillis;
+  liveTranscriptRef.current = liveTranscript;
+  draftFieldsRef.current = { lectureTitle, description, creatingNewLecture, selectedLearningPlanId };
+
+  const persistDraft = async (
+    elapsedMillis: number,
+    transcript: string,
+    audio: RecordingDraftAudio = null,
+  ) => {
+    const id = draftIdRef.current;
+    if (!id) {
+      return;
+    }
+    const fields = draftFieldsRef.current;
+    await saveRecordingDraft({
+      id,
+      startedAt: draftStartedAtRef.current || Date.now(),
+      updatedAt: Date.now(),
+      platform: Platform.OS,
+      route: {
+        subjectId,
+        subjectName,
+        chapterId,
+        chapterName: paramChapterName,
+        learningPlanId,
+        lectureTitle: paramLectureTitle,
+        replaceRecordingId,
+      },
+      form: {
+        lectureTitle: fields.lectureTitle,
+        description: fields.description,
+        transcript: transcript.trim(),
+        creatingNewLecture: fields.creatingNewLecture,
+        selectedLearningPlanId: fields.selectedLearningPlanId,
+      },
+      elapsedMillis,
+      audio,
+    });
+  };
+
+  const discardDraft = async () => {
+    draftIdRef.current = null;
+    await clearRecordingDraft();
+    await clearAudioChunks();
+  };
+
+  const autosaveRef = useRef<() => void>(() => {});
+  autosaveRef.current = () => {
+    // Reassigned every render, so this always reads the live recorder.
+    void persistDraft(liveDurationRef.current, liveTranscriptRef.current, recorder.stagedAudio());
+  };
+
+  useEffect(() => {
+    if (state !== 'recording') {
+      return;
+    }
+    const timer = setInterval(() => autosaveRef.current(), DRAFT_AUTOSAVE_MS);
+    return () => clearInterval(timer);
+  }, [state]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const draft = await loadRecordingDraft();
+      if (cancelled || !draft) {
+        return;
+      }
+      // A draft from a different subject belongs to a different screen; leaving
+      // it alone means it is still there when the teacher opens that subject.
+      if (
+        draft.route.subjectId !== subjectId ||
+        draft.route.chapterId !== chapterId ||
+        // A draft captured while replacing one lecture's audio must not be
+        // recovered into a screen that would file it as a brand new lecture.
+        draft.route.replaceRecordingId !== replaceRecordingId
+      ) {
+        return;
+      }
+      if (Date.now() - draft.updatedAt > DRAFT_MAX_AGE_MS || !draftHasContent(draft)) {
+        await clearRecordingDraft();
+        await clearAudioChunks();
+        return;
+      }
+      setRecoverableDraft(draft);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [subjectId, chapterId, replaceRecordingId]);
+
+  const restoreDraft = async () => {
+    const draft = recoverableDraft;
+    if (!draft || recovering) {
+      return;
+    }
+    setRecovering(true);
+    try {
+      setLectureTitle(draft.form.lectureTitle);
+      setDescription(draft.form.description);
+      setTranscription(draft.form.transcript);
+      setLiveTranscript(draft.form.transcript);
+      setCreatingNewLecture(draft.form.creatingNewLecture);
+      setSelectedLearningPlanId(draft.form.selectedLearningPlanId);
+
+      const mimeType = draft.audio?.mimeType ?? 'audio/webm';
+      let restoredUri: string | null = null;
+      if (draft.audio?.kind === 'chunks') {
+        // Web: reassembled from the fragments staged in IndexedDB.
+        restoredUri = await buildAudioBlobUrl(mimeType);
+      } else if (draft.audio?.kind === 'file' && draft.audio.uri && recorder.canRecoverAudio) {
+        // Native: the recorder's own cache file, usable as-is only where the
+        // output format tolerates an unclean stop. Whether the file is still on
+        // disk is a separate question - the OS may have swept the cache - which
+        // is why the notice below points the teacher at the preview.
+        restoredUri = draft.audio.uri;
+      }
+
+      draftIdRef.current = draft.id;
+      draftStartedAtRef.current = draft.startedAt;
+
+      if (restoredUri) {
+        setRecordedUri(restoredUri);
+        setRecordedMimeType(mimeType);
+        setRecordedDuration(draft.elapsedMillis / 1000);
+        try {
+          previewPlayer.replace(restoredUri);
+        } catch {
+          // Preview is optional; the audio is still uploadable.
+        }
+        setRecoveryNotice(
+          'Recovered the audio from your interrupted lecture. Play the preview to confirm it is complete before uploading.',
+        );
+        setState('stopped');
+      } else {
+        await clearAudioChunks();
+        setRecoveryNotice(
+          'The audio from the interrupted lecture could not be recovered, but your lecture details and transcript are back. Record again to attach new audio.',
+        );
+        setState('idle');
+      }
+      setRecoverableDraft(null);
+    } finally {
+      setRecovering(false);
+    }
+  };
+
+  const dismissDraft = async () => {
+    setRecoverableDraft(null);
+    await discardDraft();
+  };
+
   const startRecording = async () => {
     try {
-      const { granted } = await requestRecordingPermissionsAsync();
+      const granted = await recorder.requestPermission();
       if (!granted) {
+        setRecorderError('Microphone access is needed to record audio.');
         Alert.alert('Permission required', 'Microphone access is needed to record audio.');
         return;
       }
 
-      await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
+      setRecorderError(null);
+      setRecoveryNotice(null);
+      setRecoverableDraft(null);
       setMeterBars([]);
       setRecordedUri(null);
       setRecordedMimeType(null);
@@ -242,9 +423,13 @@ export function RecordingScreen({ navigation, route }: Props) {
       setInterimTranscript('');
       setDictationError(null);
       isRecordingRef.current = true;
-      
-      await recorder.prepareToRecordAsync();
-      recorder.record();
+
+      await recorder.start();
+      // The draft is opened before anything else can fail, so even a recording
+      // that dies in its first seconds leaves a trail back to the right chapter.
+      draftIdRef.current = createDraftId();
+      draftStartedAtRef.current = Date.now();
+      void persistDraft(0, '', recorder.stagedAudio());
       setState('recording');
 
       if (isSpeechSupported && isDictatingEnabled && recognitionRef.current) {
@@ -254,8 +439,14 @@ export function RecordingScreen({ navigation, route }: Props) {
           console.error('Failed to start speech recognition', e);
         }
       }
-    } catch {
-      Alert.alert('Error', 'Could not start recording. Please try again.');
+    } catch (e) {
+      isRecordingRef.current = false;
+      await recorder.discard().catch(() => {
+        // Nothing to release.
+      });
+      const message = e instanceof Error ? e.message : 'Could not start recording. Please try again.';
+      setRecorderError(message);
+      Alert.alert('Error', message);
     }
   };
 
@@ -280,7 +471,9 @@ export function RecordingScreen({ navigation, route }: Props) {
       recorder.pause();
       setInterimTranscript('');
       setState('paused');
+      void persistDraft(liveDurationMillis, liveTranscript, recorder.stagedAudio());
     } catch {
+      setRecorderError('Could not pause the recording.');
       Alert.alert('Error', 'Could not pause the recording.');
     }
   };
@@ -290,11 +483,9 @@ export function RecordingScreen({ navigation, route }: Props) {
       return;
     }
     try {
-      // Reasserted because another app - or an incoming call - may have taken the
-      // audio session away while we were paused.
-      await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
       isRecordingRef.current = true;
-      recorder.record();
+      await recorder.resume();
+      setRecorderError(null);
       setState('recording');
 
       if (isSpeechSupported && isDictatingEnabled && recognitionRef.current) {
@@ -306,6 +497,7 @@ export function RecordingScreen({ navigation, route }: Props) {
       }
     } catch {
       isRecordingRef.current = false;
+      setRecorderError('Could not resume the recording.');
       Alert.alert('Error', 'Could not resume the recording.');
     }
   };
@@ -321,22 +513,15 @@ export function RecordingScreen({ navigation, route }: Props) {
         }
       }
 
-      await recorder.stop();
-      await setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true });
-      const nextState = recorder.getStatus();
-      const uri = nextState.url ?? recorder.uri;
-      if (!uri) {
+      const finished = await recorder.stop();
+      if (!finished) {
         throw new Error('Missing recording file');
       }
-      setRecordedUri(uri);
-      setRecordedMimeType(inferMimeTypeFromUri(uri));
-      // getStatus() reports 0ms once the recorder has been torn down on some
-      // platforms, which showed the finished clip as "0:00". The last polled
-      // state is the reliable figure in that case.
-      const measuredMillis = nextState.durationMillis || recorderState.durationMillis || 0;
-      setRecordedDuration(measuredMillis / 1000);
+      setRecordedUri(finished.uri);
+      setRecordedMimeType(finished.mimeType);
+      setRecordedDuration(finished.durationMillis / 1000);
       try {
-        previewPlayer.replace(uri);
+        previewPlayer.replace(finished.uri);
       } catch {
         Alert.alert('Preview unavailable', 'The recording was saved, but preview could not be prepared.');
       }
@@ -345,7 +530,11 @@ export function RecordingScreen({ navigation, route }: Props) {
         setTranscription(liveTranscript.trim());
       }
       setState('stopped');
+      // The draft now describes a finished clip. It stays on disk until the
+      // upload succeeds, so a crash on the review screen is survivable too.
+      void persistDraft(finished.durationMillis, liveTranscript, recorder.stagedAudio());
     } catch {
+      setRecorderError('Failed to stop the recording.');
       Alert.alert('Error', 'Failed to stop recording.');
     }
   };
@@ -360,13 +549,12 @@ export function RecordingScreen({ navigation, route }: Props) {
           // ignore
         }
       }
-      if (recorderState.isRecording || state === 'recording' || state === 'paused') {
-        await recorder.stop();
-      }
-      await setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true });
+      await recorder.discard();
     } catch {
       // ignore cleanup failures
     }
+    // Discarding is explicit, so the safety net goes with it.
+    await discardDraft();
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
@@ -545,6 +733,7 @@ export function RecordingScreen({ navigation, route }: Props) {
         recordedUri,
       });
       setUploadPhase('done');
+      await discardDraft();
       if (navigation.canGoBack()) {
         navigation.goBack();
       } else {
@@ -617,6 +806,55 @@ export function RecordingScreen({ navigation, route }: Props) {
           </View>
         ) : null}
 
+        {recoverableDraft && state === 'idle' ? (
+          <View style={styles.recoveryCard}>
+            <Ionicons color="#B45309" name="warning" size={24} />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.recoveryTitle}>Unfinished lecture found</Text>
+              <Text style={styles.recoveryBody}>
+                {`${recoverableDraft.route.chapterName || subjectName} · ${formatAudioTime(
+                  recoverableDraft.elapsedMillis / 1000,
+                )} recorded on ${new Date(recoverableDraft.startedAt).toLocaleString()}`}
+              </Text>
+              <View style={styles.recoveryActions}>
+                <Pressable
+                  disabled={recovering}
+                  onPress={() => void restoreDraft()}
+                  style={[styles.recoveryPrimary, recovering && styles.recoveryDisabled]}
+                >
+                  {recovering ? (
+                    <ActivityIndicator color="#fff" size="small" />
+                  ) : (
+                    <Text style={styles.recoveryPrimaryText}>Recover</Text>
+                  )}
+                </Pressable>
+                <Pressable
+                  disabled={recovering}
+                  onPress={() => void dismissDraft()}
+                  style={styles.recoverySecondary}
+                >
+                  <Text style={styles.recoverySecondaryText}>Discard</Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        ) : null}
+
+        {recoveryNotice ? (
+          <Pressable onPress={() => setRecoveryNotice(null)} style={styles.noticeCard}>
+            <Ionicons color="#0369A1" name="information-circle" size={20} />
+            <Text style={styles.noticeText}>{recoveryNotice}</Text>
+            <Ionicons color="#0284C7" name="close" size={16} />
+          </Pressable>
+        ) : null}
+
+        {recorderError ? (
+          <View style={styles.recorderErrorCard}>
+            <Ionicons color="#B91C1C" name="alert-circle" size={20} />
+            <Text style={styles.recorderErrorText}>{recorderError}</Text>
+          </View>
+        ) : null}
+
         {state === 'idle' ? (
           <>
             <View style={styles.hero}>
@@ -674,7 +912,7 @@ export function RecordingScreen({ navigation, route }: Props) {
                 </Text>
               </View>
               <Text style={styles.timerText}>
-                {formatAudioTime(recorderState.durationMillis / 1000)}
+                {formatAudioTime(liveDurationMillis / 1000)}
               </Text>
             </View>
 
@@ -719,7 +957,18 @@ export function RecordingScreen({ navigation, route }: Props) {
               <Text style={styles.pausedHint}>
                 Recording is paused. Resume to continue the same lecture file.
               </Text>
-            ) : null}
+            ) : (
+              /* Web has no equivalent guarantee: a backgrounded tab keeps
+                 recording, but closing it does not. */
+              Platform.OS !== 'web' && (
+                <View style={styles.backgroundHint}>
+                  <Ionicons color={AppTheme.colors.textSecondary} name="lock-closed-outline" size={14} />
+                  <Text style={styles.backgroundHintText}>
+                    Keeps recording if you lock the screen or switch apps.
+                  </Text>
+                </View>
+              )
+            )}
 
             <View style={styles.recordingActions}>
               {/* Icon-only on phones: three labelled buttons do not fit side by side. */}
@@ -1029,6 +1278,62 @@ const styles = StyleSheet.create({
     borderRadius: 18,
   },
   uploadChoiceText: { color: '#0284C7', fontSize: 15, fontWeight: '800' },
+  recoveryCard: {
+    flexDirection: 'row',
+    gap: 12,
+    alignItems: 'flex-start',
+    backgroundColor: '#FFFBEB',
+    borderColor: '#FCD34D',
+    borderWidth: 1,
+    borderRadius: AppTheme.radius.medium,
+    padding: 14,
+    marginBottom: 16,
+  },
+  recoveryTitle: { fontSize: 14, fontWeight: '800', color: '#92400E' },
+  recoveryBody: { fontSize: 12, color: '#B45309', marginTop: 2, lineHeight: 16 },
+  recoveryActions: { flexDirection: 'row', gap: 10, marginTop: 12 },
+  recoveryPrimary: {
+    minWidth: 96,
+    alignItems: 'center',
+    borderRadius: 12,
+    backgroundColor: '#B45309',
+    paddingVertical: 9,
+    paddingHorizontal: 16,
+  },
+  recoveryPrimaryText: { color: '#fff', fontSize: 13, fontWeight: '800' },
+  recoveryDisabled: { opacity: 0.7 },
+  recoverySecondary: {
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FCD34D',
+    paddingVertical: 9,
+    paddingHorizontal: 16,
+  },
+  recoverySecondaryText: { color: '#B45309', fontSize: 13, fontWeight: '700' },
+  noticeCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: '#EFF6FF',
+    borderColor: '#BFDBFE',
+    borderWidth: 1,
+    borderRadius: AppTheme.radius.medium,
+    padding: 12,
+    marginBottom: 16,
+  },
+  noticeText: { flex: 1, fontSize: 12, color: '#0369A1', lineHeight: 16 },
+  recorderErrorCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: '#FEF2F2',
+    borderColor: '#FECACA',
+    borderWidth: 1,
+    borderRadius: AppTheme.radius.medium,
+    padding: 12,
+    marginBottom: 16,
+  },
+  recorderErrorText: { flex: 1, fontSize: 12, color: '#B91C1C', lineHeight: 16 },
   recordingTop: { alignItems: 'center', gap: 10, marginTop: 16 },
   liveRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   liveDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#E53935' },
@@ -1052,6 +1357,14 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textSecondary,
     marginBottom: 4,
   },
+  backgroundHint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginBottom: 4,
+  },
+  backgroundHintText: { fontSize: 12, color: AppTheme.colors.textSecondary },
   recordingActions: { flexDirection: 'row', gap: 12 },
   pauseBtn: {
     flex: 1,

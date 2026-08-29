@@ -16,11 +16,12 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '../context/AuthContext';
-import { deleteAdminSchool, getAdminSchool, getAdminSchoolClasses, updateAdminSchool, approveAdminSchool, rejectAdminSchool, suspendAdminSchool, reactivateAdminSchool } from '../lib/api';
+import { deleteAdminSchool, getAdminSchool, getAdminSchoolClasses, updateAdminSchool, approveAdminSchool, rejectAdminSchool, suspendAdminSchool, reactivateAdminSchool, activateAdminSchoolAdmin, setAdminSchoolAdminPassword } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { AppTheme } from '../theme/AppTheme';
 import { AppLogo } from '../components/ui/AppLogo';
 import { OrganisationTeachersSection } from '../components/admin/OrganisationTeachersSection';
+import { SetPasswordModal, SetPasswordSubmit } from '../components/admin/SetPasswordModal';
 import { ClassOut, SchoolOut } from '../types/api';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AdminSchoolDetail'>;
@@ -52,7 +53,17 @@ function SchoolHero({ school }: { school: SchoolOut }) {
   );
 }
 
-function AdminContact({ school }: { school: SchoolOut }) {
+function AdminContact({
+  school,
+  busy,
+  onSetPassword,
+  onActivate,
+}: {
+  school: SchoolOut;
+  busy: boolean;
+  onSetPassword: () => void;
+  onActivate: () => void;
+}) {
   if (!school.admin) {
     return (
       <View style={styles.adminCard}>
@@ -97,6 +108,34 @@ function AdminContact({ school }: { school: SchoolOut }) {
             {school.admin.email}
           </Text>
         </View>
+      </View>
+
+      {/* Credentials can be handed over directly when the emailed invite is not
+          an option — an unconfigured mail provider or a bouncing address must
+          not leave an organisation unable to sign in. */}
+      <View style={styles.adminCredentialRow}>
+        <Pressable
+          disabled={busy}
+          onPress={onSetPassword}
+          style={[styles.credentialBtn, busy && { opacity: 0.6 }]}
+        >
+          <Ionicons color={AppTheme.colors.primary} name="key-outline" size={15} />
+          <Text style={styles.credentialBtnText}>
+            {school.admin.status === 'invited' ? 'Set password' : 'Reset password'}
+          </Text>
+        </Pressable>
+        {/* An invited admin has no password yet, so activating them would make
+            an account nobody can sign in to — they get a password instead. */}
+        {school.admin.status !== 'active' && school.admin.status !== 'invited' ? (
+          <Pressable
+            disabled={busy}
+            onPress={onActivate}
+            style={[styles.credentialBtn, busy && { opacity: 0.6 }]}
+          >
+            <Ionicons color={AppTheme.colors.primary} name="checkmark-circle-outline" size={15} />
+            <Text style={styles.credentialBtnText}>Activate without email</Text>
+          </Pressable>
+        ) : null}
       </View>
     </View>
   );
@@ -174,6 +213,11 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
   const [editAddress, setEditAddress] = useState('');
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
+
+  // Admin credential state
+  const [showSetPassword, setShowSetPassword] = useState(false);
+  const [passwordBusy, setPasswordBusy] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   // Delete modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -295,6 +339,41 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
       showAlert('Success', 'School has been reactivated successfully.');
     } catch (e) {
       showAlert('Error', e instanceof Error ? e.message : 'Could not reactivate school');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleSetAdminPassword = async (values: SetPasswordSubmit) => {
+    if (!session || !school) return;
+    setPasswordBusy(true);
+    setPasswordError(null);
+    try {
+      const res = await setAdminSchoolAdminPassword(session.token, school.id, {
+        new_password: values.newPassword,
+        admin_password: values.adminPassword,
+        activate: values.activate,
+      });
+      setShowSetPassword(false);
+      // Status may have flipped to active, so re-read rather than patching it.
+      await load();
+      showAlert('Password updated', res.detail);
+    } catch (e) {
+      setPasswordError(e instanceof Error ? e.message : 'Could not set the password');
+    } finally {
+      setPasswordBusy(false);
+    }
+  };
+
+  const handleActivateAdmin = async () => {
+    if (!session || !school) return;
+    setActionLoading(true);
+    try {
+      const updated = await activateAdminSchoolAdmin(session.token, school.id);
+      setSchool(updated);
+      showAlert('Activated', `${updated.admin?.name ?? 'The school admin'} can now sign in.`);
+    } catch (e) {
+      showAlert('Error', e instanceof Error ? e.message : 'Could not activate this admin');
     } finally {
       setActionLoading(false);
     }
@@ -431,6 +510,18 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
           </View>
         </View>
       </Modal>
+
+      {/* Set / reset the school admin's password, no email involved */}
+      <SetPasswordModal
+        busy={passwordBusy}
+        canActivate={school?.admin?.status !== 'active'}
+        error={passwordError}
+        onClose={() => setShowSetPassword(false)}
+        onSubmit={(values) => { void handleSetAdminPassword(values); }}
+        subjectEmail={school?.admin?.email ?? ''}
+        subjectName={school?.admin?.name ?? ''}
+        visible={showSetPassword}
+      />
 
       {/* Delete School Modal */}
       <Modal animationType="slide" transparent visible={showDeleteModal} onRequestClose={() => setShowDeleteModal(false)}>
@@ -587,7 +678,15 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
                   ) : null}
 
                   {/* Admin Contact */}
-                  <AdminContact school={school} />
+                  <AdminContact
+                    busy={actionLoading}
+                    onActivate={() => { void handleActivateAdmin(); }}
+                    onSetPassword={() => {
+                      setPasswordError(null);
+                      setShowSetPassword(true);
+                    }}
+                    school={school}
+                  />
 
                   {/* Teachers in this organisation */}
                   {session ? (
@@ -841,6 +940,29 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textSecondary,
     ...AppTheme.typography.body,
     flex: 1,
+  },
+  adminCredentialRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  credentialBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: AppTheme.radius.medium,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.surface,
+  },
+  credentialBtnText: {
+    color: AppTheme.colors.primary,
+    ...AppTheme.typography.caption,
+    fontWeight: '700',
   },
   adminEmptyRow: {
     flexDirection: 'row',

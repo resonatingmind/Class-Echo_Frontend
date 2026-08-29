@@ -36,6 +36,10 @@ import {
   TimetableEntryPayload,
   TimetableImportResult,
   AcceptInvitePayload,
+  CredentialUpdateOut,
+  EmailStatusOut,
+  EmailTestResult,
+  SetPasswordPayload,
   TeacherBulkInviteResponse,
   TeacherInviteEntry,
 } from "../types/api";
@@ -397,6 +401,76 @@ export async function revokeAdminTeacherInvite(
   return request<void>(
     `/admin/schools/${schoolId}/teachers/${teacherId}`,
     { method: "DELETE" },
+    token,
+  );
+}
+
+/* ── Email delivery diagnostics (super admin) ──────────────────────────────── */
+
+/** What this deployment is configured to do with outgoing email. */
+export async function getAdminEmailStatus(token: string) {
+  return request<EmailStatusOut>('/admin/system/email-status', {}, token);
+}
+
+/** Push a real message to the provider now and report its own error verbatim. */
+export async function sendAdminTestEmail(token: string, toEmail: string) {
+  return request<EmailTestResult>(
+    '/admin/system/email-test',
+    { method: 'POST', body: JSON.stringify({ to_email: toEmail }) },
+    token,
+  );
+}
+
+/* ── Direct credential management (super admin) ────────────────────────────── */
+
+/**
+ * Set a school admin's password outright. Nothing is emailed — use this when
+ * the invite link cannot reach them or credentials are being handed over live.
+ */
+export async function setAdminSchoolAdminPassword(
+  token: string,
+  schoolId: number,
+  payload: SetPasswordPayload,
+) {
+  return request<CredentialUpdateOut>(
+    `/admin/schools/${schoolId}/admin/set-password`,
+    { method: 'POST', body: JSON.stringify(payload) },
+    token,
+  );
+}
+
+/** Set a teacher's password outright, without sending an email. */
+export async function setAdminTeacherPassword(
+  token: string,
+  schoolId: number,
+  teacherId: number,
+  payload: SetPasswordPayload,
+) {
+  return request<CredentialUpdateOut>(
+    `/admin/schools/${schoolId}/teachers/${teacherId}/set-password`,
+    { method: 'POST', body: JSON.stringify(payload) },
+    token,
+  );
+}
+
+/** Activate a school admin regardless of their current state, no email sent. */
+export async function activateAdminSchoolAdmin(token: string, schoolId: number) {
+  return request<SchoolOut>(
+    `/admin/schools/${schoolId}/admin/activate`,
+    { method: 'POST' },
+    token,
+  );
+}
+
+/** Activate a teacher regardless of their current state, no email sent. */
+export async function activateAdminTeacher(
+  token: string,
+  schoolId: number,
+  teacherId: number,
+) {
+  return request<TeacherOut>(
+    `/admin/schools/${schoolId}/teachers/${teacherId}/activate`,
+    { method: 'POST' },
     token,
   );
 }

@@ -59,6 +59,48 @@ export type AcceptInvitePayload = {
   password: string;
 };
 
+/** What this deployment is configured to do with outgoing email. */
+export type EmailStatusOut = {
+  backend: 'mailjet' | 'smtp' | 'log';
+  delivers_email: boolean;
+  from_email: string | null;
+  from_name: string | null;
+  sandbox: boolean;
+  frontend_url: string;
+  sample_invite_link: string;
+  credentials: string | null;
+  warnings: string[];
+};
+
+/** What actually happened when a real message was pushed to the provider. */
+export type EmailTestResult = {
+  delivered: boolean;
+  backend: string;
+  to_email: string;
+  from_email: string | null;
+  error: string | null;
+  credentials: string | null;
+  detail: string;
+};
+
+/** Super admin setting someone else's password directly, without any email. */
+export type SetPasswordPayload = {
+  new_password: string;
+  /** The acting super admin re-enters their own password to confirm. */
+  admin_password: string;
+  activate?: boolean;
+};
+
+export type CredentialUpdateOut = {
+  user_type: 'school_admin' | 'teacher';
+  user_id: number;
+  name: string;
+  email: string;
+  status: string;
+  activated: boolean;
+  detail: string;
+};
+
 export type ClassOut = {
   id: number;
   name: string;

@@ -17,7 +17,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { EmailDeliveryCard } from "../components/admin/EmailDeliveryCard";
 import { AppLogo } from "../components/ui/AppLogo";
 import { useAuth } from "../context/AuthContext";
 import { getAdminSchools, deleteAdminSchool, suspendAdminSchool, reactivateAdminSchool } from "../lib/api";
@@ -306,8 +305,6 @@ export function SchoolsScreen({ navigation }: Props) {
                 ) : null}
               </View>
 
-              {/* Whether invitations can actually be delivered from here */}
-              {session ? <EmailDeliveryCard token={session.token} /> : null}
 
               {/* Search */}
               <View style={styles.searchBar}>
@@ -495,6 +492,9 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   scroll: {
     flexGrow: 1,
+    // Clears the floating tab bar this screen now sits behind. Without it the
+    // last school card is unreachable under the pill.
+    paddingBottom: 120,
   },
   centerContainer: {
     flex: 1,

@@ -5,13 +5,14 @@ import { SchoolAdminTabParamList } from "./SchoolAdminTabNavigator";
 import { useAuth } from "../context/AuthContext";
 import { RecordingWithReport, UserRole } from "../types/api";
 import { SchoolAdminTabNavigator } from "./SchoolAdminTabNavigator";
+import { AdminTabNavigator } from "./AdminTabNavigator";
+import type { AdminTabParamList } from "./AdminTabNavigator";
 
 // Super Admin screens
 import { AdminClassDetailScreen } from "../screens/AdminClassDetailScreen";
 import { AdminCreateSchoolScreen } from "../screens/AdminCreateSchoolScreen";
 import { AdminSchoolDetailScreen } from "../screens/AdminSchoolDetailScreen";
 import { AdminSubjectDetailScreen } from "../screens/AdminSubjectDetailScreen";
-import { SchoolsScreen } from "../screens/SchoolsScreen";
 import { SchoolAdminTeacherRecordingsScreen } from "../screens/SchoolAdminTeacherRecordingsScreen";
 
 // School Admin screens
@@ -52,7 +53,9 @@ export type RootStackParamList = {
   AcceptInvite: { token?: string } | undefined;
   AwaitingApproval: undefined;
   // Super Admin
-  AdminSchools: undefined;
+  // The super admin shell. Kept under its original route name so every existing
+  // navigate("AdminSchools") still lands somewhere sensible - the Schools tab.
+  AdminSchools: NavigatorScreenParams<AdminTabParamList> | undefined;
   AdminCreateSchool: undefined;
   AdminSchoolDetail: { schoolId: number };
   AdminClassDetail: {
@@ -181,7 +184,7 @@ export function AppNavigator() {
         <Stack.Screen name="AwaitingApproval" component={AwaitingApprovalScreen} />
       ) : session.role === "admin" ? (
         <>
-          <Stack.Screen name="AdminSchools" component={SchoolsScreen} />
+          <Stack.Screen name="AdminSchools" component={AdminTabNavigator} />
           <Stack.Screen
             name="AdminCreateSchool"
             component={AdminCreateSchoolScreen}

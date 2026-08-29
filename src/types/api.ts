@@ -83,6 +83,74 @@ export type EmailTestResult = {
   detail: string;
 };
 
+export type EmailLogStatus = 'queued' | 'sent' | 'failed' | 'skipped';
+
+/**
+ * One recorded send attempt.
+ *
+ * Carries no message body: invite HTML holds a live single-use token, so
+ * resending re-mints one through the invite endpoints instead of replaying
+ * whatever went out before. `can_resend` is false when the row does not name an
+ * account to re-invite (a test send, or an invite whose account is gone).
+ */
+export type EmailLogEntry = {
+  id: number;
+  to_email: string;
+  subject: string;
+  purpose: string;
+  status: EmailLogStatus;
+  backend: string | null;
+  error: string | null;
+  school_id: number | null;
+  related_type: string | null;
+  related_id: number | null;
+  created_at: string;
+  updated_at: string | null;
+  can_resend: boolean;
+};
+
+/** Delivery totals for the last rolling 24 hours, against the provider's cap. */
+export type EmailStatsOut = {
+  sent_today: number;
+  failed_today: number;
+  skipped_today: number;
+  queued_now: number;
+  backend: string;
+  provider_daily_cap: number | null;
+  cap_note: string | null;
+};
+
+/** A recording as the operations screen needs it: what broke, and whose. */
+export type PipelineRecordingOut = {
+  id: number;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  error_reason: string | null;
+  lecture_title: string | null;
+  chapter_name: string | null;
+  teacher_name: string | null;
+  subject_name: string | null;
+  school_id: number | null;
+  school_name: string | null;
+  uploaded_at: string;
+  processed_at: string | null;
+  /** Time in the current state. 4 minutes of "processing" is work; 90 is death. */
+  minutes_in_state: number;
+};
+
+export type HealthComponent = {
+  key: string;
+  label: string;
+  /** warn means running, but configured in a way that loses data or mail. */
+  status: 'ok' | 'warn' | 'error';
+  detail: string;
+};
+
+export type SystemHealthOut = {
+  healthy: boolean;
+  components: HealthComponent[];
+  checked_at: string;
+};
+
 /** Super admin setting someone else's password directly, without any email. */
 export type SetPasswordPayload = {
   new_password: string;

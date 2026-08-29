@@ -37,8 +37,13 @@ import {
   TimetableImportResult,
   AcceptInvitePayload,
   CredentialUpdateOut,
+  EmailLogEntry,
+  EmailLogStatus,
+  EmailStatsOut,
   EmailStatusOut,
   EmailTestResult,
+  PipelineRecordingOut,
+  SystemHealthOut,
   SetPasswordPayload,
   TeacherBulkInviteResponse,
   TeacherInviteEntry,
@@ -419,6 +424,67 @@ export async function sendAdminTestEmail(token: string, toEmail: string) {
     { method: 'POST', body: JSON.stringify({ to_email: toEmail }) },
     token,
   );
+}
+
+/* ── Operations & system health (super admin) ──────────────────────────────── */
+
+/** Every send attempt, newest first — the answer to "no invite arrived". */
+export async function getAdminEmailLog(
+  token: string,
+  opts: { status?: EmailLogStatus; purpose?: string; limit?: number } = {},
+) {
+  const params = new URLSearchParams();
+  if (opts.status) params.set('status', opts.status);
+  if (opts.purpose) params.set('purpose', opts.purpose);
+  params.set('limit', String(opts.limit ?? 50));
+  return request<EmailLogEntry[]>(`/admin/system/email-log?${params}`, {}, token);
+}
+
+/** Rolling 24h delivery totals, and how close they are to the provider's cap. */
+export async function getAdminEmailStats(token: string) {
+  return request<EmailStatsOut>('/admin/system/email-stats', {}, token);
+}
+
+/**
+ * Re-send the invitation a log row refers to. Mints a fresh token rather than
+ * replaying the original link, which re-issuing would have invalidated anyway.
+ */
+export async function resendAdminEmailLog(token: string, logId: number) {
+  return request<{ detail: string }>(
+    `/admin/system/email-log/${logId}/resend`,
+    { method: 'POST' },
+    token,
+  );
+}
+
+/** Recordings the analysis pipeline failed or abandoned. */
+export async function getAdminPipelineRecordings(
+  token: string,
+  opts: { status?: string; problemsOnly?: boolean; limit?: number } = {},
+) {
+  const params = new URLSearchParams();
+  if (opts.status) params.set('status', opts.status);
+  params.set('problems_only', String(opts.problemsOnly ?? true));
+  params.set('limit', String(opts.limit ?? 50));
+  return request<PipelineRecordingOut[]>(
+    `/admin/system/recordings?${params}`,
+    {},
+    token,
+  );
+}
+
+/** Put a failed or stuck recording back through analysis. 409 if no worker. */
+export async function retryAdminRecording(token: string, recordingId: number) {
+  return request<{ detail: string }>(
+    `/admin/system/recordings/${recordingId}/retry`,
+    { method: 'POST' },
+    token,
+  );
+}
+
+/** Database, Redis, worker, email, storage, AI and invite-link configuration. */
+export async function getAdminSystemHealth(token: string) {
+  return request<SystemHealthOut>('/admin/system/health', {}, token);
 }
 
 /* ── Direct credential management (super admin) ────────────────────────────── */

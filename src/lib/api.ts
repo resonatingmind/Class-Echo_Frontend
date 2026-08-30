@@ -948,19 +948,19 @@ export async function assignTeacherToSubject(
 
 // ── School Admin: Teachers ────────────────────────────────────────────────────
 
-export type TeacherCreatePayload = {
+export type TeacherInvitePayload = {
   name: string;
   email: string;
-  password: string;
-  profile_image_url?: string | null;
 };
 
-export async function createSchoolAdminTeacher(
+// The school admin does not set a password here: the teacher receives the same
+// invitation email as every other onboarding path and chooses their own.
+export async function inviteSchoolAdminTeacher(
   token: string,
-  payload: TeacherCreatePayload,
+  payload: TeacherInvitePayload,
 ) {
   return request<TeacherOut>(
-    "/school/teachers",
+    "/school/teachers/invite",
     { method: "POST", body: JSON.stringify(payload) },
     token,
   );

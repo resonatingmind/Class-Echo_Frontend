@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import {
   KeyboardAvoidingView,
@@ -15,7 +15,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../context/AuthContext";
 import { acceptInvite } from "../lib/api";
 import { RootStackParamList } from "../navigation/AppNavigator";
-import { UserRole } from "../types/api";
 import { AppTheme } from "../theme/AppTheme";
 import { AppLogo } from "../components/ui/AppLogo";
 import { SectionTitle } from "../components/ui/SectionTitle";
@@ -27,7 +26,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "AcceptInvite">;
 const MIN_PASSWORD_LENGTH = 8;
 
 export function AcceptInviteScreen({ navigation, route }: Props) {
-  const { session, signInDirect, signOut } = useAuth();
+  const { session, signOut } = useAuth();
   // React Navigation surfaces the ?token= query string as a route param.
   const token = route.params?.token ?? "";
 
@@ -37,16 +36,35 @@ export function AcceptInviteScreen({ navigation, route }: Props) {
   const [confirmError, setConfirmError] = useState<string | null>(null);
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [activated, setActivated] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
 
-  // When this browser still holds a session the Login screen is not registered,
-  // so clearing the session is what actually returns it to the sign-in form.
+  // reset rather than navigate: this screen is registered in every session
+  // state, so nothing pops it off the stack on its own, and a plain navigate
+  // leaves it sitting underneath with the invite URL still in the address bar.
+  const resetToLogin = () => {
+    navigation.reset({ index: 0, routes: [{ name: "Login" }] });
+  };
+
+  // When this browser still holds a session the Login screen is not registered
+  // at all, so the session has to be cleared first and the navigation deferred
+  // until that has actually landed - hence the effect below rather than an
+  // await here.
   const goToSignIn = () => {
     if (session) {
+      setSigningOut(true);
       void signOut();
       return;
     }
-    navigation.navigate("Login");
+    resetToLogin();
   };
+
+  useEffect(() => {
+    if (!signingOut || session) return;
+    setSigningOut(false);
+    resetToLogin();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signingOut, session]);
 
   const handleAccept = async () => {
     if (submitting) return;
@@ -75,10 +93,11 @@ export function AcceptInviteScreen({ navigation, route }: Props) {
 
     setSubmitting(true);
     try {
-      const result = await acceptInvite({ token, password });
-      // Accepting an invite activates the account, so the session goes straight
-      // to the role's home rather than back through the login screen.
-      signInDirect(result.access_token, result.role as UserRole, "active");
+      await acceptInvite({ token, password });
+      // Deliberately not signing in here. Confirming the activation is what tells
+      // the invited user the link worked, and a fresh sign-in both proves the new
+      // password and clears any stale session this browser was still holding.
+      setActivated(true);
     } catch (err) {
       setGeneralError(
         err instanceof Error
@@ -89,6 +108,28 @@ export function AcceptInviteScreen({ navigation, route }: Props) {
       setSubmitting(false);
     }
   };
+
+  if (activated) {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.centerContainer}>
+          <View style={styles.body}>
+            <AppLogo />
+            <Ionicons
+              color={AppTheme.colors.success}
+              name="checkmark-circle"
+              size={48}
+            />
+            <SectionTitle
+              title="Account activated"
+              subtitle="Your password has been set. Sign in to access your Class Echo account."
+            />
+            <PrimaryButton title="Go to sign in" onPress={goToSignIn} />
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   // A link opened without a token is almost always a copy-paste that dropped the
   // query string, so say that instead of showing an empty password form.

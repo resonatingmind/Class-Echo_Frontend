@@ -18,7 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AdminNavbar } from "../components/common/AdminNavbar";
 import { useAuth } from "../context/AuthContext";
-import { createSchoolAdminTeacher, getSchoolAdminTeachers } from "../lib/api";
+import { getSchoolAdminTeachers, inviteSchoolAdminTeacher } from "../lib/api";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { AppTheme } from "../theme/AppTheme";
 import { TeacherOut } from "../types/api";
@@ -39,32 +39,30 @@ function AddTeacherModal({
   const { session } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPass, setShowPass] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [invitedEmail, setInvitedEmail] = useState<string | null>(null);
 
   const emailValid = /\S+@\S+\.\S+/.test(email.trim());
-  const canSubmit =
-    name.trim().length > 1 && emailValid && password.length >= 6;
+  const canSubmit = name.trim().length > 1 && emailValid;
 
   const handleCreate = async () => {
     if (!session || !canSubmit || submitting) return;
     setSubmitting(true);
     setError(null);
     try {
-      const teacher = await createSchoolAdminTeacher(session.token, {
+      const teacher = await inviteSchoolAdminTeacher(session.token, {
         name: name.trim(),
         email: email.trim(),
-        password,
       });
+      // The teacher is not usable until they accept, so confirm the send rather
+      // than closing as if a ready-to-use account had just been created.
+      setInvitedEmail(teacher.email);
       setName("");
       setEmail("");
-      setPassword("");
       onCreated(teacher);
-      onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to add teacher");
+      setError(e instanceof Error ? e.message : "Failed to send invitation");
     } finally {
       setSubmitting(false);
     }
@@ -73,8 +71,8 @@ function AddTeacherModal({
   const handleClose = () => {
     setName("");
     setEmail("");
-    setPassword("");
     setError(null);
+    setInvitedEmail(null);
     onClose();
   };
 
@@ -88,11 +86,39 @@ function AddTeacherModal({
     >
       <Pressable onPress={handleClose} style={styles.modalOverlay}>
         <Pressable style={styles.modalCard}>
-
-          <Text style={styles.modalTitle}>Add New Faculty</Text>
+          {invitedEmail ? (
+            <>
+              <View style={styles.modalSuccessIcon}>
+                <Ionicons
+                  color={AppTheme.colors.success}
+                  name="mail-outline"
+                  size={22}
+                />
+              </View>
+              <Text style={styles.modalTitle}>Invitation sent</Text>
+              <Text style={styles.modalSubtitle}>
+                {invitedEmail} has been emailed a link to set their password.
+                They will appear as Invited until they accept, and the link
+                expires in 7 days.
+              </Text>
+              <View style={styles.modalActions}>
+                <Pressable
+                  onPress={() => setInvitedEmail(null)}
+                  style={styles.modalCancelBtn}
+                >
+                  <Text style={styles.modalCancelText}>Invite another</Text>
+                </Pressable>
+                <Pressable onPress={handleClose} style={styles.modalSubmitBtn}>
+                  <Text style={styles.modalSubmitText}>Done</Text>
+                </Pressable>
+              </View>
+            </>
+          ) : (
+          <>
+          <Text style={styles.modalTitle}>Invite New Faculty</Text>
           <Text style={styles.modalSubtitle}>
-            Register a teacher and assign them to subjects from any class
-            detail.
+            We will email them an invitation link to set their own password.
+            Assign them to subjects from any class detail once they accept.
           </Text>
 
           <View style={styles.fields}>
@@ -123,32 +149,6 @@ function AddTeacherModal({
                 value={email}
               />
             </View>
-            <View style={styles.fieldDivider} />
-            <View style={styles.field}>
-              <Text style={styles.fieldLabel}>TEMPORARY PASSWORD</Text>
-              <View style={styles.passWrap}>
-                <TextInput
-                  onChangeText={setPassword}
-                  placeholder="Min. 6 characters"
-                  placeholderTextColor={AppTheme.colors.textPlaceholder}
-                  secureTextEntry={!showPass}
-                  style={[styles.input, { paddingRight: 40 }]}
-                  textContentType="newPassword"
-                  value={password}
-                />
-                <Pressable
-                  hitSlop={8}
-                  onPress={() => setShowPass((v) => !v)}
-                  style={styles.eyeBtn}
-                >
-                  <Ionicons
-                    color={AppTheme.colors.textSecondary}
-                    name={showPass ? "eye-off-outline" : "eye-outline"}
-                    size={18}
-                  />
-                </Pressable>
-              </View>
-            </View>
           </View>
 
           {error ? (
@@ -173,10 +173,12 @@ function AddTeacherModal({
               {submitting ? (
                 <ActivityIndicator color="#fff" size="small" />
               ) : (
-                <Text style={styles.modalSubmitText}>Add Teacher</Text>
+                <Text style={styles.modalSubmitText}>Send Invitation</Text>
               )}
             </Pressable>
           </View>
+          </>
+          )}
         </Pressable>
       </Pressable>
     </Modal>
@@ -435,6 +437,15 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   pageSubtitle: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body },
+  modalSuccessIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#ECFDF3",
+    marginBottom: AppTheme.spacing.m,
+  },
   addTeacherBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -552,14 +563,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 0,
   },
   input: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.body, padding: 0, minHeight: 24, outlineStyle: 'none' as any },
-  passWrap: { position: "relative" },
-  eyeBtn: {
-    position: "absolute",
-    right: 0,
-    top: 0,
-    bottom: 0,
-    justifyContent: "center",
-  },
   modalError: {
     flexDirection: "row",
     alignItems: "center",

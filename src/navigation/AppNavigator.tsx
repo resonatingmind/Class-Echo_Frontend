@@ -29,6 +29,7 @@ import { SchoolAdminProfileScreen } from "../screens/SchoolAdminProfileScreen";
 
 // Auth screens
 import { AcceptInviteScreen } from "../screens/AcceptInviteScreen";
+import { VerifyEmailScreen } from "../screens/VerifyEmailScreen";
 import { LoginScreen } from "../screens/LoginScreen";
 import { SignupScreen } from "../screens/SignupScreen";
 import { AwaitingApprovalScreen } from "../screens/AwaitingApprovalScreen";
@@ -51,6 +52,8 @@ export type RootStackParamList = {
   Signup: undefined;
   // token arrives as the ?token= query string on the emailed invite link.
   AcceptInvite: { token?: string } | undefined;
+  // token arrives as the ?token= query string on the emailed verification link.
+  VerifyEmail: { token?: string } | undefined;
   AwaitingApproval: undefined;
   // Super Admin
   // The super admin shell. Kept under its original route name so every existing
@@ -145,7 +148,7 @@ export type RootStackParamList = {
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-function roleHome(role: UserRole): keyof RootStackParamList {
+export function roleHome(role: UserRole): keyof RootStackParamList {
   switch (role) {
     case "admin":
       return "AdminSchools";
@@ -178,7 +181,6 @@ export function AppNavigator() {
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Signup" component={SignupScreen} />
-          <Stack.Screen name="AcceptInvite" component={AcceptInviteScreen} />
         </>
       ) : (session.role === "school_admin" || session.role === "teacher") && session.status !== "active" ? (
         <Stack.Screen name="AwaitingApproval" component={AwaitingApprovalScreen} />
@@ -296,6 +298,21 @@ export function AppNavigator() {
           />
         </>
       )}
+
+      {/* Registered outside the session branches on purpose. An invitation link
+          is how an account first gets a password, so it has to open even when
+          this browser already holds a session — otherwise the emailed link
+          silently lands on whatever home screen that stale session resolves to
+          and the invited user never sees the password form. Kept last so the
+          first screen of the matched branch stays the initial route. */}
+      <Stack.Screen name="AcceptInvite" component={AcceptInviteScreen} />
+
+      {/* Registered outside the session branches for the same reason as
+          AcceptInvite: a verification link is emailed to an address that may
+          already be signed in on this browser, or not signed in at all, and
+          either way the link has to show the verification result instead of
+          silently resolving to a home screen. */}
+      <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
     </Stack.Navigator>
   );
 }

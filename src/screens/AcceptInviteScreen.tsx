@@ -27,7 +27,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "AcceptInvite">;
 const MIN_PASSWORD_LENGTH = 8;
 
 export function AcceptInviteScreen({ navigation, route }: Props) {
-  const { signInDirect } = useAuth();
+  const { session, signInDirect, signOut } = useAuth();
   // React Navigation surfaces the ?token= query string as a route param.
   const token = route.params?.token ?? "";
 
@@ -37,6 +37,16 @@ export function AcceptInviteScreen({ navigation, route }: Props) {
   const [confirmError, setConfirmError] = useState<string | null>(null);
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // When this browser still holds a session the Login screen is not registered,
+  // so clearing the session is what actually returns it to the sign-in form.
+  const goToSignIn = () => {
+    if (session) {
+      void signOut();
+      return;
+    }
+    navigation.navigate("Login");
+  };
 
   const handleAccept = async () => {
     if (submitting) return;
@@ -95,7 +105,7 @@ export function AcceptInviteScreen({ navigation, route }: Props) {
                 invitation email, or ask your administrator to resend it.
               </Text>
             </View>
-            <Pressable onPress={() => navigation.navigate("Login")}>
+            <Pressable onPress={goToSignIn}>
               <Text style={styles.link}>Back to sign in</Text>
             </Pressable>
           </View>
@@ -175,7 +185,7 @@ export function AcceptInviteScreen({ navigation, route }: Props) {
                 expired, ask your administrator to send a new one.
               </Text>
 
-              <Pressable onPress={() => navigation.navigate("Login")}>
+              <Pressable onPress={goToSignIn}>
                 <Text style={styles.link}>Already activated? Sign in</Text>
               </Pressable>
             </View>

@@ -662,6 +662,13 @@ export async function acceptInvite(payload: AcceptInvitePayload) {
   });
 }
 
+/** Consume an emailed email-verification token. Needs no session of its own. */
+export async function verifyEmail(token: string) {
+  return request<{ email_verified: boolean }>(
+    `/auth/verify-email?token=${encodeURIComponent(token)}`,
+  );
+}
+
 export async function getAdminSchool(token: string, schoolId: number) {
   return request<SchoolOut>(`/admin/schools/${schoolId}`, {}, token);
 }

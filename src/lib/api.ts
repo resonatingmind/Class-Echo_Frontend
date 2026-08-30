@@ -36,14 +36,19 @@ import {
   TimetableEntryPayload,
   TimetableImportResult,
   AcceptInvitePayload,
+  AuditLogEntry,
   CredentialUpdateOut,
+  ExportResource,
   EmailLogEntry,
   EmailLogStatus,
   EmailStatsOut,
   EmailStatusOut,
   EmailTestResult,
   PipelineRecordingOut,
+  PublicSystemStatus,
+  SettingOut,
   SystemHealthOut,
+  UserSearchResult,
   SetPasswordPayload,
   TeacherBulkInviteResponse,
   TeacherInviteEntry,
@@ -485,6 +490,114 @@ export async function retryAdminRecording(token: string, recordingId: number) {
 /** Database, Redis, worker, email, storage, AI and invite-link configuration. */
 export async function getAdminSystemHealth(token: string) {
   return request<SystemHealthOut>('/admin/system/health', {}, token);
+}
+
+/* ── Runtime settings (super admin) ────────────────────────────────────────── */
+
+/** Everything changeable without a redeploy. Never includes credentials. */
+export async function getAdminSettings(token: string) {
+  return request<SettingOut[]>('/admin/system/settings', {}, token);
+}
+
+export async function updateAdminSetting(
+  token: string,
+  key: string,
+  value: string | number | boolean,
+) {
+  return request<SettingOut>(
+    `/admin/system/settings/${key}`,
+    { method: 'PUT', body: JSON.stringify({ value }) },
+    token,
+  );
+}
+
+/** Drop the override so the environment variable applies again. */
+export async function resetAdminSetting(token: string, key: string) {
+  return request<SettingOut>(
+    `/admin/system/settings/${key}/reset`,
+    { method: 'POST' },
+    token,
+  );
+}
+
+/* ── Global user lookup (super admin) ──────────────────────────────────────── */
+
+/** Find anyone across every school by email or name. */
+export async function searchAdminUsers(token: string, q: string) {
+  return request<UserSearchResult[]>(
+    `/admin/users/search?q=${encodeURIComponent(q)}`,
+    {},
+    token,
+  );
+}
+
+/* ── Audit log & export (super admin) ──────────────────────────────────────── */
+
+/** What super admins have done, newest first. Read-only — there is no delete. */
+export async function getAdminAuditLog(
+  token: string,
+  opts: { action?: string; schoolId?: number; limit?: number } = {},
+) {
+  const params = new URLSearchParams();
+  if (opts.action) params.set('action', opts.action);
+  if (opts.schoolId != null) params.set('school_id', String(opts.schoolId));
+  params.set('limit', String(opts.limit ?? 50));
+  return request<AuditLogEntry[]>(`/admin/system/audit-log?${params}`, {}, token);
+}
+
+/**
+ * Download one school's records as CSV.
+ *
+ * Fetched with the auth header and handed to the browser as a blob rather than
+ * opened as a plain link: the endpoint requires a bearer token, which a link
+ * navigation cannot carry. Web only — a native save needs the filesystem and
+ * sharing APIs, so callers should route mobile users to the web panel rather
+ * than silently doing nothing.
+ */
+export async function downloadAdminSchoolExport(
+  token: string,
+  schoolId: number,
+  resource: ExportResource,
+): Promise<void> {
+  if (Platform.OS !== 'web') {
+    throw new ApiError('Exports are available in the web admin panel.', 0);
+  }
+
+  const response = await fetch(
+    `${API_BASE_URL}/admin/schools/${schoolId}/export?resource=${resource}`,
+    { headers: { Authorization: `Bearer ${token}` } },
+  );
+  if (!response.ok) {
+    if (response.status === 401) notifyUnauthorized();
+    throw new ApiError(
+      (await response.text()) || 'Export failed',
+      response.status,
+    );
+  }
+
+  const disposition = response.headers.get('content-disposition') ?? '';
+  const named = /filename="?([^";]+)"?/.exec(disposition);
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = named?.[1] ?? `school-${schoolId}-${resource}.csv`;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  // Revoked on the next tick, not immediately: Safari cancels an in-flight
+  // download if the object URL disappears in the same frame as the click.
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+/* ── Public ────────────────────────────────────────────────────────────────── */
+
+/**
+ * Maintenance state. Unauthenticated, because the people who most need to see
+ * it are the ones whose requests are being refused.
+ */
+export async function getPublicSystemStatus() {
+  return request<PublicSystemStatus>('/public/system/status', {});
 }
 
 /* ── Direct credential management (super admin) ────────────────────────────── */

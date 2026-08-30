@@ -16,13 +16,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '../context/AuthContext';
-import { deleteAdminSchool, getAdminSchool, getAdminSchoolClasses, updateAdminSchool, approveAdminSchool, rejectAdminSchool, suspendAdminSchool, reactivateAdminSchool, activateAdminSchoolAdmin, setAdminSchoolAdminPassword } from '../lib/api';
+import { deleteAdminSchool, getAdminSchool, getAdminSchoolClasses, updateAdminSchool, approveAdminSchool, rejectAdminSchool, suspendAdminSchool, reactivateAdminSchool, activateAdminSchoolAdmin, setAdminSchoolAdminPassword, downloadAdminSchoolExport } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { AppTheme } from '../theme/AppTheme';
 import { AppLogo } from '../components/ui/AppLogo';
 import { OrganisationTeachersSection } from '../components/admin/OrganisationTeachersSection';
 import { SetPasswordModal, SetPasswordSubmit } from '../components/admin/SetPasswordModal';
-import { ClassOut, SchoolOut } from '../types/api';
+import { ClassOut, ExportResource, SchoolOut } from '../types/api';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AdminSchoolDetail'>;
 
@@ -196,6 +196,25 @@ const showAlert = (title: string, message: string, buttons?: { text: string; onP
 
 export function AdminSchoolDetailScreen({ navigation, route }: Props) {
   const { session, signOut } = useAuth();
+  const [exporting, setExporting] = useState<ExportResource | null>(null);
+
+  const handleExport = async (resource: ExportResource) => {
+    if (!session) return;
+    setExporting(resource);
+    try {
+      await downloadAdminSchoolExport(session.token, route.params.schoolId, resource);
+    } catch (err) {
+      // Includes the deliberate native refusal from downloadAdminSchoolExport:
+      // saving a file on a device needs the filesystem and sharing APIs, so the
+      // honest answer is to send them to the web panel rather than do nothing.
+      showAlert(
+        'Export unavailable',
+        err instanceof Error ? err.message : 'The export could not be produced.',
+      );
+    } finally {
+      setExporting(null);
+    }
+  };
   const [school, setSchool] = useState<SchoolOut | null>(null);
   const [classes, setClasses] = useState<ClassOut[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -740,6 +759,46 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
                   </View>
                 </>
               ) : null}
+
+              <View style={styles.exportCard}>
+                <Text style={styles.exportTitle}>Export data</Text>
+                <Text style={styles.exportNote}>
+                  Downloads this school's records as CSV — useful for support,
+                  for handing a school its own data, and for keeping something
+                  readable outside the app.
+                </Text>
+                <View style={styles.exportRow}>
+                  {(["teachers", "classes", "recordings"] as ExportResource[]).map(
+                    (resource) => (
+                      <Pressable
+                        key={resource}
+                        disabled={exporting !== null}
+                        onPress={() => void handleExport(resource)}
+                        style={[
+                          styles.exportBtn,
+                          exporting !== null && styles.exportBtnDisabled,
+                        ]}
+                      >
+                        {exporting === resource ? (
+                          <ActivityIndicator
+                            color={AppTheme.colors.primary}
+                            size="small"
+                          />
+                        ) : (
+                          <>
+                            <Ionicons
+                              color={AppTheme.colors.primary}
+                              name="download-outline"
+                              size={14}
+                            />
+                            <Text style={styles.exportBtnText}>{resource}</Text>
+                          </>
+                        )}
+                      </Pressable>
+                    ),
+                  )}
+                </View>
+              </View>
             </View>
           </View>
         </ScrollView>
@@ -992,6 +1051,49 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
     justifyContent: 'space-between',
     gap: 8,
+  },
+  exportCard: {
+    marginTop: AppTheme.spacing.l,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+    padding: AppTheme.spacing.l,
+    gap: AppTheme.spacing.s,
+  },
+  exportTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: AppTheme.colors.textPrimary,
+  },
+  exportNote: {
+    fontSize: 12,
+    color: AppTheme.colors.textSecondary,
+    lineHeight: 17,
+  },
+  exportRow: {
+    flexDirection: 'row',
+    gap: AppTheme.spacing.s,
+    flexWrap: 'wrap',
+    marginTop: AppTheme.spacing.xs,
+  },
+  exportBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: AppTheme.spacing.m,
+    borderRadius: 8,
+    backgroundColor: AppTheme.colors.primaryLight,
+    minWidth: 96,
+    justifyContent: 'center',
+  },
+  exportBtnDisabled: { opacity: 0.6 },
+  exportBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: AppTheme.colors.primary,
+    textTransform: 'capitalize',
   },
   unitsSectionTitle: {
     color: AppTheme.colors.textPrimary,

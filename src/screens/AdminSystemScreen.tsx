@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AdminNavbar } from "../components/common/AdminNavbar";
+import { SettingsPanel } from "../components/admin/SettingsPanel";
 import { useAuth } from "../context/AuthContext";
 import {
   getAdminEmailStatus,
@@ -31,6 +32,8 @@ import { EmailStatusOut, EmailTestResult, SystemHealthOut } from "../types/api";
  * does not belong on the screen you use when everything is fine.
  */
 
+type Section = "health" | "settings";
+
 const TONE: Record<string, { fg: string; bg: string; icon: string }> = {
   ok: { fg: "#127A40", bg: "#E7F6EE", icon: "checkmark-circle" },
   warn: { fg: "#B45309", bg: "#FEF3C7", icon: "alert-circle" },
@@ -41,6 +44,7 @@ export function AdminSystemScreen() {
   const { session } = useAuth();
   const token = session?.token ?? "";
 
+  const [section, setSection] = useState<Section>("health");
   const [health, setHealth] = useState<SystemHealthOut | null>(null);
   const [emailStatus, setEmailStatus] = useState<EmailStatusOut | null>(null);
   const [loading, setLoading] = useState(true);
@@ -100,6 +104,29 @@ export function AdminSystemScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <AdminNavbar title="System" />
+
+      <View style={styles.segmentRow}>
+        {(["health", "settings"] as Section[]).map((key) => (
+          <Pressable
+            key={key}
+            onPress={() => setSection(key)}
+            style={[styles.segment, section === key && styles.segmentActive]}
+          >
+            <Text
+              style={[
+                styles.segmentText,
+                section === key && styles.segmentTextActive,
+              ]}
+            >
+              {key === "health" ? "Health" : "Settings"}
+              {key === "health" && problems.length > 0
+                ? ` (${problems.length})`
+                : ""}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
       <ScrollView
         contentContainerStyle={styles.content}
         refreshControl={
@@ -112,7 +139,9 @@ export function AdminSystemScreen() {
           />
         }
       >
-        {loading ? (
+        {section === "settings" ? (
+          <SettingsPanel token={token} />
+        ) : loading ? (
           <View style={styles.center}>
             <ActivityIndicator color={AppTheme.colors.primary} size="large" />
           </View>
@@ -265,6 +294,21 @@ export function AdminSystemScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: AppTheme.colors.background },
+  segmentRow: {
+    flexDirection: "row",
+    gap: AppTheme.spacing.s,
+    paddingHorizontal: AppTheme.spacing.l,
+    paddingBottom: AppTheme.spacing.m,
+  },
+  segment: {
+    paddingVertical: AppTheme.spacing.s,
+    paddingHorizontal: AppTheme.spacing.l,
+    borderRadius: 999,
+    backgroundColor: AppTheme.colors.surfaceMuted,
+  },
+  segmentActive: { backgroundColor: AppTheme.colors.primary },
+  segmentText: { fontSize: 13, fontWeight: "700", color: AppTheme.colors.textSecondary },
+  segmentTextActive: { color: "#FFFFFF" },
   content: { padding: AppTheme.spacing.l, paddingBottom: 120, gap: AppTheme.spacing.m },
   center: { alignItems: "center", justifyContent: "center", paddingVertical: 48, gap: 12 },
   errorText: { color: AppTheme.colors.textSecondary, textAlign: "center" },

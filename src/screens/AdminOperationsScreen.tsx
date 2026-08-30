@@ -17,6 +17,7 @@ import { AdminNavbar } from "../components/common/AdminNavbar";
 import { useAuth } from "../context/AuthContext";
 import {
   getAdminEmailLog,
+  getAdminAuditLog,
   getAdminEmailStats,
   getAdminPipelineRecordings,
   resendAdminEmailLog,
@@ -24,6 +25,7 @@ import {
 } from "../lib/api";
 import { AppTheme } from "../theme/AppTheme";
 import {
+  AuditLogEntry,
   EmailLogEntry,
   EmailLogStatus,
   EmailStatsOut,
@@ -39,7 +41,24 @@ import {
  * would think to open.
  */
 
-type Section = "email" | "recordings";
+type Section = "email" | "recordings" | "audit";
+
+const SECTION_LABELS: Record<Section, string> = {
+  email: "Email",
+  recordings: "Recordings",
+  audit: "Audit",
+};
+
+/** Actions that destroy or override something, flagged so they stand out. */
+const DESTRUCTIVE_ACTIONS = new Set([
+  "school.delete",
+  "school.suspend",
+  "school.reject",
+  "recording.delete",
+  "teacher.revoke_invite",
+  "teacher.set_password",
+  "school_admin.set_password",
+]);
 
 const STATUS_COLORS: Record<string, { fg: string; bg: string }> = {
   sent: { fg: "#127A40", bg: "#E7F6EE" },
@@ -108,6 +127,7 @@ export function AdminOperationsScreen() {
   const [stats, setStats] = useState<EmailStatsOut | null>(null);
   const [emails, setEmails] = useState<EmailLogEntry[]>([]);
   const [recordings, setRecordings] = useState<PipelineRecordingOut[]>([]);
+  const [audit, setAudit] = useState<AuditLogEntry[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -118,14 +138,16 @@ export function AdminOperationsScreen() {
     if (!token) return;
     setError(null);
     try {
-      const [nextStats, nextEmails, nextRecordings] = await Promise.all([
+      const [nextStats, nextEmails, nextRecordings, nextAudit] = await Promise.all([
         getAdminEmailStats(token),
         getAdminEmailLog(token, { status: statusFilter ?? undefined, limit: 100 }),
         getAdminPipelineRecordings(token, { problemsOnly: true, limit: 100 }),
+        getAdminAuditLog(token, { limit: 100 }),
       ]);
       setStats(nextStats);
       setEmails(nextEmails);
       setRecordings(nextRecordings);
+      setAudit(nextAudit);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not load operations data");
     } finally {
@@ -184,7 +206,7 @@ export function AdminOperationsScreen() {
       <AdminNavbar title="Operations" />
 
       <View style={styles.segmentRow}>
-        {(["email", "recordings"] as Section[]).map((key) => (
+        {(["email", "recordings", "audit"] as Section[]).map((key) => (
           <Pressable
             key={key}
             onPress={() => setSection(key)}
@@ -196,7 +218,7 @@ export function AdminOperationsScreen() {
                 section === key && styles.segmentTextActive,
               ]}
             >
-              {key === "email" ? "Email" : "Recordings"}
+              {SECTION_LABELS[key]}
               {key === "email" && failedCount > 0 ? ` (${failedCount})` : ""}
               {key === "recordings" && recordings.length > 0
                 ? ` (${recordings.length})`
@@ -339,6 +361,55 @@ export function AdminOperationsScreen() {
               ))
             )}
           </>
+        ) : section === "audit" ? (
+          audit.length === 0 ? (
+            <Text style={styles.emptyText}>
+              Nothing recorded yet. Super admin actions that cannot be
+              reconstructed afterwards — setting someone's password, suspending
+              a school, deleting a recording, changing a setting — are listed
+              here as they happen.
+            </Text>
+          ) : (
+            audit.map((entry) => (
+              <View key={entry.id} style={styles.row}>
+                <View style={styles.rowHeader}>
+                  <Text style={styles.rowTitle} numberOfLines={1}>
+                    {entry.target_label ?? entry.target_type ?? "—"}
+                  </Text>
+                  <View
+                    style={[
+                      styles.pill,
+                      {
+                        backgroundColor: DESTRUCTIVE_ACTIONS.has(entry.action)
+                          ? "#FEE4E2"
+                          : "#F2F4F7",
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.pillText,
+                        {
+                          color: DESTRUCTIVE_ACTIONS.has(entry.action)
+                            ? "#B42318"
+                            : "#475467",
+                          textTransform: "none",
+                        },
+                      ]}
+                    >
+                      {entry.action}
+                    </Text>
+                  </View>
+                </View>
+                <Text style={styles.rowSubtitle} numberOfLines={1}>
+                  {entry.actor_email} · {relativeTime(entry.created_at)}
+                </Text>
+                {entry.detail ? (
+                  <Text style={styles.auditDetail}>{entry.detail}</Text>
+                ) : null}
+              </View>
+            ))
+          )
         ) : recordings.length === 0 ? (
           <Text style={styles.emptyText}>
             Nothing failed or stuck. Recordings only appear here when analysis
@@ -490,6 +561,12 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.primaryLight,
   },
   rowActionText: { fontSize: 12, fontWeight: "700", color: AppTheme.colors.primary },
+  auditDetail: {
+    fontSize: 12,
+    color: AppTheme.colors.textPrimary,
+    lineHeight: 17,
+    marginTop: 2,
+  },
   pill: { paddingVertical: 3, paddingHorizontal: 10, borderRadius: 999 },
   pillText: { fontSize: 11, fontWeight: "800", textTransform: "capitalize" },
   emptyText: {

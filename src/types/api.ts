@@ -61,7 +61,7 @@ export type AcceptInvitePayload = {
 
 /** What this deployment is configured to do with outgoing email. */
 export type EmailStatusOut = {
-  backend: 'mailjet' | 'smtp' | 'log';
+  backend: 'resend' | 'brevo' | 'mailjet' | 'smtp' | 'log';
   delivers_email: boolean;
   from_email: string | null;
   from_name: string | null;
@@ -149,6 +149,65 @@ export type SystemHealthOut = {
   healthy: boolean;
   components: HealthComponent[];
   checked_at: string;
+};
+
+/**
+ * An operational value changeable from the panel instead of by redeploy.
+ *
+ * `is_overridden` separates "this is what the environment says" from "somebody
+ * changed this here" — indistinguishable from the value alone, and the first
+ * thing you want to know when a setting is not behaving.
+ */
+export type SettingOut = {
+  key: string;
+  label: string;
+  description: string;
+  kind: 'string' | 'bool' | 'int';
+  category: string;
+  value: string | number | boolean;
+  default: string | number | boolean;
+  is_overridden: boolean;
+};
+
+/** Anyone with an account, found by email or name across every school. */
+export type UserSearchResult = {
+  id: number;
+  name: string;
+  email: string;
+  role: 'school_admin' | 'teacher' | 'student';
+  status: string | null;
+  school_id: number | null;
+  school_name: string | null;
+  has_password: boolean;
+  email_verified: boolean | null;
+  created_at: string | null;
+  can_resend_invite: boolean;
+};
+
+/**
+ * One recorded super admin action.
+ *
+ * Every field is a snapshot taken at the time, not a live lookup — the actions
+ * most worth auditing are the ones that delete or rename what they touched.
+ */
+export type AuditLogEntry = {
+  id: number;
+  actor_email: string;
+  action: string;
+  target_type: string | null;
+  target_id: number | null;
+  target_label: string | null;
+  school_id: number | null;
+  detail: string | null;
+  created_at: string;
+};
+
+export type ExportResource = 'teachers' | 'classes' | 'recordings';
+
+/** Unauthenticated maintenance state, for the banner every client shows. */
+export type PublicSystemStatus = {
+  maintenance_mode: boolean;
+  maintenance_message: string;
 };
 
 /** Super admin setting someone else's password directly, without any email. */

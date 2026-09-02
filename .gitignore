@@ -40,3 +40,10 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# build artifacts (never commit - GitHub rejects files over 100MB)
+*.apk
+*.aab
+*.ipa
+*.tar.gz
+*.zip

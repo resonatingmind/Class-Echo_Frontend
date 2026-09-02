@@ -237,6 +237,25 @@ export type ClassOut = {
   created_at: string;
 };
 
+export type ClassFilterTeacher = {
+  id: number;
+  name: string;
+};
+
+export type ClassFiltersOut = {
+  classes: string[];
+  sections: string[];
+  teachers: ClassFilterTeacher[];
+  subjects: string[];
+};
+
+export type SchoolAdminClassFilters = {
+  name?: string | null;
+  section?: string | null;
+  teacher_id?: number | null;
+  subject?: string | null;
+};
+
 export type TeacherOut = {
   id: number;
   name: string;

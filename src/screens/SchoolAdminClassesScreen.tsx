@@ -19,12 +19,18 @@ import { AdminNavbar } from "../components/common/AdminNavbar";
 import { useAuth } from "../context/AuthContext";
 import {
   createSchoolAdminClass,
+  getSchoolAdminClassFilters,
   getSchoolAdminClasses,
   getSchoolAdminTeachers,
 } from "../lib/api";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { AppTheme } from "../theme/AppTheme";
-import { ClassOut } from "../types/api";
+import {
+  ClassFiltersOut,
+  ClassOut,
+  SchoolAdminClassFilters,
+} from "../types/api";
+import { ClassFilterBar } from "../components/schoolAdmin/ClassFilterBar";
 import { SelectDropdown } from "../components/ui/SelectDropdown";
 import { CLASS_NAME_OPTIONS, SECTION_OPTIONS } from "../constants";
 
@@ -193,6 +199,10 @@ export function SchoolAdminClassesScreen({ navigation }: Props) {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const [filters, setFilters] = useState<SchoolAdminClassFilters>({});
+  const [filterOptions, setFilterOptions] = useState<ClassFiltersOut | null>(
+    null,
+  );
 
   const load = useCallback(
     async (silent = false) => {
@@ -200,7 +210,7 @@ export function SchoolAdminClassesScreen({ navigation }: Props) {
       if (!silent) setIsLoading(true);
       setError(null);
       try {
-        setClasses(await getSchoolAdminClasses(session.token));
+        setClasses(await getSchoolAdminClasses(session.token, filters));
       } catch (e) {
         setError(e instanceof Error ? e.message : "Could not load classes");
       } finally {
@@ -208,19 +218,36 @@ export function SchoolAdminClassesScreen({ navigation }: Props) {
         setRefreshing(false);
       }
     },
-    [session],
+    [session, filters],
   );
+
+  const loadFilterOptions = useCallback(async () => {
+    if (!session) return;
+    try {
+      setFilterOptions(await getSchoolAdminClassFilters(session.token));
+    } catch {
+      // Filter options are non-critical: the list still loads unfiltered.
+    }
+  }, [session]);
 
   useFocusEffect(
     useCallback(() => {
       void load();
-    }, [load]),
+      void loadFilterOptions();
+    }, [load, loadFilterOptions]),
   );
 
   const onRefresh = () => {
     setRefreshing(true);
     void load(true);
+    void loadFilterOptions();
   };
+
+  const hasActiveFilter =
+    Boolean(filters.name) ||
+    Boolean(filters.section) ||
+    filters.teacher_id != null ||
+    Boolean(filters.subject);
 
   return (
     <SafeAreaView edges={["top"]} style={styles.safe}>
@@ -253,10 +280,17 @@ export function SchoolAdminClassesScreen({ navigation }: Props) {
                   </Pressable>
                 </View>
                 <Text style={styles.pageSubtitle}>
-                  Managing {classes.length} active classroom
-                  {classes.length !== 1 ? "s" : ""} for the current session.
+                  {hasActiveFilter ? "Showing" : "Managing"} {classes.length}{" "}
+                  active classroom{classes.length !== 1 ? "s" : ""} for the
+                  current session.
                 </Text>
               </View>
+
+              <ClassFilterBar
+                filters={filters}
+                onChange={setFilters}
+                options={filterOptions}
+              />
 
               {isLoading ? (
                 <View style={styles.center}>
@@ -283,9 +317,13 @@ export function SchoolAdminClassesScreen({ navigation }: Props) {
                     name="school-outline"
                     size={44}
                   />
-                  <Text style={styles.emptyTitle}>No classes yet</Text>
+                  <Text style={styles.emptyTitle}>
+                    {hasActiveFilter ? "No matching classes" : "No classes yet"}
+                  </Text>
                   <Text style={styles.emptyBody}>
-                    Create your first class to start organizing subjects.
+                    {hasActiveFilter
+                      ? "Try clearing or changing the filters above."
+                      : "Create your first class to start organizing subjects."}
                   </Text>
                 </View>
               ) : (
@@ -313,7 +351,10 @@ export function SchoolAdminClassesScreen({ navigation }: Props) {
 
       <CreateClassModal
         onClose={() => setShowCreate(false)}
-        onCreated={(cls) => setClasses((prev) => [...prev, cls])}
+        onCreated={() => {
+          void load(true);
+          void loadFilterOptions();
+        }}
         visible={showCreate}
       />
     </SafeAreaView>

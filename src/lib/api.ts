@@ -1,6 +1,8 @@
 import { LearningPlanOut, LearningPlanCreatePayload } from '../types/api';
 import {
   ClassOut,
+  ClassFiltersOut,
+  SchoolAdminClassFilters,
   LLMReportOut,
   RecordingWithReport,
   SchoolCreatePayload,
@@ -759,8 +761,30 @@ export async function deleteAdminRecording(token: string, recordingId: number) {
   );
 }
 
-export async function getSchoolAdminClasses(token: string) {
-  return request<ClassOut[]>("/school/classes", {}, token);
+export async function getSchoolAdminClasses(
+  token: string,
+  filters?: SchoolAdminClassFilters,
+) {
+  const query = new URLSearchParams();
+
+  if (filters?.name) query.set("name", filters.name);
+  if (filters?.section) query.set("section", filters.section);
+  if (filters?.teacher_id != null) {
+    query.set("teacher_id", String(filters.teacher_id));
+  }
+  if (filters?.subject) query.set("subject", filters.subject);
+
+  const qs = query.toString();
+
+  return request<ClassOut[]>(
+    `/school/classes${qs ? `?${qs}` : ""}`,
+    {},
+    token,
+  );
+}
+
+export async function getSchoolAdminClassFilters(token: string) {
+  return request<ClassFiltersOut>("/school/classes/filters", {}, token);
 }
 
 export async function getSchoolAdminTeachers(token: string) {

@@ -58,7 +58,11 @@ function getScoreColor(score: number | undefined | null) {
 type Props = NativeStackScreenProps<RootStackParamList, "TeacherSubjectWorkspace">;
 
 export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
-  const { subjectId, subjectName, className, section } = route.params;
+  const params = route.params || ({} as any);
+  const subjectId = Number(params.subjectId);
+  const subjectName = params.subjectName || "Subject";
+  const className = params.className || "";
+  const section = params.section || "";
   const { session } = useAuth();
   const token = session?.token ?? "";
 

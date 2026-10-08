@@ -272,37 +272,46 @@ const bl = StyleSheet.create({
 // ── Main screen ───────────────────────────────────────────────────────────────
 
 export function RecordingDetailScreen({ navigation, route }: Props) {
-  const { recording: initialRecording, subjectName } = route.params;
+  const params = route.params || ({} as any);
+  const initialRecording = params.recording;
+  const recordingId = initialRecording?.id ?? (params.recordingId ? Number(params.recordingId) : null);
+  const subjectName = params.subjectName || initialRecording?.subject_name || '';
   const { session } = useAuth();
-  const [status, setStatus] = useState(initialRecording.status);
+  const [status, setStatus] = useState<RecordingStatus>(initialRecording?.status || 'pending');
   const [retrying, setRetrying] = useState(false);
-  const [recordingDetails, setRecordingDetails] = useState(initialRecording);
+  const [recordingDetails, setRecordingDetails] = useState<RecordingWithReport | null>(initialRecording || null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   
   // Modals / Actions states
   const [showOptionsSheet, setShowOptionsSheet] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editChapterName, setEditChapterName] = useState(initialRecording.chapter_name || '');
-  const [editLectureTitle, setEditLectureTitle] = useState(initialRecording.lecture_title || '');
-  const [editDescription, setEditDescription] = useState(initialRecording.description || '');
+  const [editChapterName, setEditChapterName] = useState(initialRecording?.chapter_name || '');
+  const [editLectureTitle, setEditLectureTitle] = useState(initialRecording?.lecture_title || '');
+  const [editDescription, setEditDescription] = useState(initialRecording?.description || '');
   const [updatingDetails, setUpdatingDetails] = useState(false);
 
   const fetchDetails = useCallback(async () => {
-    if (!session) return;
+    if (!session || !recordingId) return;
     try {
       let updated: RecordingWithReport | null = null;
       if (session.role === 'school_admin' || session.role === 'admin') {
-        updated = await getSchoolRecordingDetail(session.token, recordingDetails.id);
+        updated = await getSchoolRecordingDetail(session.token, recordingId);
       } else {
-        updated = await getTeacherRecordingDetail(session.token, recordingDetails.id);
+        updated = await getTeacherRecordingDetail(session.token, recordingId);
       }
       if (updated) {
         setRecordingDetails(updated);
         setStatus(updated.status);
+        setEditChapterName(updated.chapter_name || '');
+        setEditLectureTitle(updated.lecture_title || '');
+        setEditDescription(updated.description || '');
+      } else {
+        setLoadError('Recording not found');
       }
-    } catch {
-      // ignore
+    } catch (e) {
+      setLoadError(e instanceof Error ? e.message : 'Could not load recording');
     }
-  }, [session, recordingDetails.id]);
+  }, [session, recordingId]);
 
   useEffect(() => {
     void fetchDetails();
@@ -325,7 +334,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
 
   // Relative storage paths have to resolve against whichever backend this build
   // points at — a hardcoded localhost never works in a packaged APK.
-  const audioUrl = resolveMediaUrl(recordingDetails.cloudinary_url) ?? '';
+  const audioUrl = resolveMediaUrl(recordingDetails?.cloudinary_url) ?? '';
 
   const player = useAudioPlayer(audioUrl, {
     updateInterval: 200,
@@ -333,7 +342,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
 
   const playerStatus = useAudioPlayerStatus(player);
   const statusBadge = statusStyle(status);
-  const waveform = useMemo(() => buildWaveformBars(recordingDetails.id), [recordingDetails.id]);
+  const waveform = useMemo(() => buildWaveformBars(recordingDetails?.id ?? 0), [recordingDetails?.id]);
 
   useEffect(() => {
     void setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true });
@@ -465,6 +474,24 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
       ]
     );
   };
+
+  if (!recordingDetails) {
+    if (loadError) {
+      return (
+        <SafeAreaView style={{ flex: 1, backgroundColor: AppTheme.colors.background, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+          <Text style={{ fontSize: 16, color: '#B42318', marginBottom: 12 }}>{loadError}</Text>
+          <Pressable onPress={() => navigation.goBack()} style={{ paddingHorizontal: 16, paddingVertical: 8, backgroundColor: AppTheme.colors.primary, borderRadius: 8 }}>
+            <Text style={{ color: '#fff', fontWeight: '600' }}>Go Back</Text>
+          </Pressable>
+        </SafeAreaView>
+      );
+    }
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: AppTheme.colors.background, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color={AppTheme.colors.primary} />
+      </SafeAreaView>
+    );
+  }
 
   const recording = { ...recordingDetails, status };
   const report = recording.report;
@@ -668,9 +695,15 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
                   <LearningPlanInfoCard data={recording.learning_plan} />
                 ) : null}
 
-                {/* Curriculum coverage */}
-                {report.curriculum_coverage ? (
-                  <CurriculumCoverageCard data={report.curriculum_coverage} />
+                {/* Curriculum & Lecture Dual-Angle Coverage */}
+                {report.curriculum_coverage || report.lecture_coverage || report.chapter_coverage ? (
+                  <CurriculumCoverageCard
+                    data={report.curriculum_coverage}
+                    lectureCoverage={report.lecture_coverage}
+                    chapterCoverage={report.chapter_coverage}
+                    learningPlan={recording.learning_plan}
+                    chapterInfo={report.chapter_info}
+                  />
                 ) : null}
 
                 {/* Reference alignment */}

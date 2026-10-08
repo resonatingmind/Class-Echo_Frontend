@@ -21,6 +21,7 @@ import {
   createSubject,
   getClassSubjects,
   getSchoolAdminTeachers,
+  getSchoolAdminClasses,
   updateSchoolAdminClass,
   deleteSubject,
   getSchoolAdminMe,
@@ -246,7 +247,10 @@ function SubjectCard({
 
 export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
   const { session } = useAuth();
-  const { classId, className, section } = route.params;
+  const params = route.params || ({} as any);
+  const classId = Number(params.classId);
+  const [className, setClassName] = useState(params.className || '');
+  const [section, setSection] = useState(params.section || '');
 
   const [subjects, setSubjects] = useState<SubjectOut[]>([]);
   const [teachers, setTeachers] = useState<TeacherOut[]>([]);
@@ -256,8 +260,8 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
   const [showAddSubject, setShowAddSubject] = useState(false);
   const [assignTarget, setAssignTarget] = useState<SubjectOut | null>(null);
   const [showEditClass, setShowEditClass] = useState(false);
-  const [editClassName, setEditClassName] = useState(className);
-  const [editClassSection, setEditClassSection] = useState(section || "");
+  const [editClassName, setEditClassName] = useState(params.className || '');
+  const [editClassSection, setEditClassSection] = useState(params.section || "");
   const [editingClass, setEditingClass] = useState(false);
   const [editClassError, setEditClassError] = useState<string | null>(null);
 
@@ -280,12 +284,23 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
       if (!silent) setIsLoading(true);
       setError(null);
       try {
-        const [subjectsData, teachersData] = await Promise.all([
+        const [subjectsData, teachersData, classesData] = await Promise.all([
           getClassSubjects(session.token, classId),
           getSchoolAdminTeachers(session.token),
+          !className ? getSchoolAdminClasses(session.token) : Promise.resolve([]),
         ]);
         setSubjects(subjectsData);
         setTeachers(teachersData);
+
+        if (classesData && classesData.length > 0) {
+          const found = classesData.find((c: any) => c.id === classId);
+          if (found) {
+            setClassName(found.name);
+            setSection(found.section || '');
+            setEditClassName(found.name);
+            setEditClassSection(found.section || '');
+          }
+        }
 
         // Fetch admin me if email not cached yet
         if (!adminEmail) {

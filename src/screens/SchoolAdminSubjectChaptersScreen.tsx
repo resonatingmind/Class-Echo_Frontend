@@ -126,7 +126,9 @@ function ChapterModal({
 
 export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
   const { session } = useAuth();
-  const { subjectId, subjectName } = route.params;
+  const params = route.params || ({} as any);
+  const subjectId = Number(params.subjectId);
+  const subjectName = params.subjectName || "Subject";
 
   const [chapters, setChapters] = useState<ChapterOut[]>([]);
   const [importModalVisible, setImportModalVisible] = useState(false);

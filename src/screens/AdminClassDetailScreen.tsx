@@ -63,7 +63,11 @@ function SubjectCard({
 
 export function AdminClassDetailScreen({ navigation, route }: Props) {
   const { session, signOut } = useAuth();
-  const { schoolId, classId, className, schoolName } = route.params;
+  const params = route.params || ({} as any);
+  const schoolId = Number(params.schoolId);
+  const classId = Number(params.classId);
+  const className = params.className || "Class";
+  const schoolName = params.schoolName || "School";
 
   const [classDetail, setClassDetail] = useState<ClassOut | null>(null);
   const [subjects, setSubjects] = useState<SubjectOut[]>([]);

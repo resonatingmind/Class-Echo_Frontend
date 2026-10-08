@@ -358,6 +358,25 @@ export type CurriculumCoverage = {
   coverage_percentage: number;
 };
 
+export type LectureCoverage = {
+  topic?: string | null;
+  sub_topic?: string | null;
+  planned_concepts: string[];
+  covered_concepts: string[];
+  missed_concepts: string[];
+  coverage_percentage: number;
+  alignment_status?: "fully_aligned" | "partially_aligned" | "diverged" | null;
+  notes?: string | null;
+};
+
+export type ChapterCoverage = {
+  chapter_name?: string | null;
+  total_concepts_count: number;
+  covered_in_lecture: string[];
+  remaining_chapter_concepts: string[];
+  chapter_coverage_percentage: number;
+};
+
 export type AccuracyAnalysis = {
   correct_explanations: string[];
   potential_inaccuracies: string[];
@@ -382,6 +401,8 @@ export type LLMReportOut = {
   score_breakdown: ScoreBreakdown | null;
   quantitative_metrics: QuantitativeMetrics | null;
   curriculum_coverage: CurriculumCoverage | null;
+  lecture_coverage?: LectureCoverage | null;
+  chapter_coverage?: ChapterCoverage | null;
   accuracy_analysis: AccuracyAnalysis | null;
   chapter_info: ChapterInfo | null;
   learning_objectives_achievement: LearningObjectiveStatus[] | null;

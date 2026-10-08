@@ -100,7 +100,10 @@ function RecordingRow({
 
 export function AdminSubjectDetailScreen({ navigation, route }: Props) {
   const { session, signOut } = useAuth();
-  const { schoolId, subjectId, subjectName } = route.params;
+  const params = route.params || ({} as any);
+  const schoolId = Number(params.schoolId);
+  const subjectId = Number(params.subjectId);
+  const subjectName = params.subjectName || "Subject";
 
   const [recordings, setRecordings] = useState<RecordingWithReport[]>([]);
   const [isLoading, setIsLoading] = useState(true);

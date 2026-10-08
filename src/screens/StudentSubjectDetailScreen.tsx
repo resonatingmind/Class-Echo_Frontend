@@ -44,7 +44,9 @@ function formatDuration(seconds: number | null): string {
 
 export function StudentSubjectDetailScreen({ navigation, route }: Props) {
   const { session } = useAuth();
-  const { subjectId, subjectName } = route.params;
+  const params = route.params || ({} as any);
+  const subjectId = Number(params.subjectId);
+  const subjectName = params.subjectName || "Subject";
 
   const [recordings, setRecordings] = useState<RecordingWithReport[]>([]);
   const [isLoading, setIsLoading] = useState(true);

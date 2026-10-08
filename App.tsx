@@ -11,8 +11,9 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useRef } from "react";
+import { ActivityIndicator, View } from "react-native";
 
-import { AuthProvider } from './src/context/AuthContext';
+import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { MaintenanceBanner } from './src/components/common/MaintenanceBanner';
 import { colors } from './src/theme/colors';
@@ -43,12 +44,38 @@ const linking = {
 
   config: {
     screens: {
+      // ── Auth screens ──
       Login: "login",
       Signup: "signup",
       AcceptInvite: "accept-invite",
       VerifyEmail: "verify-email",
       AwaitingApproval: "awaiting-approval",
 
+      // ── Super Admin screens ──
+      AdminSchools: {
+        path: "admin",
+        screens: {
+          AdminSchoolsTab: "schools",
+          AdminPeople: "people",
+          AdminOperations: "operations",
+          AdminSystem: "system",
+        },
+      },
+      AdminCreateSchool: "admin/schools/create",
+      AdminSchoolDetail: {
+        path: "admin/schools/:schoolId",
+        parse: { schoolId: Number },
+      },
+      AdminClassDetail: {
+        path: "admin/schools/:schoolId/class/:classId",
+        parse: { schoolId: Number, classId: Number },
+      },
+      AdminSubjectDetail: {
+        path: "admin/schools/:schoolId/subject/:subjectId",
+        parse: { schoolId: Number, subjectId: Number },
+      },
+
+      // ── School Admin screens ──
       SchoolAdminTabs: {
         screens: {
           SchoolAdminDashboard: "dashboard",
@@ -59,14 +86,33 @@ const linking = {
         },
       },
 
-      SchoolAdminClassDetail: "admin/class/:classId",
-      SchoolAdminTeacherDetail: "admin/teacher/:teacherId",
-      SchoolAdminTeacherAnalytics: "admin/teacher/:teacherId/analytics",
-      SchoolAdminTeacherRecordings: "admin/teacher/:teacherId/recordings",
-      SchoolAdminSubjectChapters: "admin/subject/:subjectId/chapters",
-      SchoolAdminChapterDetail: "admin/chapter/:chapterId",
+      SchoolAdminClassDetail: {
+        path: "admin/class/:classId",
+        parse: { classId: Number },
+      },
+      SchoolAdminTeacherDetail: {
+        path: "admin/teacher/:teacherId",
+        parse: { teacherId: Number },
+      },
+      SchoolAdminTeacherAnalytics: {
+        path: "admin/teacher/:teacherId/analytics",
+        parse: { teacherId: Number },
+      },
+      SchoolAdminTeacherRecordings: {
+        path: "admin/teacher/:teacherId/recordings",
+        parse: { teacherId: Number, chapterId: Number },
+      },
+      SchoolAdminSubjectChapters: {
+        path: "admin/subject/:subjectId/chapters",
+        parse: { subjectId: Number },
+      },
+      SchoolAdminChapterDetail: {
+        path: "admin/chapter/:chapterId",
+        parse: { chapterId: Number },
+      },
       SchoolAdminProfile: "admin/profile",
 
+      // ── Teacher screens ──
       TeacherTabs: {
         screens: {
           TeacherDashboard: "teacher/dashboard",
@@ -76,22 +122,66 @@ const linking = {
         },
       },
 
-      TeacherSubjectWorkspace: "teacher/subject/:subjectId/workspace",
-      TeacherChapterDetail: "teacher/chapter/:chapterId",
-      TeacherRecording: "teacher/recording",
+      TeacherSubjectWorkspace: {
+        path: "teacher/subject/:subjectId/workspace",
+        parse: { subjectId: Number },
+      },
+      TeacherChapterDetail: {
+        path: "teacher/chapter/:chapterId",
+        parse: { chapterId: Number },
+      },
+      TeacherRecording: {
+        path: "teacher/recording",
+        parse: { subjectId: Number, chapterId: Number, learningPlanId: Number, replaceRecordingId: Number },
+      },
       TeacherProfile: "teacher/profile",
 
+      // ── Student screens ──
       StudentHome: "student",
-      StudentSubjectDetail: "student/subject/:subjectId",
+      StudentSubjectDetail: {
+        path: "student/subject/:subjectId",
+        parse: { subjectId: Number },
+      },
       StudentProfile: "student/profile",
 
-      RecordingDetail: "recording/detail",
+      // ── Shared detail screens ──
+      RecordingDetail: {
+        path: "recording/:recordingId",
+        parse: { recordingId: Number },
+      },
     },
   },
 };
 
-export default function App() {
+function RootNavigator() {
+  const { isLoading } = useAuth();
   const navigationRef = useRef<NavigationContainerRef<any>>(null);
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: colors.background }}>
+        <ActivityIndicator size="large" color={colors.accent} />
+      </View>
+    );
+  }
+
+  return (
+    <NavigationContainer
+      ref={navigationRef}
+      theme={navigationTheme}
+      linking={linking}
+    >
+      <StatusBar style="dark" />
+      {/* Above the navigator so it is visible on every screen, including
+          the login form — a user who cannot sign in during maintenance
+          needs the explanation more than anyone. */}
+      <MaintenanceBanner />
+      <AppNavigator />
+    </NavigationContainer>
+  );
+}
+
+export default function App() {
   const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
@@ -114,18 +204,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <NavigationContainer
-          ref={navigationRef}
-          theme={navigationTheme}
-          linking={linking}
-        >
-          <StatusBar style="dark" />
-          {/* Above the navigator so it is visible on every screen, including
-              the login form — a user who cannot sign in during maintenance
-              needs the explanation more than anyone. */}
-          <MaintenanceBanner />
-          <AppNavigator />
-        </NavigationContainer>
+        <RootNavigator />
       </AuthProvider>
     </SafeAreaProvider>
   );

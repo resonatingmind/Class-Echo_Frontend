@@ -62,12 +62,11 @@ function statusStyle(status: string) {
 
 export function TeacherChapterDetailScreen({ navigation, route }: Props) {
   const { session } = useAuth();
-  const {
-    chapterId,
-    chapterName,
-    subjectName,
-    initialTab,
-  } = route.params;
+  const params = route.params || ({} as any);
+  const chapterId = Number(params.chapterId);
+  const [chapterName, setChapterName] = useState(params.chapterName || '');
+  const [subjectName, setSubjectName] = useState(params.subjectName || '');
+  const initialTab = params.initialTab;
 
   const [chapter, setChapter] = useState<ChapterOut | null>(null);
   const [knowledge, setKnowledge] = useState<ChapterKnowledgeOut | null>(null);
@@ -103,6 +102,7 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
           getTeacherChapterDocuments(session.token, chapterId),
         ]);
         setChapter(detailData);
+        if (!chapterName) setChapterName(detailData.name);
         setDocuments(docsData);
 
         const subId = route.params.subjectId || detailData.subject_id;

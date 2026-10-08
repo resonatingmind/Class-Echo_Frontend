@@ -7,6 +7,7 @@ import { RecordingWithReport, UserRole } from "../types/api";
 import { SchoolAdminTabNavigator } from "./SchoolAdminTabNavigator";
 import { AdminTabNavigator } from "./AdminTabNavigator";
 import type { AdminTabParamList } from "./AdminTabNavigator";
+import type { TeacherTabParamList } from "./TeacherTabNavigator";
 
 // Super Admin screens
 import { AdminClassDetailScreen } from "../screens/AdminClassDetailScreen";
@@ -113,24 +114,24 @@ export type RootStackParamList = {
 
   TeacherChapterDetail: {
     chapterId: number;
-    chapterName: string;
-    subjectName: string;
+    chapterName?: string;
+    subjectName?: string;
     subjectId?: number;
     openUpload?: boolean;
     initialTab?: 'planner' | 'profile' | 'documents';
   };
   TeacherProfile: undefined;
-  TeacherTabs: undefined;
+  TeacherTabs: NavigatorScreenParams<TeacherTabParamList> | undefined;
 
   TeacherSubjectWorkspace: {
     subjectId: number;
-    subjectName: string;
-    className: string;
-    section: string;
+    subjectName?: string;
+    className?: string;
+    section?: string;
   };
   TeacherRecording: {
     subjectId: number;
-    subjectName: string;
+    subjectName?: string;
     existingChapters?: string[];
     chapterId?: number;
     chapterName?: string;
@@ -141,9 +142,13 @@ export type RootStackParamList = {
 
   // Student
   StudentHome: undefined;
-  StudentSubjectDetail: { subjectId: number; subjectName: string };
+  StudentSubjectDetail: { subjectId: number; subjectName?: string };
   StudentProfile: undefined;
-  RecordingDetail: { recording: RecordingWithReport; subjectName: string };
+  RecordingDetail: {
+    recording?: RecordingWithReport;
+    subjectName?: string;
+    recordingId?: number;
+  };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -171,6 +176,7 @@ export function AppNavigator() {
   return (
     <Stack.Navigator
       id="RootStack"
+      initialRouteName={session ? roleHome(session.role) : "Login"}
       screenOptions={{
         headerShown: false,
         contentStyle: { backgroundColor: "#FAF9F9" },

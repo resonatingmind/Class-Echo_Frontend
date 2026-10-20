@@ -38,6 +38,7 @@ import {
   TimetableEntryPayload,
   TimetableImportResult,
   AcceptInvitePayload,
+  ResetPasswordPayload,
   AuditLogEntry,
   CredentialUpdateOut,
   ExportResource,
@@ -60,7 +61,7 @@ import { notifyUnauthorized } from "./authSession";
 import { Platform } from "react-native";
 
 function getDefaultApiBaseUrl() {
-  return "https://class-echo-backend.onrender.com";
+  return "https://3-24-211-242.sslip.io";
 }
 
 // Load from environment variable (Expo requires prefixing with EXPO_PUBLIC_)
@@ -669,6 +670,22 @@ export async function verifyEmail(token: string) {
   return request<{ email_verified: boolean }>(
     `/auth/verify-email?token=${encodeURIComponent(token)}`,
   );
+}
+
+/** Ask for a password reset email. Resolves the same way whether or not the email has an account. */
+export async function forgotPassword(email: string) {
+  return request<{ detail: string }>("/auth/forgot-password", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+/** Set a new password using the token from an emailed reset link. */
+export async function resetPassword(payload: ResetPasswordPayload) {
+  return request<{ password_reset: boolean }>("/auth/reset-password", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 }
 
 export async function getAdminSchool(token: string, schoolId: number) {

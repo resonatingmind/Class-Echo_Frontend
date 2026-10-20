@@ -130,6 +130,16 @@ export function LoginScreen({ navigation }: Props) {
                   error={passwordError}
                 />
 
+                <Pressable
+                  onPress={() =>
+                    navigation.navigate("ForgotPassword", { email: email.trim() || undefined })
+                  }
+                  style={styles.forgotRow}
+                  hitSlop={8}
+                >
+                  <Text style={styles.forgotLink}>Forgot password?</Text>
+                </Pressable>
+
                 <PrimaryButton
                   title="Sign In"
                   onPress={handleSignIn}
@@ -199,6 +209,15 @@ const styles = StyleSheet.create({
   },
   buttonSpacing: {
     marginTop: AppTheme.spacing.s,
+  },
+  forgotRow: {
+    alignSelf: "flex-end",
+    marginTop: -AppTheme.spacing.s,
+  },
+  forgotLink: {
+    color: AppTheme.colors.primary,
+    ...AppTheme.typography.caption,
+    fontWeight: "600",
   },
   signupRow: {
     flexDirection: "row",

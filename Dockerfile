@@ -7,7 +7,7 @@ RUN npm ci --legacy-peer-deps || npm install --legacy-peer-deps
 
 COPY . .
 
-ARG EXPO_PUBLIC_API_URL=https://class-echo-backend.onrender.com
+ARG EXPO_PUBLIC_API_URL=https://3-24-211-242.sslip.io
 ENV EXPO_PUBLIC_API_URL=$EXPO_PUBLIC_API_URL
 
 RUN npx expo export -p web

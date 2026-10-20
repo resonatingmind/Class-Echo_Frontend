@@ -11,7 +11,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://class-echo-backend.onrender.com"
+        "EXPO_PUBLIC_API_URL": "https://3-24-211-242.sslip.io"
       }
     },
     "preview": {
@@ -20,7 +20,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://class-echo-backend.onrender.com"
+        "EXPO_PUBLIC_API_URL": "https://3-24-211-242.sslip.io"
       },
       "ios": {
         "simulator": false
@@ -33,7 +33,7 @@
         "gradleCommand": ":app:assembleRelease -PreactNativeArchitectures=arm64-v8a"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://class-echo-backend.onrender.com"
+        "EXPO_PUBLIC_API_URL": "https://3-24-211-242.sslip.io"
       }
     },
     "production": {
@@ -42,7 +42,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://class-echo-backend.onrender.com"
+        "EXPO_PUBLIC_API_URL": "https://3-24-211-242.sslip.io"
       }
     },
     "ios-simulator": {
@@ -51,7 +51,7 @@
         "simulator": true
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://class-echo-backend.onrender.com"
+        "EXPO_PUBLIC_API_URL": "https://3-24-211-242.sslip.io"
       }
     }
   },

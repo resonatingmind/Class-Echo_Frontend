@@ -47,6 +47,8 @@ const linking = {
       Signup: "signup",
       AcceptInvite: "accept-invite",
       VerifyEmail: "verify-email",
+      ForgotPassword: "forgot-password",
+      ResetPassword: "reset-password",
       AwaitingApproval: "awaiting-approval",
 
       SchoolAdminTabs: {

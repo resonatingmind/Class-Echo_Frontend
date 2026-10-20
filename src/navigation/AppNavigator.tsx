@@ -30,6 +30,8 @@ import { SchoolAdminProfileScreen } from "../screens/SchoolAdminProfileScreen";
 // Auth screens
 import { AcceptInviteScreen } from "../screens/AcceptInviteScreen";
 import { VerifyEmailScreen } from "../screens/VerifyEmailScreen";
+import { ForgotPasswordScreen } from "../screens/ForgotPasswordScreen";
+import { ResetPasswordScreen } from "../screens/ResetPasswordScreen";
 import { LoginScreen } from "../screens/LoginScreen";
 import { SignupScreen } from "../screens/SignupScreen";
 import { AwaitingApprovalScreen } from "../screens/AwaitingApprovalScreen";
@@ -54,6 +56,10 @@ export type RootStackParamList = {
   AcceptInvite: { token?: string } | undefined;
   // token arrives as the ?token= query string on the emailed verification link.
   VerifyEmail: { token?: string } | undefined;
+  // email pre-fills the field with whatever was typed on the Login screen.
+  ForgotPassword: { email?: string } | undefined;
+  // token arrives as the ?token= query string on the emailed reset link.
+  ResetPassword: { token?: string } | undefined;
   AwaitingApproval: undefined;
   // Super Admin
   // The super admin shell. Kept under its original route name so every existing
@@ -181,6 +187,7 @@ export function AppNavigator() {
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Signup" component={SignupScreen} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
         </>
       ) : (session.role === "school_admin" || session.role === "teacher") && session.status !== "active" ? (
         <Stack.Screen name="AwaitingApproval" component={AwaitingApprovalScreen} />
@@ -313,6 +320,10 @@ export function AppNavigator() {
           either way the link has to show the verification result instead of
           silently resolving to a home screen. */}
       <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
+
+      {/* Same reasoning again: a reset link may be opened on a browser that is
+          still signed in (often as someone else), and it must reach the form. */}
+      <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
     </Stack.Navigator>
   );
 }

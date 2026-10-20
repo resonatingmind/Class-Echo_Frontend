@@ -59,6 +59,11 @@ export type AcceptInvitePayload = {
   password: string;
 };
 
+export type ResetPasswordPayload = {
+  token: string;
+  password: string;
+};
+
 /** What this deployment is configured to do with outgoing email. */
 export type EmailStatusOut = {
   backend: 'resend' | 'brevo' | 'mailjet' | 'smtp' | 'log';
@@ -473,6 +478,8 @@ export type ChapterDocumentOut = {
   storage_url: string;
   file_type: string;
   processing_status: string;
+  /** Why processing FAILED, written for the uploader. Null otherwise. */
+  error_reason?: string | null;
   uploaded_at: string;
 };
 

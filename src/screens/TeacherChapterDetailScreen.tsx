@@ -669,6 +669,11 @@ export function TeacherChapterDetailScreen({ navigation, route }: Props) {
                             <Text style={styles.docCardMeta}>
                               {doc.file_type} · {uploadDate}
                             </Text>
+                            {doc.processing_status === "FAILED" && doc.error_reason ? (
+                              <Text style={styles.docCardError}>
+                                {doc.error_reason}
+                              </Text>
+                            ) : null}
                           </View>
                           <View style={styles.docCardRight}>
                             <View
@@ -992,6 +997,12 @@ const styles = StyleSheet.create({
   docCardMeta: {
     fontSize: 12,
     color: AppTheme.colors.textSecondary,
+  },
+  docCardError: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: '#B42318',
+    marginTop: 4,
   },
   docCardRight: {
     flexDirection: 'row',

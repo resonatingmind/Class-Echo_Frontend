@@ -139,7 +139,9 @@ export function RecordingScreen({ navigation, route }: Props) {
     setLectureSelectError(null);
   };
 
-  const [isDictatingEnabled, setIsDictatingEnabled] = useState(true);
+  /* Dev-only: a browser transcript uploaded with the audio stops the backend
+     from transcribing it properly, so teachers never get dictation. */
+  const [isDictatingEnabled, setIsDictatingEnabled] = useState(__DEV__);
   const [liveTranscript, setLiveTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
   const [dictationError, setDictationError] = useState<string | null>(null);
@@ -871,7 +873,7 @@ export function RecordingScreen({ navigation, route }: Props) {
               </Text>
             </View>
 
-            {isSpeechSupported && (
+            {__DEV__ && isSpeechSupported && (
               <Pressable
                 onPress={() => setIsDictatingEnabled(!isDictatingEnabled)}
                 style={styles.toggleRow}

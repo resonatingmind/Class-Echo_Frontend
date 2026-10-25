@@ -36,7 +36,6 @@ import {
 } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { AppTheme } from '../theme/AppTheme';
-import { AppLogo } from '../components/ui/AppLogo';
 import { DimensionScore, QuantitativeMetrics, RecordingStatus, ScoreBreakdown, RecordingWithReport } from '../types/api';
 import { buildWaveformBars, formatAudioTime } from '../lib/audio';
 
@@ -69,14 +68,6 @@ function scoreColor(score: number, max: number): string {
   return '#B42318';
 }
 
-function grade(score: number): string {
-  if (score >= 85) return 'A';
-  if (score >= 70) return 'B';
-  if (score >= 55) return 'C';
-  if (score >= 40) return 'D';
-  return 'F';
-}
-
 function statusStyle(status: RecordingStatus) {
   switch (status) {
     case 'completed':  return { bg: '#E8F7EE', text: '#127A40', label: 'Analysed' };
@@ -89,7 +80,6 @@ function statusStyle(status: RecordingStatus) {
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 function ScoreRing({ score }: { score: number }) {
-  const g = grade(score);
   const col = scoreColor(score, 100);
   return (
     <View style={ring.wrap}>
@@ -97,31 +87,29 @@ function ScoreRing({ score }: { score: number }) {
         <Text style={[ring.score, { color: col }]}>{Math.round(score)}</Text>
         <Text style={ring.outOf}>/100</Text>
       </View>
-      <View style={[ring.gradeBadge, { backgroundColor: col }]}>
-        <Text style={ring.gradeText}>{g}</Text>
-      </View>
     </View>
   );
 }
 
 const ring = StyleSheet.create({
-  wrap: { alignItems: 'center', gap: 8 },
+  wrap: { alignItems: 'center' },
   circle: {
     width: 100, height: 100, borderRadius: 50, borderWidth: 5,
     alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 2,
   },
   score: { fontSize: 30, fontWeight: '800' },
   outOf: { fontSize: 12, fontWeight: '600', color: AppTheme.colors.textSecondary, marginTop: 10 },
-  gradeBadge: {
-    paddingHorizontal: 14, paddingVertical: 4, borderRadius: 999,
-  },
-  gradeText: { fontSize: 13, fontWeight: '800', color: '#fff' },
 });
 
 function MetricsStrip({ q }: { q: QuantitativeMetrics }) {
   const items = [
-    { label: 'WPM', value: q.wpm_estimate > 0 ? `~${q.wpm_estimate}` : '—', icon: 'speedometer-outline' },
-    { label: 'Fillers', value: String(q.filler_words_heard), icon: 'chatbubble-ellipses-outline' },
+    {
+      label: 'Speaking pace',
+      value: q.wpm_estimate > 0 ? `~${q.wpm_estimate}` : '—',
+      hint: 'words/min · 110–150 typical',
+      icon: 'speedometer-outline',
+    },
+    { label: 'Filler words', value: String(q.filler_words_heard), icon: 'chatbubble-ellipses-outline' },
     { label: 'Questions', value: String(q.questions_asked), icon: 'help-circle-outline' },
   ];
   return (
@@ -131,6 +119,7 @@ function MetricsStrip({ q }: { q: QuantitativeMetrics }) {
           <Ionicons color={AppTheme.colors.primary} name={item.icon as any} size={16} />
           <Text style={ms.value}>{item.value}</Text>
           <Text style={ms.label}>{item.label}</Text>
+          {item.hint ? <Text style={ms.hint}>{item.hint}</Text> : null}
         </View>
       ))}
     </View>
@@ -146,11 +135,18 @@ const ms = StyleSheet.create({
     backgroundColor: AppTheme.colors.background,
     overflow: 'hidden',
   },
-  cell: { flex: 1, alignItems: 'center', paddingVertical: 14, gap: 3 },
+  cell: { flex: 1, alignItems: 'center', paddingVertical: 14, paddingHorizontal: 6, gap: 3 },
   cellBorder: { borderRightWidth: 1, borderRightColor: AppTheme.colors.border },
   value: { fontSize: 18, fontWeight: '800', color: AppTheme.colors.textPrimary },
-  label: { fontSize: 10, fontWeight: '700', color: AppTheme.colors.textSecondary, letterSpacing: 0.8 },
+  label: { fontSize: 11, fontWeight: '700', color: AppTheme.colors.textSecondary, textAlign: 'center' },
+  hint: { fontSize: 10, color: AppTheme.colors.textSecondary, textAlign: 'center' },
 });
+
+/** Rough wait for a report: a fixed minute plus one per 10 min of audio. A guess; tune it against real processing times. */
+function estimateAnalysisMinutes(durationSeconds: number | null | undefined): number {
+  const audioMinutes = (durationSeconds ?? 0) / 60;
+  return Math.max(2, Math.ceil(1 + audioMinutes / 10));
+}
 
 function LanguagePill({ text }: { text: string }) {
   return (
@@ -280,6 +276,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
   
   // Modals / Actions states
   const [showOptionsSheet, setShowOptionsSheet] = useState(false);
+  const [showTranscript, setShowTranscript] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editChapterName, setEditChapterName] = useState(initialRecording.chapter_name || '');
   const [editLectureTitle, setEditLectureTitle] = useState(initialRecording.lecture_title || '');
@@ -475,13 +472,25 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
       {/* Global Header */}
       <View style={styles.globalHeader}>
         <View style={styles.headerLeft}>
-          <AppLogo showText={false} />
+          <Pressable
+            accessibilityLabel="Back"
+            accessibilityRole="button"
+            onPress={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('TeacherTabs'))}
+            style={styles.iconBtn}
+          >
+            <Ionicons color={AppTheme.colors.textPrimary} name="arrow-back" size={22} />
+          </Pressable>
         </View>
         <Text style={styles.headerTitle}>
           {session?.role === 'admin' ? 'Super Admin' : session?.role === 'school_admin' ? 'School Admin' : 'Teacher Portal'}
         </Text>
         <View style={styles.headerRight}>
-          <Pressable onPress={() => setShowOptionsSheet(true)} style={styles.iconBtn}>
+          <Pressable
+            accessibilityLabel="Lecture options"
+            accessibilityRole="button"
+            onPress={() => setShowOptionsSheet(true)}
+            style={styles.iconBtn}
+          >
             <Ionicons color={AppTheme.colors.textPrimary} name="ellipsis-horizontal" size={22} />
           </Pressable>
         </View>
@@ -491,11 +500,6 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           <View style={styles.centerContainer}>
             <View style={styles.body}>
-              <Pressable onPress={() => navigation.goBack()} style={styles.backBtnRow}>
-                <Ionicons name="arrow-back" size={20} color={AppTheme.colors.textSecondary} />
-                <Text style={styles.backBtnText}>Back</Text>
-              </Pressable>
-
               {/* Hero */}
               <View style={styles.hero}>
           <Text style={styles.subjectLabel}>{subjectName}{recording.chapter_name ? ` · ${recording.chapter_name}` : ''}</Text>
@@ -572,18 +576,18 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
           <View style={styles.waveformWrap}>
             <AudioWaveform bars={waveform} progress={progress} />
           </View>
+          {recording.transcription ? (
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setShowTranscript(true)}
+              style={styles.transcriptButton}
+            >
+              <Ionicons color={AppTheme.colors.primary} name="document-text-outline" size={18} />
+              <Text style={styles.transcriptButtonText}>View transcript</Text>
+              <Ionicons color={AppTheme.colors.textSecondary} name="chevron-forward" size={16} />
+            </Pressable>
+          ) : null}
         </View>
-
-        {recording.transcription ? (
-          <View style={styles.card}>
-            <Text style={styles.sectionLabel}>LECTURE TRANSCRIPTION</Text>
-            <ScrollView style={{ maxHeight: 200, marginTop: 8 }} nestedScrollEnabled>
-              <Text style={{ fontSize: 14, lineHeight: 22, color: AppTheme.colors.textSecondary }}>
-                {recording.transcription}
-              </Text>
-            </ScrollView>
-          </View>
-        ) : null}
 
         {/* Report */}
         {recording.status === 'completed' && (report || overallScore != null) ? (
@@ -598,6 +602,26 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
                 <Text style={styles.overallNotes}>{report.teaching_quality_notes}</Text>
               ) : null}
             </View>
+
+            {/* Strengths + improvements, ahead of the detail */}
+            {report?.quantitative_metrics &&
+            (report.quantitative_metrics.top_strengths.length > 0 ||
+              report.quantitative_metrics.priority_improvements.length > 0) ? (
+              <View style={styles.card}>
+                <BulletList
+                  color="#127A40"
+                  icon="checkmark-circle-outline"
+                  items={report.quantitative_metrics.top_strengths}
+                  title="What went well"
+                />
+                <BulletList
+                  color={AppTheme.colors.warning}
+                  icon="arrow-up-circle-outline"
+                  items={report.quantitative_metrics.priority_improvements}
+                  title="Try next class"
+                />
+              </View>
+            ) : null}
 
             {/* Quantitative metrics */}
             {report?.quantitative_metrics ? (
@@ -633,30 +657,10 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
               </View>
             ) : null}
 
-            {/* Strengths + improvements */}
-            {report?.quantitative_metrics &&
-            (report.quantitative_metrics.top_strengths.length > 0 ||
-              report.quantitative_metrics.priority_improvements.length > 0) ? (
-              <View style={styles.card}>
-                <BulletList
-                  color="#127A40"
-                  icon="checkmark-circle-outline"
-                  items={report?.quantitative_metrics?.top_strengths || []}
-                  title="Top Strengths"
-                />
-                <BulletList
-                   color={AppTheme.colors.warning}
-                  icon="arrow-up-circle-outline"
-                  items={report?.quantitative_metrics?.priority_improvements || []}
-                  title="Priority Improvements"
-                />
-              </View>
-            ) : null}
-
-            {/* ── RAG Evaluation Section ── */}
+            {/* ── Syllabus coverage (RAG evaluation) ── */}
             {report && (report.chapter_info || report.curriculum_coverage || report.accuracy_analysis || report.learning_objectives_achievement) ? (
               <View style={styles.card}>
-                <Text style={styles.sectionLabel}>RAG-BASED EVALUATION</Text>
+                <Text style={styles.sectionLabel}>SYLLABUS COVERAGE</Text>
 
                 {/* Chapter info banner */}
                 {report.chapter_info ? (
@@ -699,10 +703,10 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
             <View style={styles.processingBody}>
               <Text style={styles.processingText}>
                 {status === 'processing'
-                  ? 'AI analysis in progress. Check back in about a minute.'
+                  ? `Analysing your lecture. This usually takes about ${estimateAnalysisMinutes(recording.duration_seconds)} minutes. You can leave this screen; the report will be here when it's ready.`
                   : status === 'failed'
                   ? recording.error_reason || 'The report could not be generated for this recording.'
-                  : 'Analysis is queued and will start soon.'}
+                  : 'Your recording is in the queue. Analysis will start shortly.'}
               </Text>
               {status === 'failed' ? (
                 <View style={{ flexDirection: 'row', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
@@ -738,6 +742,29 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
           </View>
         </ScrollView>
       </View>
+
+      {/* Full-screen transcript */}
+      <Modal animationType="slide" onRequestClose={() => setShowTranscript(false)} visible={showTranscript}>
+        <SafeAreaView edges={['top', 'bottom']} style={styles.safe}>
+          <View style={styles.globalHeader}>
+            <View style={styles.headerLeft}>
+              <Pressable
+                accessibilityLabel="Close transcript"
+                accessibilityRole="button"
+                onPress={() => setShowTranscript(false)}
+                style={styles.iconBtn}
+              >
+                <Ionicons color={AppTheme.colors.textPrimary} name="close" size={24} />
+              </Pressable>
+            </View>
+            <Text style={styles.headerTitle}>Transcript</Text>
+            <View style={styles.headerRight} />
+          </View>
+          <ScrollView contentContainerStyle={styles.transcriptScroll}>
+            <Text selectable style={styles.transcriptText}>{recording.transcription}</Text>
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
 
       {/* Actions sheet */}
       <Modal animationType="fade" onRequestClose={() => setShowOptionsSheet(false)} transparent visible={showOptionsSheet}>
@@ -910,18 +937,6 @@ const styles = StyleSheet.create({
     maxWidth: 800,
     gap: AppTheme.spacing.l,
   },
-  backBtnRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    alignSelf: 'flex-start',
-    marginBottom: AppTheme.spacing.s,
-  },
-  backBtnText: {
-    color: AppTheme.colors.textSecondary,
-    ...AppTheme.typography.body,
-    fontWeight: '600',
-  },
   actionBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   scroll: { paddingBottom: 40 },
   hero: {
@@ -986,6 +1001,19 @@ const styles = StyleSheet.create({
     borderColor: AppTheme.colors.border,
     backgroundColor: AppTheme.colors.background,
   },
+  transcriptButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    minHeight: 44,
+    paddingHorizontal: 14,
+    borderRadius: AppTheme.radius.medium,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+  },
+  transcriptButtonText: { flex: 1, fontSize: 14, fontWeight: '700', color: AppTheme.colors.textPrimary },
+  transcriptScroll: { padding: AppTheme.spacing.l, maxWidth: 800, width: '100%', alignSelf: 'center' },
+  transcriptText: { fontSize: 16, lineHeight: 26, color: AppTheme.colors.textPrimary },
   reportWrap: { gap: 16 },
   overallNotes: {
     fontSize: 14, lineHeight: 22, color: AppTheme.colors.textSecondary,

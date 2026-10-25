@@ -24,6 +24,7 @@ import {
 } from "../lib/api";
 import { RecordingWithReport, TeacherDashboardSubject } from "../types/api";
 import { AppTheme } from "../theme/AppTheme";
+import { recordingStatusLabel, reportHighlight } from "../lib/reportHighlight";
 import { AdminNavbar } from "../components/common/AdminNavbar";
 
 function StatChip({ icon, label, value }: { icon: string; label: string; value: string | number }) {
@@ -97,6 +98,12 @@ function formatDate(iso: string): string {
 
 const STATUS_FILTER_OPTIONS = ["All", "Completed", "Processing", "Pending", "Failed"];
 const SORT_OPTIONS           = ["Newest", "Oldest", "Highest Score", "Lowest Score"];
+const DATE_OPTIONS           = ["Any time", "Last 7 days", "Last 30 days"];
+const DATE_WINDOW_DAYS: Record<string, number> = { "Last 7 days": 7, "Last 30 days": 30 };
+
+function classLabel(r: { class_name: string; section: string }): string {
+  return `${r.class_name} · ${r.section}`;
+}
 
 export function TeacherRecordingsScreen() {
   const navigation = useNavigation<Nav>();
@@ -113,12 +120,16 @@ export function TeacherRecordingsScreen() {
   const [search, setSearch]             = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [subjectFilter, setSubjectFilter] = useState("All");
+  const [classFilter, setClassFilter]   = useState("All");
+  const [dateFilter, setDateFilter]     = useState("Any time");
   const [sortBy, setSortBy]             = useState("Newest");
 
   // Filter modal temp state
   const [filterVisible, setFilterVisible] = useState(false);
   const [tempStatus, setTempStatus]       = useState("All");
   const [tempSubject, setTempSubject]     = useState("All");
+  const [tempClass, setTempClass]         = useState("All");
+  const [tempDate, setTempDate]           = useState("Any time");
   const [tempSort, setTempSort]           = useState("Newest");
 
   const load = useCallback(async (silent = false) => {
@@ -169,6 +180,11 @@ export function TeacherRecordingsScreen() {
     return ["All", ...names];
   }, [recordings]);
 
+  const classOptions = useMemo(() => {
+    const names = [...new Set(recordings.map(classLabel))].sort();
+    return ["All", ...names];
+  }, [recordings]);
+
   // Filtered + sorted list
   const filtered = useMemo(() => {
     let list = recordings.filter((r) => {
@@ -181,6 +197,9 @@ export function TeacherRecordingsScreen() {
       }
       if (statusFilter !== "All" && r.status.toLowerCase() !== statusFilter.toLowerCase()) return false;
       if (subjectFilter !== "All" && r.subject_name !== subjectFilter) return false;
+      if (classFilter !== "All" && classLabel(r) !== classFilter) return false;
+      const windowDays = DATE_WINDOW_DAYS[dateFilter];
+      if (windowDays && Date.now() - new Date(r.uploaded_at).getTime() > windowDays * 86_400_000) return false;
       return true;
     });
 
@@ -193,7 +212,7 @@ export function TeacherRecordingsScreen() {
       }
     });
     return list;
-  }, [recordings, search, statusFilter, subjectFilter, sortBy]);
+  }, [recordings, search, statusFilter, subjectFilter, classFilter, dateFilter, sortBy]);
 
   // Stats
   const stats = useMemo(() => {
@@ -207,11 +226,15 @@ export function TeacherRecordingsScreen() {
     return { total, completed, processing, avg };
   }, [recordings]);
 
-  const activeFilterCount = Number(statusFilter !== "All") + Number(subjectFilter !== "All") + Number(sortBy !== "Newest");
+  const activeFilterCount =
+    Number(statusFilter !== "All") + Number(subjectFilter !== "All") + Number(classFilter !== "All") +
+    Number(dateFilter !== "Any time") + Number(sortBy !== "Newest");
 
   const openFilter = () => {
     setTempStatus(statusFilter);
     setTempSubject(subjectFilter);
+    setTempClass(classFilter);
+    setTempDate(dateFilter);
     setTempSort(sortBy);
     setFilterVisible(true);
   };
@@ -219,6 +242,8 @@ export function TeacherRecordingsScreen() {
   const applyFilter = () => {
     setStatusFilter(tempStatus);
     setSubjectFilter(tempSubject);
+    setClassFilter(tempClass);
+    setDateFilter(tempDate);
     setSortBy(tempSort);
     setFilterVisible(false);
   };
@@ -227,12 +252,14 @@ export function TeacherRecordingsScreen() {
     setSearch("");
     setStatusFilter("All");
     setSubjectFilter("All");
+    setClassFilter("All");
+    setDateFilter("Any time");
     setSortBy("Newest");
   };
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
-      <AdminNavbar title="Recordings" onProfilePress={() => navigation.navigate("TeacherProfile" as never)} />
+      <AdminNavbar title="My Growth" onProfilePress={() => navigation.navigate("TeacherProfile" as never)} />
 
       <ScrollView
         contentContainerStyle={styles.scroll}
@@ -261,9 +288,9 @@ export function TeacherRecordingsScreen() {
             <View style={isMobile ? { width: "100%", marginBottom: 12 } : { flex: 1 }}>
               <View style={styles.heroLabelRow}>
                 <Ionicons name="mic-outline" size={13} color="rgba(255,255,255,0.8)" />
-                <Text style={styles.heroLabel}>TEACHER RECORDINGS</Text>
+                <Text style={styles.heroLabel}>MY GROWTH</Text>
               </View>
-              <Text style={styles.heroTitle}>My Recordings</Text>
+              <Text style={styles.heroTitle}>Lessons & reports</Text>
               <Text style={styles.heroSubtitle}>
                 {loading ? "Loading…" : `${stats.total} recording${stats.total === 1 ? "" : "s"} across all subjects`}
               </Text>
@@ -322,6 +349,8 @@ export function TeacherRecordingsScreen() {
           <View style={styles.chipRow}>
             {statusFilter !== "All"  && <View style={styles.chip}><Text style={styles.chipText}>{statusFilter}</Text></View>}
             {subjectFilter !== "All" && <View style={styles.chip}><Text style={styles.chipText}>{subjectFilter}</Text></View>}
+            {classFilter !== "All"   && <View style={styles.chip}><Text style={styles.chipText}>{classFilter}</Text></View>}
+            {dateFilter !== "Any time" && <View style={styles.chip}><Text style={styles.chipText}>{dateFilter}</Text></View>}
             {sortBy !== "Newest"     && <View style={styles.chip}><Text style={styles.chipText}>{sortBy}</Text></View>}
             <Pressable onPress={clearAll} style={styles.chipClear}>
               <Text style={styles.chipClearText}>Clear all</Text>
@@ -359,7 +388,7 @@ export function TeacherRecordingsScreen() {
             </Text>
             <Text style={styles.emptyBody}>
               {recordings.length === 0
-                ? "Start recording your lectures from the subjects screen."
+                ? "Record your class from Home when it starts, or from a chapter in Classes."
                 : "Try adjusting your search or filters."}
             </Text>
             {activeFilterCount > 0 && (
@@ -390,27 +419,22 @@ export function TeacherRecordingsScreen() {
                   <View style={styles.cardBody}>
                     <Text style={styles.cardTitle} numberOfLines={2}>{title}</Text>
                     <Text style={styles.cardSub} numberOfLines={1}>
-                      {rec.subject_name}
-                      {rec.chapter_name ? ` · ${rec.chapter_name}` : ""}
-                    </Text>
-                    <Text style={styles.cardMeta}>
-                      {rec.class_name} · Section {rec.section}
+                      {rec.subject_name} · {classLabel(rec)} · {formatDate(rec.uploaded_at)}
                     </Text>
 
                     <View style={styles.cardFooter}>
-                      {/* Status badge */}
                       <View style={[styles.statusBadge, { backgroundColor: s.bg }]}>
                         <Text style={[styles.statusText, { color: s.text }]}>
-                          {rec.status.charAt(0).toUpperCase() + rec.status.slice(1)}
+                          {recordingStatusLabel(rec.status, rec.processing_step)}
                         </Text>
                       </View>
-
-                      {/* Date */}
-                      <View style={styles.dateRow}>
-                        <Ionicons name="calendar-outline" size={12} color={AppTheme.colors.hint} />
-                        <Text style={styles.dateText}>{formatDate(rec.uploaded_at)}</Text>
-                      </View>
                     </View>
+
+                    {rec.status === "completed" && reportHighlight(rec.report) ? (
+                      <Text style={styles.cardHighlight} numberOfLines={1}>
+                        {reportHighlight(rec.report)}
+                      </Text>
+                    ) : null}
                   </View>
 
                   {/* Score */}
@@ -475,6 +499,36 @@ export function TeacherRecordingsScreen() {
                 </>
               )}
 
+              {/* Class */}
+              {classOptions.length > 2 && (
+                <>
+                  <Text style={styles.modalSection}>Class</Text>
+                  {classOptions.map((c) => (
+                    <Pressable key={c} style={styles.option} onPress={() => setTempClass(c)}>
+                      <Ionicons
+                        name={tempClass === c ? "radio-button-on" : "radio-button-off"}
+                        size={20}
+                        color={AppTheme.colors.primary}
+                      />
+                      <Text style={styles.optionText}>{c}</Text>
+                    </Pressable>
+                  ))}
+                </>
+              )}
+
+              {/* Date */}
+              <Text style={styles.modalSection}>Date</Text>
+              {DATE_OPTIONS.map((d) => (
+                <Pressable key={d} style={styles.option} onPress={() => setTempDate(d)}>
+                  <Ionicons
+                    name={tempDate === d ? "radio-button-on" : "radio-button-off"}
+                    size={20}
+                    color={AppTheme.colors.primary}
+                  />
+                  <Text style={styles.optionText}>{d}</Text>
+                </Pressable>
+              ))}
+
               {/* Sort */}
               <Text style={styles.modalSection}>Sort by</Text>
               {SORT_OPTIONS.map((s) => (
@@ -492,7 +546,10 @@ export function TeacherRecordingsScreen() {
               <View style={styles.modalActions}>
                 <Pressable
                   style={styles.resetBtn}
-                  onPress={() => { setTempStatus("All"); setTempSubject("All"); setTempSort("Newest"); }}
+                  onPress={() => {
+                    setTempStatus("All"); setTempSubject("All"); setTempClass("All");
+                    setTempDate("Any time"); setTempSort("Newest");
+                  }}
                 >
                   <Text style={styles.resetText}>Reset</Text>
                 </Pressable>
@@ -742,10 +799,7 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.primary,
     fontWeight: "600",
   },
-  cardMeta: {
-    fontSize: 11,
-    color: AppTheme.colors.textSecondary,
-  },
+  cardHighlight: { fontSize: 13, color: AppTheme.colors.textPrimary, marginTop: 6 },
   cardFooter: {
     flexDirection: "row",
     alignItems: "center",
@@ -758,8 +812,6 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.pill,
   },
   statusText: { fontSize: 11, fontWeight: "700" },
-  dateRow: { flexDirection: "row", alignItems: "center", gap: 3 },
-  dateText: { fontSize: 11, color: AppTheme.colors.hint },
 
   // Score
   scoreWrap: {

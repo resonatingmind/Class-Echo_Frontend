@@ -9,7 +9,7 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { ScreenShell } from "../components/common/ScreenShell";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -80,7 +80,8 @@ function nowMinutes(): number {
   return now.getHours() * 60 + now.getMinutes();
 }
 
-export function TeacherTimetableScreen() {
+/** `embedded`: shown inside the Classes tab, which supplies the header and safe area. */
+export function TeacherTimetableScreen({ embedded = false }: { embedded?: boolean }) {
   const { session } = useAuth();
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
@@ -163,8 +164,8 @@ export function TeacherTimetableScreen() {
       : "Set by your school admin";
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
-      <AdminNavbar title="Timetable" />
+    <ScreenShell embedded={embedded} style={styles.container}>
+      {embedded ? null : <AdminNavbar title="Timetable" />}
 
       <ScrollView
         contentContainerStyle={styles.listContent}
@@ -260,7 +261,7 @@ export function TeacherTimetableScreen() {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </ScreenShell>
   );
 }
 

@@ -29,8 +29,10 @@ import {
 } from "../types/api";
 import { AppTheme } from "../theme/AppTheme";
 import { RootStackParamList } from "../navigation/AppNavigator";
+import { reportHighlight } from "../lib/reportHighlight";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
+type RecentRecording = RecordingWithReport & { subject_name: string };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -67,13 +69,6 @@ function formatTime(time: string): string {
   return `${hour}:${String(m).padStart(2, "0")} ${ampm}`;
 }
 
-const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
-  completed:  { bg: "#ECFDF3", text: "#047857" },
-  processing: { bg: "#FFF7ED", text: "#B45309" },
-  pending:    { bg: "#F0F9FF", text: "#0369A1" },
-  failed:     { bg: "#FEF2F2", text: "#B91C1C" },
-};
-
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function TeacherDashboardScreen() {
@@ -83,7 +78,7 @@ export function TeacherDashboardScreen() {
   const [profile,    setProfile]    = useState<TeacherOut | null>(null);
   const [subjects,   setSubjects]   = useState<TeacherDashboardSubject[]>([]);
   const [timetable,  setTimetable]  = useState<TimetableEntryOut[]>([]);
-  const [recentRecs, setRecentRecs] = useState<(RecordingWithReport & { subject_name: string })[]>([]);
+  const [latestReport, setLatestReport] = useState<RecentRecording | null>(null);
   const [loading,    setLoading]    = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -101,22 +96,24 @@ export function TeacherDashboardScreen() {
       setSubjects(dashboard.subjects);
       setTimetable(timetableData);
 
-      // Grab the 3 most recent recordings across first 3 subjects (avoid too many requests)
-      const topSubjects = dashboard.subjects.slice(0, 4);
+      // Only subjects with a recording can hold the latest report.
+      const withRecordings = dashboard.subjects.filter((s) => s.recording_count > 0);
       const results = await Promise.allSettled(
-        topSubjects.map((s) => getTeacherSubjectRecordings(session.token!, s.subject_id))
+        withRecordings.map((s) => getTeacherSubjectRecordings(session.token!, s.subject_id))
       );
 
-      const flat: (RecordingWithReport & { subject_name: string })[] = [];
+      const flat: RecentRecording[] = [];
       results.forEach((res, i) => {
         if (res.status === "fulfilled") {
-          const subjectName = topSubjects[i]!.subject_name;
+          const subjectName = withRecordings[i]!.subject_name;
           res.value.forEach((r) => flat.push({ ...r, subject_name: subjectName }));
         }
       });
 
       flat.sort((a, b) => new Date(b.uploaded_at).getTime() - new Date(a.uploaded_at).getTime());
-      setRecentRecs(flat.slice(0, 4));
+      setLatestReport(
+        flat.find((r) => r.status === "completed" && !r.is_archived && r.report) ?? null,
+      );
     } finally {
       silent ? setRefreshing(false) : setLoading(false);
     }
@@ -125,17 +122,6 @@ export function TeacherDashboardScreen() {
   useFocusEffect(useCallback(() => { void load(); }, [load]));
 
   // ── Derived data ──────────────────────────────────────────────────────────
-
-  const stats = useMemo(() => ({
-    subjects:   subjects.length,
-    recordings: subjects.reduce((s, r) => s + r.recording_count, 0),
-    pending:    subjects.filter((s) => s.ai_status === "Processing" || s.ai_status === "Pending").length,
-    avgScore:   (() => {
-      const scored = subjects.filter((s) => s.average_score != null);
-      if (!scored.length) return null;
-      return Math.round(scored.reduce((s, r) => s + (r.average_score ?? 0), 0) / scored.length);
-    })(),
-  }), [subjects]);
 
   /** Today's periods sorted by time */
   const todayPeriods = useMemo(() => {
@@ -150,6 +136,13 @@ export function TeacherDashboardScreen() {
   const nextPeriod = useMemo(() => {
     const now = nowMinutes();
     return todayPeriods.find((p) => toMinutes(p.start_time) > now) ?? null;
+  }, [todayPeriods]);
+
+  const currentPeriod = useMemo(() => {
+    const now = nowMinutes();
+    return todayPeriods.find(
+      (p) => toMinutes(p.start_time) <= now && now < toMinutes(p.end_time),
+    ) ?? null;
   }, [todayPeriods]);
 
   const subjectFor = (period: TimetableEntryOut) => ({
@@ -210,28 +203,89 @@ export function TeacherDashboardScreen() {
           ) : null}
         </View>
 
-        {/* Stats Grid */}
-        <Text style={styles.sectionTitle}>Teacher Overview</Text>
-        <View style={styles.statsGrid}>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{stats.subjects}</Text>
-            <Text style={styles.statLabel}>Subjects</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{stats.recordings}</Text>
-            <Text style={styles.statLabel}>Recordings</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{stats.pending}</Text>
-            <Text style={styles.statLabel}>Processing</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>
-              {stats.avgScore != null ? `${stats.avgScore}%` : "—"}
+        {/* ── What to do next: the class on now, else the next one today ── */}
+        {currentPeriod ? (
+          <View style={[styles.heroCard, styles.heroCardNow]}>
+            <View style={styles.heroTag}>
+              <View style={styles.heroLiveDot} />
+              <Text style={styles.heroTagText}>
+                NOW · until {formatTime(currentPeriod.end_time)}
+              </Text>
+            </View>
+            <Text style={styles.heroSubject}>{currentPeriod.subject?.name ?? "Class"}</Text>
+            <Text style={styles.heroMeta}>
+              {currentPeriod.class_ ? `${currentPeriod.class_.name} · Section ${currentPeriod.class_.section}` : ""}
+              {currentPeriod.room ? ` · Room ${currentPeriod.room}` : ""}
             </Text>
-            <Text style={styles.statLabel}>Avg Score</Text>
+            <Pressable
+              accessibilityLabel={`Record ${currentPeriod.subject?.name ?? "this class"}`}
+              accessibilityRole="button"
+              onPress={() => recordPeriod(currentPeriod)}
+              style={({ pressed }) => [styles.recordNowBtn, pressed && { opacity: 0.85 }]}
+            >
+              <View style={styles.recordNowDot} />
+              <Text style={styles.recordNowText}>Record</Text>
+            </Pressable>
           </View>
-        </View>
+        ) : nextPeriod ? (
+          <View style={styles.heroCard}>
+            <View style={styles.heroTag}>
+              <Text style={[styles.heroTagText, styles.heroTagTextNext]}>
+                NEXT · {formatTime(nextPeriod.start_time)}
+              </Text>
+            </View>
+            <Text style={styles.heroSubject}>{nextPeriod.subject?.name ?? "Class"}</Text>
+            <Text style={styles.heroMeta}>
+              {nextPeriod.class_ ? `${nextPeriod.class_.name} · Section ${nextPeriod.class_.section}` : ""}
+              {nextPeriod.room ? ` · Room ${nextPeriod.room}` : ""}
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => openSubject(nextPeriod)}
+              style={({ pressed }) => [styles.prepareBtn, pressed && { opacity: 0.85 }]}
+            >
+              <Ionicons name="book-outline" size={16} color={AppTheme.colors.primaryDark} />
+              <Text style={styles.prepareText}>Prepare</Text>
+            </Pressable>
+          </View>
+        ) : null}
+
+        {/* ── Latest report ── */}
+        {latestReport ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() =>
+              navigation.navigate("RecordingDetail", {
+                recording: latestReport,
+                subjectName: latestReport.subject_name,
+              })
+            }
+            style={({ pressed }) => [styles.reportCard, pressed && { opacity: 0.88 }]}
+          >
+            <View style={styles.reportTop}>
+              <Text style={styles.reportLabel}>LATEST REPORT</Text>
+              <Text style={styles.reportDate}>
+                {new Date(latestReport.uploaded_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+              </Text>
+            </View>
+            <Text style={styles.reportTitle} numberOfLines={2}>
+              {latestReport.lecture_title || latestReport.chapter_name || `Recording #${latestReport.id}`}
+            </Text>
+            <Text style={styles.reportSub} numberOfLines={1}>
+              {latestReport.subject_name}
+              {latestReport.chapter_name ? ` · ${latestReport.chapter_name}` : ""}
+            </Text>
+            {reportHighlight(latestReport.report) ? (
+              <Text style={styles.reportHighlight} numberOfLines={2}>
+                {reportHighlight(latestReport.report)}
+              </Text>
+            ) : null}
+            <View style={styles.reportFooter}>
+              <Text style={styles.reportView}>View report</Text>
+              <Ionicons name="chevron-forward" size={16} color={AppTheme.colors.primary} />
+            </View>
+          </Pressable>
+        ) : null}
 
         {/* ── Today's Schedule ── */}
         <View style={styles.section}>
@@ -316,26 +370,6 @@ export function TeacherDashboardScreen() {
                       {period.room ? (
                         <Text style={styles.periodRoom}>Room {period.room}</Text>
                       ) : null}
-                      {isNow ? (
-                        <Pressable
-                          accessibilityLabel={`Record ${period.subject?.name ?? "this class"}`}
-                          accessibilityRole="button"
-                          onPress={() => recordPeriod(period)}
-                          style={({ pressed }) => [styles.recordNowBtn, pressed && { opacity: 0.85 }]}
-                        >
-                          <View style={styles.recordNowDot} />
-                          <Text style={styles.recordNowText}>Record</Text>
-                        </Pressable>
-                      ) : isNext ? (
-                        <Pressable
-                          accessibilityRole="button"
-                          onPress={() => openSubject(period)}
-                          style={({ pressed }) => [styles.prepareBtn, pressed && { opacity: 0.85 }]}
-                        >
-                          <Ionicons name="book-outline" size={16} color={AppTheme.colors.primaryDark} />
-                          <Text style={styles.prepareText}>Prepare</Text>
-                        </Pressable>
-                      ) : null}
                     </Pressable>
                   </View>
                 );
@@ -348,7 +382,7 @@ export function TeacherDashboardScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>My Subjects</Text>
-            <Pressable onPress={() => navigation.navigate("TeacherTabs", { screen: "TeacherHome" } as never)}>
+            <Pressable onPress={() => navigation.navigate("TeacherTabs", { screen: "TeacherClasses", params: { view: "subjects" } } as never)}>
               <Text style={styles.seeAll}>See all</Text>
             </Pressable>
           </View>
@@ -401,45 +435,6 @@ export function TeacherDashboardScreen() {
           )}
         </View>
 
-        {/* ── Recent Recordings ── */}
-        {recentRecs.length > 0 && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Recent Recordings</Text>
-              <Pressable onPress={() => navigation.navigate("TeacherTabs", { screen: "TeacherRecordings" } as never)}>
-                <Text style={styles.seeAll}>See all</Text>
-              </Pressable>
-            </View>
-            <View style={styles.recList}>
-              {recentRecs.map((rec) => {
-                const sc = STATUS_COLORS[rec.status] ?? STATUS_COLORS.pending!;
-                const score = rec.report?.overall_score;
-                return (
-                  <Pressable
-                    key={rec.id}
-                    style={({ pressed }) => [styles.recCard, pressed && { opacity: 0.85 }]}
-                    onPress={() => navigation.navigate("RecordingDetail", { recording: rec, subjectName: rec.subject_name })}
-                  >
-                    <View style={styles.recIconWrap}>
-                      <Ionicons name="mic" size={16} color={AppTheme.colors.primary} />
-                    </View>
-                    <View style={styles.recBody}>
-                      <Text style={styles.recTitle} numberOfLines={1}>
-                        {rec.lecture_title || rec.chapter_name || `Recording #${rec.id}`}
-                      </Text>
-                      <Text style={styles.recSub} numberOfLines={1}>{rec.subject_name}</Text>
-                    </View>
-                    <View style={[styles.statusDot, { backgroundColor: sc.bg }]}>
-                      <Text style={[styles.statusDotText, { color: sc.text }]}>
-                        {score != null ? `${score}%` : rec.status}
-                      </Text>
-                    </View>
-                  </Pressable>
-                );
-              })}
-            </View>
-          </View>
-        )}
 
             </View>
           </View>
@@ -489,31 +484,6 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textSecondary,
   },
 
-  // Stats Grid
-  statsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: AppTheme.spacing.m,
-  },
-  statCard: {
-    flex: 1,
-    minWidth: 100,
-    backgroundColor: AppTheme.colors.surface,
-    borderRadius: AppTheme.radius.large,
-    paddingVertical: AppTheme.spacing.xl,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: AppTheme.colors.border,
-  },
-  statNumber: {
-    color: AppTheme.colors.primary,
-    ...AppTheme.typography.heading1,
-  },
-  statLabel: {
-    marginTop: AppTheme.spacing.xs,
-    color: AppTheme.colors.textSecondary,
-    ...AppTheme.typography.body,
-  },
 
   // ── Sections ──
   section: {
@@ -623,6 +593,42 @@ const styles = StyleSheet.create({
   ribbonNext: { backgroundColor: AppTheme.colors.warning },
   ribbonText: { fontSize: 9, fontWeight: "800", color: AppTheme.colors.surface, letterSpacing: 0.5 },
 
+  // ── Now / Next card ──
+  heroCard: {
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+    padding: AppTheme.spacing.l,
+    gap: 4,
+    ...AppTheme.shadows.subtle,
+  },
+  heroCardNow: { borderColor: AppTheme.colors.primary, backgroundColor: AppTheme.colors.primaryLight },
+  heroTag: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 2 },
+  heroLiveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#DC2626" },
+  heroTagText: { fontSize: 12, fontWeight: "800", letterSpacing: 0.6, color: AppTheme.colors.primaryDark },
+  heroTagTextNext: { color: "#B45309" },
+  heroSubject: { fontSize: 22, fontWeight: "800", color: AppTheme.colors.textPrimary },
+  heroMeta: { fontSize: 13, color: AppTheme.colors.textSecondary },
+
+  // ── Latest report ──
+  reportCard: {
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+    padding: AppTheme.spacing.l,
+    gap: 4,
+  },
+  reportTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  reportLabel: { fontSize: 11, fontWeight: "800", letterSpacing: 1, color: AppTheme.colors.textSecondary },
+  reportDate: { fontSize: 12, color: AppTheme.colors.textSecondary },
+  reportTitle: { fontSize: 17, fontWeight: "800", color: AppTheme.colors.textPrimary, marginTop: 2 },
+  reportSub: { fontSize: 12, color: AppTheme.colors.textSecondary },
+  reportHighlight: { fontSize: 14, lineHeight: 20, color: AppTheme.colors.textPrimary, marginTop: 6 },
+  reportFooter: { flexDirection: "row", alignItems: "center", gap: 2, marginTop: 6, minHeight: 28 },
+  reportView: { fontSize: 14, fontWeight: "700", color: AppTheme.colors.primary },
+
   recordNowBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -688,38 +694,6 @@ const styles = StyleSheet.create({
   subjectStat: { flexDirection: "row", alignItems: "center", gap: 3 },
   subjectStatText: { fontSize: 11, color: AppTheme.colors.textSecondary, fontWeight: "600" },
 
-  // ── Recent recordings ──
-  recList: { gap: AppTheme.spacing.s },
-  recCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: AppTheme.colors.surface,
-    borderRadius: AppTheme.radius.medium,
-    borderWidth: 1,
-    borderColor: AppTheme.colors.border,
-    padding: AppTheme.spacing.m,
-    gap: AppTheme.spacing.m,
-  },
-  recIconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: AppTheme.radius.medium,
-    backgroundColor: AppTheme.colors.primaryLight,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  recBody:  { flex: 1 },
-  recTitle: { fontSize: 14, fontWeight: "700", color: AppTheme.colors.textPrimary },
-  recSub:   { fontSize: 12, color: AppTheme.colors.textSecondary, marginTop: 2 },
-
-  statusDot: {
-    paddingHorizontal: AppTheme.spacing.s,
-    paddingVertical: 4,
-    borderRadius: AppTheme.radius.pill,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  statusDotText: { fontSize: 11, fontWeight: "700" },
 
   // ── Empty states ──
   emptyCard: {

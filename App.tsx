@@ -72,9 +72,10 @@ const linking = {
       TeacherTabs: {
         screens: {
           TeacherDashboard: "teacher/dashboard",
-          TeacherHome: "teacher/subjects",
-          TeacherTimetable: "teacher/timetable",
-          TeacherRecordings: "teacher/recordings",
+          // The old Subjects, Timetable and Recordings tabs live on as aliases
+          // so saved links keep working.
+          TeacherClasses: { path: "teacher/classes", alias: ["teacher/subjects", "teacher/timetable"] },
+          TeacherGrowth: { path: "teacher/growth", alias: ["teacher/recordings"] },
         },
       },
 

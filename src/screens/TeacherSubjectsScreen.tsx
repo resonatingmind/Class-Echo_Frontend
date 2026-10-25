@@ -12,7 +12,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScreenShell } from '../components/common/ScreenShell';
 import { AdminNavbar } from "../components/common/AdminNavbar";
 
 import { RootStackParamList } from "../navigation/AppNavigator";
@@ -48,7 +48,8 @@ const SUBJECT_COLORS = [
 
 type SubjectGroup = { className: string; subjects: SubjectOut[] };
 
-export function TeacherSubjectsScreen({ navigation }: Props) {
+/** `embedded`: shown inside the Classes tab, which supplies the header and safe area. */
+export function TeacherSubjectsScreen({ navigation, embedded = false }: Props) {
   const { session } = useAuth();
   const [subjects, setSubjects] = useState<SubjectOut[]>([]);
 
@@ -235,8 +236,10 @@ export function TeacherSubjectsScreen({ navigation }: Props) {
   ]);
 
   return (
-    <SafeAreaView edges={["top"]} style={styles.safe}>
-      <AdminNavbar title="Subjects" onProfilePress={() => navigation.navigate("TeacherProfile" as never)} />
+    <ScreenShell embedded={embedded} style={styles.safe}>
+      {embedded ? null : (
+        <AdminNavbar title="Subjects" onProfilePress={() => navigation.navigate("TeacherProfile" as never)} />
+      )}
       <View style={styles.flex}>
 
       <ScrollView
@@ -427,7 +430,7 @@ export function TeacherSubjectsScreen({ navigation }: Props) {
         onClose={() => setStatusSheetVisible(false)}
         onSelect={(item) => setSelectedStatus(item.id)}
       />
-    </SafeAreaView>
+    </ScreenShell>
   );
 }
 

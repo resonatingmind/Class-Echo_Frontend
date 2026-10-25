@@ -5,29 +5,28 @@ import { FloatingPillTabBar, FloatingTabItem } from "../components/common/Floati
 import { useProcessingCount } from "../lib/useProcessingCount";
 
 import { TeacherDashboardScreen }  from "../screens/TeacherDashboardScreen";
-import { TeacherSubjectsScreen }   from "../screens/TeacherSubjectsScreen";
-import { TeacherTimetableScreen }  from "../screens/TeacherTimetableScreen";
+import { TeacherClassesScreen }    from "../screens/TeacherClassesScreen";
 import { TeacherRecordingsScreen } from "../screens/TeacherRecordingsScreen";
 
+/* Three tabs: Home (what to do next), Classes (timetable, subjects and
+   chapters) and My Growth (every lesson and its report). */
 export type TeacherTabParamList = {
-  TeacherDashboard:  undefined;
-  TeacherHome:       undefined;
-  TeacherTimetable:  undefined;
-  TeacherRecordings: undefined;
+  TeacherDashboard: undefined;
+  TeacherClasses:   { view?: "timetable" | "subjects" } | undefined;
+  TeacherGrowth:    undefined;
 };
 
 const Tab = createBottomTabNavigator<TeacherTabParamList>();
 
 const TABS: FloatingTabItem[] = [
-  { key: "TeacherDashboard",  label: "Home",       icon: "home-outline",      activeIcon: "home"      },
-  { key: "TeacherHome",       label: "Subjects",   icon: "book-outline",      activeIcon: "book"      },
-  { key: "TeacherTimetable",  label: "Timetable",  icon: "calendar-outline",  activeIcon: "calendar"  },
-  { key: "TeacherRecordings", label: "Recordings", icon: "mic-outline",       activeIcon: "mic"       },
+  { key: "TeacherDashboard", label: "Home",      icon: "home-outline",        activeIcon: "home"        },
+  { key: "TeacherClasses",   label: "Classes",   icon: "calendar-outline",    activeIcon: "calendar"    },
+  { key: "TeacherGrowth",    label: "My Growth", icon: "trending-up-outline", activeIcon: "trending-up" },
 ];
 
 function TeacherTabBar({ state, navigation, processingCount }: BottomTabBarProps & { processingCount: number }) {
   const tabs = TABS.map((t) =>
-    t.key === "TeacherRecordings" ? { ...t, badge: processingCount } : t,
+    t.key === "TeacherGrowth" ? { ...t, badge: processingCount } : t,
   );
 
   const handlePress = (index: number) => {
@@ -60,10 +59,9 @@ export function TeacherTabNavigator() {
       tabBar={(props) => <TeacherTabBar {...props} processingCount={processingCount} />}
       screenOptions={{ headerShown: false }}
     >
-      <Tab.Screen name="TeacherDashboard"  component={TeacherDashboardScreen}  options={{ title: "Home"       }} />
-      <Tab.Screen name="TeacherHome"       component={TeacherSubjectsScreen}   options={{ title: "Subjects"   }} />
-      <Tab.Screen name="TeacherTimetable"  component={TeacherTimetableScreen}  options={{ title: "Timetable"  }} />
-      <Tab.Screen name="TeacherRecordings" component={TeacherRecordingsScreen} options={{ title: "Recordings" }} />
+      <Tab.Screen name="TeacherDashboard" component={TeacherDashboardScreen}  options={{ title: "Home"      }} />
+      <Tab.Screen name="TeacherClasses"   component={TeacherClassesScreen}    options={{ title: "Classes"   }} />
+      <Tab.Screen name="TeacherGrowth"    component={TeacherRecordingsScreen} options={{ title: "My Growth" }} />
     </Tab.Navigator>
   );
 }

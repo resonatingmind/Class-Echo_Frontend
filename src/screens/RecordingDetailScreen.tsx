@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
-import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import {
   ActivityIndicator,
   Alert,
@@ -16,7 +15,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AudioWaveform } from '../components/AudioWaveform';
 import {
   ChapterInfoBanner,
   CurriculumCoverageCard,
@@ -24,6 +22,7 @@ import {
   ReferenceAlignmentCard,
   LearningPlanInfoCard,
 } from '../components/RAGReportSections';
+import { ReportAudioPlayer } from '../components/ReportAudioPlayer';
 import { useAuth } from '../context/AuthContext';
 import {
   resolveMediaUrl,
@@ -37,7 +36,7 @@ import {
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { AppTheme } from '../theme/AppTheme';
 import { DimensionScore, QuantitativeMetrics, RecordingStatus, ScoreBreakdown, RecordingWithReport } from '../types/api';
-import { buildWaveformBars, formatAudioTime } from '../lib/audio';
+import { formatAudioTime } from '../lib/audio';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'RecordingDetail'>;
 
@@ -164,105 +163,212 @@ const lp = StyleSheet.create({
   text: { fontSize: 12, fontWeight: '700', color: '#156FD6' },
 });
 
-function DimensionCard({ dim, data }: { dim: typeof DIMENSIONS[0]; data: DimensionScore }) {
+/** The weakest dimension relative to its max; the report expands it by default. */
+function findFocusDimension(breakdown: ScoreBreakdown | null | undefined): keyof ScoreBreakdown | null {
+  if (!breakdown) return null;
+  let focus: keyof ScoreBreakdown | null = null;
+  let lowest = Infinity;
+  for (const dim of DIMENSIONS) {
+    const data = breakdown[dim.key];
+    if (!data) continue;
+    const pct = data.score / dim.max;
+    if (pct < lowest) {
+      lowest = pct;
+      focus = dim.key;
+    }
+  }
+  return focus;
+}
+
+/** One evidence quote. Kept as its own row so a ▶ timestamp chip can sit beside the text later. */
+function EvidenceQuote({ text }: { text: string }) {
+  return (
+    <View style={dr.evidenceRow}>
+      <Text style={dr.evidenceDot}>›</Text>
+      <Text style={dr.evidenceText}>{text}</Text>
+    </View>
+  );
+}
+
+function DimensionRow({ dim, data, isFocus }: {
+  dim: typeof DIMENSIONS[0]; data: DimensionScore; isFocus: boolean;
+}) {
+  const [expanded, setExpanded] = useState(isFocus);
   const col = scoreColor(data.score, dim.max);
   const pct = Math.round((data.score / dim.max) * 100);
 
   return (
-    <View style={dc.card}>
-      <View style={dc.header}>
-        <View style={dc.iconWrap}>
+    <View style={[dr.row, isFocus && dr.rowFocus]}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ expanded }}
+        onPress={() => setExpanded((v) => !v)}
+        style={dr.summary}
+      >
+        <View style={dr.topLine}>
           <Ionicons color={col} name={dim.icon as any} size={16} />
+          <Text numberOfLines={1} style={dr.label}>{dim.label}</Text>
+          {isFocus ? <Text style={dr.focusTag}>LOWEST</Text> : null}
+          <Text style={[dr.score, { color: col }]}>
+            {data.score}<Text style={dr.max}>/{dim.max}</Text>
+          </Text>
+          <Ionicons
+            color={AppTheme.colors.textSecondary}
+            name={expanded ? 'chevron-up' : 'chevron-down'}
+            size={16}
+          />
         </View>
-        <Text style={dc.label}>{dim.label}</Text>
-        <View style={[dc.scoreBadge, { backgroundColor: col + '18', borderColor: col + '40' }]}>
-          <Text style={[dc.scoreText, { color: col }]}>{data.score}<Text style={dc.maxText}>/{dim.max}</Text></Text>
+        <View style={dr.barTrack}>
+          <View style={[dr.barFill, { width: `${pct}%`, backgroundColor: col }]} />
         </View>
-      </View>
+        {data.finding ? (
+          <Text numberOfLines={expanded ? undefined : 1} style={dr.finding}>{data.finding}</Text>
+        ) : null}
+      </Pressable>
 
-      {/* Score bar */}
-      <View style={dc.barTrack}>
-        <View style={[dc.barFill, { width: `${pct}%` as any, backgroundColor: col }]} />
-      </View>
-
-      {/* Finding */}
-      {data.finding ? (
-        <Text style={dc.finding}>{data.finding}</Text>
-      ) : null}
-
-      {/* Evidence quotes */}
-      {data.evidence.length > 0 ? (
-        <View style={dc.evidenceList}>
-          {data.evidence.map((e, i) => (
-            <View key={i} style={dc.evidenceRow}>
-              <Text style={dc.evidenceDot}>›</Text>
-              <Text style={dc.evidenceText}>{e}</Text>
-            </View>
-          ))}
+      {expanded && data.evidence.length > 0 ? (
+        <View style={dr.evidenceList}>
+          {data.evidence.map((e, i) => <EvidenceQuote key={i} text={e} />)}
         </View>
       ) : null}
     </View>
   );
 }
 
-const dc = StyleSheet.create({
-  card: {
+const dr = StyleSheet.create({
+  row: {
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
     borderColor: AppTheme.colors.border,
     backgroundColor: AppTheme.colors.surface,
-    padding: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     gap: 10,
   },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  iconWrap: {
-    width: 32, height: 32, borderRadius: AppTheme.radius.medium, backgroundColor: AppTheme.colors.background,
-    alignItems: 'center', justifyContent: 'center',
-  },
+  rowFocus: { borderColor: AppTheme.colors.warning },
+  summary: { gap: 8 },
+  topLine: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 24 },
   label: { flex: 1, fontSize: 14, fontWeight: '700', color: AppTheme.colors.textPrimary },
-  scoreBadge: {
-    paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, borderWidth: 1,
+  focusTag: {
+    fontSize: 10, fontWeight: '800', letterSpacing: 0.8, color: '#92400E',
+    backgroundColor: '#FFF4E0', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6, overflow: 'hidden',
   },
-  scoreText: { fontSize: 14, fontWeight: '800' },
-  maxText: { fontSize: 11, fontWeight: '600' },
+  score: { fontSize: 14, fontWeight: '800' },
+  max: { fontSize: 11, fontWeight: '600' },
   barTrack: {
     height: 6, borderRadius: 3, backgroundColor: AppTheme.colors.background, overflow: 'hidden',
   },
   barFill: { height: 6, borderRadius: 3 },
-  finding: { fontSize: 13, lineHeight: 19, color: AppTheme.colors.textSecondary, fontStyle: 'italic' },
+  finding: { fontSize: 13, lineHeight: 19, color: AppTheme.colors.textSecondary },
   evidenceList: { gap: 5 },
   evidenceRow: { flexDirection: 'row', gap: 6 },
   evidenceDot: { fontSize: 14, color: AppTheme.colors.textSecondary, lineHeight: 20, marginTop: 1 },
   evidenceText: { flex: 1, fontSize: 12, lineHeight: 18, color: AppTheme.colors.textSecondary },
 });
 
-function BulletList({ items, color, title, icon }: {
-  items: string[]; color: string; title: string; icon: string;
-}) {
-  if (!items.length) return null;
+/**
+ * A single strength or improvement. Text takes the flexible width so a trailing
+ * 👍/👎 control can be added later without reworking the layout.
+ */
+function FindingItem({ text, color, icon }: { text: string; color: string; icon: string }) {
   return (
-    <View style={bl.wrap}>
-      <View style={bl.titleRow}>
-        <Ionicons color={color} name={icon as any} size={15} />
-        <Text style={[bl.title, { color }]}>{title}</Text>
-      </View>
-      {items.map((item, i) => (
-        <View key={i} style={bl.row}>
-          <View style={[bl.dot, { backgroundColor: color }]} />
-          <Text style={bl.text}>{item}</Text>
-        </View>
-      ))}
+    <View style={fi.row}>
+      <Ionicons color={color} name={icon as any} size={18} style={fi.icon} />
+      <Text style={fi.text}>{text}</Text>
     </View>
   );
 }
 
-const bl = StyleSheet.create({
-  wrap: { gap: 8 },
-  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  title: { fontSize: 13, fontWeight: '700' },
-  row: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
-  dot: { width: 5, height: 5, borderRadius: 3, marginTop: 7 },
-  text: { flex: 1, fontSize: 13, lineHeight: 20, color: AppTheme.colors.textSecondary },
+const fi = StyleSheet.create({
+  row: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
+  icon: { marginTop: 1 },
+  text: { flex: 1, fontSize: 14, lineHeight: 21, color: AppTheme.colors.textPrimary },
+});
+
+/** Card heading row with an icon; shared by the report's top-level cards. */
+function SectionHeading({ icon, color, title }: { icon: string; color: string; title: string }) {
+  return (
+    <View style={sh.row}>
+      <Ionicons color={color} name={icon as any} size={18} />
+      <Text style={sh.title}>{title}</Text>
+    </View>
+  );
+}
+
+const sh = StyleSheet.create({
+  row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  title: { fontSize: 17, fontWeight: '800', color: AppTheme.colors.textPrimary },
+});
+
+function FocusCard({ improvements, focusDimension }: {
+  improvements: string[];
+  focusDimension: { dim: typeof DIMENSIONS[0]; data: DimensionScore } | null;
+}) {
+  const [showMore, setShowMore] = useState(false);
+  // Without written improvements, fall back to the weakest dimension's finding.
+  // Improvements aren't tagged with a dimension, so only name the area for the fallback.
+  const fromDimension = !improvements[0] && !!focusDimension?.data.finding;
+  const primary = improvements[0] ?? focusDimension?.data.finding;
+  const secondary = improvements.slice(1, 3);
+  if (!primary) return null;
+
+  return (
+    <View style={styles.card}>
+      <SectionHeading color={AppTheme.colors.warning} icon="flag-outline" title="Your focus for next class" />
+      <View style={fc.primary}>
+        <Text style={fc.primaryText}>{primary}</Text>
+        {fromDimension && focusDimension ? (
+          <Text style={fc.area}>
+            Area: {focusDimension.dim.label} · {focusDimension.data.score}/{focusDimension.dim.max}
+          </Text>
+        ) : null}
+      </View>
+      {secondary.length > 0 ? (
+        <>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityState={{ expanded: showMore }}
+            onPress={() => setShowMore((v) => !v)}
+            style={fc.toggle}
+          >
+            <Text style={fc.toggleText}>
+              {showMore ? 'Hide' : `${secondary.length} more to work on`}
+            </Text>
+            <Ionicons
+              color={AppTheme.colors.primary}
+              name={showMore ? 'chevron-up' : 'chevron-down'}
+              size={16}
+            />
+          </Pressable>
+          {showMore
+            ? secondary.map((item, i) => (
+                <FindingItem
+                  color={AppTheme.colors.warning}
+                  icon="arrow-up-circle-outline"
+                  key={i}
+                  text={item}
+                />
+              ))
+            : null}
+        </>
+      ) : null}
+    </View>
+  );
+}
+
+const fc = StyleSheet.create({
+  primary: {
+    gap: 6,
+    padding: 14,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: '#FFF8EB',
+    borderLeftWidth: 4,
+    borderLeftColor: AppTheme.colors.warning,
+  },
+  primaryText: { fontSize: 15, lineHeight: 22, fontWeight: '600', color: AppTheme.colors.textPrimary },
+  area: { fontSize: 12, fontWeight: '600', color: '#92400E' },
+  toggle: { flexDirection: 'row', alignItems: 'center', gap: 4, minHeight: 44, alignSelf: 'flex-start' },
+  toggleText: { fontSize: 14, fontWeight: '700', color: AppTheme.colors.primary },
 });
 
 // ── Main screen ───────────────────────────────────────────────────────────────
@@ -282,6 +388,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
   const [editLectureTitle, setEditLectureTitle] = useState(initialRecording.lecture_title || '');
   const [editDescription, setEditDescription] = useState(initialRecording.description || '');
   const [updatingDetails, setUpdatingDetails] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
   const fetchDetails = useCallback(async () => {
     if (!session) return;
@@ -323,28 +430,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
   // Relative storage paths have to resolve against whichever backend this build
   // points at — a hardcoded localhost never works in a packaged APK.
   const audioUrl = resolveMediaUrl(recordingDetails.cloudinary_url) ?? '';
-
-  const player = useAudioPlayer(audioUrl, {
-    updateInterval: 200,
-  });
-
-  const playerStatus = useAudioPlayerStatus(player);
   const statusBadge = statusStyle(status);
-  const waveform = useMemo(() => buildWaveformBars(recordingDetails.id), [recordingDetails.id]);
-
-  useEffect(() => {
-    void setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true });
-  }, []);
-
-  useEffect(() => {
-    if (audioUrl && player) {
-      try {
-        player.replace(audioUrl);
-      } catch {
-        // ignore
-      }
-    }
-  }, [audioUrl, player]);
 
   const handleNavigateToReplaceAudio = () => {
     setShowOptionsSheet(false);
@@ -357,19 +443,6 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
       lectureTitle: recordingDetails.lecture_title || undefined,
       replaceRecordingId: recordingDetails.id,
     });
-  };
-
-  const progress =
-    playerStatus.duration > 0
-      ? Math.min(1, playerStatus.currentTime / playerStatus.duration)
-      : 0;
-
-  const handleTogglePlay = () => {
-    if (playerStatus.playing) { player.pause(); return; }
-    if (playerStatus.duration > 0 && playerStatus.currentTime >= playerStatus.duration - 0.2) {
-      void player.seekTo(0);
-    }
-    player.play();
   };
 
   const handleRetry = async () => {
@@ -466,6 +539,18 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
   const recording = { ...recordingDetails, status };
   const report = recording.report;
   const overallScore = report?.overall_score ?? (recording as any).overall_score;
+  const focusKey = useMemo(() => findFocusDimension(report?.score_breakdown), [report?.score_breakdown]);
+  const focusDim = DIMENSIONS.find((d) => d.key === focusKey);
+  const focusDimension =
+    focusDim && report?.score_breakdown?.[focusDim.key]
+      ? { dim: focusDim, data: report.score_breakdown[focusDim.key] }
+      : null;
+  const strengths = report?.quantitative_metrics?.top_strengths.slice(0, 2) ?? [];
+  const improvements = report?.quantitative_metrics?.priority_improvements ?? [];
+  const hasSyllabus = !!report && !!(
+    report.chapter_info || report.curriculum_coverage || report.accuracy_analysis ||
+    report.learning_objectives_achievement?.length
+  );
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.safe}>
@@ -524,167 +609,107 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
           </View>
         </View>
 
-        {/* Playback card */}
-        <View style={styles.card}>
-          <View style={styles.cardHeaderRow}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <Text style={styles.cardHeading}>Audio Playback</Text>
-              {session?.role === 'teacher' ? (
-                <Pressable
-                  onPress={handleNavigateToReplaceAudio}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 4,
-                    paddingHorizontal: 8,
-                    paddingVertical: 3,
-                    borderRadius: 6,
-                    backgroundColor: '#E0F2FE',
-                  }}
-                >
-                  <Ionicons name="refresh" size={12} color="#0284C7" />
-                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#0284C7' }}>
-                    Replace Audio
-                  </Text>
-                </Pressable>
-              ) : null}
-            </View>
-            <Text style={styles.playerTime}>
-              {formatAudioTime(playerStatus.currentTime)} /{' '}
-              {formatAudioTime(playerStatus.duration || recording.duration_seconds)}
-            </Text>
-          </View>
-          <Pressable onPress={handleTogglePlay} style={styles.playerButton}>
-            <View style={styles.playerIcon}>
-              {!playerStatus.isLoaded || playerStatus.isBuffering ? (
-                <ActivityIndicator color={AppTheme.colors.primary} size="small" />
-              ) : (
-                <Ionicons
-                  color={AppTheme.colors.primary}
-                  name={playerStatus.playing ? 'pause' : 'play'}
-                  size={24}
-                />
-              )}
-            </View>
-            <View style={styles.playerTextWrap}>
-              <Text style={styles.playerTitle}>Play recording</Text>
-              <Text style={styles.playerSubtitle}>
-                {playerStatus.playing ? 'Tap to pause' : 'Tap to listen'}
-              </Text>
-            </View>
-          </Pressable>
-          <View style={styles.waveformWrap}>
-            <AudioWaveform bars={waveform} progress={progress} />
-          </View>
-          {recording.transcription ? (
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => setShowTranscript(true)}
-              style={styles.transcriptButton}
-            >
-              <Ionicons color={AppTheme.colors.primary} name="document-text-outline" size={18} />
-              <Text style={styles.transcriptButtonText}>View transcript</Text>
-              <Ionicons color={AppTheme.colors.textSecondary} name="chevron-forward" size={16} />
-            </Pressable>
-          ) : null}
-        </View>
-
-        {/* Report */}
+        {/* Report: summary → what went well → focus → details (collapsed) */}
         {recording.status === 'completed' && (report || overallScore != null) ? (
           <View style={styles.reportWrap}>
-            {/* Header + score */}
+            {/* Summary */}
             <View style={styles.card}>
-              <Text style={styles.cardHeading}>AI Performance Report</Text>
-              {overallScore != null ? (
-                <ScoreRing score={overallScore} />
-              ) : null}
+              <View style={styles.summaryRow}>
+                {overallScore != null ? <ScoreRing score={overallScore} /> : null}
+                <View style={styles.summaryBody}>
+                  <Text style={styles.cardHeading}>Lecture summary</Text>
+                  {overallScore != null ? <Text style={styles.detailsHint}>Overall score</Text> : null}
+                </View>
+              </View>
               {report?.teaching_quality_notes ? (
                 <Text style={styles.overallNotes}>{report.teaching_quality_notes}</Text>
               ) : null}
             </View>
 
-            {/* Strengths + improvements, ahead of the detail */}
-            {report?.quantitative_metrics &&
-            (report.quantitative_metrics.top_strengths.length > 0 ||
-              report.quantitative_metrics.priority_improvements.length > 0) ? (
+            {/* What went well */}
+            {strengths.length > 0 ? (
               <View style={styles.card}>
-                <BulletList
-                  color="#127A40"
-                  icon="checkmark-circle-outline"
-                  items={report.quantitative_metrics.top_strengths}
-                  title="What went well"
-                />
-                <BulletList
-                  color={AppTheme.colors.warning}
-                  icon="arrow-up-circle-outline"
-                  items={report.quantitative_metrics.priority_improvements}
-                  title="Try next class"
-                />
+                <SectionHeading color="#127A40" icon="checkmark-circle-outline" title="What went well" />
+                {strengths.map((item, i) => (
+                  <FindingItem color="#127A40" icon="checkmark-circle" key={i} text={item} />
+                ))}
               </View>
             ) : null}
 
-            {/* Quantitative metrics */}
-            {report?.quantitative_metrics ? (
+            {/* Your focus for next class */}
+            <FocusCard focusDimension={focusDimension} improvements={improvements} />
+
+            {/* Details */}
+            {report?.score_breakdown || report?.quantitative_metrics || hasSyllabus ? (
               <View style={styles.card}>
-                <Text style={styles.sectionLabel}>KEY METRICS</Text>
-                <MetricsStrip q={report.quantitative_metrics} />
-                {report.quantitative_metrics.languages_detected.length > 0 ? (
-                  <View style={styles.langRow}>
-                    <Text style={styles.langPrefix}>Languages detected:</Text>
-                    {report.quantitative_metrics.languages_detected.map((lang) => (
-                      <LanguagePill key={lang} text={lang} />
-                    ))}
-                    {report.quantitative_metrics.code_switching_frequency !== 'none' ? (
-                      <LanguagePill
-                        text={`${report.quantitative_metrics.code_switching_frequency} switching`}
-                      />
-                    ) : null}
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityState={{ expanded: showDetails }}
+                  onPress={() => setShowDetails((v) => !v)}
+                  style={styles.detailsToggle}
+                >
+                  <View style={styles.detailsToggleBody}>
+                    <Text style={styles.cardHeading}>Report details</Text>
+                    <Text style={styles.detailsHint}>Scores by area, syllabus coverage and key metrics</Text>
                   </View>
-                ) : null}
-              </View>
-            ) : null}
+                  <Ionicons
+                    color={AppTheme.colors.textSecondary}
+                    name={showDetails ? 'chevron-up' : 'chevron-down'}
+                    size={20}
+                  />
+                </Pressable>
 
-            {/* Per-dimension scores */}
-            {report?.score_breakdown ? (
-              <View style={styles.card}>
-                <Text style={styles.sectionLabel}>DIMENSION BREAKDOWN</Text>
-                {DIMENSIONS.map((dim) => {
-                  const data = report.score_breakdown![dim.key];
-                  return data ? (
-                    <DimensionCard key={dim.key} dim={dim} data={data} />
-                  ) : null;
-                })}
-              </View>
-            ) : null}
+                {showDetails ? (
+                  <>
+                    {report?.score_breakdown ? (
+                      <View style={styles.detailSection}>
+                        <Text style={styles.sectionLabel}>SCORES BY AREA</Text>
+                        {DIMENSIONS.map((dim) => {
+                          const data = report.score_breakdown![dim.key];
+                          return data ? (
+                            <DimensionRow data={data} dim={dim} isFocus={dim.key === focusKey} key={dim.key} />
+                          ) : null;
+                        })}
+                      </View>
+                    ) : null}
 
-            {/* ── Syllabus coverage (RAG evaluation) ── */}
-            {report && (report.chapter_info || report.curriculum_coverage || report.accuracy_analysis || report.learning_objectives_achievement) ? (
-              <View style={styles.card}>
-                <Text style={styles.sectionLabel}>SYLLABUS COVERAGE</Text>
+                    {report && hasSyllabus ? (
+                      <View style={styles.detailSection}>
+                        <Text style={styles.sectionLabel}>SYLLABUS COVERAGE</Text>
+                        {report.chapter_info ? <ChapterInfoBanner data={report.chapter_info} /> : null}
+                        {recording.learning_plan ? <LearningPlanInfoCard data={recording.learning_plan} /> : null}
+                        {report.curriculum_coverage ? (
+                          <CurriculumCoverageCard data={report.curriculum_coverage} />
+                        ) : null}
+                        {report.accuracy_analysis ? (
+                          <ReferenceAlignmentCard data={report.accuracy_analysis} />
+                        ) : null}
+                        {report.learning_objectives_achievement?.length ? (
+                          <LearningObjectivesCard data={report.learning_objectives_achievement} />
+                        ) : null}
+                      </View>
+                    ) : null}
 
-                {/* Chapter info banner */}
-                {report.chapter_info ? (
-                  <ChapterInfoBanner data={report.chapter_info} />
-                ) : null}
-
-                {/* Selected Learning Plan (Lecture Planner) */}
-                {recording.learning_plan ? (
-                  <LearningPlanInfoCard data={recording.learning_plan} />
-                ) : null}
-
-                {/* Curriculum coverage */}
-                {report.curriculum_coverage ? (
-                  <CurriculumCoverageCard data={report.curriculum_coverage} />
-                ) : null}
-
-                {/* Reference alignment */}
-                {report.accuracy_analysis ? (
-                  <ReferenceAlignmentCard data={report.accuracy_analysis} />
-                ) : null}
-
-                {/* Learning objectives */}
-                {report.learning_objectives_achievement && report.learning_objectives_achievement.length > 0 ? (
-                  <LearningObjectivesCard data={report.learning_objectives_achievement} />
+                    {report?.quantitative_metrics ? (
+                      <View style={styles.detailSection}>
+                        <Text style={styles.sectionLabel}>KEY METRICS</Text>
+                        <MetricsStrip q={report.quantitative_metrics} />
+                        {report.quantitative_metrics.languages_detected.length > 0 ? (
+                          <View style={styles.langRow}>
+                            <Text style={styles.langPrefix}>Languages detected:</Text>
+                            {report.quantitative_metrics.languages_detected.map((lang) => (
+                              <LanguagePill key={lang} text={lang} />
+                            ))}
+                            {report.quantitative_metrics.code_switching_frequency !== 'none' ? (
+                              <LanguagePill
+                                text={`${report.quantitative_metrics.code_switching_frequency} switching`}
+                              />
+                            ) : null}
+                          </View>
+                        ) : null}
+                      </View>
+                    ) : null}
+                  </>
                 ) : null}
               </View>
             ) : null}
@@ -738,6 +763,25 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
             </View>
           </View>
         )}
+
+        {/* Recording: below the report, since most teachers come for the feedback */}
+        <View style={styles.card}>
+          <Text style={styles.cardHeading}>Recording</Text>
+          {audioUrl ? (
+            <ReportAudioPlayer audioUrl={audioUrl} fallbackDuration={recording.duration_seconds} />
+          ) : null}
+          {recording.transcription ? (
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setShowTranscript(true)}
+              style={styles.transcriptButton}
+            >
+              <Ionicons color={AppTheme.colors.primary} name="document-text-outline" size={18} />
+              <Text style={styles.transcriptButtonText}>View transcript</Text>
+              <Ionicons color={AppTheme.colors.textSecondary} name="chevron-forward" size={16} />
+            </Pressable>
+          ) : null}
+        </View>
             </View>
           </View>
         </ScrollView>
@@ -972,35 +1016,13 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
-  cardHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   cardHeading: { fontSize: 17, fontWeight: '800', color: AppTheme.colors.textPrimary },
-  playerTime: { fontSize: 12, color: AppTheme.colors.textSecondary, fontWeight: '600' },
-  playerButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-    padding: 14,
-    borderRadius: AppTheme.radius.medium,
-    backgroundColor: AppTheme.colors.background,
-  },
-  playerIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#EAF4FF',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  playerTextWrap: { flex: 1, gap: 3 },
-  playerTitle: { fontSize: 15, fontWeight: '700', color: AppTheme.colors.textPrimary },
-  playerSubtitle: { fontSize: 13, color: AppTheme.colors.textSecondary },
-  waveformWrap: {
-    padding: 14,
-    borderRadius: AppTheme.radius.medium,
-    borderWidth: 1,
-    borderColor: AppTheme.colors.border,
-    backgroundColor: AppTheme.colors.background,
-  },
+  summaryRow: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+  summaryBody: { flex: 1, gap: 4 },
+  detailsToggle: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 44 },
+  detailsToggleBody: { flex: 1, gap: 2 },
+  detailsHint: { fontSize: 13, color: AppTheme.colors.textSecondary },
+  detailSection: { gap: 10 },
   transcriptButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1015,10 +1037,7 @@ const styles = StyleSheet.create({
   transcriptScroll: { padding: AppTheme.spacing.l, maxWidth: 800, width: '100%', alignSelf: 'center' },
   transcriptText: { fontSize: 16, lineHeight: 26, color: AppTheme.colors.textPrimary },
   reportWrap: { gap: 16 },
-  overallNotes: {
-    fontSize: 14, lineHeight: 22, color: AppTheme.colors.textSecondary,
-    textAlign: 'center', paddingHorizontal: 4,
-  },
+  overallNotes: { fontSize: 15, lineHeight: 23, color: AppTheme.colors.textPrimary },
   sectionLabel: {
     fontSize: 11, fontWeight: '800', letterSpacing: 1.2,
     color: AppTheme.colors.textSecondary,

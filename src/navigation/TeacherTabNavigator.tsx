@@ -2,6 +2,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 
 import { FloatingPillTabBar, FloatingTabItem } from "../components/common/FloatingPillTabBar";
+import { useProcessingCount } from "../lib/useProcessingCount";
 
 import { TeacherDashboardScreen }  from "../screens/TeacherDashboardScreen";
 import { TeacherSubjectsScreen }   from "../screens/TeacherSubjectsScreen";
@@ -24,7 +25,11 @@ const TABS: FloatingTabItem[] = [
   { key: "TeacherRecordings", label: "Recordings", icon: "mic-outline",       activeIcon: "mic"       },
 ];
 
-function TeacherTabBar({ state, navigation }: BottomTabBarProps) {
+function TeacherTabBar({ state, navigation, processingCount }: BottomTabBarProps & { processingCount: number }) {
+  const tabs = TABS.map((t) =>
+    t.key === "TeacherRecordings" ? { ...t, badge: processingCount } : t,
+  );
+
   const handlePress = (index: number) => {
     const route = state.routes[index];
     const event = navigation.emit({
@@ -39,7 +44,7 @@ function TeacherTabBar({ state, navigation }: BottomTabBarProps) {
 
   return (
     <FloatingPillTabBar
-      tabs={TABS}
+      tabs={tabs}
       activeIndex={state.index}
       onTabPress={handlePress}
     />
@@ -47,11 +52,12 @@ function TeacherTabBar({ state, navigation }: BottomTabBarProps) {
 }
 
 export function TeacherTabNavigator() {
+  const processingCount = useProcessingCount();
   return (
     <Tab.Navigator
       id="TeacherTabs"
       initialRouteName="TeacherDashboard"
-      tabBar={(props) => <TeacherTabBar {...props} />}
+      tabBar={(props) => <TeacherTabBar {...props} processingCount={processingCount} />}
       screenOptions={{ headerShown: false }}
     >
       <Tab.Screen name="TeacherDashboard"  component={TeacherDashboardScreen}  options={{ title: "Home"       }} />

@@ -408,6 +408,8 @@ export type RecordingWithReport = {
   duration_seconds: number | null;
   status: RecordingStatus;
   error_reason: string | null;
+  /** Set only while status is "processing". Older backends omit it. */
+  processing_step?: "transcribing" | "analysing" | null;
   is_archived: boolean;
   uploaded_at: string;
   learning_plan_id?: number | null;

@@ -33,7 +33,8 @@ import {
 } from '../lib/recordingDraft';
 import { useLectureRecorder } from '../lib/useLectureRecorder';
 import { uploadRecording, getTeacherLearningPlans, createTeacherLearningPlan } from '../lib/api';
-import { LearningPlanOut } from '../types/api';
+import { LectureSuggestion, suggestLecture } from '../lib/lectureContext';
+import { ChapterOut, LearningPlanOut } from '../types/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 
@@ -76,6 +77,7 @@ export function RecordingScreen({ navigation, route }: Props) {
     learningPlanId,
     lectureTitle: paramLectureTitle,
     replaceRecordingId,
+    fromTimetable = false,
   } = route.params;
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
@@ -113,13 +115,64 @@ export function RecordingScreen({ navigation, route }: Props) {
   const [creatingNewLecture, setCreatingNewLecture] = useState(!learningPlanId && !replaceRecordingId);
   const [lectureSelectError, setLectureSelectError] = useState<string | null>(null);
 
+  /* A timetable launch knows only the subject. The chapter and lecture are
+     guessed from the planner while the teacher records, and confirmed after Stop. */
+  const [selectedChapterId, setSelectedChapterId] = useState<number | undefined>(chapterId);
+  const [chapters, setChapters] = useState<ChapterOut[]>([]);
+  const [suggestion, setSuggestion] = useState<LectureSuggestion | null>(null);
+  const [suggestionLoading, setSuggestionLoading] = useState(fromTimetable);
+  // Once the teacher picks a chapter or lecture, a late suggestion must not undo it.
+  const choiceTouchedRef = useRef(false);
+
+  const applySuggestion = (s: LectureSuggestion) => {
+    setSelectedChapterId(s.chapter?.id);
+    setSelectedLearningPlanId(s.plan?.id);
+    setCreatingNewLecture(!s.plan);
+  };
+
   useEffect(() => {
-    if (session && subjectId && chapterId) {
-      getTeacherLearningPlans(session.token, subjectId, chapterId)
+    if (!fromTimetable || !session) return;
+    let cancelled = false;
+    suggestLecture(session.token, subjectId)
+      .then((s) => {
+        if (cancelled) return;
+        setChapters(s.chapters);
+        setSuggestion(s);
+        if (!choiceTouchedRef.current) applySuggestion(s);
+      })
+      .catch(() => {
+        // No suggestion: the teacher picks the chapter after Stop.
+      })
+      .finally(() => {
+        if (!cancelled) setSuggestionLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [fromTimetable, session, subjectId]);
+
+  const selectedChapterName =
+    chapters.find((c) => c.id === selectedChapterId)?.name ?? paramChapterName;
+
+  const selectChapter = (chapter: ChapterOut) => {
+    choiceTouchedRef.current = true;
+    if (chapter.id === selectedChapterId) return;
+    setSelectedChapterId(chapter.id);
+    // A lecture created by an earlier failed upload belongs to the old chapter.
+    createdLearningPlanIdRef.current = null;
+    setLearningPlans([]);
+    setSelectedLearningPlanId(undefined);
+    setCreatingNewLecture(true);
+    setLectureSelectError(null);
+  };
+
+  useEffect(() => {
+    if (session && subjectId && selectedChapterId) {
+      getTeacherLearningPlans(session.token, subjectId, selectedChapterId)
         .then(setLearningPlans)
         .catch(() => setLearningPlans([]));
     }
-  }, [session, subjectId, chapterId]);
+  }, [session, subjectId, selectedChapterId]);
 
   const selectedLearningPlan = useMemo(
     () => learningPlans.find((lp) => lp.id === selectedLearningPlanId) ?? null,
@@ -127,6 +180,7 @@ export function RecordingScreen({ navigation, route }: Props) {
   );
 
   const selectExistingLecture = (lp: LearningPlanOut) => {
+    choiceTouchedRef.current = true;
     setSelectedLearningPlanId(lp.id);
     setCreatingNewLecture(false);
     setLectureSelectError(null);
@@ -134,6 +188,7 @@ export function RecordingScreen({ navigation, route }: Props) {
   };
 
   const selectNewLecture = () => {
+    choiceTouchedRef.current = true;
     setSelectedLearningPlanId(undefined);
     setCreatingNewLecture(true);
     setLectureSelectError(null);
@@ -243,6 +298,8 @@ export function RecordingScreen({ navigation, route }: Props) {
 
   const draftIdRef = useRef<string | null>(null);
   const draftStartedAtRef = useRef(0);
+  const [draftChecked, setDraftChecked] = useState(false);
+  const autoStartedRef = useRef(false);
   /* The autosave timer and the dictation callbacks both outlive the render that
      created them, so everything they read lives in a ref rather than a closure
      over state - otherwise a five-minute-old copy of the form gets written. */
@@ -253,10 +310,13 @@ export function RecordingScreen({ navigation, route }: Props) {
     description,
     creatingNewLecture,
     selectedLearningPlanId,
+    selectedChapterId,
   });
   liveDurationRef.current = liveDurationMillis;
   liveTranscriptRef.current = liveTranscript;
-  draftFieldsRef.current = { lectureTitle, description, creatingNewLecture, selectedLearningPlanId };
+  draftFieldsRef.current = {
+    lectureTitle, description, creatingNewLecture, selectedLearningPlanId, selectedChapterId,
+  };
 
   const persistDraft = async (
     elapsedMillis: number,
@@ -288,6 +348,7 @@ export function RecordingScreen({ navigation, route }: Props) {
         transcript: transcript.trim(),
         creatingNewLecture: fields.creatingNewLecture,
         selectedLearningPlanId: fields.selectedLearningPlanId,
+        selectedChapterId: fields.selectedChapterId,
       },
       elapsedMillis,
       audio,
@@ -316,7 +377,7 @@ export function RecordingScreen({ navigation, route }: Props) {
 
   useEffect(() => {
     let cancelled = false;
-    void (async () => {
+    const check = async () => {
       const draft = await loadRecordingDraft();
       if (cancelled || !draft) {
         return;
@@ -330,6 +391,10 @@ export function RecordingScreen({ navigation, route }: Props) {
         // recovered into a screen that would file it as a brand new lecture.
         draft.route.replaceRecordingId !== replaceRecordingId
       ) {
+        // Only one draft is kept, so recording now would overwrite that one.
+        if (Date.now() - draft.updatedAt <= DRAFT_MAX_AGE_MS && draftHasContent(draft)) {
+          autoStartedRef.current = true;
+        }
         return;
       }
       if (Date.now() - draft.updatedAt > DRAFT_MAX_AGE_MS || !draftHasContent(draft)) {
@@ -338,7 +403,12 @@ export function RecordingScreen({ navigation, route }: Props) {
         return;
       }
       setRecoverableDraft(draft);
-    })();
+    };
+    // Auto-start waits for this check, so it never records over a lecture the
+    // teacher might still want back.
+    void check().finally(() => {
+      if (!cancelled) setDraftChecked(true);
+    });
     return () => {
       cancelled = true;
     };
@@ -357,6 +427,9 @@ export function RecordingScreen({ navigation, route }: Props) {
       setLiveTranscript(draft.form.transcript);
       setCreatingNewLecture(draft.form.creatingNewLecture);
       setSelectedLearningPlanId(draft.form.selectedLearningPlanId);
+      if (draft.form.selectedChapterId) setSelectedChapterId(draft.form.selectedChapterId);
+      // The teacher's earlier choice wins over a suggestion still loading.
+      choiceTouchedRef.current = true;
 
       const mimeType = draft.audio?.mimeType ?? 'audio/webm';
       let restoredUri: string | null = null;
@@ -451,6 +524,15 @@ export function RecordingScreen({ navigation, route }: Props) {
       Alert.alert('Error', message);
     }
   };
+
+  // Timetable launch: the tap on Record already said "start", so don't ask again.
+  useEffect(() => {
+    if (!fromTimetable || !draftChecked || recoverableDraft || autoStartedRef.current) return;
+    autoStartedRef.current = true;
+    void startRecording();
+    // startRecording is recreated every render; this must run once.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fromTimetable, draftChecked, recoverableDraft]);
 
   /* Pause keeps the same recorder session alive, so resumed audio is appended to
      the very same file. The teacher ends up with one continuous lecture instead
@@ -610,8 +692,13 @@ export function RecordingScreen({ navigation, route }: Props) {
     setLectureTitle(paramLectureTitle || '');
     setLectureTitleError(null);
     setLectureSelectError(null);
-    setSelectedLearningPlanId(learningPlanId);
-    setCreatingNewLecture(!learningPlanId && !replaceRecordingId);
+    if (fromTimetable && suggestion) {
+      choiceTouchedRef.current = false;
+      applySuggestion(suggestion);
+    } else {
+      setSelectedLearningPlanId(learningPlanId);
+      setCreatingNewLecture(!learningPlanId && !replaceRecordingId);
+    }
     setTranscription('');
     setDescription('');
     setLiveTranscript('');
@@ -642,12 +729,15 @@ export function RecordingScreen({ navigation, route }: Props) {
     }
     // Bailing out silently here left the teacher tapping Upload with nothing
     // at all happening, and no clue why.
-    if (!chapterId) {
+    if (!selectedChapterId) {
       setUploadError(
-        'This recording is not linked to a chapter. Go back and start the recording from a chapter so the AI evaluation has something to compare against.',
+        fromTimetable
+          ? 'Choose the chapter this lecture was from, so the AI evaluation has something to compare against.'
+          : 'This recording is not linked to a chapter. Go back and start the recording from a chapter so the AI evaluation has something to compare against.',
       );
       return;
     }
+    const chapterIdForUpload = selectedChapterId;
     let hasError = false;
     if (creatingNewLecture) {
       if (!lectureTitle.trim()) {
@@ -674,7 +764,7 @@ export function RecordingScreen({ navigation, route }: Props) {
       recordedUri,
       uploadUri,
       resolvedMime,
-      chapterId,
+      chapterId: chapterIdForUpload,
       creatingNewLecture,
       replaceRecordingId,
       hasDescription: Boolean(description.trim()),
@@ -697,12 +787,12 @@ export function RecordingScreen({ navigation, route }: Props) {
           const createdPlan = await createTeacherLearningPlan(
             session.token,
             subjectId,
-            chapterId,
+            chapterIdForUpload,
             {
               // A lecture created straight from an upload happened today, so it
               // lands in the planner dated instead of blank.
               date: todayIsoDate(),
-              topic_name: paramChapterName || targetLectureTitle,
+              topic_name: selectedChapterName || targetLectureTitle,
               sub_topic: targetLectureTitle,
             },
           );
@@ -716,7 +806,7 @@ export function RecordingScreen({ navigation, route }: Props) {
         subjectId,
         recordedUri,
         resolvedMime,
-        chapterId,
+        chapterIdForUpload,
         targetLectureTitle || paramLectureTitle || undefined,
         description.trim() || undefined,
         transcription.trim() || undefined,
@@ -1043,20 +1133,59 @@ export function RecordingScreen({ navigation, route }: Props) {
             </View>
 
             <View style={styles.metaCard}>
-              <Text style={styles.metaLabel}>CHAPTER</Text>
-              <View style={{
-                paddingHorizontal: 14,
-                paddingVertical: 12,
-                borderRadius: 16,
-                backgroundColor: AppTheme.colors.surfaceMuted,
-                borderWidth: 1,
-                borderColor: AppTheme.colors.border,
-                marginBottom: 12,
-              }}>
-                <Text style={{ color: AppTheme.colors.textPrimary, fontSize: 15, fontWeight: '600' }}>
-                  {paramChapterName}
-                </Text>
-              </View>
+              <Text style={styles.metaLabel}>{fromTimetable ? 'CHAPTER *' : 'CHAPTER'}</Text>
+              {fromTimetable ? (
+                <View style={styles.chapterPicker}>
+                  {suggestion?.reason && !choiceTouchedRef.current ? (
+                    <View style={styles.suggestionHint}>
+                      <Ionicons color={AppTheme.colors.primaryDark} name="sparkles-outline" size={14} />
+                      <Text style={styles.suggestionHintText}>
+                        {suggestion.reason === 'today'
+                          ? "Filled in from today's lesson plan. Change it if you taught something else."
+                          : 'Filled in with your next lecture that has no recording yet. Change it if needed.'}
+                      </Text>
+                    </View>
+                  ) : null}
+                  {suggestionLoading ? (
+                    <ActivityIndicator color={AppTheme.colors.primary} size="small" style={{ alignSelf: 'flex-start' }} />
+                  ) : chapters.length === 0 ? (
+                    <Text style={styles.chapterEmpty}>
+                      This subject has no chapters yet. Add one from the subject page, then upload this recording.
+                    </Text>
+                  ) : (
+                    <View style={styles.chipWrap}>
+                      {chapters.map((c) => {
+                        const isSel = c.id === selectedChapterId;
+                        return (
+                          <Pressable
+                            accessibilityRole="button"
+                            accessibilityState={{ selected: isSel }}
+                            key={c.id}
+                            onPress={() => selectChapter(c)}
+                            style={[styles.chip, isSel && styles.chipSelected]}
+                          >
+                            <Text style={[styles.chipText, isSel && styles.chipTextSelected]}>{c.name}</Text>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
+                  )}
+                </View>
+              ) : (
+                <View style={{
+                  paddingHorizontal: 14,
+                  paddingVertical: 12,
+                  borderRadius: 16,
+                  backgroundColor: AppTheme.colors.surfaceMuted,
+                  borderWidth: 1,
+                  borderColor: AppTheme.colors.border,
+                  marginBottom: 12,
+                }}>
+                  <Text style={{ color: AppTheme.colors.textPrimary, fontSize: 15, fontWeight: '600' }}>
+                    {paramChapterName}
+                  </Text>
+                </View>
+              )}
 
               <View style={{ marginBottom: 14 }}>
                 <Text style={styles.metaLabel}>LECTURE *</Text>
@@ -1234,6 +1363,31 @@ const styles = StyleSheet.create({
     gap: 18,
   },
   hero: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 },
+  chapterPicker: { gap: 10, marginTop: 6, marginBottom: 14 },
+  suggestionHint: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 6,
+    padding: 10,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primaryLight,
+  },
+  suggestionHintText: { flex: 1, fontSize: 12, lineHeight: 17, color: AppTheme.colors.primaryDark },
+  chapterEmpty: { fontSize: 13, lineHeight: 19, color: AppTheme.colors.textSecondary },
+  chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  chip: {
+    minHeight: 40,
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: AppTheme.radius.medium,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.surface,
+  },
+  chipSelected: { borderColor: '#0284C7', backgroundColor: '#E0F2FE' },
+  chipText: { fontSize: 13, fontWeight: '700', color: AppTheme.colors.textPrimary },
+  chipTextSelected: { color: '#0369A1' },
   micRing: {
     width: 132,
     height: 132,

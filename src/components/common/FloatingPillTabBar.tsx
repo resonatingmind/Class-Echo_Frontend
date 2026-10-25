@@ -18,6 +18,8 @@ export type FloatingTabItem = {
   label: string;
   icon: keyof typeof Ionicons.glyphMap;
   activeIcon: keyof typeof Ionicons.glyphMap;
+  /** Shown as a count on the icon when above zero. */
+  badge?: number;
 };
 
 type Props = {
@@ -89,16 +91,26 @@ export function FloatingPillTabBar({ tabs, activeIndex, onTabPress }: Props) {
           return (
             <TouchableOpacity
               key={tab.key}
+              accessibilityLabel={
+                tab.badge ? `${tab.label}, ${tab.badge} being analysed` : tab.label
+              }
               activeOpacity={0.7}
               onPress={() => onTabPress(i)}
               style={styles.tab}
             >
-              <Ionicons
-                color={isActive ? AppTheme.colors.primary : colors.navInactive}
-                name={isActive ? tab.activeIcon : tab.icon}
-                size={22}
-                style={{ marginBottom: 6 }}
-              />
+              <View>
+                <Ionicons
+                  color={isActive ? AppTheme.colors.primary : colors.navInactive}
+                  name={isActive ? tab.activeIcon : tab.icon}
+                  size={22}
+                  style={{ marginBottom: 6 }}
+                />
+                {tab.badge ? (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{tab.badge > 9 ? '9+' : tab.badge}</Text>
+                  </View>
+                ) : null}
+              </View>
               <Text
                 style={[
                   styles.label,
@@ -116,6 +128,21 @@ export function FloatingPillTabBar({ tabs, activeIndex, onTabPress }: Props) {
 }
 
 const styles = StyleSheet.create({
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -10,
+    minWidth: 18,
+    height: 18,
+    paddingHorizontal: 4,
+    borderRadius: 9,
+    backgroundColor: AppTheme.colors.warning,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeText: { fontSize: 10, fontWeight: '800', color: '#FFFFFF' },
   container: {
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 20,

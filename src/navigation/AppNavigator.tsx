@@ -143,6 +143,8 @@ export type RootStackParamList = {
     learningPlanId?: number;
     lectureTitle?: string;
     replaceRecordingId?: number;
+    /** Opened from a timetable period: record at once, suggest chapter and lecture after Stop. */
+    fromTimetable?: boolean;
   };
 
   // Student

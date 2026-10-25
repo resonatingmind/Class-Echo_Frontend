@@ -37,6 +37,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { AppTheme } from '../theme/AppTheme';
 import { DimensionScore, QuantitativeMetrics, RecordingStatus, ScoreBreakdown, RecordingWithReport } from '../types/api';
 import { formatAudioTime } from '../lib/audio';
+import { describeFailure } from '../lib/failureMessages';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'RecordingDetail'>;
 
@@ -370,6 +371,124 @@ const fc = StyleSheet.create({
   toggle: { flexDirection: 'row', alignItems: 'center', gap: 4, minHeight: 44, alignSelf: 'flex-start' },
   toggleText: { fontSize: 14, fontWeight: '700', color: AppTheme.colors.primary },
 });
+
+const STEPS = ['Uploading', 'Transcribing', 'Analysing', 'Ready'] as const;
+
+/**
+ * Where a recording is on its way to a report. Uploading is always done by the
+ * time the recording exists. A pending recording is waiting for Transcribing.
+ */
+function ProcessingSteps({ status, step }: {
+  status: RecordingStatus;
+  step: RecordingWithReport['processing_step'];
+}) {
+  const current = status === 'processing' && step === 'analysing' ? 2 : 1;
+  const waiting = status === 'pending';
+
+  return (
+    <View accessibilityRole="progressbar" style={ps.list}>
+      {STEPS.map((label, i) => {
+        const done = i < current;
+        const active = i === current;
+        return (
+          <View key={label} style={ps.row}>
+            <View style={[ps.marker, done && ps.markerDone, active && ps.markerActive]}>
+              {done ? (
+                <Ionicons color="#fff" name="checkmark" size={14} />
+              ) : active && !waiting ? (
+                <ActivityIndicator color={AppTheme.colors.primary} size="small" />
+              ) : null}
+            </View>
+            <Text style={[ps.label, (done || active) && ps.labelOn]}>
+              {label}
+              {active && waiting ? <Text style={ps.note}>  · waiting to start</Text> : null}
+            </Text>
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+const ps = StyleSheet.create({
+  list: { gap: 10 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  marker: {
+    width: 24, height: 24, borderRadius: 12, borderWidth: 2,
+    borderColor: AppTheme.colors.border, alignItems: 'center', justifyContent: 'center',
+  },
+  markerDone: { backgroundColor: '#127A40', borderColor: '#127A40' },
+  markerActive: { borderColor: AppTheme.colors.primary },
+  label: { fontSize: 15, fontWeight: '600', color: AppTheme.colors.hint },
+  labelOn: { color: AppTheme.colors.textPrimary },
+  note: { fontSize: 13, fontWeight: '500', color: AppTheme.colors.textSecondary },
+});
+
+/** A failed analysis in plain words, with one primary action and the raw reason behind Details. */
+function FailedState({ errorReason, canReplace, retrying, onRetry, onReplace }: {
+  errorReason: string | null | undefined;
+  canReplace: boolean;
+  retrying: boolean;
+  onRetry: () => void;
+  onReplace: () => void;
+}) {
+  const [showDetails, setShowDetails] = useState(false);
+  const failure = describeFailure(errorReason);
+  // Only teachers can upload new audio; everyone else gets Retry.
+  const primary = failure.action === 'replace' && canReplace ? 'replace' : 'retry';
+
+  const retryButton = (
+    <Pressable
+      disabled={retrying}
+      onPress={onRetry}
+      style={[styles.retryButton, styles.failurePrimary]}
+    >
+      {retrying ? (
+        <ActivityIndicator color="#fff" size="small" />
+      ) : (
+        <Ionicons color="#fff" name="refresh-outline" size={16} />
+      )}
+      <Text style={styles.retryButtonText}>{retrying ? 'Queuing…' : 'Retry analysis'}</Text>
+    </Pressable>
+  );
+  const replaceButton = (
+    <Pressable onPress={onReplace} style={[styles.retryButton, styles.failurePrimary]}>
+      <Ionicons color="#fff" name="cloud-upload-outline" size={16} />
+      <Text style={styles.retryButtonText}>Upload different audio</Text>
+    </Pressable>
+  );
+
+  return (
+    <View style={styles.failureBody}>
+      <Text style={styles.failureTitle}>{failure.title}</Text>
+      <Text style={styles.processingText}>{failure.body}</Text>
+      {primary === 'replace' ? replaceButton : retryButton}
+      <View style={styles.failureLinks}>
+        {primary === 'replace' ? (
+          <Pressable disabled={retrying} onPress={onRetry} style={styles.failureLink}>
+            <Text style={styles.failureLinkText}>{retrying ? 'Queuing…' : 'Retry analysis'}</Text>
+          </Pressable>
+        ) : canReplace ? (
+          <Pressable onPress={onReplace} style={styles.failureLink}>
+            <Text style={styles.failureLinkText}>Upload different audio</Text>
+          </Pressable>
+        ) : null}
+        {errorReason ? (
+          <Pressable
+            accessibilityState={{ expanded: showDetails }}
+            onPress={() => setShowDetails((v) => !v)}
+            style={styles.failureLink}
+          >
+            <Text style={styles.failureLinkText}>{showDetails ? 'Hide details' : 'Details'}</Text>
+          </Pressable>
+        ) : null}
+      </View>
+      {showDetails && errorReason ? (
+        <Text selectable style={styles.failureDetails}>{errorReason}</Text>
+      ) : null}
+    </View>
+  );
+}
 
 // ── Main screen ───────────────────────────────────────────────────────────────
 
@@ -716,50 +835,26 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
           </View>
         ) : (
           <View style={[styles.processingCard, status === 'failed' && styles.processingCardFailed]}>
-            {status === 'processing' ? (
-              <ActivityIndicator color={AppTheme.colors.primary} size="small" />
-            ) : (
-              <Ionicons
-                color={status === 'failed' ? '#B42318' : AppTheme.colors.hint}
-                name={status === 'failed' ? 'alert-circle-outline' : 'time-outline'}
-                size={20}
-              />
-            )}
+            {status === 'failed' ? (
+              <Ionicons color="#B42318" name="alert-circle-outline" size={20} />
+            ) : null}
             <View style={styles.processingBody}>
-              <Text style={styles.processingText}>
-                {status === 'processing'
-                  ? `Analysing your lecture. This usually takes about ${estimateAnalysisMinutes(recording.duration_seconds)} minutes. You can leave this screen; the report will be here when it's ready.`
-                  : status === 'failed'
-                  ? recording.error_reason || 'The report could not be generated for this recording.'
-                  : 'Your recording is in the queue. Analysis will start shortly.'}
-              </Text>
               {status === 'failed' ? (
-                <View style={{ flexDirection: 'row', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
-                  {session?.role === 'teacher' ? (
-                    <Pressable
-                      onPress={handleNavigateToReplaceAudio}
-                      style={[styles.retryButton, { backgroundColor: '#0284C7' }]}
-                    >
-                      <Ionicons color="#fff" name="mic-outline" size={14} />
-                      <Text style={styles.retryButtonText}>Re-record / Upload New Audio</Text>
-                    </Pressable>
-                  ) : null}
-                  <Pressable
-                    disabled={retrying}
-                    onPress={() => void handleRetry()}
-                    style={[styles.retryButton, { backgroundColor: '#475569' }]}
-                  >
-                    {retrying ? (
-                      <ActivityIndicator color="#fff" size="small" />
-                    ) : (
-                      <Ionicons color="#fff" name="refresh-outline" size={14} />
-                    )}
-                    <Text style={styles.retryButtonText}>
-                      {retrying ? 'Queuing…' : 'Retry Same Audio'}
-                    </Text>
-                  </Pressable>
-                </View>
-              ) : null}
+                <FailedState
+                  canReplace={session?.role === 'teacher'}
+                  errorReason={recording.error_reason}
+                  onReplace={handleNavigateToReplaceAudio}
+                  onRetry={() => void handleRetry()}
+                  retrying={retrying}
+                />
+              ) : (
+                <>
+                  <ProcessingSteps status={status} step={recording.processing_step} />
+                  <Text style={styles.processingText}>
+                    {`Usually ready in about ${estimateAnalysisMinutes(recording.duration_seconds)} minutes. You can close the app; the Recordings tab shows a badge until it's ready.`}
+                  </Text>
+                </>
+              )}
             </View>
           </View>
         )}
@@ -1068,6 +1163,16 @@ const styles = StyleSheet.create({
     borderRadius: 999, backgroundColor: '#B42318',
   },
   retryButtonText: { fontSize: 13, fontWeight: '700', color: '#fff' },
+  failureBody: { gap: 10 },
+  failureTitle: { fontSize: 15, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  failurePrimary: { backgroundColor: AppTheme.colors.primary, minHeight: 44, paddingHorizontal: 18 },
+  failureLinks: { flexDirection: 'row', flexWrap: 'wrap', gap: 16 },
+  failureLink: { minHeight: 44, justifyContent: 'center' },
+  failureLinkText: { fontSize: 13, fontWeight: '700', color: AppTheme.colors.primaryDark },
+  failureDetails: {
+    fontSize: 12, lineHeight: 18, color: AppTheme.colors.textSecondary,
+    padding: 10, borderRadius: AppTheme.radius.medium, backgroundColor: AppTheme.colors.background,
+  },
   sheetOverlay: {
     flex: 1,
     backgroundColor: 'rgba(26, 28, 28, 0.32)',

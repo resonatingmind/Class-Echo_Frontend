@@ -36,6 +36,8 @@ export type RecordingDraftForm = {
   transcript: string;
   creatingNewLecture: boolean;
   selectedLearningPlanId?: number;
+  /* Only differs from route.chapterId for a recording started from the timetable. */
+  selectedChapterId?: number;
 };
 
 export type RecordingDraft = {

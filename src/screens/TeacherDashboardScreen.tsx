@@ -51,9 +51,12 @@ function nowMinutes(): number {
   return d.getHours() * 60 + d.getMinutes();
 }
 
-const TODAY_NAME = [
-  "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
-][new Date().getDay()] ?? "Monday";
+/* Read on every load, not once at import: the app can stay open past midnight. */
+function todayName(): string {
+  return [
+    "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
+  ][new Date().getDay()] ?? "Monday";
+}
 
 const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -136,23 +139,34 @@ export function TeacherDashboardScreen() {
 
   /** Today's periods sorted by time */
   const todayPeriods = useMemo(() => {
-    if (!(WEEKDAYS as string[]).includes(TODAY_NAME)) return [];
+    const today = todayName();
+    if (!(WEEKDAYS as string[]).includes(today)) return [];
     return timetable
-      .filter((e) => e.day_of_week === TODAY_NAME)
+      .filter((e) => e.day_of_week === today)
       .sort((a, b) => toMinutes(a.start_time) - toMinutes(b.start_time));
   }, [timetable]);
 
-  /** Next or current class */
-  const upcomingPeriod = useMemo(() => {
+  /** The next class that has not started yet, shown even while another is on */
+  const nextPeriod = useMemo(() => {
     const now = nowMinutes();
-    return (
-      todayPeriods.find((p) => toMinutes(p.end_time) > now) ?? null
-    );
+    return todayPeriods.find((p) => toMinutes(p.start_time) > now) ?? null;
   }, [todayPeriods]);
 
-  const isOngoing = upcomingPeriod != null &&
-    toMinutes(upcomingPeriod.start_time) <= nowMinutes() &&
-    nowMinutes() < toMinutes(upcomingPeriod.end_time);
+  const subjectFor = (period: TimetableEntryOut) => ({
+    subjectId:   period.subject_id,
+    subjectName: period.subject?.name ?? "Subject",
+  });
+
+  const openSubject = (period: TimetableEntryOut) =>
+    navigation.navigate("TeacherSubjectWorkspace", {
+      ...subjectFor(period),
+      className: period.class_?.name ?? "",
+      section:   period.class_?.section ?? "",
+    });
+
+  // Recording starts straight away; chapter and lecture are confirmed after Stop.
+  const recordPeriod = (period: TimetableEntryOut) =>
+    navigation.navigate("TeacherRecording", { ...subjectFor(period), fromTimetable: true });
 
   // ── Render ────────────────────────────────────────────────────────────────
 
@@ -223,7 +237,7 @@ export function TeacherDashboardScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Today's Schedule</Text>
-            <Text style={styles.sectionSub}>{TODAY_NAME}</Text>
+            <Text style={styles.sectionSub}>{todayName()}</Text>
           </View>
 
           {todayPeriods.length === 0 ? (
@@ -239,8 +253,7 @@ export function TeacherDashboardScreen() {
                 const start  = toMinutes(period.start_time);
                 const end    = toMinutes(period.end_time);
                 const isNow  = start <= now && now < end;
-                const isNext = !isNow && start > now &&
-                  upcomingPeriod?.id === period.id;
+                const isNext = nextPeriod?.id === period.id;
                 const isDone = end <= now;
 
                 return (
@@ -273,7 +286,15 @@ export function TeacherDashboardScreen() {
                     </View>
 
                     {/* Content */}
-                    <View style={[styles.periodCard, isNow && styles.periodCardNow]}>
+                    <Pressable
+                      accessibilityRole="button"
+                      onPress={() => openSubject(period)}
+                      style={({ pressed }) => [
+                        styles.periodCard,
+                        isNow && styles.periodCardNow,
+                        pressed && { opacity: 0.85 },
+                      ]}
+                    >
                       <View style={styles.periodCardTop}>
                         <Text
                           style={[styles.periodSubject, isNow && styles.periodSubjectNow]}
@@ -295,7 +316,27 @@ export function TeacherDashboardScreen() {
                       {period.room ? (
                         <Text style={styles.periodRoom}>Room {period.room}</Text>
                       ) : null}
-                    </View>
+                      {isNow ? (
+                        <Pressable
+                          accessibilityLabel={`Record ${period.subject?.name ?? "this class"}`}
+                          accessibilityRole="button"
+                          onPress={() => recordPeriod(period)}
+                          style={({ pressed }) => [styles.recordNowBtn, pressed && { opacity: 0.85 }]}
+                        >
+                          <View style={styles.recordNowDot} />
+                          <Text style={styles.recordNowText}>Record</Text>
+                        </Pressable>
+                      ) : isNext ? (
+                        <Pressable
+                          accessibilityRole="button"
+                          onPress={() => openSubject(period)}
+                          style={({ pressed }) => [styles.prepareBtn, pressed && { opacity: 0.85 }]}
+                        >
+                          <Ionicons name="book-outline" size={16} color={AppTheme.colors.primaryDark} />
+                          <Text style={styles.prepareText}>Prepare</Text>
+                        </Pressable>
+                      ) : null}
+                    </Pressable>
                   </View>
                 );
               })}
@@ -581,6 +622,32 @@ const styles = StyleSheet.create({
   ribbonNow:  { backgroundColor: AppTheme.colors.primary },
   ribbonNext: { backgroundColor: AppTheme.colors.warning },
   ribbonText: { fontSize: 9, fontWeight: "800", color: AppTheme.colors.surface, letterSpacing: 0.5 },
+
+  recordNowBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: AppTheme.spacing.s,
+    marginTop: AppTheme.spacing.s,
+    minHeight: 48,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: "#DC2626",
+  },
+  recordNowDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: "#FFFFFF" },
+  recordNowText: { fontSize: 16, fontWeight: "800", color: "#FFFFFF" },
+  prepareBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    marginTop: AppTheme.spacing.s,
+    minHeight: 44,
+    borderRadius: AppTheme.radius.medium,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.primary,
+    backgroundColor: AppTheme.colors.primaryLight,
+  },
+  prepareText: { fontSize: 14, fontWeight: "700", color: AppTheme.colors.primaryDark },
 
   // ── Subjects horizontal scroll ──
   subjectScroll: { paddingBottom: AppTheme.spacing.xs, gap: AppTheme.spacing.m },

@@ -390,7 +390,89 @@ export type LLMReportOut = {
   accuracy_analysis: AccuracyAnalysis | null;
   chapter_info: ChapterInfo | null;
   learning_objectives_achievement: LearningObjectiveStatus[] | null;
+  /** Which prompt/rubric scored the report; scores only compare within one version. Missing on older backends. */
+  rubric_version?: string | null;
+  /** Structured findings. Older backends omit them; fall back to the plain strings in quantitative_metrics. */
+  strengths?: ReportStrength[];
+  improvements?: ReportImprovement[];
+  /** The teacher's 👍/👎 per finding. Only sent by detail endpoints. */
+  feedback?: ReportFeedback[] | null;
   created_at: string;
+};
+
+export type ReportStrength = {
+  area: keyof ScoreBreakdown | null;
+  text: string;
+  evidence: string;
+};
+
+export type ReportImprovement = {
+  area: keyof ScoreBreakdown | null;
+  observation: string;
+  /** Empty on reports scored before rubric 2. */
+  try_this: string;
+  why: string;
+  is_focus: boolean;
+};
+
+export type FeedbackTarget = "strength" | "dimension" | "improvement";
+export type FeedbackVerdict = "agree" | "disagree";
+export type FeedbackReason =
+  | "score_too_low"
+  | "score_too_high"
+  | "quote_out_of_context"
+  | "transcript_wrong"
+  | "class_type"
+  | "student_context"
+  | "other";
+
+export type ReportFeedback = {
+  target_type: FeedbackTarget;
+  /** Dimension key for dimension findings, list index for strengths and improvements. */
+  target_key: string;
+  area: string | null;
+  verdict: FeedbackVerdict;
+  reasons: FeedbackReason[];
+  comment: string | null;
+  updated_at: string;
+};
+
+export type ReportFeedbackIn = {
+  target_type: FeedbackTarget;
+  target_key: string;
+  verdict: FeedbackVerdict;
+  reasons?: FeedbackReason[];
+  comment?: string | null;
+};
+
+export type ReportFeedbackSummary = {
+  rubric_version: string | null;
+  alert_rate: number;
+  reports_total: number;
+  teachers_total: number;
+  feedback_total: number;
+  disagree_total: number;
+  by_area: {
+    area: string;
+    agree: number;
+    disagree: number;
+    teachers_disagreeing: number;
+    teacher_rate: number;
+    flagged: boolean;
+  }[];
+  by_reason: { reason: FeedbackReason; count: number }[];
+  by_target: { target_type: FeedbackTarget; agree: number; disagree: number }[];
+  recent: {
+    recording_id: number;
+    lecture_title: string | null;
+    teacher_name: string;
+    school_name: string | null;
+    target_type: FeedbackTarget;
+    area: string | null;
+    reasons: FeedbackReason[];
+    comment: string | null;
+    updated_at: string;
+  }[];
 };
 
 export type RecordingStatus = "pending" | "processing" | "completed" | "failed";

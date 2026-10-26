@@ -1,4 +1,11 @@
-import { LearningPlanOut, LearningPlanCreatePayload } from '../types/api';
+import {
+  FeedbackTarget,
+  LearningPlanOut,
+  LearningPlanCreatePayload,
+  ReportFeedback,
+  ReportFeedbackIn,
+  ReportFeedbackSummary,
+} from '../types/api';
 import {
   ClassOut,
   ClassFiltersOut,
@@ -1265,6 +1272,41 @@ export async function uploadRecording(
 
     xhr.send(form);
   });
+}
+
+/** Agree or disagree with one report finding. Returns all feedback on the report. */
+export async function putReportFeedback(
+  token: string,
+  recordingId: number,
+  body: ReportFeedbackIn,
+): Promise<ReportFeedback[]> {
+  return request<ReportFeedback[]>(
+    `/teacher/recordings/${recordingId}/feedback`,
+    { method: "PUT", body: JSON.stringify(body) },
+    token,
+  );
+}
+
+/** Undo a 👍/👎. Returns the remaining feedback on the report. */
+export async function deleteReportFeedback(
+  token: string,
+  recordingId: number,
+  targetType: FeedbackTarget,
+  targetKey: string,
+): Promise<ReportFeedback[]> {
+  return request<ReportFeedback[]>(
+    `/teacher/recordings/${recordingId}/feedback/${targetType}/${encodeURIComponent(targetKey)}`,
+    { method: "DELETE" },
+    token,
+  );
+}
+
+export async function getReportFeedbackSummary(
+  token: string,
+  rubricVersion?: string,
+): Promise<ReportFeedbackSummary> {
+  const query = rubricVersion ? `?rubric_version=${encodeURIComponent(rubricVersion)}` : "";
+  return request<ReportFeedbackSummary>(`/admin/system/report-feedback${query}`, {}, token);
 }
 
 export async function getTeacherRecordingDetail(

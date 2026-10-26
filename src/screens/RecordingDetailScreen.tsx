@@ -35,9 +35,23 @@ import {
 } from '../lib/api';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { AppTheme } from '../theme/AppTheme';
-import { DimensionScore, QuantitativeMetrics, RecordingStatus, ScoreBreakdown, RecordingWithReport } from '../types/api';
+import {
+  DimensionScore,
+  FeedbackTarget,
+  QuantitativeMetrics,
+  RecordingStatus,
+  ReportImprovement,
+  ScoreBreakdown,
+  RecordingWithReport,
+} from '../types/api';
 import { formatAudioTime } from '../lib/audio';
 import { describeFailure } from '../lib/failureMessages';
+import { reportImprovements, reportStrengths } from '../lib/reportFindings';
+import {
+  DisagreementNote,
+  FeedbackButtons,
+  FindingFeedbackProvider,
+} from '../components/report/FindingFeedback';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'RecordingDetail'>;
 
@@ -227,11 +241,15 @@ function DimensionRow({ dim, data, isFocus }: {
         ) : null}
       </Pressable>
 
-      {expanded && data.evidence.length > 0 ? (
-        <View style={dr.evidenceList}>
-          {data.evidence.map((e, i) => <EvidenceQuote key={i} text={e} />)}
+      {expanded ? (
+        <View style={dr.expanded}>
+          <View style={dr.evidenceList}>
+            {data.evidence.map((e, i) => <EvidenceQuote key={i} text={e} />)}
+          </View>
+          <FeedbackButtons targetKey={dim.key} type="dimension" />
         </View>
       ) : null}
+      <DisagreementNote targetKey={dim.key} type="dimension" />
     </View>
   );
 }
@@ -261,29 +279,46 @@ const dr = StyleSheet.create({
   },
   barFill: { height: 6, borderRadius: 3 },
   finding: { fontSize: 13, lineHeight: 19, color: AppTheme.colors.textSecondary },
-  evidenceList: { gap: 5 },
+  expanded: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, minHeight: 30 },
+  evidenceList: { flex: 1, gap: 5 },
   evidenceRow: { flexDirection: 'row', gap: 6 },
   evidenceDot: { fontSize: 14, color: AppTheme.colors.textSecondary, lineHeight: 20, marginTop: 1 },
   evidenceText: { flex: 1, fontSize: 12, lineHeight: 18, color: AppTheme.colors.textSecondary },
 });
 
 /**
- * A single strength or improvement. Text takes the flexible width so a trailing
- * 👍/👎 control can be added later without reworking the layout.
+ * A single strength or improvement line. Text takes the flexible width; the
+ * 👍/👎 control sits on the right.
  */
-function FindingItem({ text, color, icon }: { text: string; color: string; icon: string }) {
+function FindingItem({ text, color, icon, evidence, feedbackType, feedbackKey }: {
+  text: string;
+  color: string;
+  icon: string;
+  evidence?: string;
+  feedbackType?: FeedbackTarget;
+  feedbackKey?: string;
+}) {
   return (
-    <View style={fi.row}>
-      <Ionicons color={color} name={icon as any} size={18} style={fi.icon} />
-      <Text style={fi.text}>{text}</Text>
+    <View style={fi.wrap}>
+      <View style={fi.row}>
+        <Ionicons color={color} name={icon as any} size={18} style={fi.icon} />
+        <View style={fi.body}>
+          <Text style={fi.text}>{text}</Text>
+          {evidence ? <EvidenceQuote text={`“${evidence}”`} /> : null}
+        </View>
+        {feedbackType && feedbackKey ? <FeedbackButtons targetKey={feedbackKey} type={feedbackType} /> : null}
+      </View>
+      {feedbackType && feedbackKey ? <DisagreementNote targetKey={feedbackKey} type={feedbackType} /> : null}
     </View>
   );
 }
 
 const fi = StyleSheet.create({
+  wrap: { gap: 8 },
   row: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   icon: { marginTop: 1 },
-  text: { flex: 1, fontSize: 14, lineHeight: 21, color: AppTheme.colors.textPrimary },
+  body: { flex: 1, gap: 4 },
+  text: { fontSize: 14, lineHeight: 21, color: AppTheme.colors.textPrimary },
 });
 
 /** Card heading row with an icon; shared by the report's top-level cards. */
@@ -301,27 +336,63 @@ const sh = StyleSheet.create({
   title: { fontSize: 17, fontWeight: '800', color: AppTheme.colors.textPrimary },
 });
 
+function dimensionLabel(area: keyof ScoreBreakdown | null | undefined): string | null {
+  return DIMENSIONS.find((d) => d.key === area)?.label ?? null;
+}
+
+/** What happened → Try this next class → Why it helps. Older reports have the first part only. */
+function ImprovementBody({ item, index, primary }: { item: ReportImprovement; index: number; primary?: boolean }) {
+  const area = dimensionLabel(item.area);
+  return (
+    <View style={fc.item}>
+      <View style={fc.itemTop}>
+        <View style={fc.itemBody}>
+          {area ? <Text style={fc.area}>{area}</Text> : null}
+          <Text style={primary ? fc.primaryText : fc.observation}>{item.observation}</Text>
+        </View>
+        <FeedbackButtons targetKey={String(index)} type="improvement" />
+      </View>
+      {item.try_this ? (
+        <View style={fc.tryThis}>
+          <Text style={fc.tryLabel}>TRY THIS NEXT CLASS</Text>
+          <Text style={fc.tryText}>{item.try_this}</Text>
+        </View>
+      ) : null}
+      {item.why ? <Text style={fc.why}>Why it helps: {item.why}</Text> : null}
+      <DisagreementNote targetKey={String(index)} type="improvement" />
+    </View>
+  );
+}
+
 function FocusCard({ improvements, focusDimension }: {
-  improvements: string[];
+  improvements: ReportImprovement[];
   focusDimension: { dim: typeof DIMENSIONS[0]; data: DimensionScore } | null;
 }) {
   const [showMore, setShowMore] = useState(false);
-  // Without written improvements, fall back to the weakest dimension's finding.
-  // Improvements aren't tagged with a dimension, so only name the area for the fallback.
-  const fromDimension = !improvements[0] && !!focusDimension?.data.finding;
-  const primary = improvements[0] ?? focusDimension?.data.finding;
   const secondary = improvements.slice(1, 3);
-  if (!primary) return null;
+  // Without written improvements, fall back to the weakest dimension's finding.
+  const fallback = !improvements[0] && focusDimension?.data.finding ? focusDimension : null;
+  if (!improvements[0] && !fallback) return null;
 
   return (
     <View style={styles.card}>
       <SectionHeading color={AppTheme.colors.warning} icon="flag-outline" title="Your focus for next class" />
       <View style={fc.primary}>
-        <Text style={fc.primaryText}>{primary}</Text>
-        {fromDimension && focusDimension ? (
-          <Text style={fc.area}>
-            Area: {focusDimension.dim.label} · {focusDimension.data.score}/{focusDimension.dim.max}
-          </Text>
+        {improvements[0] ? (
+          <ImprovementBody index={0} item={improvements[0]} primary />
+        ) : fallback ? (
+          <>
+            <View style={fc.itemTop}>
+              <View style={fc.itemBody}>
+                <Text style={fc.primaryText}>{fallback.data.finding}</Text>
+                <Text style={fc.area}>
+                  Area: {fallback.dim.label} · {fallback.data.score}/{fallback.dim.max}
+                </Text>
+              </View>
+              <FeedbackButtons targetKey={fallback.dim.key} type="dimension" />
+            </View>
+            <DisagreementNote targetKey={fallback.dim.key} type="dimension" />
+          </>
         ) : null}
       </View>
       {secondary.length > 0 ? (
@@ -343,12 +414,9 @@ function FocusCard({ improvements, focusDimension }: {
           </Pressable>
           {showMore
             ? secondary.map((item, i) => (
-                <FindingItem
-                  color={AppTheme.colors.warning}
-                  icon="arrow-up-circle-outline"
-                  key={i}
-                  text={item}
-                />
+                <View key={i} style={fc.secondary}>
+                  <ImprovementBody index={i + 1} item={item} />
+                </View>
               ))
             : null}
         </>
@@ -366,8 +434,29 @@ const fc = StyleSheet.create({
     borderLeftWidth: 4,
     borderLeftColor: AppTheme.colors.warning,
   },
+  secondary: {
+    padding: 14,
+    borderRadius: AppTheme.radius.medium,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+  },
+  item: { gap: 10 },
+  itemTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
+  itemBody: { flex: 1, gap: 4 },
   primaryText: { fontSize: 15, lineHeight: 22, fontWeight: '600', color: AppTheme.colors.textPrimary },
-  area: { fontSize: 12, fontWeight: '600', color: '#92400E' },
+  observation: { fontSize: 14, lineHeight: 21, color: AppTheme.colors.textPrimary },
+  area: { fontSize: 12, fontWeight: '700', color: '#92400E' },
+  tryThis: {
+    gap: 4,
+    padding: 12,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.surface,
+    borderWidth: 1,
+    borderColor: '#FDE7C2',
+  },
+  tryLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 1, color: '#92400E' },
+  tryText: { fontSize: 15, lineHeight: 22, color: AppTheme.colors.textPrimary },
+  why: { fontSize: 13, lineHeight: 19, color: AppTheme.colors.textSecondary },
   toggle: { flexDirection: 'row', alignItems: 'center', gap: 4, minHeight: 44, alignSelf: 'flex-start' },
   toggleText: { fontSize: 14, fontWeight: '700', color: AppTheme.colors.primary },
 });
@@ -664,8 +753,8 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
     focusDim && report?.score_breakdown?.[focusDim.key]
       ? { dim: focusDim, data: report.score_breakdown[focusDim.key] }
       : null;
-  const strengths = report?.quantitative_metrics?.top_strengths.slice(0, 2) ?? [];
-  const improvements = report?.quantitative_metrics?.priority_improvements ?? [];
+  const strengths = reportStrengths(report);
+  const improvements = reportImprovements(report);
   const hasSyllabus = !!report && !!(
     report.chapter_info || report.curriculum_coverage || report.accuracy_analysis ||
     report.learning_objectives_achievement?.length
@@ -730,6 +819,12 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
 
         {/* Report: summary → what went well → focus → details (collapsed) */}
         {recording.status === 'completed' && (report || overallScore != null) ? (
+          <FindingFeedbackProvider
+            canEdit={session?.role === 'teacher'}
+            initial={report?.feedback}
+            recordingId={recording.id}
+            token={session?.token}
+          >
           <View style={styles.reportWrap}>
             {/* Summary */}
             <View style={styles.card}>
@@ -750,7 +845,15 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
               <View style={styles.card}>
                 <SectionHeading color="#127A40" icon="checkmark-circle-outline" title="What went well" />
                 {strengths.map((item, i) => (
-                  <FindingItem color="#127A40" icon="checkmark-circle" key={i} text={item} />
+                  <FindingItem
+                    color="#127A40"
+                    evidence={item.evidence}
+                    feedbackKey={String(i)}
+                    feedbackType="strength"
+                    icon="checkmark-circle"
+                    key={i}
+                    text={item.text}
+                  />
                 ))}
               </View>
             ) : null}
@@ -833,6 +936,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
               </View>
             ) : null}
           </View>
+          </FindingFeedbackProvider>
         ) : (
           <View style={[styles.processingCard, status === 'failed' && styles.processingCardFailed]}>
             {status === 'failed' ? (

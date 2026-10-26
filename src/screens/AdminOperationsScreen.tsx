@@ -14,12 +14,14 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AdminNavbar } from "../components/common/AdminNavbar";
+import { ReportFeedbackPanel } from "../components/admin/ReportFeedbackPanel";
 import { useAuth } from "../context/AuthContext";
 import {
   getAdminEmailLog,
   getAdminAuditLog,
   getAdminEmailStats,
   getAdminPipelineRecordings,
+  getReportFeedbackSummary,
   resendAdminEmailLog,
   retryAdminRecording,
 } from "../lib/api";
@@ -30,6 +32,7 @@ import {
   EmailLogStatus,
   EmailStatsOut,
   PipelineRecordingOut,
+  ReportFeedbackSummary,
 } from "../types/api";
 
 /**
@@ -41,11 +44,12 @@ import {
  * would think to open.
  */
 
-type Section = "email" | "recordings" | "audit";
+type Section = "email" | "recordings" | "feedback" | "audit";
 
 const SECTION_LABELS: Record<Section, string> = {
   email: "Email",
   recordings: "Recordings",
+  feedback: "Feedback",
   audit: "Audit",
 };
 
@@ -128,6 +132,7 @@ export function AdminOperationsScreen() {
   const [emails, setEmails] = useState<EmailLogEntry[]>([]);
   const [recordings, setRecordings] = useState<PipelineRecordingOut[]>([]);
   const [audit, setAudit] = useState<AuditLogEntry[]>([]);
+  const [feedback, setFeedback] = useState<ReportFeedbackSummary | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -138,16 +143,18 @@ export function AdminOperationsScreen() {
     if (!token) return;
     setError(null);
     try {
-      const [nextStats, nextEmails, nextRecordings, nextAudit] = await Promise.all([
+      const [nextStats, nextEmails, nextRecordings, nextAudit, nextFeedback] = await Promise.all([
         getAdminEmailStats(token),
         getAdminEmailLog(token, { status: statusFilter ?? undefined, limit: 100 }),
         getAdminPipelineRecordings(token, { problemsOnly: true, limit: 100 }),
         getAdminAuditLog(token, { limit: 100 }),
+        getReportFeedbackSummary(token),
       ]);
       setStats(nextStats);
       setEmails(nextEmails);
       setRecordings(nextRecordings);
       setAudit(nextAudit);
+      setFeedback(nextFeedback);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not load operations data");
     } finally {
@@ -206,7 +213,7 @@ export function AdminOperationsScreen() {
       <AdminNavbar title="Operations" />
 
       <View style={styles.segmentRow}>
-        {(["email", "recordings", "audit"] as Section[]).map((key) => (
+        {(["email", "recordings", "feedback", "audit"] as Section[]).map((key) => (
           <Pressable
             key={key}
             onPress={() => setSection(key)}
@@ -361,6 +368,8 @@ export function AdminOperationsScreen() {
               ))
             )}
           </>
+        ) : section === "feedback" ? (
+          feedback ? <ReportFeedbackPanel summary={feedback} /> : null
         ) : section === "audit" ? (
           audit.length === 0 ? (
             <Text style={styles.emptyText}>

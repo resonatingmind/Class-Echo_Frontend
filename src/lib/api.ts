@@ -9,6 +9,7 @@ import {
   ReportFeedbackSummary,
   SelfRating,
   SelfRatingArea,
+  SharedClip,
 } from '../types/api';
 import {
   ClassOut,
@@ -1314,6 +1315,28 @@ export async function putSelfRating(
   return request<SelfRating>(
     `/teacher/recordings/${recordingId}/self-rating`,
     { method: "PUT", body: JSON.stringify(body) },
+    token,
+  );
+}
+
+/** Show a moment to the school admin. Returns every clip now shared from the report. */
+export async function shareClip(
+  token: string,
+  recordingId: number,
+  body: { start: number; title: string; note?: string | null },
+): Promise<SharedClip[]> {
+  return request<SharedClip[]>(
+    `/teacher/recordings/${recordingId}/shared-clips`,
+    { method: "PUT", body: JSON.stringify(body) },
+    token,
+  );
+}
+
+/** Stop showing a moment to the school admin. Returns the clips still shared. */
+export async function unshareClip(token: string, recordingId: number, clipId: number): Promise<SharedClip[]> {
+  return request<SharedClip[]>(
+    `/teacher/recordings/${recordingId}/shared-clips/${clipId}`,
+    { method: "DELETE" },
     token,
   );
 }

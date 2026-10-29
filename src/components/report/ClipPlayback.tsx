@@ -1,12 +1,12 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
-import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { recordClipPlay } from '../../lib/api';
+import { recordClipPlay, shareClip, unshareClip } from '../../lib/api';
 import { formatAudioTime } from '../../lib/audio';
 import { AppTheme } from '../../theme/AppTheme';
-import { TranscriptSegment } from '../../types/api';
+import { SharedClip, TranscriptSegment } from '../../types/api';
 
 /** A clip runs from this long before the cited moment... */
 const LEAD_SECONDS = 10;
@@ -14,50 +14,154 @@ const LEAD_SECONDS = 10;
 const TAIL_SECONDS = 20;
 
 type ClipContextValue = {
+  /** Every cited moment can be played: the teacher's own report. */
   canPlay: boolean;
-  openClip: (start: number, title?: string) => void;
+  /** onClose runs when the clip sheet is dismissed, e.g. to bring back the sheet that opened it. */
+  openClip: (start: number, title?: string, onClose?: () => void) => void;
+  /** Moments the teacher chose to show their school admin. */
+  sharedClips: SharedClip[];
+  /** Clips that can be opened at all: every moment for the teacher, shared ones for the admin. */
+  canOpenShared: boolean;
+  /** The teacher can share and unshare moments. */
+  canShare: boolean;
+  shareBusy: boolean;
+  share: (start: number, title: string) => void;
+  unshare: (clip: SharedClip) => void;
 };
 
-const ClipContext = createContext<ClipContextValue>({ canPlay: false, openClip: () => {} });
+const ClipContext = createContext<ClipContextValue>({
+  canPlay: false,
+  openClip: () => {},
+  sharedClips: [],
+  canOpenShared: false,
+  canShare: false,
+  shareBusy: false,
+  share: () => {},
+  unshare: () => {},
+});
 
 /**
  * Lets any finding on the report open a short clip of the moment it cites.
  * Clips are private to the teacher, so they are only offered when canPlay
- * (the teacher's own report with a segmented transcript and audio).
+ * (the teacher's own report with a segmented transcript and audio). The
+ * teacher can share single moments; anyone else can play only those.
  */
-export function ClipProvider({ audioUrl, segments, canPlay, token, recordingId, children }: {
+export function ClipProvider({ audioUrl, segments, canPlay, token, recordingId, sharedClips: initialShared, children }: {
   audioUrl: string;
   segments: TranscriptSegment[] | null | undefined;
   canPlay: boolean;
   token: string | undefined;
   recordingId: number;
+  sharedClips: SharedClip[] | null | undefined;
   children: ReactNode;
 }) {
-  const [clip, setClip] = useState<{ start: number; title?: string } | null>(null);
-  const enabled = canPlay && !!audioUrl && !!segments?.length;
+  const [clip, setClip] = useState<{ start: number; title?: string; onClose?: () => void } | null>(null);
+  const [sharedClips, setSharedClips] = useState<SharedClip[]>(initialShared ?? []);
+  const [shareBusy, setShareBusy] = useState(false);
+  const playable = !!audioUrl && !!segments?.length;
+  const enabled = canPlay && playable;
+  const canOpenShared = playable && (canPlay || sharedClips.length > 0);
 
-  const value = useMemo<ClipContextValue>(() => ({
-    canPlay: enabled,
-    openClip: (start, title) => {
-      setClip({ start, title });
-      if (token) void recordClipPlay(token, recordingId);
-    },
-  }), [enabled, token, recordingId]);
+  // A refetch of the report brings fresh shared clips; adopt them unless a save is in flight.
+  const [lastInitial, setLastInitial] = useState(initialShared);
+  if (initialShared !== lastInitial) {
+    setLastInitial(initialShared);
+    if (!shareBusy && initialShared) setSharedClips(initialShared);
+  }
+
+  const value = useMemo<ClipContextValue>(() => {
+    const save = async (call: () => Promise<SharedClip[]>) => {
+      setShareBusy(true);
+      try {
+        setSharedClips(await call());
+      } catch (e) {
+        Alert.alert('Could not save', e instanceof Error ? e.message : 'Please try again.');
+      } finally {
+        setShareBusy(false);
+      }
+    };
+    return {
+      canPlay: enabled,
+      openClip: (start, title, onClose) => {
+        setClip({ start, title, onClose });
+        // Only the teacher's own plays count towards the clip-usage metric.
+        if (token && enabled) void recordClipPlay(token, recordingId);
+      },
+      sharedClips,
+      canOpenShared,
+      canShare: enabled && !!token,
+      shareBusy,
+      share: (start, title) => {
+        if (token) void save(() => shareClip(token, recordingId, { start, title }));
+      },
+      unshare: (c) => {
+        if (token) void save(() => unshareClip(token, recordingId, c.id));
+      },
+    };
+  }, [enabled, canOpenShared, token, recordingId, sharedClips, shareBusy]);
 
   return (
     <ClipContext.Provider value={value}>
       {children}
-      {clip && enabled ? (
+      {clip && canOpenShared ? (
         <ClipSheet
           audioUrl={audioUrl}
           key={clip.start}
           moment={clip.start}
-          onClose={() => setClip(null)}
+          onClose={() => { setClip(null); clip.onClose?.(); }}
           segments={segments ?? []}
           title={clip.title}
         />
       ) : null}
     </ClipContext.Provider>
+  );
+}
+
+/** The clip shared at this moment, if any. Shared starts are rounded to the hundredth by the server. */
+function sharedAt(clips: SharedClip[], start: number): SharedClip | undefined {
+  return clips.find((c) => Math.abs(c.start - start) < 0.01);
+}
+
+/**
+ * Moments the teacher shared, at the top of the report. The teacher sees
+ * what their admin can see and can stop sharing; the admin plays them.
+ */
+export function SharedClipsCard() {
+  const { sharedClips, canOpenShared, canShare, shareBusy, openClip, unshare } = useClips();
+  if (!canOpenShared || sharedClips.length === 0) return null;
+  return (
+    <View style={sc.card}>
+      <View style={sc.heading}>
+        <Ionicons color={AppTheme.colors.primaryDark} name="share-social-outline" size={18} />
+        <Text style={sc.title}>{canShare ? 'Shared with your admin' : 'Shared by the teacher'}</Text>
+      </View>
+      {sharedClips.map((c) => (
+        <View key={c.id} style={sc.row}>
+          <Pressable
+            accessibilityLabel={`Play ${c.title} at ${formatAudioTime(c.start)}`}
+            accessibilityRole="button"
+            onPress={() => openClip(c.start, c.title)}
+            style={sc.play}
+          >
+            <Ionicons color={AppTheme.colors.primaryDark} name="play" size={14} />
+            <Text style={sc.time}>{formatAudioTime(c.start)}</Text>
+            <Text numberOfLines={1} style={sc.clipTitle}>{c.title}</Text>
+          </Pressable>
+          {canShare ? (
+            <Pressable
+              accessibilityLabel={`Stop sharing ${c.title}`}
+              accessibilityRole="button"
+              disabled={shareBusy}
+              onPress={() => unshare(c)}
+              style={sc.unshare}
+            >
+              <Text style={sc.unshareText}>Stop sharing</Text>
+            </Pressable>
+          ) : null}
+        </View>
+      ))}
+      {canShare ? <Text style={sc.hint}>Your admin sees only these moments, not your other clips.</Text> : null}
+    </View>
   );
 }
 
@@ -170,11 +274,73 @@ function ClipSheet({ audioUrl, moment, segments, title, onClose }: {
             </Pressable>
             <Text style={cs.time}>{formatAudioTime(Math.max(from, Math.min(now, to)))}</Text>
           </View>
+
+          <ShareRow moment={moment} title={title ?? 'The moment'} />
         </Pressable>
       </Pressable>
     </Modal>
   );
 }
+
+/** Share this moment with the school admin, or stop sharing it. Teacher only. */
+function ShareRow({ moment, title }: { moment: number; title: string }) {
+  const { canShare, sharedClips, shareBusy, share, unshare } = useClips();
+  if (!canShare) return null;
+  const shared = sharedAt(sharedClips, moment);
+  return (
+    <View style={cs.shareRow}>
+      <Text style={cs.shareText}>
+        {shared ? 'Your admin can play this moment.' : 'Only you can hear this clip.'}
+      </Text>
+      <Pressable
+        accessibilityRole="button"
+        disabled={shareBusy}
+        onPress={() => (shared ? unshare(shared) : share(moment, title))}
+        style={[cs.shareBtn, shared && cs.shareBtnOn, shareBusy && cs.disabled]}
+      >
+        {shareBusy ? (
+          <ActivityIndicator color={AppTheme.colors.primaryDark} size="small" />
+        ) : (
+          <Ionicons
+            color={AppTheme.colors.primaryDark}
+            name={shared ? 'checkmark' : 'share-social-outline'}
+            size={16}
+          />
+        )}
+        <Text style={cs.shareBtnText}>{shared ? 'Shared · Stop' : 'Share with admin'}</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+const sc = StyleSheet.create({
+  card: {
+    padding: 16,
+    gap: 10,
+    borderRadius: AppTheme.radius.large,
+    backgroundColor: AppTheme.colors.surface,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+  },
+  heading: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  title: { fontSize: 17, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  play: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    minHeight: 44,
+    paddingHorizontal: 12,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primaryLight,
+  },
+  time: { fontSize: 13, fontWeight: '700', color: AppTheme.colors.primaryDark, fontVariant: ['tabular-nums'] },
+  clipTitle: { flex: 1, fontSize: 14, fontWeight: '600', color: AppTheme.colors.textPrimary },
+  unshare: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 8 },
+  unshareText: { fontSize: 13, fontWeight: '700', color: AppTheme.colors.textSecondary },
+  hint: { fontSize: 12, color: AppTheme.colors.textSecondary },
+});
 
 const chip = StyleSheet.create({
   wrap: {
@@ -229,4 +395,26 @@ const cs = StyleSheet.create({
   },
   iconBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   time: { minWidth: 44, fontSize: 13, fontWeight: '600', color: AppTheme.colors.textSecondary },
+  shareRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: AppTheme.colors.border,
+  },
+  shareText: { flex: 1, fontSize: 13, color: AppTheme.colors.textSecondary },
+  shareBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    minHeight: 44,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.primary,
+  },
+  shareBtnOn: { backgroundColor: AppTheme.colors.primaryLight },
+  shareBtnText: { fontSize: 14, fontWeight: '700', color: AppTheme.colors.primaryDark },
+  disabled: { opacity: 0.55 },
 });

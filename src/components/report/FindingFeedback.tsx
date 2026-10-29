@@ -12,14 +12,19 @@ import {
 } from 'react-native';
 
 import { deleteReportFeedback, putReportFeedback } from '../../lib/api';
+import { formatAudioTime } from '../../lib/audio';
 import { FEEDBACK_REASONS, findFeedback, reasonLabel } from '../../lib/reportFindings';
 import { AppTheme } from '../../theme/AppTheme';
 import { FeedbackReason, FeedbackTarget, ReportFeedback } from '../../types/api';
+import { useClips } from './ClipPlayback';
 
 const AGREE_COLOR = '#127A40';
 const DISAGREE_COLOR = '#B42318';
 
-type Target = { type: FeedbackTarget; key: string };
+/** The moment a finding cites, so the disagree sheet can play it back. */
+export type FindingMoment = { start: number; title: string };
+
+type Target = { type: FeedbackTarget; key: string; moment?: FindingMoment | null };
 
 type FeedbackContextValue = {
   feedback: ReportFeedback[];
@@ -51,6 +56,9 @@ export function FindingFeedbackProvider({ token, recordingId, initial, canEdit, 
   const [feedback, setFeedback] = useState<ReportFeedback[]>(initial ?? []);
   const [busyKey, setBusyKey] = useState<string | null>(null);
   const [sheetTarget, setSheetTarget] = useState<Target | null>(null);
+  // The sheet hides while its clip plays and comes back with the choices intact.
+  const [sheetHidden, setSheetHidden] = useState(false);
+  const { canPlay, openClip } = useClips();
 
   // A refetch of the report brings fresh feedback; adopt it unless a save is in flight.
   const [lastInitial, setLastInitial] = useState(initial);
@@ -106,8 +114,14 @@ export function FindingFeedbackProvider({ token, recordingId, initial, canEdit, 
         <DisagreeSheet
           initialComment={current?.comment ?? ''}
           initialReasons={current?.reasons ?? []}
+          hidden={sheetHidden}
           key={targetId(sheetTarget)}
+          moment={canPlay ? sheetTarget.moment : null}
           onClose={() => setSheetTarget(null)}
+          onShowMoment={(m) => {
+            setSheetHidden(true);
+            openClip(m.start, m.title, () => setSheetHidden(false));
+          }}
           onSave={async (reasons, comment) => {
             if (!token) return;
             const ok = await save(sheetTarget, () =>
@@ -131,10 +145,15 @@ export function FindingFeedbackProvider({ token, recordingId, initial, canEdit, 
  * 👍 / 👎 for one finding, placed to the right of its text. Read-only viewers
  * (school admins) see only a "Teacher disagreed" note.
  */
-export function FeedbackButtons({ type, targetKey }: { type: FeedbackTarget; targetKey: string }) {
+export function FeedbackButtons({ type, targetKey, moment }: {
+  type: FeedbackTarget;
+  targetKey: string;
+  /** Offered as Show me the moment in the disagree sheet. */
+  moment?: FindingMoment | null;
+}) {
   const ctx = useContext(FeedbackContext);
   if (!ctx || !ctx.canEdit) return null;
-  const target = { type, key: targetKey };
+  const target = { type, key: targetKey, moment };
   const entry = findFeedback(ctx.feedback, type, targetKey);
   const busy = ctx.busyKey === targetId(target);
 
@@ -187,7 +206,11 @@ export function useReportFeedback(): { feedback: ReportFeedback[]; canEdit: bool
 }
 
 /** The disagreement under a finding: reasons and comment, shown to the teacher and to admins. */
-export function DisagreementNote({ type, targetKey }: { type: FeedbackTarget; targetKey: string }) {
+export function DisagreementNote({ type, targetKey, moment }: {
+  type: FeedbackTarget;
+  targetKey: string;
+  moment?: FindingMoment | null;
+}) {
   const ctx = useContext(FeedbackContext);
   const entry = ctx ? findFeedback(ctx.feedback, type, targetKey) : undefined;
   if (!ctx || entry?.verdict !== 'disagree') return null;
@@ -203,7 +226,7 @@ export function DisagreementNote({ type, targetKey }: { type: FeedbackTarget; ta
         {ctx.canEdit ? (
           <Pressable
             accessibilityRole="button"
-            onPress={() => ctx.editReasons({ type, key: targetKey })}
+            onPress={() => ctx.editReasons({ type, key: targetKey, moment })}
             style={fb.noteLink}
           >
             <Text style={fb.noteLinkText}>{reasons || entry.comment ? 'Edit reason' : 'Add a reason'}</Text>
@@ -214,11 +237,14 @@ export function DisagreementNote({ type, targetKey }: { type: FeedbackTarget; ta
   );
 }
 
-function DisagreeSheet({ initialReasons, initialComment, saving, onSave, onClose }: {
+function DisagreeSheet({ initialReasons, initialComment, saving, hidden, moment, onSave, onShowMoment, onClose }: {
   initialReasons: FeedbackReason[];
   initialComment: string;
   saving: boolean;
+  hidden: boolean;
+  moment: FindingMoment | null | undefined;
   onSave: (reasons: FeedbackReason[], comment: string) => void;
+  onShowMoment: (moment: FindingMoment) => void;
   onClose: () => void;
 }) {
   const [reasons, setReasons] = useState<FeedbackReason[]>(initialReasons);
@@ -227,7 +253,7 @@ function DisagreeSheet({ initialReasons, initialComment, saving, onSave, onClose
     setReasons((cur) => (cur.includes(r) ? cur.filter((x) => x !== r) : [...cur, r]));
 
   return (
-    <Modal animationType="slide" onRequestClose={onClose} transparent visible>
+    <Modal animationType="slide" onRequestClose={onClose} transparent visible={!hidden}>
       <Pressable onPress={onClose} style={ds.overlay}>
         <Pressable style={ds.sheet}>
           <View style={ds.handle} />
@@ -236,6 +262,18 @@ function DisagreeSheet({ initialReasons, initialComment, saving, onSave, onClose
             Optional. Your score won't change. Your view is saved with this report and shown to your school admin
             next to the finding.
           </Text>
+          {moment ? (
+            <Pressable
+              accessibilityLabel={`Show me the moment at ${formatAudioTime(moment.start)}`}
+              accessibilityRole="button"
+              onPress={() => onShowMoment(moment)}
+              style={ds.moment}
+            >
+              <Ionicons color={AppTheme.colors.primaryDark} name="play-circle-outline" size={20} />
+              <Text style={ds.momentText}>Show me the moment</Text>
+              <Text style={ds.momentTime}>{formatAudioTime(moment.start)}</Text>
+            </Pressable>
+          ) : null}
           <View style={ds.chips}>
             {FEEDBACK_REASONS.map((r) => {
               const on = reasons.includes(r.key);
@@ -317,6 +355,17 @@ const ds = StyleSheet.create({
   handle: { alignSelf: 'center', width: 42, height: 4, borderRadius: 999, backgroundColor: AppTheme.colors.border },
   title: { fontSize: 20, fontWeight: '800', color: AppTheme.colors.textPrimary },
   subtitle: { fontSize: 14, lineHeight: 20, color: AppTheme.colors.textSecondary },
+  moment: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    minHeight: 44,
+    paddingHorizontal: 14,
+    borderRadius: AppTheme.radius.medium,
+    backgroundColor: AppTheme.colors.primaryLight,
+  },
+  momentText: { flex: 1, fontSize: 14, fontWeight: '700', color: AppTheme.colors.primaryDark },
+  momentTime: { fontSize: 13, fontWeight: '700', color: AppTheme.colors.primaryDark, fontVariant: ['tabular-nums'] },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: {
     flexDirection: 'row',

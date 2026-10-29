@@ -359,6 +359,14 @@ export type SelfRating = {
   created_at: string;
 };
 
+export type SharedClip = {
+  id: number;
+  start: number;
+  title: string;
+  note: string | null;
+  created_at: string;
+};
+
 export type ScoreBreakdown = {
   verbal_clarity: DimensionScore;
   pacing_delivery: DimensionScore;
@@ -425,6 +433,8 @@ export type LLMReportOut = {
   highlights?: Partial<Record<HighlightKey, ReportHighlight>>;
   /** The teacher's own view, given before the reveal. Teacher endpoint only. */
   self_rating?: SelfRating | null;
+  /** Moments the teacher chose to show their school admin. Detail endpoints only. */
+  shared_clips?: SharedClip[] | null;
   created_at: string;
 };
 

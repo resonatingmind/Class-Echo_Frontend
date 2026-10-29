@@ -48,7 +48,7 @@ import {
   SelfRating,
   TranscriptSegment,
 } from '../types/api';
-import { ClipChip, ClipProvider, useClips } from '../components/report/ClipPlayback';
+import { ClipChip, ClipProvider, SharedClipsCard, useClips } from '../components/report/ClipPlayback';
 import { SelfRatingComparison, SelfRatingPrompt } from '../components/report/SelfRating';
 import { TrendsExclusion } from '../components/report/TrendsExclusion';
 import { formatAudioTime } from '../lib/audio';
@@ -58,9 +58,14 @@ import {
   DisagreementNote,
   FeedbackButtons,
   FindingFeedbackProvider,
+  FindingMoment,
 } from '../components/report/FindingFeedback';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'RecordingDetail'>;
+
+function findingMoment(start: number | null | undefined, title: string): FindingMoment | null {
+  return start == null ? null : { start, title };
+}
 
 // ── Dimension metadata ────────────────────────────────────────────────────────
 
@@ -203,13 +208,13 @@ function findFocusDimension(breakdown: ScoreBreakdown | null | undefined): keyof
 }
 
 /** One evidence quote, with a ▶ chip that plays the moment when the transcript has timings. */
-function EvidenceQuote({ text, start }: { text: string; start?: number | null }) {
+function EvidenceQuote({ text, start, title }: { text: string; start?: number | null; title?: string }) {
   return (
     <View style={dr.evidenceRow}>
       <Text style={dr.evidenceDot}>›</Text>
       <View style={dr.evidenceBody}>
         <Text style={dr.evidenceText}>{text}</Text>
-        <ClipChip start={start} />
+        <ClipChip start={start} title={title} />
       </View>
     </View>
   );
@@ -317,6 +322,7 @@ function DimensionRow({ dim, data, isFocus }: {
   const [expanded, setExpanded] = useState(isFocus);
   const col = scoreColor(data.score, dim.max);
   const pct = Math.round((data.score / dim.max) * 100);
+  const moment = findingMoment(data.evidence_starts?.find((s) => s != null), dim.label);
 
   return (
     <View style={[dr.row, isFocus && dr.rowFocus]}>
@@ -350,12 +356,14 @@ function DimensionRow({ dim, data, isFocus }: {
       {expanded ? (
         <View style={dr.expanded}>
           <View style={dr.evidenceList}>
-            {data.evidence.map((e, i) => <EvidenceQuote key={i} start={data.evidence_starts?.[i]} text={e} />)}
+            {data.evidence.map((e, i) => (
+              <EvidenceQuote key={i} start={data.evidence_starts?.[i]} text={e} title={dim.label} />
+            ))}
           </View>
-          <FeedbackButtons targetKey={dim.key} type="dimension" />
+          <FeedbackButtons moment={moment} targetKey={dim.key} type="dimension" />
         </View>
       ) : null}
-      <DisagreementNote targetKey={dim.key} type="dimension" />
+      <DisagreementNote moment={moment} targetKey={dim.key} type="dimension" />
     </View>
   );
 }
@@ -397,7 +405,7 @@ const dr = StyleSheet.create({
  * A single strength or improvement line. Text takes the flexible width; the
  * 👍/👎 control sits on the right.
  */
-function FindingItem({ text, color, icon, evidence, start, feedbackType, feedbackKey }: {
+function FindingItem({ text, color, icon, evidence, start, momentTitle = 'The moment', feedbackType, feedbackKey }: {
   text: string;
   color: string;
   icon: string;
@@ -406,18 +414,29 @@ function FindingItem({ text, color, icon, evidence, start, feedbackType, feedbac
   start?: number | null;
   feedbackType?: FeedbackTarget;
   feedbackKey?: string;
+  /** Heading of the clip sheet, and of the clip when shared with the admin. */
+  momentTitle?: string;
 }) {
+  const moment = findingMoment(start, momentTitle);
   return (
     <View style={fi.wrap}>
       <View style={fi.row}>
         <Ionicons color={color} name={icon as any} size={18} style={fi.icon} />
         <View style={fi.body}>
           <Text style={fi.text}>{text}</Text>
-          {evidence ? <EvidenceQuote start={start} text={`“${evidence}”`} /> : <ClipChip start={start} />}
+          {evidence ? (
+            <EvidenceQuote start={start} text={`“${evidence}”`} title={momentTitle} />
+          ) : (
+            <ClipChip start={start} title={momentTitle} />
+          )}
         </View>
-        {feedbackType && feedbackKey ? <FeedbackButtons targetKey={feedbackKey} type={feedbackType} /> : null}
+        {feedbackType && feedbackKey ? (
+          <FeedbackButtons moment={moment} targetKey={feedbackKey} type={feedbackType} />
+        ) : null}
       </View>
-      {feedbackType && feedbackKey ? <DisagreementNote targetKey={feedbackKey} type={feedbackType} /> : null}
+      {feedbackType && feedbackKey ? (
+        <DisagreementNote moment={moment} targetKey={feedbackKey} type={feedbackType} />
+      ) : null}
     </View>
   );
 }
@@ -452,6 +471,7 @@ function dimensionLabel(area: keyof ScoreBreakdown | null | undefined): string |
 /** What happened → Try this next class → Why it helps. Older reports have the first part only. */
 function ImprovementBody({ item, index, primary }: { item: ReportImprovement; index: number; primary?: boolean }) {
   const area = dimensionLabel(item.area);
+  const moment = findingMoment(item.start, area ?? 'The moment');
   return (
     <View style={fc.item}>
       <View style={fc.itemTop}>
@@ -460,7 +480,7 @@ function ImprovementBody({ item, index, primary }: { item: ReportImprovement; in
           <Text style={primary ? fc.primaryText : fc.observation}>{item.observation}</Text>
           <ClipChip start={item.start} title={area ?? 'The moment'} />
         </View>
-        <FeedbackButtons targetKey={String(index)} type="improvement" />
+        <FeedbackButtons moment={moment} targetKey={String(index)} type="improvement" />
       </View>
       {item.try_this ? (
         <View style={fc.tryThis}>
@@ -469,7 +489,7 @@ function ImprovementBody({ item, index, primary }: { item: ReportImprovement; in
         </View>
       ) : null}
       {item.why ? <Text style={fc.why}>Why it helps: {item.why}</Text> : null}
-      <DisagreementNote targetKey={String(index)} type="improvement" />
+      <DisagreementNote moment={moment} targetKey={String(index)} type="improvement" />
     </View>
   );
 }
@@ -483,6 +503,9 @@ function FocusCard({ improvements, focusDimension }: {
   // Without written improvements, fall back to the weakest dimension's finding.
   const fallback = !improvements[0] && focusDimension?.data.finding ? focusDimension : null;
   if (!improvements[0] && !fallback) return null;
+  const fallbackMoment = fallback
+    ? findingMoment(fallback.data.evidence_starts?.find((s) => s != null), fallback.dim.label)
+    : null;
 
   return (
     <View style={styles.card}>
@@ -499,9 +522,9 @@ function FocusCard({ improvements, focusDimension }: {
                   Area: {fallback.dim.label} · {fallback.data.score}/{fallback.dim.max}
                 </Text>
               </View>
-              <FeedbackButtons targetKey={fallback.dim.key} type="dimension" />
+              <FeedbackButtons moment={fallbackMoment} targetKey={fallback.dim.key} type="dimension" />
             </View>
-            <DisagreementNote targetKey={fallback.dim.key} type="dimension" />
+            <DisagreementNote moment={fallbackMoment} targetKey={fallback.dim.key} type="dimension" />
           </>
         ) : null}
       </View>
@@ -884,6 +907,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
         canPlay={isTeacher}
         recordingId={recording.id}
         segments={recording.transcript_segments}
+        sharedClips={report?.shared_clips}
         token={session?.token}
       >
       {/* Global Header */}
@@ -972,6 +996,8 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
 
             <HighlightsStrip highlights={report?.highlights} />
 
+            <SharedClipsCard />
+
             {/* What went well */}
             {strengths.length > 0 ? (
               <View style={styles.card}>
@@ -980,6 +1006,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
                   <FindingItem
                     color="#127A40"
                     evidence={item.evidence}
+                    momentTitle={dimensionLabel(item.area) ?? 'What went well'}
                     start={item.start}
                     feedbackKey={String(i)}
                     feedbackType="strength"

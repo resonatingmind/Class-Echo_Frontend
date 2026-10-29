@@ -50,6 +50,7 @@ import {
 } from '../types/api';
 import { ClipChip, ClipProvider, useClips } from '../components/report/ClipPlayback';
 import { SelfRatingComparison, SelfRatingPrompt } from '../components/report/SelfRating';
+import { TrendsExclusion } from '../components/report/TrendsExclusion';
 import { formatAudioTime } from '../lib/audio';
 import { describeFailure } from '../lib/failureMessages';
 import { reportImprovements, reportStrengths } from '../lib/reportFindings';
@@ -992,6 +993,14 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
 
             {/* Your focus for next class */}
             <FocusCard focusDimension={focusDimension} improvements={improvements} />
+
+            {isTeacher && session?.token && report ? (
+              <TrendsExclusion
+                initial={!!report.excluded_from_trends}
+                recordingId={recording.id}
+                token={session.token}
+              />
+            ) : null}
 
             {/* Details */}
             {report?.score_breakdown || report?.quantitative_metrics || hasSyllabus ? (

@@ -1,6 +1,7 @@
 import {
   NextClassBriefOut,
   FeedbackTarget,
+  GrowthOut,
   LearningPlanOut,
   LearningPlanCreatePayload,
   ReportFeedback,
@@ -2268,6 +2269,20 @@ export async function getTeacherTimetable(token: string) {
 /** The recap before a period. `on` is the local date (YYYY-MM-DD), for the planner entry dated today. */
 export async function getClassBrief(token: string, entryId: number, on: string) {
   return request<NextClassBriefOut>(`/teacher/timetable/${entryId}/brief?on=${on}`, {}, token);
+}
+
+/** My Growth: trends per area and focus progress, against the teacher's own past. */
+export async function getMyGrowth(token: string) {
+  return request<GrowthOut>("/teacher/growth", {}, token);
+}
+
+/** Leave a lecture out of My Growth trends (needs a doesn't-fit-this-class dispute), or put it back. */
+export async function setExcludedFromTrends(token: string, recordingId: number, excluded: boolean) {
+  return request<{ excluded_from_trends: boolean }>(
+    `/teacher/recordings/${recordingId}/trends`,
+    { method: "PUT", body: JSON.stringify({ excluded }) },
+    token,
+  );
 }
 
 /** Turn the brief off or on for this class, every period. Returns the brief as it now stands. */

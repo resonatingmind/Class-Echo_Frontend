@@ -414,6 +414,8 @@ export type LLMReportOut = {
   learning_objectives_achievement: LearningObjectiveStatus[] | null;
   /** Which prompt/rubric scored the report; scores only compare within one version. Missing on older backends. */
   rubric_version?: string | null;
+  /** The teacher left this lecture out of My Growth trends. */
+  excluded_from_trends?: boolean;
   /** Structured findings. Older backends omit them; fall back to the plain strings in quantitative_metrics. */
   strengths?: ReportStrength[];
   improvements?: ReportImprovement[];
@@ -938,5 +940,38 @@ export type NextClassBriefOut = {
     area: string | null;
     observation: string;
     try_this: string;
+  } | null;
+};
+
+export type GrowthPoint = { recording_id: number; recorded_at: string; value: number };
+
+/** One area's trend: last `window` lectures vs the `window` before, 0-100. */
+export type AreaTrend = {
+  /** A rubric dimension, or "overall". */
+  area: string;
+  recent_avg: number | null;
+  previous_avg: number | null;
+  /** Points; null until both windows have enough lectures. */
+  change: number | null;
+  direction: 'improving' | 'steady' | 'declining' | null;
+  series: GrowthPoint[];
+};
+
+/** My Growth (GET /teacher/growth): compared only with the teacher's own past. */
+export type GrowthOut = {
+  rubric_version: string;
+  window: number;
+  lecture_count: number;
+  older_rubric_count: number;
+  excluded_count: number;
+  overall: AreaTrend;
+  areas: AreaTrend[];
+  focus: {
+    area: string | null;
+    try_this: string;
+    recording_id: number;
+    /** Of the last `recent` lectures, how many beat the earlier average in this area. */
+    recent: number;
+    improved: number;
   } | null;
 };

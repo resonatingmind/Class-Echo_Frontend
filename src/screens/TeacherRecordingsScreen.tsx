@@ -26,6 +26,7 @@ import { RecordingWithReport, TeacherDashboardSubject } from "../types/api";
 import { AppTheme } from "../theme/AppTheme";
 import { recordingStatusLabel, reportHighlight } from "../lib/reportHighlight";
 import { AdminNavbar } from "../components/common/AdminNavbar";
+import { GrowthSummary } from "../components/teacher/GrowthSummary";
 
 function StatChip({ icon, label, value }: { icon: string; label: string; value: string | number }) {
   return (
@@ -115,6 +116,7 @@ export function TeacherRecordingsScreen() {
   const [loading, setLoading]           = useState(true);
   const [refreshing, setRefreshing]     = useState(false);
   const [error, setError]               = useState<string | null>(null);
+  const [growthKey, setGrowthKey]       = useState(0);
 
   // Search & filter state
   const [search, setSearch]             = useState("");
@@ -136,6 +138,7 @@ export function TeacherRecordingsScreen() {
     if (!session?.token) return;
     silent ? setRefreshing(true) : setLoading(true);
     setError(null);
+    setGrowthKey((k) => k + 1);
     try {
       // 1. Get all subjects the teacher is assigned to
       const dashboard = await getTeacherDashboard(session.token);
@@ -315,6 +318,9 @@ export function TeacherRecordingsScreen() {
             </ScrollView>
           )}
         </LinearGradient>
+
+        {/* ── Trends per area and focus progress ── */}
+        {session?.token ? <GrowthSummary reloadKey={growthKey} token={session.token} /> : null}
 
         {/* ── Search + filter bar ── */}
         <View style={styles.searchRow}>

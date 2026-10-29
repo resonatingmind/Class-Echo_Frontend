@@ -180,6 +180,12 @@ export function FeedbackButtons({ type, targetKey }: { type: FeedbackTarget; tar
   );
 }
 
+/** The report's live feedback, and whether the viewer may change it; null outside the provider. */
+export function useReportFeedback(): { feedback: ReportFeedback[]; canEdit: boolean } | null {
+  const ctx = useContext(FeedbackContext);
+  return ctx ? { feedback: ctx.feedback, canEdit: ctx.canEdit } : null;
+}
+
 /** The disagreement under a finding: reasons and comment, shown to the teacher and to admins. */
 export function DisagreementNote({ type, targetKey }: { type: FeedbackTarget; targetKey: string }) {
   const ctx = useContext(FeedbackContext);

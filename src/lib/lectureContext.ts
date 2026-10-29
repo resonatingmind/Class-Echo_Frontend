@@ -10,7 +10,7 @@ export type LectureSuggestion = {
 };
 
 /* Local calendar day, matching how the planner stores dates. */
-function todayIsoDate(): string {
+export function todayIsoDate(): string {
   const now = new Date();
   const month = `${now.getMonth() + 1}`.padStart(2, '0');
   const day = `${now.getDate()}`.padStart(2, '0');

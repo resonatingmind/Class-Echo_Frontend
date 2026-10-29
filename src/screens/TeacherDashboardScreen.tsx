@@ -30,6 +30,7 @@ import {
 import { AppTheme } from "../theme/AppTheme";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { reportHighlight } from "../lib/reportHighlight";
+import { NextClassBrief } from "../components/teacher/NextClassBrief";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 type RecentRecording = RecordingWithReport & { subject_name: string };
@@ -226,6 +227,7 @@ export function TeacherDashboardScreen() {
               <View style={styles.recordNowDot} />
               <Text style={styles.recordNowText}>Record</Text>
             </Pressable>
+            <NextClassBrief token={session!.token} entryId={currentPeriod.id} collapsed />
           </View>
         ) : nextPeriod ? (
           <View style={styles.heroCard}>
@@ -239,6 +241,7 @@ export function TeacherDashboardScreen() {
               {nextPeriod.class_ ? `${nextPeriod.class_.name} · Section ${nextPeriod.class_.section}` : ""}
               {nextPeriod.room ? ` · Room ${nextPeriod.room}` : ""}
             </Text>
+            <NextClassBrief token={session!.token} entryId={nextPeriod.id} />
             <Pressable
               accessibilityRole="button"
               onPress={() => openSubject(nextPeriod)}

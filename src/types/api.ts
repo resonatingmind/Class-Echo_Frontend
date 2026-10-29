@@ -916,3 +916,27 @@ export type TimetableImportResult = {
   errors: string[];
 };
 
+
+/** The recap shown before a timetabled period (GET /teacher/timetable/{id}/brief). */
+export type NextClassBriefOut = {
+  timetable_entry_id: number;
+  subject_id: number;
+  muted: boolean;
+  last_lesson: {
+    recording_id: number;
+    title: string | null;
+    recorded_at: string;
+    /** Taught by another teacher: this teacher is covering the class. */
+    by_other_teacher: boolean;
+    covered: string[];
+    unfinished: string[];
+    recall_questions: string[];
+  } | null;
+  todays_plan: LearningPlanOut | null;
+  focus: {
+    recording_id: number;
+    area: string | null;
+    observation: string;
+    try_this: string;
+  } | null;
+};

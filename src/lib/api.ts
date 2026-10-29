@@ -1,4 +1,5 @@
 import {
+  NextClassBriefOut,
   FeedbackTarget,
   LearningPlanOut,
   LearningPlanCreatePayload,
@@ -2262,6 +2263,20 @@ export function getTimetableTemplateUrl() {
 
 export async function getTeacherTimetable(token: string) {
   return request<TimetableEntryOut[]>("/teacher/timetable", {}, token);
+}
+
+/** The recap before a period. `on` is the local date (YYYY-MM-DD), for the planner entry dated today. */
+export async function getClassBrief(token: string, entryId: number, on: string) {
+  return request<NextClassBriefOut>(`/teacher/timetable/${entryId}/brief?on=${on}`, {}, token);
+}
+
+/** Turn the brief off or on for this class, every period. Returns the brief as it now stands. */
+export async function setClassBriefMuted(token: string, entryId: number, muted: boolean) {
+  return request<NextClassBriefOut>(
+    `/teacher/timetable/${entryId}/brief/mute`,
+    { method: "PUT", body: JSON.stringify({ muted }) },
+    token,
+  );
 }
 
 export async function approveAdminSchool(token: string, schoolId: number) {

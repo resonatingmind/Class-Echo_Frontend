@@ -5,6 +5,8 @@ import {
   ReportFeedback,
   ReportFeedbackIn,
   ReportFeedbackSummary,
+  SelfRating,
+  SelfRatingArea,
 } from '../types/api';
 import {
   ClassOut,
@@ -1299,6 +1301,28 @@ export async function deleteReportFeedback(
     { method: "DELETE" },
     token,
   );
+}
+
+/** The teacher's own view before the report is revealed, or a skip. Once per report. */
+export async function putSelfRating(
+  token: string,
+  recordingId: number,
+  body: { ratings?: Partial<Record<SelfRatingArea, number>>; reflection?: string | null; skipped?: boolean },
+): Promise<SelfRating> {
+  return request<SelfRating>(
+    `/teacher/recordings/${recordingId}/self-rating`,
+    { method: "PUT", body: JSON.stringify(body) },
+    token,
+  );
+}
+
+/** Count a clip played from the report. Best effort: a failure is ignored. */
+export async function recordClipPlay(token: string, recordingId: number): Promise<void> {
+  try {
+    await request<void>(`/teacher/recordings/${recordingId}/clip-plays`, { method: "POST" }, token);
+  } catch {
+    // Usage counting must never get in the way of playback.
+  }
 }
 
 export async function getReportFeedbackSummary(

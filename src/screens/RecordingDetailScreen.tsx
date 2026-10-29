@@ -38,12 +38,18 @@ import { AppTheme } from '../theme/AppTheme';
 import {
   DimensionScore,
   FeedbackTarget,
+  HighlightKey,
+  LLMReportOut,
   QuantitativeMetrics,
   RecordingStatus,
   ReportImprovement,
   ScoreBreakdown,
   RecordingWithReport,
+  SelfRating,
+  TranscriptSegment,
 } from '../types/api';
+import { ClipChip, ClipProvider, useClips } from '../components/report/ClipPlayback';
+import { SelfRatingComparison, SelfRatingPrompt } from '../components/report/SelfRating';
 import { formatAudioTime } from '../lib/audio';
 import { describeFailure } from '../lib/failureMessages';
 import { reportImprovements, reportStrengths } from '../lib/reportFindings';
@@ -195,15 +201,114 @@ function findFocusDimension(breakdown: ScoreBreakdown | null | undefined): keyof
   return focus;
 }
 
-/** One evidence quote. Kept as its own row so a ▶ timestamp chip can sit beside the text later. */
-function EvidenceQuote({ text }: { text: string }) {
+/** One evidence quote, with a ▶ chip that plays the moment when the transcript has timings. */
+function EvidenceQuote({ text, start }: { text: string; start?: number | null }) {
   return (
     <View style={dr.evidenceRow}>
       <Text style={dr.evidenceDot}>›</Text>
-      <Text style={dr.evidenceText}>{text}</Text>
+      <View style={dr.evidenceBody}>
+        <Text style={dr.evidenceText}>{text}</Text>
+        <ClipChip start={start} />
+      </View>
     </View>
   );
 }
+
+const HIGHLIGHTS: { key: HighlightKey; label: string; icon: string; color: string }[] = [
+  { key: 'best_moment', label: 'Best moment', icon: 'star-outline', color: '#127A40' },
+  { key: 'moment_to_rethink', label: 'Moment to rethink', icon: 'refresh-circle-outline', color: '#92400E' },
+  { key: 'best_interaction', label: 'Best student interaction', icon: 'chatbubbles-outline', color: AppTheme.colors.primaryDark },
+];
+
+/** Three moments worth hearing again, at the top of the report. Teacher only, like every clip. */
+function HighlightsStrip({ highlights }: { highlights: LLMReportOut['highlights'] }) {
+  const { canPlay, openClip } = useClips();
+  const items = HIGHLIGHTS.filter((h) => highlights?.[h.key]);
+  if (!canPlay || items.length === 0) return null;
+  return (
+    <View style={hl.row}>
+      {items.map((h) => {
+        const moment = highlights![h.key]!;
+        return (
+          <Pressable
+            accessibilityLabel={`${h.label} at ${formatAudioTime(moment.start)}`}
+            accessibilityRole="button"
+            key={h.key}
+            onPress={() => openClip(moment.start, h.label)}
+            style={hl.card}
+          >
+            <View style={hl.top}>
+              <Ionicons color={h.color} name={h.icon as any} size={16} />
+              <Text style={[hl.label, { color: h.color }]}>{h.label}</Text>
+            </View>
+            {moment.note ? <Text numberOfLines={3} style={hl.note}>{moment.note}</Text> : null}
+            <View style={hl.play}>
+              <Ionicons color={AppTheme.colors.primaryDark} name="play" size={12} />
+              <Text style={hl.time}>{formatAudioTime(moment.start)}</Text>
+            </View>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+const hl = StyleSheet.create({
+  row: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  card: {
+    flexGrow: 1,
+    flexBasis: 200,
+    padding: 14,
+    gap: 6,
+    borderRadius: AppTheme.radius.large,
+    backgroundColor: AppTheme.colors.surface,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+  },
+  top: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  label: { fontSize: 12, fontWeight: '800', letterSpacing: 0.4 },
+  note: { fontSize: 13, lineHeight: 19, color: AppTheme.colors.textPrimary },
+  play: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 'auto' },
+  time: { fontSize: 12, fontWeight: '700', color: AppTheme.colors.primaryDark },
+});
+
+/** The transcript, line by line with times and speakers when known; tapping a line plays from there. */
+function TranscriptBody({ text, segments, onPlay }: {
+  text: string | null;
+  segments: TranscriptSegment[] | null | undefined;
+  onPlay: () => void;
+}) {
+  const { canPlay, openClip } = useClips();
+  if (!segments?.length) {
+    return <Text selectable style={styles.transcriptText}>{text}</Text>;
+  }
+  return (
+    <View style={tb.list}>
+      {segments.map((s) => (
+        <Pressable
+          accessibilityRole={canPlay ? 'button' : undefined}
+          disabled={!canPlay}
+          key={s.id}
+          onPress={() => { onPlay(); openClip(s.start); }}
+          style={tb.line}
+        >
+          <Text style={tb.meta}>
+            {formatAudioTime(s.start)} · {s.speaker === 'teacher' ? 'Teacher' : 'Student'}
+          </Text>
+          <Text selectable style={[tb.text, s.speaker === 'student' && tb.student]}>{s.text}</Text>
+        </Pressable>
+      ))}
+    </View>
+  );
+}
+
+const tb = StyleSheet.create({
+  list: { gap: 4 },
+  line: { paddingVertical: 8, gap: 2 },
+  meta: { fontSize: 12, fontWeight: '700', color: AppTheme.colors.textSecondary, fontVariant: ['tabular-nums'] },
+  text: { fontSize: 16, lineHeight: 25, color: AppTheme.colors.textPrimary },
+  student: { fontStyle: 'italic', color: AppTheme.colors.textSecondary },
+});
 
 function DimensionRow({ dim, data, isFocus }: {
   dim: typeof DIMENSIONS[0]; data: DimensionScore; isFocus: boolean;
@@ -244,7 +349,7 @@ function DimensionRow({ dim, data, isFocus }: {
       {expanded ? (
         <View style={dr.expanded}>
           <View style={dr.evidenceList}>
-            {data.evidence.map((e, i) => <EvidenceQuote key={i} text={e} />)}
+            {data.evidence.map((e, i) => <EvidenceQuote key={i} start={data.evidence_starts?.[i]} text={e} />)}
           </View>
           <FeedbackButtons targetKey={dim.key} type="dimension" />
         </View>
@@ -283,18 +388,21 @@ const dr = StyleSheet.create({
   evidenceList: { flex: 1, gap: 5 },
   evidenceRow: { flexDirection: 'row', gap: 6 },
   evidenceDot: { fontSize: 14, color: AppTheme.colors.textSecondary, lineHeight: 20, marginTop: 1 },
-  evidenceText: { flex: 1, fontSize: 12, lineHeight: 18, color: AppTheme.colors.textSecondary },
+  evidenceBody: { flex: 1, gap: 4 },
+  evidenceText: { fontSize: 12, lineHeight: 18, color: AppTheme.colors.textSecondary },
 });
 
 /**
  * A single strength or improvement line. Text takes the flexible width; the
  * 👍/👎 control sits on the right.
  */
-function FindingItem({ text, color, icon, evidence, feedbackType, feedbackKey }: {
+function FindingItem({ text, color, icon, evidence, start, feedbackType, feedbackKey }: {
   text: string;
   color: string;
   icon: string;
   evidence?: string;
+  /** Start second of the cited moment, for the ▶ chip. */
+  start?: number | null;
   feedbackType?: FeedbackTarget;
   feedbackKey?: string;
 }) {
@@ -304,7 +412,7 @@ function FindingItem({ text, color, icon, evidence, feedbackType, feedbackKey }:
         <Ionicons color={color} name={icon as any} size={18} style={fi.icon} />
         <View style={fi.body}>
           <Text style={fi.text}>{text}</Text>
-          {evidence ? <EvidenceQuote text={`“${evidence}”`} /> : null}
+          {evidence ? <EvidenceQuote start={start} text={`“${evidence}”`} /> : <ClipChip start={start} />}
         </View>
         {feedbackType && feedbackKey ? <FeedbackButtons targetKey={feedbackKey} type={feedbackType} /> : null}
       </View>
@@ -349,6 +457,7 @@ function ImprovementBody({ item, index, primary }: { item: ReportImprovement; in
         <View style={fc.itemBody}>
           {area ? <Text style={fc.area}>{area}</Text> : null}
           <Text style={primary ? fc.primaryText : fc.observation}>{item.observation}</Text>
+          <ClipChip start={item.start} title={area ?? 'The moment'} />
         </View>
         <FeedbackButtons targetKey={String(index)} type="improvement" />
       </View>
@@ -597,6 +706,8 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
   const [editDescription, setEditDescription] = useState(initialRecording.description || '');
   const [updatingDetails, setUpdatingDetails] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+  // Saved this visit; the next fetch brings it back as report.self_rating.
+  const [savedSelfRating, setSavedSelfRating] = useState<SelfRating | null>(null);
 
   const fetchDetails = useCallback(async () => {
     if (!session) return;
@@ -759,9 +870,21 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
     report.chapter_info || report.curriculum_coverage || report.accuracy_analysis ||
     report.learning_objectives_achievement?.length
   );
+  const isTeacher = session?.role === 'teacher';
+  const rating = savedSelfRating ?? report?.self_rating ?? null;
+  // Reports scored before rubric 2 predate the step; asking about an old lecture means little.
+  const askSelfRating =
+    isTeacher && !!session?.token && recording.status === 'completed' && report?.rubric_version === '2' && !rating;
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.safe}>
+      <ClipProvider
+        audioUrl={audioUrl}
+        canPlay={isTeacher}
+        recordingId={recording.id}
+        segments={recording.transcript_segments}
+        token={session?.token}
+      >
       {/* Global Header */}
       <View style={styles.globalHeader}>
         <View style={styles.headerLeft}>
@@ -817,8 +940,10 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
           </View>
         </View>
 
-        {/* Report: summary → what went well → focus → details (collapsed) */}
-        {recording.status === 'completed' && (report || overallScore != null) ? (
+        {/* Report: (self-rating first) → summary → highlights → what went well → focus → details (collapsed) */}
+        {askSelfRating && session?.token ? (
+          <SelfRatingPrompt onDone={setSavedSelfRating} recordingId={recording.id} token={session.token} />
+        ) : recording.status === 'completed' && (report || overallScore != null) ? (
           <FindingFeedbackProvider
             canEdit={session?.role === 'teacher'}
             initial={report?.feedback}
@@ -840,6 +965,12 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
               ) : null}
             </View>
 
+            {isTeacher && rating && !rating.skipped ? (
+              <SelfRatingComparison breakdown={report?.score_breakdown} rating={rating} />
+            ) : null}
+
+            <HighlightsStrip highlights={report?.highlights} />
+
             {/* What went well */}
             {strengths.length > 0 ? (
               <View style={styles.card}>
@@ -848,6 +979,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
                   <FindingItem
                     color="#127A40"
                     evidence={item.evidence}
+                    start={item.start}
                     feedbackKey={String(i)}
                     feedbackType="strength"
                     icon="checkmark-circle"
@@ -1004,7 +1136,11 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
             <View style={styles.headerRight} />
           </View>
           <ScrollView contentContainerStyle={styles.transcriptScroll}>
-            <Text selectable style={styles.transcriptText}>{recording.transcription}</Text>
+            <TranscriptBody
+              onPlay={() => setShowTranscript(false)}
+              segments={recording.transcript_segments}
+              text={recording.transcription}
+            />
           </ScrollView>
         </SafeAreaView>
       </Modal>
@@ -1131,6 +1267,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
           </Pressable>
         </Pressable>
       </Modal>
+      </ClipProvider>
     </SafeAreaView>
   );
 }

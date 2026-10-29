@@ -335,6 +335,28 @@ export type DimensionScore = {
   score: number;
   finding: string;
   evidence: string[];
+  /** Start second of each evidence quote's moment, same order; missing or null without segments. */
+  evidence_starts?: (number | null)[];
+};
+
+export type TranscriptSegment = {
+  id: number;
+  start: number;
+  end: number;
+  speaker: 'teacher' | 'student';
+  text: string;
+};
+
+export type ReportHighlight = { segment_id: number; start: number; note: string };
+export type HighlightKey = 'best_moment' | 'moment_to_rethink' | 'best_interaction';
+
+export type SelfRatingArea = 'clarity' | 'engagement' | 'coverage' | 'recap';
+
+export type SelfRating = {
+  ratings: Partial<Record<SelfRatingArea, number>>;
+  reflection: string | null;
+  skipped: boolean;
+  created_at: string;
 };
 
 export type ScoreBreakdown = {
@@ -397,6 +419,10 @@ export type LLMReportOut = {
   improvements?: ReportImprovement[];
   /** The teacher's 👍/👎 per finding. Only sent by detail endpoints. */
   feedback?: ReportFeedback[] | null;
+  /** Moments picked from a segmented transcript; empty otherwise. */
+  highlights?: Partial<Record<HighlightKey, ReportHighlight>>;
+  /** The teacher's own view, given before the reveal. Teacher endpoint only. */
+  self_rating?: SelfRating | null;
   created_at: string;
 };
 
@@ -404,6 +430,9 @@ export type ReportStrength = {
   area: keyof ScoreBreakdown | null;
   text: string;
   evidence: string;
+  segment_id?: number | null;
+  /** Start second of the cited moment; null without a segmented transcript. */
+  start?: number | null;
 };
 
 export type ReportImprovement = {
@@ -413,6 +442,8 @@ export type ReportImprovement = {
   try_this: string;
   why: string;
   is_focus: boolean;
+  segment_id?: number | null;
+  start?: number | null;
 };
 
 export type FeedbackTarget = "strength" | "dimension" | "improvement";
@@ -446,6 +477,19 @@ export type ReportFeedbackIn = {
 };
 
 export type ReportFeedbackSummary = {
+  adoption: {
+    reports_opened: number;
+    open_rate: number | null;
+    median_hours_to_open: number | null;
+    try_this_total: number;
+    try_this_useful: number;
+    try_this_useful_rate: number | null;
+    reports_with_clip_play: number;
+    clip_play_rate: number | null;
+    self_ratings_given: number;
+    self_ratings_skipped: number;
+    self_rating_completion: number | null;
+  };
   rubric_version: string | null;
   alert_rate: number;
   reports_total: number;
@@ -486,6 +530,8 @@ export type RecordingWithReport = {
   lecture_title: string | null;
   description: string | null;
   transcription: string | null;
+  /** Timestamped, speaker-labelled transcript; null for older or teacher-supplied transcripts. */
+  transcript_segments?: TranscriptSegment[] | null;
   cloudinary_url: string;
   duration_seconds: number | null;
   status: RecordingStatus;

@@ -18,8 +18,40 @@ function percent(rate: number): string {
 export function ReportFeedbackPanel({ summary }: { summary: ReportFeedbackSummary }) {
   const maxReason = Math.max(1, ...summary.by_reason.map((r) => r.count));
 
+  const a = summary.adoption;
+
   return (
     <>
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Are teachers using it?</Text>
+        <AdoptionRow
+          detail={`${a.reports_opened} of ${summary.reports_total} reports${
+            a.median_hours_to_open != null ? ` · median ${a.median_hours_to_open} h after ready` : ''
+          }`}
+          label="Reports opened"
+          rate={a.open_rate}
+          target={0.7}
+        />
+        <AdoptionRow
+          detail={`${a.try_this_useful} 👍 of ${a.try_this_total} try-this suggestions`}
+          label="Try-this found useful"
+          rate={a.try_this_useful_rate}
+          target={0.5}
+        />
+        <AdoptionRow
+          detail={`${a.reports_with_clip_play} of ${a.reports_opened} opened reports`}
+          label="Played a clip"
+          rate={a.clip_play_rate}
+          target={0.4}
+        />
+        <AdoptionRow
+          detail={`${a.self_ratings_given} rated · ${a.self_ratings_skipped} skipped`}
+          label="Self-rating completed"
+          rate={a.self_rating_completion}
+          target={0.5}
+        />
+      </View>
+
       <View style={styles.card}>
         <Text style={styles.cardTitle}>
           Teacher feedback · {summary.rubric_version ? `rubric ${summary.rubric_version}` : "all rubrics"}
@@ -111,6 +143,36 @@ export function ReportFeedbackPanel({ summary }: { summary: ReportFeedbackSummar
         ))
       )}
     </>
+  );
+}
+
+/** One roadmap success number against its target; grey until there is data. */
+function AdoptionRow({ label, rate, target, detail }: {
+  label: string;
+  rate: number | null;
+  target: number;
+  detail: string;
+}) {
+  const met = rate != null && rate >= target;
+  return (
+    <View style={styles.areaRow}>
+      <View style={styles.areaTop}>
+        <Text style={styles.areaLabel}>{label}</Text>
+        <Text style={[styles.areaValue, rate != null && { color: met ? "#127A40" : "#B45309" }]}>
+          {rate != null ? percent(rate) : "—"} · target {percent(target)}
+        </Text>
+      </View>
+      <View style={styles.track}>
+        <View
+          style={[
+            styles.fill,
+            { width: `${Math.min(100, (rate ?? 0) * 100)}%` },
+            { backgroundColor: met ? "#127A40" : AppTheme.colors.primary },
+          ]}
+        />
+      </View>
+      <Text style={styles.cardMeta}>{detail}</Text>
+    </View>
   );
 }
 

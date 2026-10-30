@@ -104,7 +104,7 @@ export function ImportTimetableModal({ visible, onClose, token, onImported }: Pr
             <View style={styles.sheet}>
               <View style={styles.headerRow}>
                 <Text style={styles.title}>Import Timetable</Text>
-                <Pressable onPress={handleClose} hitSlop={12}>
+                <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={handleClose} hitSlop={12}>
                   <Ionicons name="close" size={24} color={AppTheme.colors.textSecondary} />
                 </Pressable>
               </View>
@@ -120,6 +120,7 @@ export function ImportTimetableModal({ visible, onClose, token, onImported }: Pr
                 </Text>
 
                 <Pressable
+                  accessibilityRole="button"
                   onPress={() => Linking.openURL(getTimetableTemplateUrl())}
                   style={styles.templateLink}
                 >
@@ -127,7 +128,7 @@ export function ImportTimetableModal({ visible, onClose, token, onImported }: Pr
                   <Text style={styles.templateLinkText}>Download a blank template</Text>
                 </Pressable>
 
-                <Pressable style={styles.pickButton} onPress={handlePick}>
+                <Pressable accessibilityRole="button" style={styles.pickButton} onPress={handlePick}>
                   <Ionicons
                     name={pickedName ? "document-text" : "cloud-upload-outline"}
                     size={22}
@@ -195,6 +196,7 @@ export function ImportTimetableModal({ visible, onClose, token, onImported }: Pr
                 ) : null}
 
                 <Pressable
+                  accessibilityRole="button"
                   style={[styles.submitButton, !pickedUri && styles.submitDisabled]}
                   onPress={handleImport}
                   disabled={!pickedUri || uploading}
@@ -262,7 +264,7 @@ const styles = StyleSheet.create({
   templateLinkText: {
     fontSize: 13,
     fontWeight: "700",
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
   },
 
   pickButton: {

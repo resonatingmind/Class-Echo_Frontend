@@ -128,6 +128,7 @@ export function SettingsPanel({ token }: { token: string }) {
                   <Text style={styles.label}>{setting.label}</Text>
                   {setting.is_overridden ? (
                     <Pressable
+                      accessibilityRole="button"
                       disabled={busyKey === setting.key}
                       onPress={() => void reset(setting)}
                       style={styles.resetBtn}
@@ -172,6 +173,7 @@ export function SettingsPanel({ token }: { token: string }) {
                       value={drafts[setting.key] ?? ""}
                     />
                     <Pressable
+                      accessibilityRole="button"
                       disabled={
                         busyKey === setting.key ||
                         (drafts[setting.key] ?? "") === String(setting.value)

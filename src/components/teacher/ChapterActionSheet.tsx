@@ -41,7 +41,7 @@ export function ChapterActionSheet({
             <View style={styles.sheet}>
               <Text style={styles.title}>{chapterName ?? "Chapter"}</Text>
 
-              <Pressable style={styles.item} onPress={onEdit}>
+              <Pressable accessibilityRole="button" style={styles.item} onPress={onEdit}>
                 <Ionicons
                   name="create-outline"
                   size={20}
@@ -51,7 +51,7 @@ export function ChapterActionSheet({
                 <Text style={styles.itemText}>Edit Chapter</Text>
               </Pressable>
 
-              <Pressable style={styles.item} onPress={() => onOpenTab("planner")}>
+              <Pressable accessibilityRole="button" style={styles.item} onPress={() => onOpenTab("planner")}>
                 <Ionicons
                   name="calendar-outline"
                   size={20}
@@ -60,7 +60,7 @@ export function ChapterActionSheet({
                 <Text style={styles.itemText}>Lecture Planner</Text>
               </Pressable>
 
-              <Pressable style={styles.item} onPress={() => onOpenTab("profile")}>
+              <Pressable accessibilityRole="button" style={styles.item} onPress={() => onOpenTab("profile")}>
                 <Ionicons
                   name="sparkles-outline"
                   size={20}
@@ -69,7 +69,7 @@ export function ChapterActionSheet({
                 <Text style={styles.itemText}>Knowledge Profile</Text>
               </Pressable>
 
-              <Pressable style={styles.item} onPress={() => onOpenTab("documents")}>
+              <Pressable accessibilityRole="button" style={styles.item} onPress={() => onOpenTab("documents")}>
                 <Ionicons
                   name="document-text-outline"
                   size={20}
@@ -80,6 +80,7 @@ export function ChapterActionSheet({
 
               {/* <Pressable style={styles.item} onPress={onDelete}> */}
               <Pressable
+                accessibilityRole="button"
                 style={styles.item}
                 onPress={() => {
                   onDelete();
@@ -92,7 +93,7 @@ export function ChapterActionSheet({
                 </Text>
               </Pressable>
 
-              <Pressable style={styles.cancel} onPress={onClose}>
+              <Pressable accessibilityRole="button" style={styles.cancel} onPress={onClose}>
                 <Text style={styles.cancelText}>Cancel</Text>
               </Pressable>
             </View>

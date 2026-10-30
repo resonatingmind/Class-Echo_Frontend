@@ -467,7 +467,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
                     Configure daily teaching periods, lunch breaks, and recess
                   </Text>
                 </View>
-                <Pressable onPress={onClose} hitSlop={12} style={styles.closeBtn}>
+                <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={12} style={styles.closeBtn}>
                   <Ionicons name="close" size={20} color={AppTheme.colors.textSecondary} />
                 </Pressable>
               </View>
@@ -475,6 +475,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
               {/* ── Custom Generator Toggle & Quick Presets ──────────── */}
               <View style={styles.topActionsContainer}>
                 <Pressable
+                  accessibilityRole="button"
                   style={[
                     styles.generatorToggleBtn,
                     showGenerator && styles.generatorToggleBtnActive,
@@ -562,6 +563,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
                       <Text style={styles.quickChipLabel}>Period Duration:</Text>
                       {["35", "40", "45", "50", "60"].map((d) => (
                         <Pressable
+                          accessibilityRole="button"
                           key={d}
                           style={[
                             styles.quickChip,
@@ -591,6 +593,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
                         { val: "10", label: "10m" },
                       ].map((g) => (
                         <Pressable
+                          accessibilityRole="button"
                           key={g.val}
                           style={[
                             styles.quickChip,
@@ -613,6 +616,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
                     {/* Lunch Break Option */}
                     <View style={styles.lunchOptionRow}>
                       <Pressable
+                        accessibilityRole="button"
                         style={styles.lunchCheckRow}
                         onPress={() => setGenAddLunch(!genAddLunch)}
                       >
@@ -653,6 +657,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
 
                     {/* Generate Button */}
                     <Pressable
+                      accessibilityRole="button"
                       style={({ pressed }) => [
                         styles.generateBtn,
                         pressed && { opacity: 0.85 },
@@ -676,6 +681,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
                     >
                       {DEFAULT_TEMPLATES.map((t) => (
                         <Pressable
+                          accessibilityRole="button"
                           key={t.label}
                           style={({ pressed }) => [
                             styles.templateChip,
@@ -728,6 +734,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
                       >
                         {/* Period/Break badge & Type toggle */}
                         <Pressable
+                          accessibilityRole="button"
                           style={[
                             styles.periodBadge,
                             isBreak && styles.breakBadge,
@@ -746,6 +753,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
                           <View style={styles.rowTypeRow}>
                             <View style={styles.rowTypePill}>
                               <Pressable
+                                accessibilityRole="button"
                                 onPress={() => {
                                   if (row.isBreak) toggleRowType(row.id);
                                 }}
@@ -765,6 +773,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
                               </Pressable>
 
                               <Pressable
+                                accessibilityRole="button"
                                 onPress={() => {
                                   if (!row.isBreak) toggleRowType(row.id);
                                 }}
@@ -852,6 +861,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
                             >
                               {BREAK_SUGGESTIONS.map((sugg) => (
                                 <Pressable
+                                  accessibilityRole="button"
                                   key={sugg}
                                   onPress={() => updateRow(row.id, "label", sugg)}
                                   style={[
@@ -892,6 +902,8 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
 
                         {/* Delete */}
                         <Pressable
+                          accessibilityRole="button"
+                          accessibilityLabel="Remove period"
                           onPress={() => removeRow(row.id)}
                           hitSlop={8}
                           style={styles.removeBtn}
@@ -906,6 +918,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
                 {/* ── Add Buttons (Period & Break) ────────────────────── */}
                 <View style={styles.addButtonsContainer}>
                   <Pressable
+                    accessibilityRole="button"
                     style={({ pressed }) => [
                       styles.addRowBtn,
                       pressed && { opacity: 0.7 },
@@ -921,6 +934,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
                   </Pressable>
 
                   <Pressable
+                    accessibilityRole="button"
                     style={({ pressed }) => [
                       styles.addBreakBtn,
                       pressed && { opacity: 0.7 },
@@ -938,6 +952,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
               {/* ── Footer ─────────────────────────────────────────── */}
               <View style={styles.footer}>
                 <Pressable
+                  accessibilityRole="button"
                   style={({ pressed }) => [
                     styles.cancelBtn,
                     pressed && { opacity: 0.7 },
@@ -947,6 +962,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
                   <Text style={styles.cancelText}>Cancel</Text>
                 </Pressable>
                 <Pressable
+                  accessibilityRole="button"
                   style={({ pressed }) => [
                     styles.saveBtn,
                     pressed && { opacity: 0.88 },
@@ -1059,7 +1075,7 @@ const styles = StyleSheet.create({
   generatorToggleText: {
     fontSize: 13,
     fontWeight: "700",
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
   },
 
   generatorBox: {
@@ -1225,7 +1241,7 @@ const styles = StyleSheet.create({
   templateChipText: {
     fontSize: 12,
     fontWeight: "700",
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
   },
 
   scroll: { flex: 1 },
@@ -1402,7 +1418,7 @@ const styles = StyleSheet.create({
 
   timePreview: {
     fontSize: 11,
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     fontWeight: "600",
     marginTop: 1,
   },
@@ -1446,7 +1462,7 @@ const styles = StyleSheet.create({
   addRowText: {
     fontSize: 13,
     fontWeight: "700",
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
   },
   addBreakBtn: {
     flex: 1,
@@ -1465,7 +1481,7 @@ const styles = StyleSheet.create({
   addBreakText: {
     fontSize: 13,
     fontWeight: "700",
-    color: AppTheme.colors.orange,
+    color: AppTheme.colors.orangeText,
   },
 
   // ── Footer ───────────────────────────────────────────────────────

@@ -107,12 +107,13 @@ export function AdminPeopleScreen() {
             onChangeText={setQuery}
             onSubmitEditing={() => void runSearch()}
             placeholder="Email or name, any school"
-            placeholderTextColor={AppTheme.colors.textPlaceholder}
+            placeholderTextColor={AppTheme.colors.hint}
             returnKeyType="search"
             style={[styles.searchInput, { outlineStyle: "none" } as any]}
             value={query}
           />
           <Pressable
+            accessibilityRole="button"
             disabled={searching}
             onPress={() => void runSearch()}
             style={styles.searchBtn}
@@ -200,6 +201,7 @@ export function AdminPeopleScreen() {
                 <View style={styles.actionRow}>
                   {user.can_resend_invite ? (
                     <Pressable
+                      accessibilityRole="button"
                       disabled={busyKey === key}
                       onPress={() => void handleResend(user)}
                       style={styles.action}
@@ -224,6 +226,7 @@ export function AdminPeopleScreen() {
 
                   {user.school_id ? (
                     <Pressable
+                      accessibilityRole="button"
                       onPress={() =>
                         navigation.navigate("AdminSchoolDetail", {
                           schoolId: user.school_id,
@@ -328,5 +331,5 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: AppTheme.colors.primaryLight,
   },
-  actionText: { fontSize: 12, fontWeight: "700", color: AppTheme.colors.primary },
+  actionText: { fontSize: 12, fontWeight: "700", color: AppTheme.colors.primaryText },
 });

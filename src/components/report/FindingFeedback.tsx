@@ -335,7 +335,7 @@ const fb = StyleSheet.create({
   noteTitle: { fontSize: 12, fontWeight: '800', color: DISAGREE_COLOR },
   noteText: { fontSize: 13, lineHeight: 18, color: AppTheme.colors.textPrimary },
   noteLink: { minHeight: 32, justifyContent: 'center', alignSelf: 'flex-start' },
-  noteLinkText: { fontSize: 13, fontWeight: '700', color: AppTheme.colors.primaryDark },
+  noteLinkText: { fontSize: 13, fontWeight: '700', color: AppTheme.colors.primaryText },
 });
 
 const ds = StyleSheet.create({
@@ -364,8 +364,8 @@ const ds = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
     backgroundColor: AppTheme.colors.primaryLight,
   },
-  momentText: { flex: 1, fontSize: 14, fontWeight: '700', color: AppTheme.colors.primaryDark },
-  momentTime: { fontSize: 13, fontWeight: '700', color: AppTheme.colors.primaryDark, fontVariant: ['tabular-nums'] },
+  momentText: { flex: 1, fontSize: 14, fontWeight: '700', color: AppTheme.colors.primaryText },
+  momentTime: { fontSize: 13, fontWeight: '700', color: AppTheme.colors.primaryText, fontVariant: ['tabular-nums'] },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: {
     flexDirection: 'row',
@@ -380,7 +380,7 @@ const ds = StyleSheet.create({
   },
   chipOn: { borderColor: AppTheme.colors.primary, backgroundColor: AppTheme.colors.primaryLight },
   chipText: { fontSize: 13, fontWeight: '600', color: AppTheme.colors.textPrimary },
-  chipTextOn: { color: AppTheme.colors.primaryDark },
+  chipTextOn: { color: AppTheme.colors.primaryText },
   input: {
     minHeight: 72,
     borderWidth: 1,

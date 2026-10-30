@@ -229,7 +229,7 @@ export function SchoolAdminTeacherRecordingsScreen({
                 <View style={[styles.statIconWrap, styles.statIconTotal]}>
                   <Ionicons name="document-text-outline" size={24} color={AppTheme.colors.primary} />
                 </View>
-                <Text style={[styles.statNumber, { color: AppTheme.colors.primary }]}>{total}</Text>
+                <Text style={[styles.statNumber, { color: AppTheme.colors.primaryText }]}>{total}</Text>
                 <Text style={styles.statLabel}>Total</Text>
               </View>
 
@@ -261,13 +261,14 @@ export function SchoolAdminTeacherRecordingsScreen({
                   placeholderTextColor={AppTheme.colors.textSecondary}
                 />
                 {searchQuery.length > 0 && (
-                  <Pressable onPress={() => setSearchQuery("")} style={styles.clearSearchBtn}>
+                  <Pressable accessibilityRole="button" accessibilityLabel="Clear search" hitSlop={8} onPress={() => setSearchQuery("")} style={styles.clearSearchBtn}>
                     <Ionicons name="close-circle" size={18} color={AppTheme.colors.textSecondary} />
                   </Pressable>
                 )}
               </View>
 
               <Pressable
+                accessibilityRole="button"
                 style={({ pressed }) => [
                   styles.filterButton,
                   isMobile && { width: "100%" },
@@ -331,6 +332,7 @@ export function SchoolAdminTeacherRecordingsScreen({
           </Text>
           {activeFilterCount > 0 && (
             <Pressable
+              accessibilityRole="button"
               onPress={() => {
                 setSearchQuery("");
                 setStatusFilter("All");
@@ -348,6 +350,7 @@ export function SchoolAdminTeacherRecordingsScreen({
         <View style={styles.recordingList}>
           {filteredRecordings.map((recording) => (
             <Pressable
+              accessibilityRole="button"
               key={recording.id}
               style={({ pressed }) => [styles.card, pressed && { opacity: 0.85, transform: [{ scale: 0.99 }] }]}
               onPress={async () => {
@@ -440,7 +443,7 @@ export function SchoolAdminTeacherRecordingsScreen({
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>Filters</Text>
 
-                <Pressable onPress={() => setFilterVisible(false)}>
+                <Pressable accessibilityRole="button" accessibilityLabel="Close filters" hitSlop={8} onPress={() => setFilterVisible(false)}>
                   <Ionicons name="close" size={26} color={AppTheme.colors.textPrimary} />
                 </Pressable>
               </View>
@@ -451,6 +454,7 @@ export function SchoolAdminTeacherRecordingsScreen({
 
               {statuses.map((status) => (
                 <Pressable
+                  accessibilityRole="button"
                   key={status}
                   style={styles.option}
                   onPress={() => setTempStatus(status)}
@@ -479,6 +483,7 @@ export function SchoolAdminTeacherRecordingsScreen({
               >
                 {subjectOptions.map((subject) => (
                   <Pressable
+                    accessibilityRole="button"
                     key={subject}
                     style={styles.option}
                     onPress={() => setTempSubject(subject)}
@@ -509,6 +514,7 @@ export function SchoolAdminTeacherRecordingsScreen({
                   >
                     {classOptions.map((cls) => (
                       <Pressable
+                        accessibilityRole="button"
                         key={cls}
                         style={styles.option}
                         onPress={() => setTempClass(cls)}
@@ -541,6 +547,7 @@ export function SchoolAdminTeacherRecordingsScreen({
                   >
                     {sectionOptions.map((sec) => (
                       <Pressable
+                        accessibilityRole="button"
                         key={sec}
                         style={styles.option}
                         onPress={() => setTempSection(sec)}
@@ -568,6 +575,7 @@ export function SchoolAdminTeacherRecordingsScreen({
 
               {sortOptions.map((sort) => (
                 <Pressable
+                  accessibilityRole="button"
                   key={sort}
                   style={styles.option}
                   onPress={() => setTempSort(sort)}
@@ -588,6 +596,7 @@ export function SchoolAdminTeacherRecordingsScreen({
 
               <View style={styles.buttonRow}>
                 <Pressable
+                  accessibilityRole="button"
                   style={styles.resetButton}
                   onPress={() => {
                     setTempStatus("All");
@@ -601,6 +610,7 @@ export function SchoolAdminTeacherRecordingsScreen({
                 </Pressable>
 
                 <Pressable
+                  accessibilityRole="button"
                   style={styles.applyButton}
                   onPress={() => {
                     setStatusFilter(tempStatus);
@@ -647,7 +657,7 @@ const styles = StyleSheet.create({
   academicLabel: {
     fontSize: 12,
     fontWeight: "800",
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     letterSpacing: 1,
     marginBottom: 4,
   },
@@ -760,7 +770,7 @@ const styles = StyleSheet.create({
   },
   filterButtonText: {
     marginLeft: 8,
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     fontWeight: "700",
     fontSize: 16,
   },
@@ -778,7 +788,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   activeChipText: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     fontWeight: "600",
     fontSize: 13,
   },
@@ -794,7 +804,7 @@ const styles = StyleSheet.create({
   },
   clearFilter: {
     fontSize: 14,
-    color: AppTheme.colors.error,
+    color: AppTheme.colors.dangerText,
     fontWeight: "700",
   },
   recordingList: {
@@ -1012,7 +1022,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   resetText: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     fontWeight: "700",
     fontSize: 16,
   },

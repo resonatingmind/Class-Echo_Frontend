@@ -84,6 +84,7 @@ export function AssignTeacherModal({
 
           {currentTeacherId !== null ? (
             <Pressable
+              accessibilityRole="button"
               onPress={() => handleAssign(null)}
               disabled={assigningId !== null || unassigning}
               style={styles.unassignBtn}
@@ -114,6 +115,7 @@ export function AssignTeacherModal({
                 const initials = teacher.name.split(' ').map((w) => w[0] ?? '').join('').toUpperCase().slice(0, 2);
                 return (
                   <Pressable
+                    accessibilityRole="button"
                     key={teacher.id}
                     onPress={() => handleAssign(teacher.id)}
                     style={[styles.teacherRow, isCurrentTeacher && styles.teacherRowActive]}
@@ -208,7 +210,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '800',
   },
-  teacherAvatarTextActive: { color: AppTheme.colors.primaryDark },
+  teacherAvatarTextActive: { color: AppTheme.colors.primaryText },
   teacherInfo: { flex: 1, gap: 2 },
   teacherName: { color: AppTheme.colors.textPrimary, fontSize: 15, fontWeight: '700' },
   teacherEmail: { color: AppTheme.colors.textSecondary, fontSize: 12 },

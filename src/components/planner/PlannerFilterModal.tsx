@@ -47,6 +47,7 @@ export function PlannerFilterModal({
 
               return (
                 <Pressable
+                  accessibilityRole="button"
                   style={styles.item}
                   onPress={() => {
                     onSelect(item === "All" ? null : item);
@@ -127,7 +128,7 @@ const styles = StyleSheet.create({
   },
 
   activeText: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
 
     fontWeight: "700",
   },

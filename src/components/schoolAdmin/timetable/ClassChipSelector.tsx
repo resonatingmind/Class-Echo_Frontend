@@ -21,6 +21,7 @@ export function ClassChipSelector({ classes, selectedClassId, onSelect }: Props)
         const active = item.id === selectedClassId;
         return (
           <Pressable
+            accessibilityRole="button"
             key={item.id}
             onPress={() => onSelect(item.id)}
             style={[styles.chip, active && styles.chipActive]}

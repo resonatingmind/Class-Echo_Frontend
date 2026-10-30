@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     ...AppTheme.typography.bodyLarge,
 },
   errorText: {
-    color: AppTheme.colors.error,
+    color: AppTheme.colors.dangerText,
     ...AppTheme.typography.caption,
   },
 });

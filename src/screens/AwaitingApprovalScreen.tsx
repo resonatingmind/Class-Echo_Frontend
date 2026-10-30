@@ -63,6 +63,7 @@ export function AwaitingApprovalScreen() {
 
         <View style={styles.actions}>
           <Pressable
+            accessibilityRole="button"
             disabled={isRefreshing}
             onPress={handleRefresh}
             style={[styles.button, styles.primaryButton, isRefreshing && styles.buttonDisabled]}
@@ -75,6 +76,7 @@ export function AwaitingApprovalScreen() {
           </Pressable>
 
           <Pressable
+            accessibilityRole="button"
             disabled={isRefreshing}
             onPress={signOut}
             style={[styles.button, styles.secondaryButton]}

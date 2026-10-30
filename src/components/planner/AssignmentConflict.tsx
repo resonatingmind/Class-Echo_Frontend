@@ -45,11 +45,12 @@ export function AssignmentConflict({
       </View>
 
       <View style={styles.actions}>
-        <Pressable style={styles.cancel} onPress={onCancel}>
+        <Pressable accessibilityRole="button" style={styles.cancel} onPress={onCancel}>
           <Text style={styles.cancelText}>Cancel</Text>
         </Pressable>
 
         <Pressable
+          accessibilityRole="button"
           style={[styles.replace, loading && { opacity: 0.6 }]}
           onPress={onReplace}
           disabled={loading}

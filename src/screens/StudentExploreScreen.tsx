@@ -57,7 +57,7 @@ export function StudentExploreScreen() {
             <Text style={styles.kicker}>Student Portal</Text>
             <Text style={styles.title}>Explore schools</Text>
           </View>
-          <Pressable onPress={signOut} style={styles.signOut}>
+          <Pressable accessibilityRole="button" onPress={signOut} style={styles.signOut}>
             <Text style={styles.signOutText}>Exit</Text>
           </Pressable>
         </View>
@@ -67,7 +67,7 @@ export function StudentExploreScreen() {
           <TextInput
             onChangeText={setSearch}
             placeholder="Search institutions"
-            placeholderTextColor={AppTheme.colors.textPlaceholder}
+            placeholderTextColor={AppTheme.colors.hint}
             style={styles.searchInput}
             value={search}
           />

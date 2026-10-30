@@ -70,6 +70,8 @@ export function PrimaryButton({
 
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
       disabled={disabled || loading}
       onPress={onPress}
       onPressIn={pressIn}

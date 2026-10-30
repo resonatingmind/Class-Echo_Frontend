@@ -69,7 +69,7 @@ export function EmailDeliveryCard({ token }: { token: string }) {
 
   return (
     <View style={[styles.card, !healthy && styles.cardWarn]}>
-      <Pressable onPress={() => setExpanded((v) => !v)} style={styles.header}>
+      <Pressable accessibilityRole="button" onPress={() => setExpanded((v) => !v)} style={styles.header}>
         <Ionicons
           color={healthy ? AppTheme.colors.successText : AppTheme.colors.warningText}
           name={healthy ? 'mail-outline' : 'warning-outline'}
@@ -135,11 +135,12 @@ export function EmailDeliveryCard({ token }: { token: string }) {
               keyboardType="email-address"
               onChangeText={setTestEmail}
               placeholder="you@example.com"
-              placeholderTextColor={AppTheme.colors.textPlaceholder}
+              placeholderTextColor={AppTheme.colors.hint}
               style={styles.input}
               value={testEmail}
             />
             <Pressable
+              accessibilityRole="button"
               disabled={testing || !testEmail.trim()}
               onPress={() => void handleTest()}
               style={[

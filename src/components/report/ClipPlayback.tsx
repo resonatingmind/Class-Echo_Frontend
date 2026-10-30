@@ -335,7 +335,7 @@ const sc = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
     backgroundColor: AppTheme.colors.primaryLight,
   },
-  time: { fontSize: 13, fontWeight: '700', color: AppTheme.colors.primaryDark, fontVariant: ['tabular-nums'] },
+  time: { fontSize: 13, fontWeight: '700', color: AppTheme.colors.primaryText, fontVariant: ['tabular-nums'] },
   clipTitle: { flex: 1, fontSize: 14, fontWeight: '600', color: AppTheme.colors.textPrimary },
   unshare: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 8 },
   unshareText: { fontSize: 13, fontWeight: '700', color: AppTheme.colors.textSecondary },
@@ -353,7 +353,7 @@ const chip = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: AppTheme.colors.primaryLight,
   },
-  text: { fontSize: 12, fontWeight: '700', color: AppTheme.colors.primaryDark, fontVariant: ['tabular-nums'] },
+  text: { fontSize: 12, fontWeight: '700', color: AppTheme.colors.primaryText, fontVariant: ['tabular-nums'] },
 });
 
 const cs = StyleSheet.create({
@@ -415,6 +415,6 @@ const cs = StyleSheet.create({
     borderColor: AppTheme.colors.primary,
   },
   shareBtnOn: { backgroundColor: AppTheme.colors.primaryLight },
-  shareBtnText: { fontSize: 14, fontWeight: '700', color: AppTheme.colors.primaryDark },
+  shareBtnText: { fontSize: 14, fontWeight: '700', color: AppTheme.colors.primaryText },
   disabled: { opacity: 0.55 },
 });

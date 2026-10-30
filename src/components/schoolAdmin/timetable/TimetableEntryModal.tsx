@@ -223,7 +223,7 @@ export function TimetableEntryModal({
                   <Text style={styles.title}>{isEditing ? "Edit Period" : "Add Period"}</Text>
                   <Text style={styles.subtitle}>{dayOfWeek}</Text>
                 </View>
-                <Pressable onPress={onClose} hitSlop={12} style={styles.closeBtn}>
+                <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={12} style={styles.closeBtn}>
                   <Ionicons name="close" size={20} color={AppTheme.colors.textSecondary} />
                 </Pressable>
               </View>
@@ -236,6 +236,7 @@ export function TimetableEntryModal({
                 {/* ── Class ────────────────────────────────────────── */}
                 <Text style={styles.label}>Class</Text>
                 <Pressable
+                  accessibilityRole="button"
                   style={styles.selectInput}
                   onPress={() => setShowClassPicker(true)}
                 >
@@ -286,6 +287,7 @@ export function TimetableEntryModal({
                         !selectedSlot?.isBreak;
                       return (
                         <Pressable
+                          accessibilityRole="button"
                           key={slot.number}
                           onPress={() => setSelectedSlot(slot)}
                           style={[styles.slotChip, active && styles.slotChipActive]}
@@ -325,6 +327,7 @@ export function TimetableEntryModal({
                   </View>
                 ) : (
                   <Pressable
+                    accessibilityRole="button"
                     style={[styles.selectInput, !classId && styles.selectInputDisabled]}
                     onPress={() => classId && setShowSubjectPicker(true)}
                   >
@@ -342,6 +345,7 @@ export function TimetableEntryModal({
                 {/* ── Teacher ──────────────────────────────────────── */}
                 <Text style={styles.label}>Teacher</Text>
                 <Pressable
+                  accessibilityRole="button"
                   style={styles.selectInput}
                   onPress={() => setShowTeacherPicker(true)}
                 >
@@ -358,7 +362,7 @@ export function TimetableEntryModal({
                   value={room}
                   onChangeText={setRoom}
                   placeholder="e.g. 203"
-                  placeholderTextColor={AppTheme.colors.textPlaceholder}
+                  placeholderTextColor={AppTheme.colors.hint}
                 />
 
                 {(localError || errorMessage) && (
@@ -369,6 +373,7 @@ export function TimetableEntryModal({
                 )}
 
                 <Pressable
+                  accessibilityRole="button"
                   style={({ pressed }) => [
                     styles.submitButton,
                     pressed && { opacity: 0.88 },
@@ -534,9 +539,9 @@ const styles = StyleSheet.create({
     borderColor: AppTheme.colors.primary,
   },
   slotChipNum: { fontSize: 13, fontWeight: "800", color: AppTheme.colors.textPrimary },
-  slotChipNumActive: { color: AppTheme.colors.primaryDark },
+  slotChipNumActive: { color: AppTheme.colors.primaryText },
   slotChipTime: { fontSize: 10, color: AppTheme.colors.textSecondary, fontWeight: "500" },
-  slotChipTimeActive: { color: AppTheme.colors.primary },
+  slotChipTimeActive: { color: AppTheme.colors.primaryText },
   slotChipLabel: {
     fontSize: 9,
     color: AppTheme.colors.hint,
@@ -544,7 +549,7 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 0.4,
   },
-  slotChipLabelActive: { color: AppTheme.colors.primary },
+  slotChipLabelActive: { color: AppTheme.colors.primaryText },
 
   selectedSlotPill: {
     flexDirection: "row",
@@ -560,7 +565,7 @@ const styles = StyleSheet.create({
   selectedSlotText: {
     fontSize: 12,
     fontWeight: "600",
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
   },
 
   // ── Loading subjects ───────────────────────────────────────────────
@@ -607,7 +612,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   selectInputText: { fontSize: 15, color: AppTheme.colors.textPrimary, flex: 1 },
-  placeholderText: { color: AppTheme.colors.textPlaceholder },
+  placeholderText: { color: AppTheme.colors.hint },
 
   errorRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 14 },
   errorText: { flex: 1, color: AppTheme.colors.danger, fontSize: 13 },

@@ -201,7 +201,7 @@ export function TeacherProfileScreen({ navigation }: Props) {
       {/* Top Header with Back Button */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Pressable onPress={() => navigation.goBack()} style={styles.iconBtn}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Go back" hitSlop={8} onPress={() => navigation.goBack()} style={styles.iconBtn}>
             <Ionicons
               color={AppTheme.colors.textPrimary}
               name="arrow-back"
@@ -251,6 +251,7 @@ export function TeacherProfileScreen({ navigation }: Props) {
                   style={styles.hero}
                 >
                   <Pressable
+                    accessibilityRole="button"
                     onPress={() => void handleAvatarPick()}
                     style={styles.avatarWrap}
                   >
@@ -306,6 +307,7 @@ export function TeacherProfileScreen({ navigation }: Props) {
                     <Text style={styles.cardTitle}>Teacher Details</Text>
                     {editing ? (
                       <Pressable
+                        accessibilityRole="button"
                         onPress={() => {
                           setEditing(false);
                           setDraftName(profile?.name ?? "");
@@ -314,7 +316,7 @@ export function TeacherProfileScreen({ navigation }: Props) {
                         <Text style={styles.linkText}>Cancel</Text>
                       </Pressable>
                     ) : (
-                      <Pressable onPress={() => setEditing(true)}>
+                      <Pressable accessibilityRole="button" onPress={() => setEditing(true)}>
                         <Text style={styles.linkText}>Edit</Text>
                       </Pressable>
                     )}
@@ -355,6 +357,7 @@ export function TeacherProfileScreen({ navigation }: Props) {
 
                   {editing ? (
                     <Pressable
+                      accessibilityRole="button"
                       disabled={saving || !draftName.trim()}
                       onPress={() => void handleSave()}
                       style={[
@@ -450,7 +453,7 @@ export function TeacherProfileScreen({ navigation }: Props) {
                 ) : null}
 
                 {/* Sign Out Button */}
-                <Pressable onPress={signOut} style={styles.signOutButton}>
+                <Pressable accessibilityRole="button" onPress={signOut} style={styles.signOutButton}>
                   <Ionicons
                     color={AppTheme.colors.error}
                     name="log-out-outline"
@@ -562,7 +565,7 @@ const styles = StyleSheet.create({
   },
   avatarFallbackText: {
     ...AppTheme.typography.display,
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
   },
   cameraBadge: {
     position: "absolute",
@@ -583,7 +586,7 @@ const styles = StyleSheet.create({
     paddingVertical: AppTheme.spacing.xs,
     borderRadius: AppTheme.radius.pill,
     backgroundColor: "rgba(255, 255, 255, 0.9)",
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.caption,
     fontWeight: "800",
     overflow: "hidden",
@@ -617,7 +620,7 @@ const styles = StyleSheet.create({
   },
   statNumber: {
     ...AppTheme.typography.heading1,
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     fontWeight: "800",
     marginBottom: 4,
   },
@@ -648,7 +651,7 @@ const styles = StyleSheet.create({
     ...AppTheme.typography.heading3,
   },
   linkText: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.button,
     fontSize: 14,
   },
@@ -752,7 +755,7 @@ const styles = StyleSheet.create({
   subjectBadgeText: {
     fontSize: 11,
     fontWeight: "600",
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
   },
   signOutButton: {
     height: 52,

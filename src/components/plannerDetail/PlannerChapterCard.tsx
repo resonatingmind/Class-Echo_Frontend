@@ -81,7 +81,7 @@ export function PlannerChapterCard({
 
   return (
     <View style={[styles.card, isExpanded && styles.cardExpanded]}>
-      <Pressable style={styles.header} onPress={() => void toggleExpand()}>
+      <Pressable accessibilityRole="button" style={styles.header} onPress={() => void toggleExpand()}>
         <Text
           style={[styles.chapterName, { color: isExpanded ? AppTheme.colors.primaryDark : AppTheme.colors.textPrimary }]}
           numberOfLines={2}
@@ -107,7 +107,7 @@ export function PlannerChapterCard({
         <View style={styles.metricGroup}>
           <Text style={styles.metricLabel}>Material</Text>
           <View style={styles.metricActionRow}>
-            <Pressable onPress={onOpenDocuments} style={styles.countChip}>
+            <Pressable accessibilityRole="button" onPress={onOpenDocuments} style={styles.countChip}>
               <Ionicons name="document-text-outline" size={14} color={AppTheme.colors.violet} />
               <Text style={[styles.countChipText, { color: AppTheme.colors.violet }]}>
                 {chapter.document_count}
@@ -115,9 +115,11 @@ export function PlannerChapterCard({
             </Pressable>
 
             <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Add document"
               onPress={onAddDocument}
               style={styles.addButton}
-              hitSlop={6}
+              hitSlop={8}
             >
               <Ionicons name="add" size={14} color={AppTheme.colors.primaryDark} />
             </Pressable>
@@ -126,9 +128,9 @@ export function PlannerChapterCard({
 
         <View style={styles.metricGroup}>
           <Text style={styles.metricLabel}>Recordings</Text>
-          <Pressable onPress={() => void toggleExpand()} style={styles.countChip}>
+          <Pressable accessibilityRole="button" onPress={() => void toggleExpand()} style={styles.countChip}>
             <Ionicons name="videocam-outline" size={14} color={AppTheme.colors.orange} />
-            <Text style={[styles.countChipText, { color: AppTheme.colors.orange }]}>
+            <Text style={[styles.countChipText, { color: AppTheme.colors.orangeText }]}>
               {chapter.recording_count}
             </Text>
           </Pressable>
@@ -267,7 +269,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   scoreTextMuted: {
-    color: AppTheme.colors.textPlaceholder,
+    color: AppTheme.colors.hint,
   },
   expandedContent: {
     paddingHorizontal: 16,

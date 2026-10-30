@@ -48,12 +48,12 @@ export function LearningPlanCard({
         {!readOnly && (
           <View style={styles.actions}>
             {onEdit && (
-              <Pressable style={styles.actionBtn} onPress={onEdit} hitSlop={8}>
+              <Pressable accessibilityRole="button" accessibilityLabel="Edit learning plan" style={styles.actionBtn} onPress={onEdit} hitSlop={8}>
                 <Ionicons name="pencil" size={16} color={AppTheme.colors.primary} />
               </Pressable>
             )}
             {onDelete && (
-              <Pressable style={[styles.actionBtn, styles.deleteBtn]} onPress={onDelete} hitSlop={8}>
+              <Pressable accessibilityRole="button" accessibilityLabel="Delete learning plan" style={[styles.actionBtn, styles.deleteBtn]} onPress={onDelete} hitSlop={8}>
                 <Ionicons name="trash-outline" size={16} color={AppTheme.colors.error} />
               </Pressable>
             )}
@@ -61,7 +61,7 @@ export function LearningPlanCard({
         )}
       </View>
 
-      <Pressable onPress={onSelect} disabled={!onSelect}>
+      <Pressable accessibilityRole="button" onPress={onSelect} disabled={!onSelect}>
         <View style={styles.content}>
           <Text style={styles.topicName}>{item.sub_topic}</Text>
 
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 12,
     fontFamily: AppTheme.typography.family.bold,
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
   },
   actions: {
     flexDirection: "row",
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   detailLabel: {
     fontSize: 11,
     fontFamily: AppTheme.typography.family.bold,
-    color: AppTheme.colors.textPlaceholder,
+    color: AppTheme.colors.hint,
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   mutedText: {
-    color: AppTheme.colors.textPlaceholder,
+    color: AppTheme.colors.hint,
     fontStyle: "italic",
   },
 });

@@ -82,7 +82,7 @@ export function ForgotPasswordScreen({ navigation, route }: Props) {
               subtitle={`If an account exists for ${sentTo}, we've sent a link to reset your password. The link expires in 60 minutes.`}
             />
             <PrimaryButton title="Back to sign in" onPress={backToLogin} />
-            <Pressable onPress={() => setSentTo(null)}>
+            <Pressable accessibilityRole="button" onPress={() => setSentTo(null)}>
               <Text style={styles.link}>Didn't get it? Send again</Text>
             </Pressable>
           </View>
@@ -149,7 +149,7 @@ export function ForgotPasswordScreen({ navigation, route }: Props) {
                 />
               </View>
 
-              <Pressable onPress={backToLogin}>
+              <Pressable accessibilityRole="button" onPress={backToLogin}>
                 <Text style={styles.link}>Back to sign in</Text>
               </Pressable>
             </View>
@@ -190,14 +190,14 @@ const styles = StyleSheet.create({
     gap: AppTheme.spacing.s,
   },
   errorText: {
-    color: AppTheme.colors.error,
+    color: AppTheme.colors.dangerText,
     ...AppTheme.typography.body,
     flex: 1,
   },
   form: { gap: AppTheme.spacing.l },
   buttonSpacing: { marginTop: AppTheme.spacing.s },
   link: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.button,
     textAlign: "center",
   },

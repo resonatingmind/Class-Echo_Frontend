@@ -103,12 +103,13 @@ function AddTeacherModal({
               </Text>
               <View style={styles.modalActions}>
                 <Pressable
+                  accessibilityRole="button"
                   onPress={() => setInvitedEmail(null)}
                   style={styles.modalCancelBtn}
                 >
                   <Text style={styles.modalCancelText}>Invite another</Text>
                 </Pressable>
-                <Pressable onPress={handleClose} style={styles.modalSubmitBtn}>
+                <Pressable accessibilityRole="button" onPress={handleClose} style={styles.modalSubmitBtn}>
                   <Text style={styles.modalSubmitText}>Done</Text>
                 </Pressable>
               </View>
@@ -129,7 +130,7 @@ function AddTeacherModal({
                 autoFocus
                 onChangeText={setName}
                 placeholder="Dr. Elena Rodriguez"
-                placeholderTextColor={AppTheme.colors.textPlaceholder}
+                placeholderTextColor={AppTheme.colors.hint}
                 style={styles.input}
                 value={name}
               />
@@ -143,7 +144,7 @@ function AddTeacherModal({
                 keyboardType="email-address"
                 onChangeText={setEmail}
                 placeholder="teacher@school.edu"
-                placeholderTextColor={AppTheme.colors.textPlaceholder}
+                placeholderTextColor={AppTheme.colors.hint}
                 style={styles.input}
                 textContentType="emailAddress"
                 value={email}
@@ -159,10 +160,11 @@ function AddTeacherModal({
           ) : null}
 
           <View style={styles.modalActions}>
-            <Pressable onPress={handleClose} style={styles.modalCancelBtn}>
+            <Pressable accessibilityRole="button" onPress={handleClose} style={styles.modalCancelBtn}>
               <Text style={styles.modalCancelText}>Cancel</Text>
             </Pressable>
             <Pressable
+              accessibilityRole="button"
               disabled={!canSubmit || submitting}
               onPress={handleCreate}
               style={[
@@ -203,6 +205,7 @@ function TeacherCard({
 
   return (
     <Pressable
+      accessibilityRole="button"
       onPress={onPress}
       style={({ pressed }) => [styles.card, pressed && { opacity: 0.85 }]}
     >
@@ -312,6 +315,7 @@ export function SchoolAdminTeachersScreen({ navigation }: Props) {
                 <View style={styles.titleRow}>
                   <Text style={styles.pageTitle}>Teacher Directory</Text>
                   <Pressable
+                    accessibilityRole="button"
                     onPress={() => setShowAdd(true)}
                     style={styles.addTeacherBtn}
                   >
@@ -330,12 +334,12 @@ export function SchoolAdminTeachersScreen({ navigation }: Props) {
                 <TextInput
                   onChangeText={setQuery}
                   placeholder="Search by name, email…"
-                  placeholderTextColor={AppTheme.colors.textPlaceholder}
+                  placeholderTextColor={AppTheme.colors.hint}
                   style={styles.searchInput}
                   value={query}
                 />
                 {query.length > 0 ? (
-                  <Pressable hitSlop={8} onPress={() => setQuery("")}>
+                  <Pressable accessibilityRole="button" accessibilityLabel="Clear search" hitSlop={8} onPress={() => setQuery("")}>
                     <Ionicons
                       color={AppTheme.colors.textSecondary}
                       name="close-circle"
@@ -359,7 +363,7 @@ export function SchoolAdminTeachersScreen({ navigation }: Props) {
                   />
                   <Text style={styles.emptyTitle}>Could not load teachers</Text>
                   <Text style={styles.emptyBody}>{error}</Text>
-                  <Pressable onPress={() => void load()} style={styles.retryBtn}>
+                  <Pressable accessibilityRole="button" onPress={() => void load()} style={styles.retryBtn}>
                     <Text style={styles.retryText}>Retry</Text>
                   </Pressable>
                 </View>
@@ -484,7 +488,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: AppTheme.spacing.l,
     paddingVertical: AppTheme.spacing.m,
   },
-  retryText: { color: AppTheme.colors.primary, ...AppTheme.typography.button },
+  retryText: { color: AppTheme.colors.primaryText, ...AppTheme.typography.button },
   list: { gap: AppTheme.spacing.m },
 
   // Teacher Card
@@ -509,7 +513,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  avatarText: { color: AppTheme.colors.primary, ...AppTheme.typography.heading3 },
+  avatarText: { color: AppTheme.colors.primaryText, ...AppTheme.typography.heading3 },
   avatarImage: { width: 48, height: 48, borderRadius: 24 },
   cardInfo: { flex: 1, gap: 3 },
   cardName: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.heading3 },

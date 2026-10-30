@@ -66,7 +66,7 @@ export function ConfirmDialog({
                 <TextInput
                   style={styles.passwordInput}
                   placeholder="Enter password to confirm"
-                  placeholderTextColor={AppTheme.colors.slate400}
+                  placeholderTextColor={AppTheme.colors.hint}
                   secureTextEntry
                   value={passwordValue}
                   onChangeText={onPasswordChange}
@@ -80,6 +80,7 @@ export function ConfirmDialog({
 
               <View style={styles.actions}>
                 <Pressable
+                  accessibilityRole="button"
                   style={styles.cancelButton}
                   onPress={onCancel}
                   disabled={loading}
@@ -88,6 +89,8 @@ export function ConfirmDialog({
                 </Pressable>
 
                 <Pressable
+                  accessibilityRole="button"
+                  accessibilityState={{ busy: loading }}
                   style={[
                     styles.confirmButton,
                     destructive && styles.destructiveButton,

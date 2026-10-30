@@ -53,6 +53,8 @@ const CLASS_GRADE_COL_WIDTH = 52;
 const CLASS_SECTION_COL_WIDTH = 42;
 const PERIOD_COL_WIDTH = 140;
 const ROW_HEIGHT = 90;
+// Edit and delete sit 8 px apart; 4 px of side reach each keeps their touch areas from overlapping
+const CELL_ACTION_SLOP = { top: 8, bottom: 8, left: 4, right: 4 };
 const HEADER_HEIGHT = 64;
 
 const BORDER_COLOR = "#E4EAF0";
@@ -427,18 +429,22 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
               </View>
               <View style={styles.cellActions}>
                 <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Edit period"
                   style={[styles.cellActionBtn, { borderColor: palette.accent + "44" }]}
-                  hitSlop={6}
+                  hitSlop={CELL_ACTION_SLOP}
                   onPress={() => handleCellPress(classId, periodNumber)}
                 >
-                  <Ionicons name="pencil-outline" size={10} color={palette.text} />
+                  <Ionicons name="pencil-outline" size={14} color={palette.text} />
                 </Pressable>
                 <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Delete period"
                   style={[styles.cellActionBtn, { borderColor: "#EF444444" }]}
-                  hitSlop={6}
+                  hitSlop={CELL_ACTION_SLOP}
                   onPress={() => setDeleteTarget(entry)}
                 >
-                  <Ionicons name="trash-outline" size={10} color={AppTheme.colors.error} />
+                  <Ionicons name="trash-outline" size={14} color={AppTheme.colors.error} />
                 </Pressable>
               </View>
             </View>
@@ -495,18 +501,22 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
                 </View>
                 <View style={styles.cellActions}>
                   <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Edit period"
                     style={[styles.cellActionBtn, { borderColor: palette.accent + "44" }]}
-                    hitSlop={10}
+                    hitSlop={CELL_ACTION_SLOP}
                     onPress={() => handleCellPress(classId, periodNumber)}
                   >
-                    <Ionicons name="pencil-outline" size={12} color={palette.text} />
+                    <Ionicons name="pencil-outline" size={14} color={palette.text} />
                   </Pressable>
                   <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Delete period"
                     style={[styles.cellActionBtn, { borderColor: "#EF444444" }]}
-                    hitSlop={10}
+                    hitSlop={CELL_ACTION_SLOP}
                     onPress={() => setDeleteTarget(entry)}
                   >
-                    <Ionicons name="trash-outline" size={12} color={AppTheme.colors.error} />
+                    <Ionicons name="trash-outline" size={14} color={AppTheme.colors.error} />
                   </Pressable>
                 </View>
               </View>
@@ -571,6 +581,7 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
                   {/* Add Period */}
                   {!loading && classes.length > 0 && (
                     <Pressable
+                      accessibilityRole="button"
                       style={({ pressed }) => [styles.heroAddBtn, pressed && { opacity: 0.85 }]}
                       onPress={handleOpenAdd}
                     >
@@ -581,6 +592,7 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
 
                   {/* Period Setup */}
                   <Pressable
+                    accessibilityRole="button"
                     style={({ pressed }) => [styles.heroGlassBtn, pressed && { opacity: 0.8 }]}
                     onPress={() => setShowPeriodSetup(true)}
                   >
@@ -596,6 +608,7 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
 
                   {/* Import */}
                   <Pressable
+                    accessibilityRole="button"
                     style={({ pressed }) => [styles.heroGlassBtn, pressed && { opacity: 0.8 }]}
                     onPress={() => setShowImportModal(true)}
                   >
@@ -1003,7 +1016,7 @@ const styles = StyleSheet.create({
   heroAddText: {
     fontSize: 12,
     fontWeight: "700",
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
   },
   heroGlassBtn: {
     flexDirection: "row",
@@ -1187,7 +1200,7 @@ const styles = StyleSheet.create({
   gradeBadgeText: {
     fontSize: 10,
     fontWeight: "800",
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
     textAlign: "center",
   },
 
@@ -1202,7 +1215,7 @@ const styles = StyleSheet.create({
   sectionCellText: {
     fontSize: 14,
     fontWeight: "800",
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
   },
 
   cell: {
@@ -1253,14 +1266,14 @@ const styles = StyleSheet.create({
   cellSubject: { fontSize: 12, fontWeight: "700", lineHeight: 16 },
   cellTeacherRow: { flexDirection: "row", alignItems: "center", gap: 3, marginTop: 2 },
   cellTeacher: { fontSize: 10, color: AppTheme.colors.textSecondary, flex: 1 },
-  cellActions: { flexDirection: "row", gap: 6, marginTop: 4 },
+  cellActions: { flexDirection: "row", gap: 8, marginTop: 4 },
   cellActionBtn: {
-    padding: 4,
+    padding: 6,
     borderRadius: 6,
     backgroundColor: "rgba(255,255,255,0.8)",
     borderWidth: 1,
   },
-  cellEmpty: { fontSize: 14, color: "#C5CDD6" },
+  cellEmpty: { fontSize: 14, color: AppTheme.colors.hint },
 
   emptyCellInner: { flex: 1, justifyContent: "center", alignItems: "center" },
   emptyAddIcon: {
@@ -1326,7 +1339,7 @@ const styles = StyleSheet.create({
   mobileClassTitle: {
     fontSize: 15,
     fontWeight: "700",
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
   },
   mobileClassPeriods: {
     paddingVertical: 12,
@@ -1354,7 +1367,7 @@ const styles = StyleSheet.create({
   mobilePeriodLabel: {
     fontSize: 12,
     fontWeight: "800",
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
   },
   mobilePeriodTime: {
     fontSize: 10,

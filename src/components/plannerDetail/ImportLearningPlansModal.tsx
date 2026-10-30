@@ -160,7 +160,7 @@ export function ImportLearningPlansModal({
             <View style={styles.sheet}>
               <View style={styles.headerRow}>
                 <Text style={styles.title}>Bulk Import Lecture Planner</Text>
-                <Pressable onPress={handleClose} hitSlop={12}>
+                <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={handleClose} hitSlop={12}>
                   <Ionicons name="close" size={24} color={AppTheme.colors.textSecondary} />
                 </Pressable>
               </View>
@@ -168,6 +168,7 @@ export function ImportLearningPlansModal({
               {/* Mode Toggle Tabs */}
               <View style={styles.modeToggleRow}>
                 <Pressable
+                  accessibilityRole="button"
                   onPress={() => handleSwitchMode("excel")}
                   style={[
                     styles.modeTab,
@@ -190,6 +191,7 @@ export function ImportLearningPlansModal({
                 </Pressable>
 
                 <Pressable
+                  accessibilityRole="button"
                   onPress={() => handleSwitchMode("photo")}
                   style={[
                     styles.modeTab,
@@ -229,6 +231,7 @@ export function ImportLearningPlansModal({
                     </Text>
 
                     <Pressable
+                      accessibilityRole="button"
                       onPress={() => Linking.openURL(getSubjectLearningPlanTemplateUrl())}
                       style={styles.templateLink}
                     >
@@ -250,7 +253,7 @@ export function ImportLearningPlansModal({
                   </View>
                 )}
 
-                <Pressable style={styles.pickButton} onPress={handlePick}>
+                <Pressable accessibilityRole="button" style={styles.pickButton} onPress={handlePick}>
                   <Ionicons
                     name={
                       pickedName
@@ -279,6 +282,7 @@ export function ImportLearningPlansModal({
                 ) : null}
 
                 <Pressable
+                  accessibilityRole="button"
                   style={[styles.submitButton, (!pickedUri || uploading) && styles.submitDisabled]}
                   onPress={handleImport}
                   disabled={!pickedUri || uploading}
@@ -364,7 +368,7 @@ const styles = StyleSheet.create({
   },
   modeTabTextActive: {
     fontWeight: "700",
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
   },
   helpText: {
     fontSize: 13,
@@ -383,7 +387,7 @@ const styles = StyleSheet.create({
   aiPhotoInfoTitle: {
     fontSize: 14,
     fontWeight: "700",
-    color: AppTheme.colors.info,
+    color: AppTheme.colors.infoStrong,
   },
   aiPhotoInfoBody: {
     fontSize: 13,
@@ -399,7 +403,7 @@ const styles = StyleSheet.create({
   templateLinkText: {
     fontSize: 13,
     fontWeight: "700",
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
   },
   pickButton: {
     flexDirection: "row",

@@ -26,7 +26,7 @@ export function TeacherAssignmentRow({ row, onPress }: Props) {
   })();
 
   return (
-    <Pressable style={styles.card} onPress={onPress}>
+    <Pressable accessibilityRole="button" style={styles.card} onPress={onPress}>
       <View style={styles.headerRow}>
         <View style={styles.titleWrap}>
           <Text style={styles.subjectTitle} numberOfLines={1}>

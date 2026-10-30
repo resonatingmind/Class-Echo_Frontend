@@ -215,6 +215,7 @@ export function AdminOperationsScreen() {
       <View style={styles.segmentRow}>
         {(["email", "recordings", "feedback", "audit"] as Section[]).map((key) => (
           <Pressable
+            accessibilityRole="button"
             key={key}
             onPress={() => setSection(key)}
             style={[styles.segment, section === key && styles.segmentActive]}
@@ -259,7 +260,7 @@ export function AdminOperationsScreen() {
               size={36}
             />
             <Text style={styles.errorText}>{error}</Text>
-            <Pressable onPress={() => void load()} style={styles.retryBtn}>
+            <Pressable accessibilityRole="button" onPress={() => void load()} style={styles.retryBtn}>
               <Text style={styles.retryBtnText}>Try again</Text>
             </Pressable>
           </View>
@@ -300,6 +301,7 @@ export function AdminOperationsScreen() {
               {([null, "failed", "queued", "sent"] as (EmailLogStatus | null)[]).map(
                 (value) => (
                   <Pressable
+                    accessibilityRole="button"
                     key={value ?? "all"}
                     onPress={() => setStatusFilter(value)}
                     style={[
@@ -343,6 +345,7 @@ export function AdminOperationsScreen() {
                   ) : null}
                   {entry.can_resend && entry.status !== "sent" ? (
                     <Pressable
+                      accessibilityRole="button"
                       disabled={busyId === entry.id}
                       onPress={() => void handleResend(entry)}
                       style={styles.rowAction}
@@ -449,6 +452,7 @@ export function AdminOperationsScreen() {
                 <Text style={styles.rowError}>{rec.error_reason}</Text>
               ) : null}
               <Pressable
+                accessibilityRole="button"
                 disabled={busyId === rec.id}
                 onPress={() => void handleRetry(rec)}
                 style={styles.rowAction}
@@ -569,7 +573,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: AppTheme.colors.primaryLight,
   },
-  rowActionText: { fontSize: 12, fontWeight: "700", color: AppTheme.colors.primary },
+  rowActionText: { fontSize: 12, fontWeight: "700", color: AppTheme.colors.primaryText },
   auditDetail: {
     fontSize: 12,
     color: AppTheme.colors.textPrimary,

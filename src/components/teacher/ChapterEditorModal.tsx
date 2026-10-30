@@ -81,6 +81,7 @@ export function ChapterEditorModal({
 
           <View style={styles.actions}>
             <Pressable
+              accessibilityRole="button"
               disabled={loading}
               style={styles.cancelButton}
               onPress={onClose}
@@ -89,6 +90,7 @@ export function ChapterEditorModal({
             </Pressable>
 
             <Pressable
+              accessibilityRole="button"
               disabled={loading || !name.trim()}
               style={[
                 styles.saveButton,

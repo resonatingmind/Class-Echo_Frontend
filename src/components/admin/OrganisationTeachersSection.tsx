@@ -233,7 +233,7 @@ export function OrganisationTeachersSection({
                 (pendingCount > 0 ? ` · ${pendingCount} awaiting acceptance` : '')}
           </Text>
         </View>
-        <Pressable onPress={openInvite} style={styles.inviteBtn}>
+        <Pressable accessibilityRole="button" onPress={openInvite} style={styles.inviteBtn}>
           <Ionicons color={AppTheme.colors.white} name="mail-outline" size={16} />
           <Text style={styles.inviteBtnText}>Invite teachers</Text>
         </Pressable>
@@ -248,6 +248,7 @@ export function OrganisationTeachersSection({
             {school.admin.name} has not accepted their school admin invitation yet.
           </Text>
           <Pressable
+            accessibilityRole="button"
             disabled={adminBusy}
             onPress={() => void handleResendAdmin()}
             style={[styles.linkBtn, adminBusy && styles.disabled]}
@@ -261,7 +262,7 @@ export function OrganisationTeachersSection({
         <View style={styles.noticeCard}>
           <Ionicons color={AppTheme.colors.successText} name="checkmark-circle-outline" size={16} />
           <Text style={styles.noticeText}>{notice}</Text>
-          <Pressable hitSlop={8} onPress={() => setNotice(null)}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Close" hitSlop={8} onPress={() => setNotice(null)}>
             <Ionicons color={AppTheme.colors.textSecondary} name="close" size={16} />
           </Pressable>
         </View>
@@ -317,6 +318,7 @@ export function OrganisationTeachersSection({
                     {teacher.status === 'invited' ? (
                       <>
                         <Pressable
+                          accessibilityRole="button"
                           hitSlop={6}
                           onPress={() => void handleResendTeacher(teacher)}
                           style={styles.linkBtn}
@@ -324,6 +326,7 @@ export function OrganisationTeachersSection({
                           <Text style={styles.linkBtnText}>Resend</Text>
                         </Pressable>
                         <Pressable
+                          accessibilityRole="button"
                           hitSlop={6}
                           onPress={() => void handleRevoke(teacher)}
                           style={styles.linkBtn}
@@ -337,6 +340,7 @@ export function OrganisationTeachersSection({
                         instead, which activates them in the same step. */}
                     {teacher.status !== 'active' && teacher.status !== 'invited' ? (
                       <Pressable
+                        accessibilityRole="button"
                         hitSlop={6}
                         onPress={() => void handleActivate(teacher)}
                         style={styles.linkBtn}
@@ -345,6 +349,7 @@ export function OrganisationTeachersSection({
                       </Pressable>
                     ) : null}
                     <Pressable
+                      accessibilityRole="button"
                       hitSlop={6}
                       onPress={() => {
                         setPasswordError(null);
@@ -380,7 +385,7 @@ export function OrganisationTeachersSection({
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Invite teachers</Text>
-              <Pressable hitSlop={8} onPress={() => setShowInvite(false)}>
+              <Pressable accessibilityRole="button" accessibilityLabel="Close" hitSlop={8} onPress={() => setShowInvite(false)}>
                 <Ionicons color={AppTheme.colors.textSecondary} name="close" size={20} />
               </Pressable>
             </View>
@@ -396,7 +401,7 @@ export function OrganisationTeachersSection({
                       autoCapitalize="words"
                       onChangeText={(v) => updateDraft(draft.key, { name: v })}
                       placeholder="Full name"
-                      placeholderTextColor={AppTheme.colors.textPlaceholder}
+                      placeholderTextColor={AppTheme.colors.hint}
                       style={styles.input}
                       value={draft.name}
                     />
@@ -405,7 +410,7 @@ export function OrganisationTeachersSection({
                       keyboardType="email-address"
                       onChangeText={(v) => updateDraft(draft.key, { email: v })}
                       placeholder="teacher@school.edu"
-                      placeholderTextColor={AppTheme.colors.textPlaceholder}
+                      placeholderTextColor={AppTheme.colors.hint}
                       style={styles.input}
                       textContentType="emailAddress"
                       value={draft.email}
@@ -427,7 +432,7 @@ export function OrganisationTeachersSection({
                 </View>
               ))}
 
-              <Pressable onPress={addDraft} style={styles.addBtn}>
+              <Pressable accessibilityRole="button" onPress={addDraft} style={styles.addBtn}>
                 <Ionicons color={AppTheme.colors.primary} name="add" size={18} />
                 <Text style={styles.addBtnText}>Add another</Text>
               </Pressable>
@@ -467,12 +472,13 @@ export function OrganisationTeachersSection({
             </ScrollView>
 
             <View style={styles.modalActions}>
-              <Pressable onPress={() => setShowInvite(false)} style={styles.secondaryBtn}>
+              <Pressable accessibilityRole="button" onPress={() => setShowInvite(false)} style={styles.secondaryBtn}>
                 <Text style={styles.secondaryBtnText}>
                   {inviteResults ? 'Done' : 'Cancel'}
                 </Text>
               </Pressable>
               <Pressable
+                accessibilityRole="button"
                 disabled={!draftsValid || inviting}
                 onPress={() => void handleInvite()}
                 style={[styles.primaryBtn, (!draftsValid || inviting) && styles.disabled]}
@@ -584,7 +590,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: AppTheme.colors.infoSoft,
   },
-  avatarText: { color: AppTheme.colors.primary, ...AppTheme.typography.caption, fontWeight: '700' },
+  avatarText: { color: AppTheme.colors.primaryText, ...AppTheme.typography.caption, fontWeight: '700' },
   rowInfo: { flex: 1, minWidth: 0, gap: 2 },
   rowName: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.label },
   rowEmail: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.caption },
@@ -596,7 +602,7 @@ const styles = StyleSheet.create({
   },
   pillText: { ...AppTheme.typography.caption, fontWeight: '700' },
   linkBtn: { paddingVertical: 2 },
-  linkBtnText: { color: AppTheme.colors.primary, ...AppTheme.typography.caption, fontWeight: '700' },
+  linkBtnText: { color: AppTheme.colors.primaryText, ...AppTheme.typography.caption, fontWeight: '700' },
   destructive: { color: AppTheme.colors.dangerText },
   disabled: { opacity: 0.45 },
   modalBackdrop: {
@@ -651,7 +657,7 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
     borderColor: AppTheme.colors.border,
   },
-  addBtnText: { color: AppTheme.colors.primary, ...AppTheme.typography.body, fontWeight: '700' },
+  addBtnText: { color: AppTheme.colors.primaryText, ...AppTheme.typography.body, fontWeight: '700' },
   resultsBox: { marginTop: AppTheme.spacing.m, gap: AppTheme.spacing.s },
   resultRow: { flexDirection: 'row', alignItems: 'flex-start', gap: AppTheme.spacing.s },
   resultText: { flex: 1, color: AppTheme.colors.textSecondary, ...AppTheme.typography.caption },

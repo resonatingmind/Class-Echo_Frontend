@@ -68,7 +68,7 @@ export function AuthInput({
           onChangeText={onChangeText}
           onSubmitEditing={onSubmitEditing}
           placeholder={placeholder}
-          placeholderTextColor={AppTheme.colors.textPlaceholder}
+          placeholderTextColor={AppTheme.colors.hint}
           returnKeyType={returnKeyType}
           secureTextEntry={shouldMask}
           style={styles.input}
@@ -77,6 +77,8 @@ export function AuthInput({
         />
         {showEye ? (
           <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
             hitSlop={10}
             onPress={() => setShowPassword((current) => !current)}
           >
@@ -115,7 +117,7 @@ const styles = StyleSheet.create({
     textTransform: 'none',
   },
   link: {
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
     fontSize: 12,
     fontWeight: '600',
   },

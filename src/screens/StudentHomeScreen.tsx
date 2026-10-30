@@ -110,6 +110,7 @@ export function StudentHomeScreen({ navigation }: Props) {
             const accent = ACCENT_COLORS[index % ACCENT_COLORS.length];
             return (
               <Pressable
+                accessibilityRole="button"
                 onPress={() =>
                   navigation.navigate('StudentSubjectDetail', {
                     subjectId: item.id,
@@ -184,7 +185,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { fontSize: 14, fontWeight: '800', color: AppTheme.colors.primaryDark },
+  avatarText: { fontSize: 14, fontWeight: '800', color: AppTheme.colors.primaryText },
 
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, padding: 40 },
   errorTitle: { fontSize: 18, fontWeight: '800', color: AppTheme.colors.textPrimary },

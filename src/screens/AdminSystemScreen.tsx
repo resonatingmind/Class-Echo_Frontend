@@ -108,6 +108,7 @@ export function AdminSystemScreen() {
       <View style={styles.segmentRow}>
         {(["health", "settings"] as Section[]).map((key) => (
           <Pressable
+            accessibilityRole="button"
             key={key}
             onPress={() => setSection(key)}
             style={[styles.segment, section === key && styles.segmentActive]}
@@ -153,7 +154,7 @@ export function AdminSystemScreen() {
               size={36}
             />
             <Text style={styles.errorText}>{error}</Text>
-            <Pressable onPress={() => void load()} style={styles.primaryBtn}>
+            <Pressable accessibilityRole="button" onPress={() => void load()} style={styles.primaryBtn}>
               <Text style={styles.primaryBtnText}>Try again</Text>
             </Pressable>
           </View>
@@ -219,11 +220,12 @@ export function AdminSystemScreen() {
                   keyboardType="email-address"
                   onChangeText={setTestEmail}
                   placeholder="you@example.com"
-                  placeholderTextColor={AppTheme.colors.textPlaceholder}
+                  placeholderTextColor={AppTheme.colors.hint}
                   style={styles.input}
                   value={testEmail}
                 />
                 <Pressable
+                  accessibilityRole="button"
                   disabled={testing || !testEmail.trim()}
                   onPress={() => void handleTest()}
                   style={[

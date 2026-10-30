@@ -300,7 +300,7 @@ export function TeacherRecordingsScreen() {
             </View>
 
             <View style={[styles.heroActions, isMobile && styles.heroActionsMobile]}>
-              <Pressable style={styles.heroGlassBtn} onPress={() => load(true)}>
+              <Pressable accessibilityRole="button" style={styles.heroGlassBtn} onPress={() => load(true)}>
                 <Ionicons name="refresh-outline" size={13} color="rgba(255,255,255,0.9)" />
                 <Text style={styles.heroGlassBtnText}>Refresh</Text>
               </Pressable>
@@ -329,18 +329,18 @@ export function TeacherRecordingsScreen() {
             <TextInput
               style={styles.searchInput}
               placeholder="Search lectures, chapters, subjects…"
-              placeholderTextColor={AppTheme.colors.textPlaceholder}
+              placeholderTextColor={AppTheme.colors.hint}
               value={search}
               onChangeText={setSearch}
               returnKeyType="search"
             />
             {search.length > 0 && (
-              <Pressable onPress={() => setSearch("")} hitSlop={8}>
+              <Pressable accessibilityRole="button" accessibilityLabel="Clear search" onPress={() => setSearch("")} hitSlop={8}>
                 <Ionicons name="close-circle" size={18} color={AppTheme.colors.hint} />
               </Pressable>
             )}
           </View>
-          <Pressable style={styles.filterBtn} onPress={openFilter}>
+          <Pressable accessibilityRole="button" style={styles.filterBtn} onPress={openFilter}>
             <Ionicons name="options-outline" size={18} color={AppTheme.colors.primary} />
             {activeFilterCount > 0 && (
               <View style={styles.filterBadge}>
@@ -358,7 +358,7 @@ export function TeacherRecordingsScreen() {
             {classFilter !== "All"   && <View style={styles.chip}><Text style={styles.chipText}>{classFilter}</Text></View>}
             {dateFilter !== "Any time" && <View style={styles.chip}><Text style={styles.chipText}>{dateFilter}</Text></View>}
             {sortBy !== "Newest"     && <View style={styles.chip}><Text style={styles.chipText}>{sortBy}</Text></View>}
-            <Pressable onPress={clearAll} style={styles.chipClear}>
+            <Pressable accessibilityRole="button" onPress={clearAll} style={styles.chipClear}>
               <Text style={styles.chipClearText}>Clear all</Text>
             </Pressable>
           </View>
@@ -382,7 +382,7 @@ export function TeacherRecordingsScreen() {
             <Ionicons name="cloud-offline-outline" size={44} color={AppTheme.colors.hint} />
             <Text style={styles.emptyTitle}>Could not load recordings</Text>
             <Text style={styles.emptyBody}>{error}</Text>
-            <Pressable style={styles.retryBtn} onPress={() => void load()}>
+            <Pressable accessibilityRole="button" style={styles.retryBtn} onPress={() => void load()}>
               <Text style={styles.retryText}>Retry</Text>
             </Pressable>
           </View>
@@ -398,7 +398,7 @@ export function TeacherRecordingsScreen() {
                 : "Try adjusting your search or filters."}
             </Text>
             {activeFilterCount > 0 && (
-              <Pressable style={styles.retryBtn} onPress={clearAll}>
+              <Pressable accessibilityRole="button" style={styles.retryBtn} onPress={clearAll}>
                 <Text style={styles.retryText}>Clear Filters</Text>
               </Pressable>
             )}
@@ -412,6 +412,7 @@ export function TeacherRecordingsScreen() {
 
               return (
                 <Pressable
+                  accessibilityRole="button"
                   key={rec.id}
                   style={({ pressed }) => [styles.card, pressed && { opacity: 0.88 }]}
                   onPress={() => navigation.navigate("RecordingDetail", { recording: rec, subjectName: rec.subject_name })}
@@ -470,7 +471,7 @@ export function TeacherRecordingsScreen() {
             <ScrollView showsVerticalScrollIndicator={false}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>Filters & Sort</Text>
-                <Pressable onPress={() => setFilterVisible(false)} hitSlop={8}>
+                <Pressable accessibilityRole="button" accessibilityLabel="Close filters" onPress={() => setFilterVisible(false)} hitSlop={8}>
                   <Ionicons name="close" size={24} color={AppTheme.colors.textPrimary} />
                 </Pressable>
               </View>
@@ -478,7 +479,7 @@ export function TeacherRecordingsScreen() {
               {/* Status */}
               <Text style={styles.modalSection}>Status</Text>
               {STATUS_FILTER_OPTIONS.map((s) => (
-                <Pressable key={s} style={styles.option} onPress={() => setTempStatus(s)}>
+                <Pressable accessibilityRole="button" key={s} style={styles.option} onPress={() => setTempStatus(s)}>
                   <Ionicons
                     name={tempStatus === s ? "radio-button-on" : "radio-button-off"}
                     size={20}
@@ -493,7 +494,7 @@ export function TeacherRecordingsScreen() {
                 <>
                   <Text style={styles.modalSection}>Subject</Text>
                   {subjectOptions.map((s) => (
-                    <Pressable key={s} style={styles.option} onPress={() => setTempSubject(s)}>
+                    <Pressable accessibilityRole="button" key={s} style={styles.option} onPress={() => setTempSubject(s)}>
                       <Ionicons
                         name={tempSubject === s ? "radio-button-on" : "radio-button-off"}
                         size={20}
@@ -510,7 +511,7 @@ export function TeacherRecordingsScreen() {
                 <>
                   <Text style={styles.modalSection}>Class</Text>
                   {classOptions.map((c) => (
-                    <Pressable key={c} style={styles.option} onPress={() => setTempClass(c)}>
+                    <Pressable accessibilityRole="button" key={c} style={styles.option} onPress={() => setTempClass(c)}>
                       <Ionicons
                         name={tempClass === c ? "radio-button-on" : "radio-button-off"}
                         size={20}
@@ -525,7 +526,7 @@ export function TeacherRecordingsScreen() {
               {/* Date */}
               <Text style={styles.modalSection}>Date</Text>
               {DATE_OPTIONS.map((d) => (
-                <Pressable key={d} style={styles.option} onPress={() => setTempDate(d)}>
+                <Pressable accessibilityRole="button" key={d} style={styles.option} onPress={() => setTempDate(d)}>
                   <Ionicons
                     name={tempDate === d ? "radio-button-on" : "radio-button-off"}
                     size={20}
@@ -538,7 +539,7 @@ export function TeacherRecordingsScreen() {
               {/* Sort */}
               <Text style={styles.modalSection}>Sort by</Text>
               {SORT_OPTIONS.map((s) => (
-                <Pressable key={s} style={styles.option} onPress={() => setTempSort(s)}>
+                <Pressable accessibilityRole="button" key={s} style={styles.option} onPress={() => setTempSort(s)}>
                   <Ionicons
                     name={tempSort === s ? "radio-button-on" : "radio-button-off"}
                     size={20}
@@ -551,6 +552,7 @@ export function TeacherRecordingsScreen() {
               {/* Buttons */}
               <View style={styles.modalActions}>
                 <Pressable
+                  accessibilityRole="button"
                   style={styles.resetBtn}
                   onPress={() => {
                     setTempStatus("All"); setTempSubject("All"); setTempClass("All");
@@ -559,7 +561,7 @@ export function TeacherRecordingsScreen() {
                 >
                   <Text style={styles.resetText}>Reset</Text>
                 </Pressable>
-                <Pressable style={styles.applyBtn} onPress={applyFilter}>
+                <Pressable accessibilityRole="button" style={styles.applyBtn} onPress={applyFilter}>
                   <Text style={styles.applyText}>Apply</Text>
                 </Pressable>
               </View>
@@ -749,7 +751,7 @@ const styles = StyleSheet.create({
   chipText: {
     fontSize: 12,
     fontWeight: "700",
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
   },
   chipClear: {
     paddingHorizontal: AppTheme.spacing.s,
@@ -758,7 +760,7 @@ const styles = StyleSheet.create({
   chipClearText: {
     fontSize: 12,
     fontWeight: "700",
-    color: AppTheme.colors.error,
+    color: AppTheme.colors.dangerText,
   },
 
   resultCount: {
@@ -802,7 +804,7 @@ const styles = StyleSheet.create({
   },
   cardSub: {
     fontSize: 12,
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     fontWeight: "600",
   },
   cardHighlight: { fontSize: 13, color: AppTheme.colors.textPrimary, marginTop: 6 },
@@ -852,7 +854,7 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.large,
     backgroundColor: AppTheme.colors.primaryLight,
   },
-  retryText: { fontSize: 14, fontWeight: "700", color: AppTheme.colors.primaryDark },
+  retryText: { fontSize: 14, fontWeight: "700", color: AppTheme.colors.primaryText },
 
   // ── Filter modal ──
   modalOverlay: {

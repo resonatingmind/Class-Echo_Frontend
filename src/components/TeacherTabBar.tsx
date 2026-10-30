@@ -29,6 +29,8 @@ export function TeacherTabBar({ active, onTabPress }: Props) {
         return (
           <Pressable
             key={tab.key}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: isActive }}
             onPress={() => onTabPress(tab.key)}
             style={styles.tab}
           >
@@ -67,7 +69,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   labelActive: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
   },
 });
 

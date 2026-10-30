@@ -42,7 +42,7 @@ function SubjectCard({
   const color = SUBJECT_COLORS[colorIdx % SUBJECT_COLORS.length];
 
   return (
-    <Pressable onPress={onPress} style={styles.subjectCard}>
+    <Pressable accessibilityRole="button" onPress={onPress} style={styles.subjectCard}>
       <View style={styles.subjectCardTop}>
         <View style={[styles.subjectIcon, { backgroundColor: color.bg }]}>
           <Text style={[styles.subjectIconText, { color: color.text }]}>
@@ -112,7 +112,7 @@ export function AdminClassDetailScreen({ navigation, route }: Props) {
         </View>
         <Text style={styles.headerTitle}>Super Admin</Text>
         <View style={styles.headerRight}>
-          <Pressable onPress={signOut} style={styles.iconBtn}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Sign out" hitSlop={8} onPress={signOut} style={styles.iconBtn}>
             <Ionicons color={AppTheme.colors.textPrimary} name="log-out-outline" size={24} />
           </Pressable>
         </View>
@@ -135,7 +135,7 @@ export function AdminClassDetailScreen({ navigation, route }: Props) {
         >
           <View style={styles.centerContainer}>
             <View style={styles.body}>
-              <Pressable onPress={() => navigation.goBack()} style={styles.backBtnRow}>
+              <Pressable accessibilityRole="button" onPress={() => navigation.goBack()} style={styles.backBtnRow}>
                 <Ionicons name="arrow-back" size={20} color={AppTheme.colors.textSecondary} />
                 <Text style={styles.backBtnText}>Back</Text>
               </Pressable>

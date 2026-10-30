@@ -82,6 +82,6 @@ const styles = StyleSheet.create({
   },
   segmentActive: { borderColor: AppTheme.colors.primary, backgroundColor: AppTheme.colors.primaryLight },
   segmentText: { fontSize: 14, fontWeight: "700", color: AppTheme.colors.textSecondary },
-  segmentTextActive: { color: AppTheme.colors.primaryDark },
+  segmentTextActive: { color: AppTheme.colors.primaryText },
   body: { flex: 1 },
 });

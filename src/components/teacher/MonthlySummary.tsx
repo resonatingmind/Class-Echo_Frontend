@@ -103,5 +103,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: AppTheme.colors.primary,
   },
-  text: { fontSize: 14, fontWeight: '700', color: AppTheme.colors.primaryDark },
+  text: { fontSize: 14, fontWeight: '700', color: AppTheme.colors.primaryText },
 });

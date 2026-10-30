@@ -62,6 +62,8 @@ export function SegmentedSelector<T extends string>({
         return (
           <Pressable
             key={opt.value}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: isActive }}
             onPress={() => onChange(opt.value)}
             style={styles.segment}
           >
@@ -109,7 +111,7 @@ const styles = StyleSheet.create({
     ...AppTheme.typography.label,
   },
   activeSegmentText: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
   },
 });
 

@@ -146,7 +146,7 @@ export function AcceptInviteScreen({ navigation, route }: Props) {
                 invitation email, or ask your administrator to resend it.
               </Text>
             </View>
-            <Pressable onPress={goToSignIn}>
+            <Pressable accessibilityRole="button" onPress={goToSignIn}>
               <Text style={styles.link}>Back to sign in</Text>
             </Pressable>
           </View>
@@ -226,7 +226,7 @@ export function AcceptInviteScreen({ navigation, route }: Props) {
                 expired, ask your administrator to send a new one.
               </Text>
 
-              <Pressable onPress={goToSignIn}>
+              <Pressable accessibilityRole="button" onPress={goToSignIn}>
                 <Text style={styles.link}>Already activated? Sign in</Text>
               </Pressable>
             </View>
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
     gap: AppTheme.spacing.s,
   },
   errorText: {
-    color: AppTheme.colors.error,
+    color: AppTheme.colors.dangerText,
     ...AppTheme.typography.body,
     flex: 1,
   },
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   link: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.button,
     textAlign: "center",
   },

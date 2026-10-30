@@ -19,6 +19,7 @@ export function SelectDropdown({ label, placeholder = "Select...", options, valu
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
       <Pressable 
+        accessibilityRole="button"
         style={[styles.inputButton, error && styles.inputError]} 
         onPress={() => setIsOpen(true)}
       >
@@ -42,6 +43,7 @@ export function SelectDropdown({ label, placeholder = "Select...", options, valu
               keyExtractor={(item) => item}
               renderItem={({ item }) => (
                 <Pressable
+                  accessibilityRole="button"
                   style={styles.item}
                   onPress={() => {
                     onChange(item);
@@ -92,7 +94,7 @@ const styles = StyleSheet.create({
     ...AppTheme.typography.body,
   },
   placeholderText: {
-    color: AppTheme.colors.textPlaceholder,
+    color: AppTheme.colors.hint,
   },
   errorText: {
     color: AppTheme.colors.dangerText,
@@ -126,7 +128,7 @@ const styles = StyleSheet.create({
     ...AppTheme.typography.body,
   },
   itemSelected: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     fontWeight: "600",
   },
 });

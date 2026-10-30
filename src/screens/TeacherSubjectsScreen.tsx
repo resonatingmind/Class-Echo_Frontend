@@ -282,7 +282,7 @@ export function TeacherSubjectsScreen({ navigation, embedded = false }: Props) {
             />
             <Text style={styles.emptyTitle}>Could not load subjects</Text>
             <Text style={styles.emptyBody}>{error}</Text>
-            <Pressable onPress={() => void load()} style={styles.retryBtn}>
+            <Pressable accessibilityRole="button" onPress={() => void load()} style={styles.retryBtn}>
               <Text style={styles.retryText}>Retry</Text>
             </Pressable>
           </View>
@@ -330,6 +330,7 @@ export function TeacherSubjectsScreen({ navigation, embedded = false }: Props) {
                 </Text>
 
                 <Pressable
+                  accessibilityRole="button"
                   style={styles.retryBtn}
                   onPress={() => {
                     setSearch("");
@@ -480,7 +481,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
   },
-  retryText: { color: AppTheme.colors.primaryDark, fontWeight: "700", fontSize: 14 },
+  retryText: { color: AppTheme.colors.primaryText, fontWeight: "700", fontSize: 14 },
   list: { gap: 24 },
   classGroup: { gap: 14 },
   classGroupHeader: {

@@ -157,7 +157,7 @@ export function SchoolAdminProfileScreen({ navigation }: Props) {
       {/* Header with Back Button */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Pressable onPress={() => navigation.goBack()} style={styles.iconBtn}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Go back" hitSlop={8} onPress={() => navigation.goBack()} style={styles.iconBtn}>
             <Ionicons color={AppTheme.colors.textPrimary} name="arrow-back" size={24} />
           </Pressable>
         </View>
@@ -194,6 +194,7 @@ export function SchoolAdminProfileScreen({ navigation }: Props) {
                   style={styles.hero}
                 >
                   <Pressable
+                    accessibilityRole="button"
                     onPress={() => void handleAvatarUpload()}
                     style={styles.avatarWrap}
                   >
@@ -223,6 +224,7 @@ export function SchoolAdminProfileScreen({ navigation }: Props) {
                     <Text style={styles.cardTitle}>Admin Details</Text>
                     {editing ? (
                       <Pressable
+                        accessibilityRole="button"
                         onPress={() => {
                           setEditing(false);
                           setDraftName(profile?.name ?? "");
@@ -233,7 +235,7 @@ export function SchoolAdminProfileScreen({ navigation }: Props) {
                         <Text style={styles.linkText}>Cancel</Text>
                       </Pressable>
                     ) : (
-                      <Pressable onPress={() => setEditing(true)}>
+                      <Pressable accessibilityRole="button" onPress={() => setEditing(true)}>
                         <Text style={styles.linkText}>Edit</Text>
                       </Pressable>
                     )}
@@ -262,7 +264,7 @@ export function SchoolAdminProfileScreen({ navigation }: Props) {
                 <View style={styles.card}>
                   <View style={styles.cardHeader}>
                     <Text style={styles.cardTitle}>School</Text>
-                    <Pressable onPress={() => void handleLogoUpload()}>
+                    <Pressable accessibilityRole="button" onPress={() => void handleLogoUpload()}>
                       <Text style={styles.linkText}>
                         {logoUploading ? "Uploading…" : "Upload Logo"}
                       </Text>
@@ -329,6 +331,7 @@ export function SchoolAdminProfileScreen({ navigation }: Props) {
 
                   {editing ? (
                     <Pressable
+                      accessibilityRole="button"
                       disabled={
                         saving || !draftName.trim() || !draftSchoolName.trim()
                       }
@@ -357,7 +360,7 @@ export function SchoolAdminProfileScreen({ navigation }: Props) {
                   />
                 ) : null}
 
-                <Pressable onPress={signOut} style={styles.signOutButton}>
+                <Pressable accessibilityRole="button" onPress={signOut} style={styles.signOutButton}>
                   <Ionicons color={AppTheme.colors.error} name="log-out-outline" size={20} />
                   <Text style={styles.signOutText}>Sign Out</Text>
                 </Pressable>
@@ -465,7 +468,7 @@ const styles = StyleSheet.create({
   },
   avatarFallbackText: {
     ...AppTheme.typography.display,
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
   },
   cameraBadge: {
     position: "absolute",
@@ -486,7 +489,7 @@ const styles = StyleSheet.create({
     paddingVertical: AppTheme.spacing.xs,
     borderRadius: AppTheme.radius.pill,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.caption,
     fontWeight: "800",
     overflow: "hidden",
@@ -509,7 +512,7 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.heading3,
   },
-  linkText: { color: AppTheme.colors.primary, ...AppTheme.typography.button, fontSize: 14 },
+  linkText: { color: AppTheme.colors.primaryText, ...AppTheme.typography.button, fontSize: 14 },
   label: {
     ...AppTheme.typography.caption,
     letterSpacing: 1.2,

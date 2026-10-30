@@ -113,7 +113,7 @@ export function SetPasswordModal({
         <View style={styles.card}>
           <View style={styles.header}>
             <Text style={styles.title}>Set password</Text>
-            <Pressable hitSlop={8} onPress={onClose}>
+            <Pressable accessibilityRole="button" accessibilityLabel="Close" hitSlop={8} onPress={onClose}>
               <Ionicons color={AppTheme.colors.textSecondary} name="close" size={20} />
             </Pressable>
           </View>
@@ -126,7 +126,7 @@ export function SetPasswordModal({
           <ScrollView style={styles.scroll}>
             <View style={styles.labelRow}>
               <Text style={styles.label}>New password</Text>
-              <Pressable hitSlop={6} onPress={handleGenerate}>
+              <Pressable accessibilityRole="button" hitSlop={6} onPress={handleGenerate}>
                 <Text style={styles.generateText}>Generate</Text>
               </Pressable>
             </View>
@@ -138,7 +138,7 @@ export function SetPasswordModal({
                 setLocalError(null);
               }}
               placeholder={`At least ${MIN_LENGTH} characters`}
-              placeholderTextColor={AppTheme.colors.textPlaceholder}
+              placeholderTextColor={AppTheme.colors.hint}
               style={styles.input}
               value={newPassword}
             />
@@ -152,13 +152,18 @@ export function SetPasswordModal({
                 setLocalError(null);
               }}
               placeholder="Repeat the password"
-              placeholderTextColor={AppTheme.colors.textPlaceholder}
+              placeholderTextColor={AppTheme.colors.hint}
               style={styles.input}
               value={confirmPassword}
             />
 
             {canActivate ? (
-              <Pressable onPress={() => setActivate((v) => !v)} style={styles.checkRow}>
+              <Pressable
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: activate }}
+                onPress={() => setActivate((v) => !v)}
+                style={styles.checkRow}
+              >
                 <View style={[styles.checkbox, activate && styles.checkboxOn]}>
                   {activate ? <Ionicons color={AppTheme.colors.white} name="checkmark" size={13} /> : null}
                 </View>
@@ -176,7 +181,7 @@ export function SetPasswordModal({
                 setLocalError(null);
               }}
               placeholder="••••••••"
-              placeholderTextColor={AppTheme.colors.textPlaceholder}
+              placeholderTextColor={AppTheme.colors.hint}
               secureTextEntry
               style={styles.input}
               value={adminPassword}
@@ -199,10 +204,11 @@ export function SetPasswordModal({
           </ScrollView>
 
           <View style={styles.actions}>
-            <Pressable onPress={onClose} style={styles.secondaryBtn}>
+            <Pressable accessibilityRole="button" onPress={onClose} style={styles.secondaryBtn}>
               <Text style={styles.secondaryBtnText}>Cancel</Text>
             </Pressable>
             <Pressable
+              accessibilityRole="button"
               disabled={busy}
               onPress={handleSubmit}
               style={[styles.primaryBtn, busy && styles.disabled]}
@@ -256,7 +262,7 @@ const styles = StyleSheet.create({
   },
   labelSpaced: { marginTop: AppTheme.spacing.l },
   generateText: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.caption,
     fontWeight: '700',
   },

@@ -139,7 +139,7 @@ export function VerifyEmailScreen({ navigation, route }: Props) {
                 account.
               </Text>
 
-              <Pressable onPress={goToSignIn}>
+              <Pressable accessibilityRole="button" onPress={goToSignIn}>
                 <Text style={styles.link}>Back to sign in</Text>
               </Pressable>
             </>
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     gap: AppTheme.spacing.s,
   },
   successText: {
-    color: AppTheme.colors.success,
+    color: AppTheme.colors.successText,
     ...AppTheme.typography.body,
     flex: 1,
   },
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     gap: AppTheme.spacing.s,
   },
   errorText: {
-    color: AppTheme.colors.error,
+    color: AppTheme.colors.dangerText,
     ...AppTheme.typography.body,
     flex: 1,
   },
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   link: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.button,
     textAlign: "center",
   },

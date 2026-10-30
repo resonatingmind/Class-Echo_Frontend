@@ -220,11 +220,11 @@ const styles = StyleSheet.create({
     padding: AppTheme.spacing.m,
     gap: 4,
   },
-  focusLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 0.8, color: AppTheme.colors.primaryDark },
+  focusLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 0.8, color: AppTheme.colors.primaryText },
   focusText: { fontSize: 14, lineHeight: 20, color: AppTheme.colors.textPrimary },
   footer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', minHeight: 32 },
   footerMuted: { fontSize: 12, fontWeight: '600', color: AppTheme.colors.textSecondary },
-  link: { fontSize: 13, fontWeight: '700', color: AppTheme.colors.primary },
+  link: { fontSize: 13, fontWeight: '700', color: AppTheme.colors.primaryText },
   mutedRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -240,5 +240,5 @@ const styles = StyleSheet.create({
     marginTop: AppTheme.spacing.s,
     minHeight: 44,
   },
-  toggleText: { fontSize: 14, fontWeight: '700', color: AppTheme.colors.primaryDark },
+  toggleText: { fontSize: 14, fontWeight: '700', color: AppTheme.colors.primaryText },
 });

@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     gap: AppTheme.spacing.xs,
   },
   stepText: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.caption,
     textTransform: "uppercase",
     letterSpacing: 0.5,

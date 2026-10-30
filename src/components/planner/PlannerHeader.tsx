@@ -13,6 +13,7 @@ export function PlannerHeader({ onCreatePress }: Props) {
       <View style={styles.titleRow}>
         <Text style={styles.pageTitle}>Academic Planner</Text>
         <Pressable 
+          accessibilityRole="button"
           style={({ pressed }) => [
             styles.addBtn,
             pressed && { opacity: 0.8 }

@@ -131,6 +131,7 @@ export function LoginScreen({ navigation }: Props) {
                 />
 
                 <Pressable
+                  accessibilityRole="button"
                   onPress={() =>
                     navigation.navigate("ForgotPassword", { email: email.trim() || undefined })
                   }
@@ -150,7 +151,7 @@ export function LoginScreen({ navigation }: Props) {
 
               <View style={styles.signupRow}>
                 <Text style={styles.signupLabel}>Don't have an account?</Text>
-                <Pressable onPress={() => navigation.navigate("Signup")}>
+                <Pressable accessibilityRole="button" onPress={() => navigation.navigate("Signup")}>
                   <Text style={styles.signupLink}> Sign Up</Text>
                 </Pressable>
               </View>
@@ -200,7 +201,7 @@ const styles = StyleSheet.create({
     gap: AppTheme.spacing.s,
   },
   errorText: {
-    color: AppTheme.colors.error,
+    color: AppTheme.colors.dangerText,
     ...AppTheme.typography.body,
     flex: 1,
   },
@@ -215,7 +216,7 @@ const styles = StyleSheet.create({
     marginTop: -AppTheme.spacing.s,
   },
   forgotLink: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.caption,
     fontWeight: "600",
   },
@@ -229,7 +230,7 @@ const styles = StyleSheet.create({
     ...AppTheme.typography.body,
   },
   signupLink: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.button,
   },
   footer: {

@@ -68,7 +68,7 @@ export function PlannerUnifiedFilterSheet({
         <Pressable style={styles.sheet} onPress={() => {}}>
           <View style={styles.header}>
             <Text style={styles.title}>Filters</Text>
-            <Pressable onPress={onClose} hitSlop={10}>
+            <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={10}>
               <Ionicons name="close" size={24} color={AppTheme.colors.textPrimary} />
             </Pressable>
           </View>
@@ -108,10 +108,10 @@ export function PlannerUnifiedFilterSheet({
           </ScrollView>
 
           <View style={styles.footer}>
-            <Pressable style={styles.clearBtn} onPress={handleClearAll}>
+            <Pressable accessibilityRole="button" style={styles.clearBtn} onPress={handleClearAll}>
               <Text style={styles.clearBtnText}>Clear all</Text>
             </Pressable>
-            <Pressable style={styles.applyBtn} onPress={handleApply}>
+            <Pressable accessibilityRole="button" style={styles.applyBtn} onPress={handleApply}>
               <Text style={styles.applyBtnText}>Apply</Text>
             </Pressable>
           </View>
@@ -130,6 +130,7 @@ function FilterSection({ title, options, selected, onSelect }: { title: string, 
       <View style={styles.chipsContainer}>
         {options.map((opt) => (
           <Pressable
+            accessibilityRole="button"
             key={opt}
             onPress={() => onSelect(opt)}
             style={[styles.chip, selected === opt && styles.chipActive]}
@@ -204,7 +205,7 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textPrimary,
   },
   chipTextActive: {
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
     fontFamily: AppTheme.typography.family.bold,
   },
   footer: {

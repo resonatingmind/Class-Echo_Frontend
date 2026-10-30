@@ -24,6 +24,7 @@ export function ActiveFilterChips({ chips, onClearAll }: Props) {
       <View style={styles.chips}>
         {chips.map((chip) => (
           <Pressable
+            accessibilityRole="button"
             key={chip.label}
             style={styles.chip}
             onPress={chip.onRemove}
@@ -35,7 +36,7 @@ export function ActiveFilterChips({ chips, onClearAll }: Props) {
         ))}
       </View>
 
-      <Pressable onPress={onClearAll}>
+      <Pressable accessibilityRole="button" onPress={onClearAll}>
         <Text style={styles.clear}>Clear All</Text>
       </Pressable>
     </View>
@@ -65,12 +66,12 @@ const styles = StyleSheet.create({
   },
 
   text: {
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
     fontWeight: "600",
   },
 
   clear: {
-    color: AppTheme.colors.error,
+    color: AppTheme.colors.dangerText,
     fontWeight: "700",
   },
 });

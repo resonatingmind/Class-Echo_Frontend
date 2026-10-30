@@ -331,7 +331,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
               {/* Search */}
               <TextInput
                 placeholder="Search chapter..."
-                placeholderTextColor={AppTheme.colors.textPlaceholder}
+                placeholderTextColor={AppTheme.colors.hint}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 style={styles.search}
@@ -340,6 +340,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
               {/* Toolbar */}
               <View style={styles.toolbar}>
                 <Pressable
+                  accessibilityRole="button"
                   style={styles.filterButton}
                   onPress={() => {
                     setFilter((prev) => {
@@ -365,6 +366,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
 
                 <View style={styles.toolbarActions}>
                   <Pressable
+                    accessibilityRole="button"
                     style={styles.importBtn}
                     onPress={() => setImportModalVisible(true)}
                   >
@@ -372,6 +374,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
                     <Text style={styles.importText}>Bulk Import</Text>
                   </Pressable>
                   <Pressable
+                    accessibilityRole="button"
                     style={styles.addButton}
                     onPress={() => setEditorVisible(true)}
                   >
@@ -421,6 +424,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
                           <View style={[styles.row, isExpanded && styles.rowExpanded]}>
                             {/* Chapter name */}
                             <Pressable
+                              accessibilityRole="button"
                               style={[styles.colChapter, styles.rowChapterCell]}
                               onPress={() => void toggleExpandChapter(item.id)}
                             >
@@ -440,6 +444,8 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
                             {/* PDF */}
                             <View style={styles.colPdf}>
                               <Pressable
+                                accessibilityRole="button"
+                                hitSlop={7}
                                 style={[
                                   styles.pdfButton,
                                   { backgroundColor: item.document_count ? AppTheme.colors.primaryLight : AppTheme.colors.background },
@@ -475,6 +481,7 @@ export function TeacherSubjectWorkspaceScreen({ navigation, route }: Props) {
                             {/* Action */}
                             <View style={styles.colAction}>
                               <Pressable
+                                accessibilityRole="button"
                                 style={styles.manageButton}
                                 onPress={() => {
                                   setSelectedChapter(item);
@@ -705,7 +712,7 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textSecondary,
   },
   tabLabelActive: {
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
     fontWeight: "700",
   },
 
@@ -765,7 +772,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   importText: {
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
     fontSize: 13,
     fontWeight: "700",
   },
@@ -835,7 +842,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   chapterNameExpanded: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
   },
 
   // Column widths
@@ -938,7 +945,7 @@ const styles = StyleSheet.create({
   },
   studentInitials: {
     fontWeight: "700",
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
     fontSize: 14,
   },
   studentInfo: { flex: 1 },

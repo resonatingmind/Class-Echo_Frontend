@@ -210,11 +210,12 @@ export function QuickAssignmentModal({
             />
 
             <View style={styles.actions}>
-              <Pressable style={styles.cancel} onPress={onClose}>
+              <Pressable accessibilityRole="button" style={styles.cancel} onPress={onClose}>
                 <Text style={styles.cancelText}>Cancel</Text>
               </Pressable>
 
               <Pressable
+                accessibilityRole="button"
                 onPress={handleAssign}
                 disabled={
                   submitting ||

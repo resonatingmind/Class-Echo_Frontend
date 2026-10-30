@@ -317,7 +317,7 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
           }
         }}
         rightActions={
-          <Pressable onPress={() => void load(true)} hitSlop={8}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Refresh" onPress={() => void load(true)} hitSlop={8}>
             <Ionicons color={AppTheme.colors.textSecondary} name="refresh-outline" size={22} />
           </Pressable>
         }
@@ -373,6 +373,7 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
         >
           <View style={styles.tabContainer}>
             <Pressable
+              accessibilityRole="button"
               onPress={() => setActiveTab("planner")}
               style={[
                 styles.tabButton,
@@ -396,6 +397,7 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
               </Text>
             </Pressable>
             <Pressable
+              accessibilityRole="button"
               onPress={() => setActiveTab('profile')}
               style={[styles.tabButton, activeTab === 'profile' && styles.tabButtonActive]}
             >
@@ -409,6 +411,7 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
               </Text>
             </Pressable>
             <Pressable
+              accessibilityRole="button"
               onPress={() => setActiveTab('documents')}
               style={[styles.tabButton, activeTab === 'documents' && styles.tabButtonActive]}
             >
@@ -445,6 +448,7 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
                 </Text>
               </View>
               <Pressable
+                accessibilityRole="button"
                 style={styles.addPlanBtn}
                 onPress={() => {
                   setSelectedLpItem(null);
@@ -562,6 +566,7 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
                 </Text>
               </View>
               <Pressable
+                accessibilityRole="button"
                 disabled={uploading}
                 onPress={handlePickDocument}
                 style={[styles.addPlanBtn, uploading && styles.btnDisabled]}
@@ -624,6 +629,8 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
                           <Text style={[styles.statusText, { color: s.text }]}>{s.label}</Text>
                         </View>
                         <Pressable
+                          accessibilityRole="button"
+                          accessibilityLabel="Delete document"
                           hitSlop={8}
                           onPress={() => handleDeleteDocument(doc)}
                           style={styles.trashBtn}
@@ -734,7 +741,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: AppTheme.typography.family.bold,
     letterSpacing: 1.1,
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
   },
   heroTitle: {
     fontSize: 26,
@@ -765,7 +772,7 @@ const styles = StyleSheet.create({
   metaBadgeText: {
     fontSize: 12,
     fontFamily: AppTheme.typography.family.bold,
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
   },
   metaDate: {
     fontSize: 12,

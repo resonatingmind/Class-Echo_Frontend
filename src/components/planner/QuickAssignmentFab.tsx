@@ -9,7 +9,7 @@ type Props = {
 
 export function QuickAssignmentFab({ onPress }: Props) {
   return (
-    <Pressable onPress={onPress} style={styles.fab}>
+    <Pressable accessibilityRole="button" accessibilityLabel="Quick assign" hitSlop={8} onPress={onPress} style={styles.fab}>
       <Ionicons name="add" size={30} color={AppTheme.colors.white} />
     </Pressable>
   );

@@ -374,6 +374,9 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
         }}
         rightActions={
           <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Delete subject"
+            hitSlop={8}
             onPress={() => {
               setSubjectDeleteVisible(true);
               setSubjectDeletePassword('');
@@ -408,6 +411,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                 <Text style={styles.pageTitle}>{subjectName}</Text>
                 <View style={{ flexDirection: "row", gap: 8 }}>
                   <Pressable
+                    accessibilityRole="button"
                     onPress={() => setImportModalVisible(true)}
                     style={styles.importBtn}
                   >
@@ -415,6 +419,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                     <Text style={styles.importBtnText}>Bulk Import</Text>
                   </Pressable>
                   <Pressable
+                    accessibilityRole="button"
                     onPress={openCreateModal}
                     style={styles.addChapterBtn}
                   >
@@ -463,7 +468,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
             <Ionicons color={AppTheme.colors.textSecondary} name="journal-outline" size={40} />
             <Text style={styles.emptyTitle}>No chapters yet</Text>
             <Text style={styles.emptyBody}>Create a chapter to begin adding curriculum materials.</Text>
-            <Pressable onPress={openCreateModal} style={styles.createBtnInline}>
+            <Pressable accessibilityRole="button" onPress={openCreateModal} style={styles.createBtnInline}>
               <Ionicons color={AppTheme.colors.white} name="add" size={16} />
               <Text style={styles.createBtnInlineText}>Add Chapter</Text>
             </Pressable>
@@ -508,6 +513,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
 
                     <View style={styles.chapterActions}>
                       <Pressable
+                        accessibilityRole="button"
                         style={styles.actionPillBtn}
                         onPress={(e) => {
                           e.stopPropagation();
@@ -524,6 +530,8 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                       </Pressable>
                       <View style={{ flex: 1 }} />
                       <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel="Edit chapter"
                         hitSlop={8}
                         onPress={() => openEditModal(chapter)}
                         style={styles.actionIconBtn}
@@ -531,6 +539,8 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                         <Ionicons color={AppTheme.colors.textSecondary} name="create-outline" size={18} />
                       </Pressable>
                       <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel="Delete chapter"
                         hitSlop={8}
                         onPress={() => handleDelete(chapter)}
                         style={styles.actionIconBtn}
@@ -617,7 +627,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                 autoFocus
                 onChangeText={setName}
                 placeholder="e.g. Chemical Reactions, Trigonometry…"
-                placeholderTextColor={AppTheme.colors.textPlaceholder}
+                placeholderTextColor={AppTheme.colors.hint}
                 style={[styles.modalInput, modalError ? { borderColor: AppTheme.colors.dangerText } : {}]}
                 value={name}
               />
@@ -631,7 +641,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                 numberOfLines={3}
                 onChangeText={setDescription}
                 placeholder="Provide a brief summary of concepts covered..."
-                placeholderTextColor={AppTheme.colors.textPlaceholder}
+                placeholderTextColor={AppTheme.colors.hint}
                 style={[styles.modalInput, styles.descriptionInput]}
                 value={description}
               />
@@ -645,10 +655,11 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
             ) : null}
 
             <View style={styles.modalActions}>
-              <Pressable onPress={() => setModalVisible(false)} style={styles.modalCancelBtn}>
+              <Pressable accessibilityRole="button" onPress={() => setModalVisible(false)} style={styles.modalCancelBtn}>
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </Pressable>
               <Pressable
+                accessibilityRole="button"
                 disabled={submitting}
                 onPress={handleSave}
                 style={[styles.modalSubmitBtn, submitting && styles.btnDisabled]}
@@ -745,7 +756,7 @@ const styles = StyleSheet.create({
     marginBottom: AppTheme.spacing.xs,
   },
   kicker: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.caption,
     fontWeight: '700',
     letterSpacing: 1.2,
@@ -790,7 +801,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start'
   },
   importBtnText: {
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.body,
     fontWeight: "700"
   },
@@ -844,7 +855,7 @@ const styles = StyleSheet.create({
   actionPillText: {
     fontSize: 13,
     fontWeight: "600",
-    color: AppTheme.colors.info,
+    color: AppTheme.colors.infoStrong,
   },
   actionIconBtn: {
     width: 32,

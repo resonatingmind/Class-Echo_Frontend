@@ -77,7 +77,7 @@ function SchoolCard({
   return (
     <View style={styles.card}>
       <View style={styles.cardRow}>
-        <Pressable onPress={onPress} style={styles.cardMainPressable}>
+        <Pressable accessibilityRole="button" onPress={onPress} style={styles.cardMainPressable}>
           <View style={styles.cardTop}>
             <View style={styles.cardIcon}>
               <Text style={styles.cardInitials}>{initials}</Text>
@@ -95,12 +95,12 @@ function SchoolCard({
             </View>
           </View>
         </Pressable>
-        <Pressable onPress={onOptionsPress} hitSlop={12} style={styles.optionsBtn}>
+        <Pressable accessibilityRole="button" accessibilityLabel="More options" onPress={onOptionsPress} hitSlop={12} style={styles.optionsBtn}>
           <Ionicons color={AppTheme.colors.textSecondary} name="ellipsis-vertical" size={18} />
         </Pressable>
       </View>
 
-      <Pressable onPress={onPress}>
+      <Pressable accessibilityRole="button" onPress={onPress}>
         <View style={styles.cardDivider} />
         <View style={styles.cardMeta}>
           <View style={styles.metaItem}>
@@ -252,13 +252,13 @@ export function SchoolsScreen({ navigation }: Props) {
         </View>
         <Text style={styles.headerTitle}>Super Admin</Text>
         <View style={styles.headerRight}>
-          <Pressable 
+          <Pressable accessibilityRole="button" accessibilityLabel="Add school" hitSlop={8} 
             onPress={() => navigation.navigate("AdminCreateSchool")} 
             style={styles.iconBtn}
           >
             <Ionicons color={AppTheme.colors.primary} name="add-circle" size={24} />
           </Pressable>
-          <Pressable onPress={signOut} style={styles.iconBtn}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Sign out" hitSlop={8} onPress={signOut} style={styles.iconBtn}>
             <Ionicons color={AppTheme.colors.textPrimary} name="log-out-outline" size={24} />
           </Pressable>
         </View>
@@ -317,7 +317,7 @@ export function SchoolsScreen({ navigation }: Props) {
                   value={query}
                 />
                 {query.length > 0 ? (
-                  <Pressable onPress={() => setQuery("")} hitSlop={8}>
+                  <Pressable accessibilityRole="button" accessibilityLabel="Clear search" onPress={() => setQuery("")} hitSlop={8}>
                     <Ionicons color={AppTheme.colors.textSecondary} name="close-circle" size={16} />
                   </Pressable>
                 ) : null}
@@ -334,7 +334,7 @@ export function SchoolsScreen({ navigation }: Props) {
                   <Ionicons color={AppTheme.colors.textSecondary} name="cloud-offline-outline" size={40} />
                   <Text style={styles.errorTitle}>Could not load schools</Text>
                   <Text style={styles.errorBody}>{error}</Text>
-                  <Pressable onPress={() => void loadSchools()} style={styles.retryBtn}>
+                  <Pressable accessibilityRole="button" onPress={() => void loadSchools()} style={styles.retryBtn}>
                     <Text style={styles.retryText}>Retry</Text>
                   </Pressable>
                 </View>
@@ -380,12 +380,13 @@ export function SchoolsScreen({ navigation }: Props) {
           <View style={styles.modalSheet}>
             <View style={styles.modalHeader}>
               <Text numberOfLines={1} style={styles.modalTitle}>{selectedSchoolOptions?.name}</Text>
-              <Pressable hitSlop={8} onPress={() => setSelectedSchoolOptions(null)}>
+              <Pressable accessibilityRole="button" accessibilityLabel="Close" hitSlop={8} onPress={() => setSelectedSchoolOptions(null)}>
                 <Ionicons color={AppTheme.colors.textSecondary} name="close" size={22} />
               </Pressable>
             </View>
             
             <Pressable
+              accessibilityRole="button"
               style={styles.modalActionBtn}
               onPress={() => {
                 const s = selectedSchoolOptions;
@@ -399,6 +400,7 @@ export function SchoolsScreen({ navigation }: Props) {
 
             {selectedSchoolOptions?.admin ? (
               <Pressable
+                accessibilityRole="button"
                 style={styles.modalActionBtn}
                 onPress={() => {
                   const s = selectedSchoolOptions;
@@ -421,6 +423,7 @@ export function SchoolsScreen({ navigation }: Props) {
             ) : null}
 
             <Pressable
+              accessibilityRole="button"
               style={styles.modalActionBtn}
               onPress={() => {
                 const s = selectedSchoolOptions;
@@ -429,7 +432,7 @@ export function SchoolsScreen({ navigation }: Props) {
               }}
             >
               <Ionicons name="trash-outline" size={18} color={AppTheme.colors.error} />
-              <Text style={[styles.modalActionText, { color: AppTheme.colors.error }]}>Delete School</Text>
+              <Text style={[styles.modalActionText, { color: AppTheme.colors.dangerText }]}>Delete School</Text>
             </Pressable>
           </View>
         </View>
@@ -441,7 +444,7 @@ export function SchoolsScreen({ navigation }: Props) {
           <View style={styles.modalSheet}>
             <View style={styles.modalHeader}>
               <Text numberOfLines={1} style={styles.modalTitle}>Delete School</Text>
-              <Pressable hitSlop={8} onPress={() => setSelectedSchoolForDelete(null)}>
+              <Pressable accessibilityRole="button" accessibilityLabel="Close" hitSlop={8} onPress={() => setSelectedSchoolForDelete(null)}>
                 <Ionicons color={AppTheme.colors.textSecondary} name="close" size={22} />
               </Pressable>
             </View>
@@ -453,19 +456,21 @@ export function SchoolsScreen({ navigation }: Props) {
               secureTextEntry
               onChangeText={setDeletePassword}
               placeholder="••••••••"
-              placeholderTextColor={AppTheme.colors.textPlaceholder}
+              placeholderTextColor={AppTheme.colors.hint}
               style={[styles.input, { outlineStyle: "none" } as any]}
               value={deletePassword}
             />
             {deleteError ? <Text style={styles.modalError}>{deleteError}</Text> : null}
             <View style={{ flexDirection: 'row', gap: 12, marginTop: 4 }}>
               <Pressable
+                accessibilityRole="button"
                 onPress={() => setSelectedSchoolForDelete(null)}
                 style={[styles.modalCancelBtn, { flex: 1 }]}
               >
                 <Text style={styles.modalCancelBtnText}>Cancel</Text>
               </Pressable>
               <Pressable
+                accessibilityRole="button"
                 disabled={deleteSaving}
                 onPress={() => { void confirmDeleteSchool(); }}
                 style={[styles.modalSaveBtn, { flex: 1, backgroundColor: AppTheme.colors.error }, deleteSaving && { opacity: 0.6 }]}
@@ -621,7 +626,7 @@ const styles = StyleSheet.create({
     paddingVertical: AppTheme.spacing.m,
   },
   retryText: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.button,
   },
   // School Card
@@ -661,7 +666,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   cardInitials: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.heading2,
   },
   cardBody: {
@@ -771,10 +776,10 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.warningStrong,
   },
   statusBlue: {
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
   },
   statusRed: {
-    color: AppTheme.colors.error,
+    color: AppTheme.colors.dangerText,
   },
   statusGray: {
     color: AppTheme.colors.textSecondary,
@@ -783,7 +788,7 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.primaryLight,
   },
   statChipTextInfo: {
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
   },
   modalOverlay: {
     flex: 1,
@@ -850,7 +855,7 @@ const styles = StyleSheet.create({
     ...AppTheme.typography.body,
   },
   modalError: {
-    color: AppTheme.colors.error,
+    color: AppTheme.colors.dangerText,
     ...AppTheme.typography.caption,
   },
   modalSaveBtn: {

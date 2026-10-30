@@ -215,5 +215,5 @@ const styles = StyleSheet.create({
   },
   speedChipActive: { backgroundColor: AppTheme.colors.primaryLight, borderColor: AppTheme.colors.primary },
   speedText: { fontSize: 12, fontWeight: '700', color: AppTheme.colors.textSecondary },
-  speedTextActive: { color: AppTheme.colors.primaryDark },
+  speedTextActive: { color: AppTheme.colors.primaryText },
 });

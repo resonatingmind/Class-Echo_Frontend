@@ -16,11 +16,12 @@ export const AppTheme = {
     warning: "#F59E0B",
     error: "#EF4444",
     textPrimary: "#111827",
-    textSecondary: "#6B7280",
-    hint: "#9CA3AF",
+    textSecondary: "#5F6672", // 4.5:1 or better on every light tint
+    hint: "#6B7280", // 4.5:1 on white and the page background
     textPlaceholder: "#BFC7D4",
     disabled: "#D1D5DB",
     primarySoft: "#D1E4FF",
+    primaryText: "#1366C9", // links and blue labels; primary itself is 3.4:1 on white
 
     // Status: text is the readable shade, Bg the light tint behind it,
     // Soft a stronger tint, Border for outlined chips and banners.

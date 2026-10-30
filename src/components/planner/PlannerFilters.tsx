@@ -23,12 +23,12 @@ export function PlannerFilters({
           value={search}
           onChangeText={onSearchChange}
           placeholder="Search class, subject or teacher"
-          placeholderTextColor={AppTheme.colors.textPlaceholder}
+          placeholderTextColor={AppTheme.colors.hint}
           style={styles.input}
         />
       </View>
 
-      <Pressable style={styles.filterBtn} onPress={onFilterPress}>
+      <Pressable accessibilityRole="button" style={styles.filterBtn} onPress={onFilterPress}>
         <Ionicons name="options-outline" size={20} color={AppTheme.colors.textPrimary} />
         {activeFilterCount > 0 && (
           <View style={styles.badge}>

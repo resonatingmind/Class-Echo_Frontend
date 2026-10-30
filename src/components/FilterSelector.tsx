@@ -41,6 +41,7 @@ export function FilterSelector({
   return (
     <>
       <Pressable
+        accessibilityRole="button"
         style={styles.selector}
         onPress={onClose}
       >
@@ -81,6 +82,7 @@ export function FilterSelector({
             <ScrollView>
               {options.map((item) => (
                 <Pressable
+                  accessibilityRole="button"
                   key={String(item.value)}
                   style={styles.option}
                   onPress={() => {

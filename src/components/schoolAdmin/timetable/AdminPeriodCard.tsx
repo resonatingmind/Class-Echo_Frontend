@@ -48,10 +48,12 @@ export function AdminPeriodCard({ entry, onEdit, onDelete }: Props) {
       </View>
 
       <View style={styles.actions}>
-        <Pressable style={styles.actionButton} onPress={() => onEdit(entry)} hitSlop={8}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Edit period" style={styles.actionButton} onPress={() => onEdit(entry)} hitSlop={8}>
           <Ionicons name="create-outline" size={18} color={AppTheme.colors.primaryDark} />
         </Pressable>
         <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Delete period"
           style={[styles.actionButton, styles.deleteButton]}
           onPress={() => onDelete(entry)}
           hitSlop={8}
@@ -85,7 +87,7 @@ const styles = StyleSheet.create({
   periodBadgeText: {
     fontSize: 13,
     fontWeight: "800",
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
   },
 
   body: {
@@ -133,7 +135,7 @@ const styles = StyleSheet.create({
   },
 
   metaMuted: {
-    color: AppTheme.colors.textPlaceholder,
+    color: AppTheme.colors.hint,
   },
 
   actions: {

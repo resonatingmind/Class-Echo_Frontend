@@ -83,6 +83,7 @@ export function SelectionBottomSheet({
             keyboardShouldPersistTaps="handled"
             renderItem={({ item }) => (
               <Pressable
+                accessibilityRole="button"
                 style={styles.item}
                 onPress={() => {
                   onSelect(item);

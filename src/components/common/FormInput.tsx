@@ -23,6 +23,8 @@ type FormInputProps = {
   iconLeft?: IoniconName;
   iconRight?: IoniconName;
   onIconRightPress?: () => void;
+  /** Screen reader label for the right icon button */
+  iconRightLabel?: string;
   size?: 'sm' | 'md';
   placeholder?: string;
   value?: string;
@@ -49,6 +51,7 @@ export function FormInput({
   iconLeft,
   iconRight,
   onIconRightPress,
+  iconRightLabel,
   size = 'md',
   placeholder,
   value,
@@ -110,7 +113,7 @@ export function FormInput({
           onFocus={() => setFocused(true)}
           onSubmitEditing={onSubmitEditing}
           placeholder={placeholder}
-          placeholderTextColor={AppTheme.colors.textPlaceholder}
+          placeholderTextColor={AppTheme.colors.hint}
           returnKeyType={returnKeyType}
           secureTextEntry={secureTextEntry}
           style={[styles.input, { fontSize: s.fontSize }]}
@@ -119,7 +122,7 @@ export function FormInput({
         />
 
         {iconRight ? (
-          <Pressable hitSlop={10} onPress={onIconRightPress}>
+          <Pressable accessibilityRole="button" accessibilityLabel={iconRightLabel} hitSlop={10} onPress={onIconRightPress}>
             <Ionicons
               color={AppTheme.colors.textSecondary}
               name={iconRight}

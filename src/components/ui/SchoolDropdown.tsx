@@ -57,6 +57,7 @@ export function SchoolDropdown({ schools, loading, value, onChange, error }: Sch
               style={{ maxHeight: 200 }}
               renderItem={({ item }) => (
                 <Pressable
+                  accessibilityRole="button"
                   style={styles.item}
                   onPress={() => {
                     onChange(item);

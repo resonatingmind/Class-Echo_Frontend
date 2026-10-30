@@ -105,7 +105,7 @@ export function ChapterLearningPlanModal({
             <Text style={styles.title}>
               {initialItem ? "Edit Lecture Planner Entry" : "Add Lecture Planner Entry"}
             </Text>
-            <Pressable style={styles.closeBtn} onPress={onClose}>
+            <Pressable accessibilityRole="button" accessibilityLabel="Close" hitSlop={8} style={styles.closeBtn} onPress={onClose}>
               <Ionicons name="close" size={20} color={AppTheme.colors.slate500} />
             </Pressable>
           </View>
@@ -138,6 +138,7 @@ export function ChapterLearningPlanModal({
               ) : (
                 <>
                   <Pressable
+                    accessibilityRole="button"
                     style={[styles.input, { justifyContent: 'center' }]}
                     onPress={() => setShowDatePicker(true)}
                   >
@@ -184,7 +185,7 @@ export function ChapterLearningPlanModal({
               <TextInput
                 style={styles.input}
                 placeholder="e.g. Introduction & Distance Formula"
-                placeholderTextColor={AppTheme.colors.slate400}
+                placeholderTextColor={AppTheme.colors.hint}
                 value={subTopic}
                 onChangeText={setSubTopic}
               />
@@ -195,7 +196,7 @@ export function ChapterLearningPlanModal({
               <TextInput
                 style={[styles.input, styles.multilineInput]}
                 placeholder="Practice questions are done and concepts will be discussed."
-                placeholderTextColor={AppTheme.colors.slate400}
+                placeholderTextColor={AppTheme.colors.hint}
                 value={classworkActivities}
                 onChangeText={setClassworkActivities}
                 multiline
@@ -208,7 +209,7 @@ export function ChapterLearningPlanModal({
               <TextInput
                 style={styles.input}
                 placeholder="e.g. Ex - 6.1"
-                placeholderTextColor={AppTheme.colors.slate400}
+                placeholderTextColor={AppTheme.colors.hint}
                 value={assessmentTask}
                 onChangeText={setAssessmentTask}
               />
@@ -219,7 +220,7 @@ export function ChapterLearningPlanModal({
               <TextInput
                 style={styles.input}
                 placeholder="e.g. None, Board, Projector"
-                placeholderTextColor={AppTheme.colors.slate400}
+                placeholderTextColor={AppTheme.colors.hint}
                 value={teachingAids}
                 onChangeText={setTeachingAids}
               />
@@ -230,7 +231,7 @@ export function ChapterLearningPlanModal({
               <TextInput
                 style={[styles.input, styles.multilineInput]}
                 placeholder="Able to understand applications of section formula."
-                placeholderTextColor={AppTheme.colors.slate400}
+                placeholderTextColor={AppTheme.colors.hint}
                 value={learningOutcomes}
                 onChangeText={setLearningOutcomes}
                 multiline
@@ -240,11 +241,12 @@ export function ChapterLearningPlanModal({
           </ScrollView>
 
           <View style={styles.footer}>
-            <Pressable style={styles.cancelBtn} onPress={onClose}>
+            <Pressable accessibilityRole="button" style={styles.cancelBtn} onPress={onClose}>
               <Text style={styles.cancelText}>Cancel</Text>
             </Pressable>
 
             <Pressable
+              accessibilityRole="button"
               style={[styles.saveBtn, loading && styles.disabledBtn]}
               onPress={handleSubmit}
               disabled={loading}
@@ -295,7 +297,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   errorText: {
-    color: AppTheme.colors.error,
+    color: AppTheme.colors.dangerText,
     fontSize: 13,
     marginBottom: 10,
     fontWeight: "600",

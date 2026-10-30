@@ -55,6 +55,7 @@ export function PlannerTableRow({
         <View style={styles.teacherSection}>
           {isUnassigned ? (
             <Pressable
+              accessibilityRole="button"
               style={({ pressed }) => [
                 styles.assignButton,
                 pressed && { opacity: 0.7 }
@@ -73,6 +74,7 @@ export function PlannerTableRow({
             </Pressable>
           ) : (
             <Pressable
+              accessibilityRole="button"
               style={({ pressed }) => [
                 styles.teacherBadge,
                 pressed && { opacity: 0.7 }
@@ -195,7 +197,7 @@ const styles = StyleSheet.create({
   assignText: {
     fontFamily: AppTheme.typography.family.semibold,
     fontSize: 12,
-    color: AppTheme.colors.warning,
+    color: AppTheme.colors.warningText,
   },
   teacherBadge: {
     flexDirection: "row",

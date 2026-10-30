@@ -397,7 +397,7 @@ export function TeacherDashboardScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>My Subjects</Text>
-            <Pressable onPress={() => navigation.navigate("TeacherTabs", { screen: "TeacherClasses", params: { view: "subjects" } } as never)}>
+            <Pressable accessibilityRole="button" onPress={() => navigation.navigate("TeacherTabs", { screen: "TeacherClasses", params: { view: "subjects" } } as never)}>
               <Text style={styles.seeAll}>See all</Text>
             </Pressable>
           </View>
@@ -416,6 +416,7 @@ export function TeacherDashboardScreen() {
             >
               {subjects.map((sub) => (
                 <Pressable
+                  accessibilityRole="button"
                   key={sub.subject_id}
                   style={styles.subjectCard}
                   onPress={() =>
@@ -522,7 +523,7 @@ const styles = StyleSheet.create({
   seeAll: {
     fontSize: 13,
     fontWeight: "700",
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
   },
 
 
@@ -546,7 +547,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: AppTheme.colors.textSecondary,
   },
-  periodTimeTextNow: { color: AppTheme.colors.primary },
+  periodTimeTextNow: { color: AppTheme.colors.primaryText },
   periodTimeSub: {
     fontSize: 10,
     color: AppTheme.colors.hint,
@@ -595,7 +596,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: AppTheme.colors.textPrimary,
   },
-  periodSubjectNow: { color: AppTheme.colors.primaryDark },
+  periodSubjectNow: { color: AppTheme.colors.primaryText },
   periodClass: { fontSize: 12, color: AppTheme.colors.textSecondary },
   periodRoom:  { fontSize: 11, color: AppTheme.colors.hint, marginTop: 1 },
 
@@ -621,7 +622,7 @@ const styles = StyleSheet.create({
   heroCardNow: { borderColor: AppTheme.colors.primary, backgroundColor: AppTheme.colors.primaryLight },
   heroTag: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 2 },
   heroLiveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: AppTheme.colors.danger },
-  heroTagText: { fontSize: 12, fontWeight: "800", letterSpacing: 0.6, color: AppTheme.colors.primaryDark },
+  heroTagText: { fontSize: 12, fontWeight: "800", letterSpacing: 0.6, color: AppTheme.colors.primaryText },
   heroTagTextNext: { color: AppTheme.colors.warningText },
   heroSubject: { fontSize: 22, fontWeight: "800", color: AppTheme.colors.textPrimary },
   heroMeta: { fontSize: 13, color: AppTheme.colors.textSecondary },
@@ -642,7 +643,7 @@ const styles = StyleSheet.create({
   reportSub: { fontSize: 12, color: AppTheme.colors.textSecondary },
   reportHighlight: { fontSize: 14, lineHeight: 20, color: AppTheme.colors.textPrimary, marginTop: 6 },
   reportFooter: { flexDirection: "row", alignItems: "center", gap: 2, marginTop: 6, minHeight: 28 },
-  reportView: { fontSize: 14, fontWeight: "700", color: AppTheme.colors.primary },
+  reportView: { fontSize: 14, fontWeight: "700", color: AppTheme.colors.primaryText },
 
   recordNowBtn: {
     flexDirection: "row",
@@ -668,7 +669,7 @@ const styles = StyleSheet.create({
     borderColor: AppTheme.colors.primary,
     backgroundColor: AppTheme.colors.primaryLight,
   },
-  prepareText: { fontSize: 14, fontWeight: "700", color: AppTheme.colors.primaryDark },
+  prepareText: { fontSize: 14, fontWeight: "700", color: AppTheme.colors.primaryText },
 
   // ── Subjects horizontal scroll ──
   subjectScroll: { paddingBottom: AppTheme.spacing.xs, gap: AppTheme.spacing.m },

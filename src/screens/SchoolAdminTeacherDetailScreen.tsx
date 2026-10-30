@@ -365,6 +365,7 @@ try {
           {teacher.status === "pending_approval" && (
             <View style={styles.actionButtonGroup}>
               <Pressable
+                accessibilityRole="button"
                 style={[styles.actionBtn, styles.actionBtnSuccess]}
                 onPress={handleApprove}
               >
@@ -372,6 +373,7 @@ try {
                 <Text style={styles.actionBtnText}>Approve Request</Text>
               </Pressable>
               <Pressable
+                accessibilityRole="button"
                 style={[styles.actionBtn, styles.actionBtnDanger]}
                 onPress={handleReject}
               >
@@ -384,6 +386,7 @@ try {
           {teacher.status === "active" && (
             <View style={styles.actionButtonGroup}>
               <Pressable
+                accessibilityRole="button"
                 style={[styles.actionBtn, styles.actionBtnDanger]}
                 onPress={handleSuspend}
               >
@@ -396,6 +399,7 @@ try {
           {teacher.status === "suspended" && (
             <View style={styles.actionButtonGroup}>
               <Pressable
+                accessibilityRole="button"
                 style={[styles.actionBtn, styles.actionBtnSuccess]}
                 onPress={handleReactivate}
               >
@@ -407,6 +411,7 @@ try {
 
           <View style={styles.actionButtonGroup}>
             <Pressable
+              accessibilityRole="button"
               style={[styles.actionBtn, styles.actionBtnSecondary]}
               onPress={() =>
                 navigation.navigate("SchoolAdminTeacherGrowth", {
@@ -419,6 +424,7 @@ try {
             </Pressable>
 
             <Pressable
+              accessibilityRole="button"
               style={[styles.actionBtn, styles.actionBtnSecondary]}
               onPress={() =>
                 navigation.navigate("SchoolAdminTeacherRecordings", {
@@ -476,7 +482,7 @@ const styles = StyleSheet.create({
   },
 
   academicLabel: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.caption,
     fontWeight: "700",
     letterSpacing: 1.2,
@@ -569,7 +575,7 @@ const styles = StyleSheet.create({
   },
 
   actionBtnTextSecondary: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     fontWeight: "700",
     fontSize: 15,
   },
@@ -645,7 +651,7 @@ const styles = StyleSheet.create({
   },
 
   chipText: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     fontWeight: "600",
     fontSize: 13,
   },
@@ -670,7 +676,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 28,
     fontWeight: "800",
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
   },
 
   statLabel: {

@@ -75,7 +75,7 @@ function FormField({
           multiline={multiline}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor={AppTheme.colors.textPlaceholder}
+          placeholderTextColor={AppTheme.colors.hint}
           secureTextEntry={secureTextEntry && !showPass}
           style={[styles.input, multiline && styles.inputMultiline]}
           textContentType={textContentType}
@@ -83,6 +83,8 @@ function FormField({
         />
         {secureTextEntry ? (
           <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={showPass ? 'Hide password' : 'Show password'}
             hitSlop={8}
             onPress={() => setShowPass((v) => !v)}
             style={styles.eyeBtn}
@@ -179,7 +181,7 @@ export function AdminCreateSchoolScreen({ navigation }: Props) {
         </View>
         <Text style={styles.headerTitle}>Super Admin</Text>
         <View style={styles.headerRight}>
-          <Pressable onPress={signOut} style={styles.iconBtn}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Sign out" hitSlop={8} onPress={signOut} style={styles.iconBtn}>
             <Ionicons color={AppTheme.colors.textPrimary} name="log-out-outline" size={24} />
           </Pressable>
         </View>
@@ -196,7 +198,7 @@ export function AdminCreateSchoolScreen({ navigation }: Props) {
         >
           <View style={styles.centerContainer}>
             <View style={styles.body}>
-              <Pressable onPress={() => navigation.goBack()} style={styles.backBtnRow}>
+              <Pressable accessibilityRole="button" onPress={() => navigation.goBack()} style={styles.backBtnRow}>
                 <Ionicons name="arrow-back" size={20} color={AppTheme.colors.textSecondary} />
                 <Text style={styles.backBtnText}>Back</Text>
               </Pressable>
@@ -207,6 +209,7 @@ export function AdminCreateSchoolScreen({ navigation }: Props) {
                   <Text style={styles.topTitle}>Configuration</Text>
                 </View>
                 <Pressable
+                  accessibilityRole="button"
                   disabled={!isValid || isSubmitting}
                   onPress={handleCreate}
                   style={[styles.saveBtn, (!isValid || isSubmitting) && styles.saveBtnDisabled]}
@@ -334,7 +337,7 @@ export function AdminCreateSchoolScreen({ navigation }: Props) {
                   </View>
                 ) : null}
 
-                <Pressable onPress={addTeacherRow} style={styles.addRowBtn}>
+                <Pressable accessibilityRole="button" onPress={addTeacherRow} style={styles.addRowBtn}>
                   <Ionicons color={AppTheme.colors.primary} name="add" size={18} />
                   <Text style={styles.addRowText}>
                     {teachers.length === 0 ? 'Add a teacher' : 'Add another teacher'}
@@ -401,7 +404,7 @@ const styles = StyleSheet.create({
     borderColor: AppTheme.colors.border,
     marginTop: AppTheme.spacing.s,
   },
-  addRowText: { color: AppTheme.colors.primary, ...AppTheme.typography.body, fontWeight: '700' },
+  addRowText: { color: AppTheme.colors.primaryText, ...AppTheme.typography.body, fontWeight: '700' },
   inlineWarning: {
     color: AppTheme.colors.dangerText,
     ...AppTheme.typography.caption,

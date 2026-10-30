@@ -11,7 +11,7 @@ type Props = {
 
 export function TeacherFilterSelect({ label, value, onPress }: Props) {
   return (
-    <Pressable style={styles.container} onPress={onPress}>
+    <Pressable accessibilityRole="button" style={styles.container} onPress={onPress}>
       <View>
         <Text style={styles.label}>{label}</Text>
 

@@ -91,6 +91,8 @@ export function FloatingPillTabBar({ tabs, activeIndex, onTabPress }: Props) {
           return (
             <TouchableOpacity
               key={tab.key}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: isActive }}
               accessibilityLabel={
                 tab.badge ? `${tab.label}, ${tab.badge} being analysed` : tab.label
               }
@@ -177,7 +179,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   labelActive: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     opacity: 1,
   },
   labelInactive: {

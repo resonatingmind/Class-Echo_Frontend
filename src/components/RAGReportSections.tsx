@@ -75,7 +75,7 @@ const ci = StyleSheet.create({
     paddingHorizontal: 10, paddingVertical: 3, borderRadius: 999,
     backgroundColor: AppTheme.colors.primary + '18',
   },
-  countText: { fontSize: 13, fontWeight: '800', color: AppTheme.colors.primary },
+  countText: { fontSize: 13, fontWeight: '800', color: AppTheme.colors.primaryText },
 });
 
 // ── Learning Plan Info Card ──────────────────────────────────────────────────
@@ -147,7 +147,7 @@ const lpic = StyleSheet.create({
     justifyContent: "center",
   },
   title: { fontSize: 14, fontWeight: "800", color: AppTheme.colors.slate900 },
-  subtitle: { fontSize: 13, fontWeight: "600", color: AppTheme.colors.info },
+  subtitle: { fontSize: 13, fontWeight: "600", color: AppTheme.colors.infoStrong },
   dateBadge: {
     backgroundColor: AppTheme.colors.infoBg,
     paddingHorizontal: 8,

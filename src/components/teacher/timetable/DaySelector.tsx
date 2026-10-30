@@ -30,6 +30,7 @@ export function DaySelector({ selectedDay, onSelectDay, daysWithEntries }: Props
 
         return (
           <Pressable
+            accessibilityRole="button"
             key={day}
             onPress={() => onSelectDay(day)}
             style={({ pressed }) => [
@@ -98,7 +99,7 @@ const styles = StyleSheet.create({
   },
 
   activeText: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
   },
 
   indicatorRow: {

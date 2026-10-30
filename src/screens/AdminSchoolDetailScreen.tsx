@@ -115,6 +115,7 @@ function AdminContact({
           not leave an organisation unable to sign in. */}
       <View style={styles.adminCredentialRow}>
         <Pressable
+          accessibilityRole="button"
           disabled={busy}
           onPress={onSetPassword}
           style={[styles.credentialBtn, busy && { opacity: 0.6 }]}
@@ -128,6 +129,7 @@ function AdminContact({
             an account nobody can sign in to — they get a password instead. */}
         {school.admin.status !== 'active' && school.admin.status !== 'invited' ? (
           <Pressable
+            accessibilityRole="button"
             disabled={busy}
             onPress={onActivate}
             style={[styles.credentialBtn, busy && { opacity: 0.6 }]}
@@ -155,7 +157,7 @@ function ClassRow({
   const colorIdx = index % bgColors.length;
 
   return (
-    <Pressable onPress={onPress} style={styles.classRow}>
+    <Pressable accessibilityRole="button" onPress={onPress} style={styles.classRow}>
       <View style={[styles.classTag, { backgroundColor: bgColors[colorIdx] }]}>
         <Text style={[styles.classTagText, { color: textColors[colorIdx] }]}>
           {classItem.name.slice(0, 3).toUpperCase()}
@@ -433,7 +435,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
         </View>
         <Text style={styles.headerTitle}>Super Admin</Text>
         <View style={styles.headerRight}>
-          <Pressable onPress={signOut} style={styles.iconBtn}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Sign out" hitSlop={8} onPress={signOut} style={styles.iconBtn}>
             <Ionicons color={AppTheme.colors.textPrimary} name="log-out-outline" size={24} />
           </Pressable>
         </View>
@@ -445,7 +447,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
           <View style={styles.modalSheet}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Reject School Registration</Text>
-              <Pressable hitSlop={8} onPress={() => setShowRejectModal(false)}>
+              <Pressable accessibilityRole="button" accessibilityLabel="Close" hitSlop={8} onPress={() => setShowRejectModal(false)}>
                 <Ionicons color={AppTheme.colors.textSecondary} name="close" size={22} />
               </Pressable>
             </View>
@@ -456,19 +458,21 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
               numberOfLines={3}
               onChangeText={setRejectReason}
               placeholder="e.g. Invalid school info, unverified school email domain"
-              placeholderTextColor={AppTheme.colors.textPlaceholder}
+              placeholderTextColor={AppTheme.colors.hint}
               style={[styles.input, styles.inputMultiline]}
               value={rejectReason}
             />
             {rejectError ? <Text style={styles.modalError}>{rejectError}</Text> : null}
             <View style={{ flexDirection: 'row', gap: 12, marginTop: 4 }}>
               <Pressable
+                accessibilityRole="button"
                 onPress={() => setShowRejectModal(false)}
                 style={[styles.modalCancelBtn, { flex: 1 }]}
               >
                 <Text style={styles.modalCancelBtnText}>Cancel</Text>
               </Pressable>
               <Pressable
+                accessibilityRole="button"
                 disabled={actionLoading}
                 onPress={() => { void handleReject(); }}
                 style={[styles.modalSaveBtn, { flex: 1, backgroundColor: AppTheme.colors.error }, actionLoading && { opacity: 0.6 }]}
@@ -490,7 +494,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
           <View style={styles.modalSheet}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Edit School</Text>
-              <Pressable hitSlop={8} onPress={() => setShowEdit(false)}>
+              <Pressable accessibilityRole="button" accessibilityLabel="Close" hitSlop={8} onPress={() => setShowEdit(false)}>
                 <Ionicons color={AppTheme.colors.textSecondary} name="close" size={22} />
               </Pressable>
             </View>
@@ -499,7 +503,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
               autoCapitalize="words"
               onChangeText={setEditName}
               placeholder="School name"
-              placeholderTextColor={AppTheme.colors.textPlaceholder}
+              placeholderTextColor={AppTheme.colors.hint}
               style={styles.input}
               value={editName}
             />
@@ -510,12 +514,13 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
               numberOfLines={2}
               onChangeText={setEditAddress}
               placeholder="School address (optional)"
-              placeholderTextColor={AppTheme.colors.textPlaceholder}
+              placeholderTextColor={AppTheme.colors.hint}
               style={[styles.input, styles.inputMultiline]}
               value={editAddress}
             />
             {editError ? <Text style={styles.modalError}>{editError}</Text> : null}
             <Pressable
+              accessibilityRole="button"
               disabled={editSaving}
               onPress={() => { void handleEditSave(); }}
               style={[styles.modalSaveBtn, editSaving && { opacity: 0.6 }]}
@@ -548,7 +553,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
           <View style={styles.modalSheet}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Delete School</Text>
-              <Pressable hitSlop={8} onPress={() => setShowDeleteModal(false)}>
+              <Pressable accessibilityRole="button" accessibilityLabel="Close" hitSlop={8} onPress={() => setShowDeleteModal(false)}>
                 <Ionicons color={AppTheme.colors.textSecondary} name="close" size={22} />
               </Pressable>
             </View>
@@ -560,19 +565,21 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
               secureTextEntry
               onChangeText={setDeletePassword}
               placeholder="••••••••"
-              placeholderTextColor={AppTheme.colors.textPlaceholder}
+              placeholderTextColor={AppTheme.colors.hint}
               style={styles.input}
               value={deletePassword}
             />
             {deleteError ? <Text style={styles.modalError}>{deleteError}</Text> : null}
             <View style={{ flexDirection: 'row', gap: 12, marginTop: 4 }}>
               <Pressable
+                accessibilityRole="button"
                 onPress={() => setShowDeleteModal(false)}
                 style={[styles.modalCancelBtn, { flex: 1 }]}
               >
                 <Text style={styles.modalCancelBtnText}>Cancel</Text>
               </Pressable>
               <Pressable
+                accessibilityRole="button"
                 disabled={actionLoading}
                 onPress={() => { void confirmDelete(); }}
                 style={[styles.modalSaveBtn, { flex: 1, backgroundColor: AppTheme.colors.error }, actionLoading && { opacity: 0.6 }]}
@@ -595,7 +602,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
         >
           <View style={styles.centerContainer}>
             <View style={styles.body}>
-              <Pressable onPress={() => navigation.goBack()} style={styles.backBtnRow}>
+              <Pressable accessibilityRole="button" onPress={() => navigation.goBack()} style={styles.backBtnRow}>
                 <Ionicons name="arrow-back" size={20} color={AppTheme.colors.textSecondary} />
                 <Text style={styles.backBtnText}>Back</Text>
               </Pressable>
@@ -608,14 +615,14 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
                 {school ? (
                   <View style={styles.titleActions}>
                     {school.admin?.status === 'active' ? (
-                      <Pressable onPress={handleSuspend} style={styles.actionBtn}>
+                      <Pressable accessibilityRole="button" accessibilityLabel="Suspend school" hitSlop={8} onPress={handleSuspend} style={styles.actionBtn}>
                         <Ionicons color={AppTheme.colors.warning} name="ban-outline" size={20} />
                       </Pressable>
                     ) : null}
-                    <Pressable onPress={openEdit} style={styles.actionBtn}>
+                    <Pressable accessibilityRole="button" accessibilityLabel="Edit school" hitSlop={8} onPress={openEdit} style={styles.actionBtn}>
                       <Ionicons color={AppTheme.colors.textPrimary} name="pencil-outline" size={20} />
                     </Pressable>
-                    <Pressable onPress={handleDelete} style={styles.actionBtn}>
+                    <Pressable accessibilityRole="button" accessibilityLabel="Delete school" hitSlop={8} onPress={handleDelete} style={styles.actionBtn}>
                       <Ionicons color={AppTheme.colors.error} name="trash-outline" size={20} />
                     </Pressable>
                   </View>
@@ -649,6 +656,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
                       </Text>
                       <View style={styles.approvalActions}>
                         <Pressable
+                          accessibilityRole="button"
                           onPress={handleApprove}
                           disabled={actionLoading}
                           style={[styles.approveBtn, actionLoading && { opacity: 0.6 }]}
@@ -656,6 +664,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
                           <Text style={styles.approveBtnText}>Approve</Text>
                         </Pressable>
                         <Pressable
+                          accessibilityRole="button"
                           onPress={() => setShowRejectModal(true)}
                           disabled={actionLoading}
                           style={[styles.rejectBtn, actionLoading && { opacity: 0.6 }]}
@@ -668,7 +677,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
                     <View style={[styles.approvalCard, styles.rejectedCard]}>
                       <View style={styles.approvalHeader}>
                         <Ionicons color={AppTheme.colors.error} name="close-circle-outline" size={20} />
-                        <Text style={[styles.approvalTitle, { color: AppTheme.colors.error }]}>Registration Rejected</Text>
+                        <Text style={[styles.approvalTitle, { color: AppTheme.colors.dangerText }]}>Registration Rejected</Text>
                       </View>
                       <Text style={styles.approvalText}>
                         This school registration has been rejected.
@@ -686,6 +695,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
                       </Text>
                       <View style={styles.approvalActions}>
                         <Pressable
+                          accessibilityRole="button"
                           onPress={handleReactivate}
                           disabled={actionLoading}
                           style={[styles.approveBtn, actionLoading && { opacity: 0.6 }]}
@@ -771,6 +781,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
                   {(["teachers", "classes", "recordings"] as ExportResource[]).map(
                     (resource) => (
                       <Pressable
+                        accessibilityRole="button"
                         key={resource}
                         disabled={exporting !== null}
                         onPress={() => void handleExport(resource)}
@@ -893,7 +904,7 @@ const styles = StyleSheet.create({
     borderColor: AppTheme.colors.surface,
   },
   heroInitials: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.heading1,
     fontSize: 36,
   },
@@ -902,7 +913,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   institutionalLabel: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1.5,
@@ -969,7 +980,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   adminAvatarText: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     fontSize: 16,
     fontWeight: '800',
   },
@@ -1019,7 +1030,7 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.surface,
   },
   credentialBtnText: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.caption,
     fontWeight: '700',
   },
@@ -1092,7 +1103,7 @@ const styles = StyleSheet.create({
   exportBtnText: {
     fontSize: 12,
     fontWeight: '700',
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     textTransform: 'capitalize',
   },
   unitsSectionTitle: {
@@ -1247,7 +1258,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   rejectBtnText: {
-    color: AppTheme.colors.error,
+    color: AppTheme.colors.dangerText,
     ...AppTheme.typography.button,
   },
 
@@ -1303,7 +1314,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   modalError: {
-    color: AppTheme.colors.error,
+    color: AppTheme.colors.dangerText,
     ...AppTheme.typography.caption,
   },
   modalSaveBtn: {

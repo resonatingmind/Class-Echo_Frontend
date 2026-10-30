@@ -79,6 +79,7 @@ export function PeriodCard({ period, isNow, isNext, onRecord }: Props) {
           {/* Record CTA — shown on current/next period */}
           {(isNow || isNext) && (
             <Pressable
+              accessibilityRole="button"
               style={[styles.recordBtn, isNow && styles.recordBtnNow]}
               onPress={onRecord}
               disabled={!onRecord}
@@ -177,7 +178,7 @@ const styles = StyleSheet.create({
   },
 
   timeNow: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     fontWeight: "700",
   },
 
@@ -223,7 +224,7 @@ const styles = StyleSheet.create({
   recordText: {
     fontSize: 12,
     fontWeight: "700",
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
   },
   recordTextNow: {
     color: AppTheme.colors.surface,

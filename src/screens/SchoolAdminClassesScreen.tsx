@@ -59,7 +59,7 @@ function ClassCard({
   const initials = classItem.name.slice(0, 2).toUpperCase();
 
   return (
-    <Pressable onPress={onPress} style={styles.card}>
+    <Pressable accessibilityRole="button" onPress={onPress} style={styles.card}>
       <View style={styles.cardLeft}>
         <View style={[styles.cardIcon, { backgroundColor: c.bg }]}>
           <Text style={[styles.cardIconText, { color: c.text }]}>
@@ -168,10 +168,11 @@ function CreateClassModal({
           ) : null}
 
           <View style={styles.modalActions}>
-            <Pressable onPress={handleClose} style={styles.modalCancelBtn}>
+            <Pressable accessibilityRole="button" onPress={handleClose} style={styles.modalCancelBtn}>
               <Text style={styles.modalCancelText}>Cancel</Text>
             </Pressable>
             <Pressable
+              accessibilityRole="button"
               disabled={!canSubmit || submitting}
               onPress={handleCreate}
               style={[
@@ -272,6 +273,7 @@ export function SchoolAdminClassesScreen({ navigation }: Props) {
                 <View style={styles.titleRow}>
                   <Text style={styles.pageTitle}>Academic Classes</Text>
                   <Pressable
+                    accessibilityRole="button"
                     onPress={() => setShowCreate(true)}
                     style={styles.addClassBtn}
                   >
@@ -306,7 +308,7 @@ export function SchoolAdminClassesScreen({ navigation }: Props) {
                   />
                   <Text style={styles.emptyTitle}>Could not load classes</Text>
                   <Text style={styles.emptyBody}>{error}</Text>
-                  <Pressable onPress={() => void load()} style={styles.retryBtn}>
+                  <Pressable accessibilityRole="button" onPress={() => void load()} style={styles.retryBtn}>
                     <Text style={styles.retryText}>Retry</Text>
                   </Pressable>
                 </View>
@@ -416,7 +418,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: AppTheme.spacing.l,
     paddingVertical: AppTheme.spacing.m,
   },
-  retryText: { color: AppTheme.colors.primary, ...AppTheme.typography.button },
+  retryText: { color: AppTheme.colors.primaryText, ...AppTheme.typography.button },
   list: { gap: AppTheme.spacing.m },
   // Class Card
   card: {
@@ -441,7 +443,7 @@ const styles = StyleSheet.create({
   cardInfo: { flex: 1, gap: 4 },
   cardName: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.heading3 },
   cardSection: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.body,
     fontWeight: "600",
   },

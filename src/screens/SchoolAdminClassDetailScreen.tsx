@@ -101,7 +101,7 @@ function AddSubjectModal({
               onChangeText={setName}
               onSubmitEditing={handleCreate}
               placeholder="e.g. Mathematics, Physics…"
-              placeholderTextColor={AppTheme.colors.textPlaceholder}
+              placeholderTextColor={AppTheme.colors.hint}
               returnKeyType="done"
               style={styles.modalInput}
               value={name}
@@ -116,10 +116,11 @@ function AddSubjectModal({
           ) : null}
 
           <View style={styles.modalActions}>
-            <Pressable onPress={handleClose} style={styles.modalCancelBtn}>
+            <Pressable accessibilityRole="button" onPress={handleClose} style={styles.modalCancelBtn}>
               <Text style={styles.modalCancelText}>Cancel</Text>
             </Pressable>
             <Pressable
+              accessibilityRole="button"
               disabled={!canSubmit || submitting}
               onPress={handleCreate}
               style={[styles.modalSubmitBtn, (!canSubmit || submitting) && styles.btnDisabled]}
@@ -174,6 +175,8 @@ function SubjectCard({
           </Text>
         </View>
         <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Delete subject"
           hitSlop={8}
           onPress={(e) => {
             e.stopPropagation?.();
@@ -226,6 +229,7 @@ function SubjectCard({
           </View>
         )}
         <Pressable
+          accessibilityRole="button"
           onPress={(e) => {
             e.stopPropagation?.();
             onAssignPress();
@@ -420,6 +424,7 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
           <Text style={styles.pageTitle}>Curriculum Overview</Text>
           <View style={styles.headingActions}>
             <Pressable
+              accessibilityRole="button"
               onPress={() => {
                 setEditClassName(className);
                 setEditClassSection(section || "");
@@ -436,6 +441,7 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
               <Text style={styles.editClassText}>Edit Class</Text>
             </Pressable>
             <Pressable
+              accessibilityRole="button"
               onPress={() => setShowAddSubject(true)}
               style={styles.addSubjectBtn}
             >
@@ -488,6 +494,7 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
         >
           {["All", "Assigned", "Unassigned"].map((item) => (
             <Pressable
+              accessibilityRole="button"
               key={item}
               onPress={() =>
                 setAssignmentFilter(item as "All" | "Assigned" | "Unassigned")
@@ -621,12 +628,14 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
             ) : null}
             <View style={styles.modalActions}>
               <Pressable
+                accessibilityRole="button"
                 onPress={() => setShowEditClass(false)}
                 style={styles.modalCancelBtn}
               >
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </Pressable>
               <Pressable
+                accessibilityRole="button"
                 disabled={!editClassName.trim() || !editClassSection.trim() || editingClass}
                 onPress={handleEditClassSave}
                 style={[
@@ -699,7 +708,7 @@ const styles = StyleSheet.create({
     marginBottom: AppTheme.spacing.xs,
   },
   academicLabel: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.caption,
     fontWeight: "700",
     letterSpacing: 1.2,
@@ -750,7 +759,7 @@ const styles = StyleSheet.create({
     borderColor: AppTheme.colors.border,
   },
   statNumber: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.display },
-  statNumberWarn: { color: AppTheme.colors.warning },
+  statNumberWarn: { color: AppTheme.colors.warningText },
   statLabel: { color: AppTheme.colors.textSecondary, ...AppTheme.typography.body, marginTop: AppTheme.spacing.xs },
 
   // Subjects section
@@ -805,7 +814,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  miniAvatarText: { color: AppTheme.colors.primaryDark, ...AppTheme.typography.caption, fontSize: 10, fontWeight: "800" },
+  miniAvatarText: { color: AppTheme.colors.primaryText, ...AppTheme.typography.caption, fontSize: 10, fontWeight: "800" },
   assignedTeacherText: {
     color: AppTheme.colors.textPrimary,
     ...AppTheme.typography.body,
@@ -830,7 +839,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
   },
-  assignBtnText: { color: AppTheme.colors.primary, ...AppTheme.typography.caption, fontWeight: "700" },
+  assignBtnText: { color: AppTheme.colors.primaryText, ...AppTheme.typography.caption, fontWeight: "700" },
 
   // Shared states
   center: { alignItems: "center", paddingVertical: 40, gap: 10 },

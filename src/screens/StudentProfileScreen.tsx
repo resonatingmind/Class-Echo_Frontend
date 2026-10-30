@@ -128,7 +128,7 @@ export function StudentProfileScreen({ navigation }: Props) {
             end={{ x: 1, y: 1 }}
             style={styles.hero}
           >
-            <Pressable onPress={() => void handleAvatarPick()} style={styles.avatarWrap}>
+            <Pressable accessibilityRole="button" onPress={() => void handleAvatarPick()} style={styles.avatarWrap}>
               {profile?.profile_image_url ? (
                 <Image source={{ uri: profile.profile_image_url }} style={styles.avatarImage} />
               ) : (
@@ -152,6 +152,7 @@ export function StudentProfileScreen({ navigation }: Props) {
               <Text style={styles.cardTitle}>Personal Details</Text>
               {editing ? (
                 <Pressable
+                  accessibilityRole="button"
                   onPress={() => {
                     setEditing(false);
                     setDraftName(profile?.name ?? '');
@@ -161,7 +162,7 @@ export function StudentProfileScreen({ navigation }: Props) {
                   <Text style={styles.linkText}>Cancel</Text>
                 </Pressable>
               ) : (
-                <Pressable onPress={() => setEditing(true)}>
+                <Pressable accessibilityRole="button" onPress={() => setEditing(true)}>
                   <Text style={styles.linkText}>Edit</Text>
                 </Pressable>
               )}
@@ -173,7 +174,7 @@ export function StudentProfileScreen({ navigation }: Props) {
                 autoCapitalize="words"
                 onChangeText={setDraftName}
                 placeholder="Full name"
-                placeholderTextColor={AppTheme.colors.textPlaceholder}
+                placeholderTextColor={AppTheme.colors.hint}
                 style={styles.input}
                 value={draftName}
               />
@@ -190,7 +191,7 @@ export function StudentProfileScreen({ navigation }: Props) {
                 keyboardType="phone-pad"
                 onChangeText={setDraftMobile}
                 placeholder="Mobile number"
-                placeholderTextColor={AppTheme.colors.textPlaceholder}
+                placeholderTextColor={AppTheme.colors.hint}
                 style={styles.input}
                 value={draftMobile}
               />
@@ -206,6 +207,7 @@ export function StudentProfileScreen({ navigation }: Props) {
 
             {editing ? (
               <Pressable
+                accessibilityRole="button"
                 disabled={saving || !draftName.trim()}
                 onPress={() => void handleSave()}
                 style={[styles.primaryButton, (saving || !draftName.trim()) && styles.buttonDisabled]}
@@ -216,7 +218,7 @@ export function StudentProfileScreen({ navigation }: Props) {
             ) : null}
           </View>
 
-          <Pressable onPress={signOut} style={styles.signOutButton}>
+          <Pressable accessibilityRole="button" onPress={signOut} style={styles.signOutButton}>
             <Ionicons color={AppTheme.colors.error} name="log-out-outline" size={18} />
             <Text style={styles.signOutText}>Sign Out</Text>
           </Pressable>
@@ -270,7 +272,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarFallbackText: { fontSize: 34, fontWeight: '800', color: AppTheme.colors.primaryDark },
+  avatarFallbackText: { fontSize: 34, fontWeight: '800', color: AppTheme.colors.primaryText },
   cameraBadge: {
     position: 'absolute',
     right: 4,
@@ -290,7 +292,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 999,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
     fontWeight: '800',
     overflow: 'hidden',
     fontSize: 13,
@@ -309,7 +311,7 @@ const styles = StyleSheet.create({
   },
   cardHeader: { flexDirection: 'row', alignItems: 'center' },
   cardTitle: { flex: 1, fontSize: 18, fontWeight: '800', color: AppTheme.colors.textPrimary },
-  linkText: { color: AppTheme.colors.primaryDark, fontSize: 14, fontWeight: '700' },
+  linkText: { color: AppTheme.colors.primaryText, fontSize: 14, fontWeight: '700' },
   label: { fontSize: 11, letterSpacing: 1.2, color: AppTheme.colors.textSecondary, fontWeight: '800', marginTop: 4 },
   value: { fontSize: 16, color: AppTheme.colors.textPrimary, fontWeight: '600' },
   input: {

@@ -121,11 +121,11 @@ const styles = StyleSheet.create({
   },
 
   badgeTextSuccess: {
-    color: AppTheme.colors.success,
+    color: AppTheme.colors.successText,
   },
 
   badgeTextWarning: {
-    color: AppTheme.colors.warning,
+    color: AppTheme.colors.warningText,
   },
 });
 

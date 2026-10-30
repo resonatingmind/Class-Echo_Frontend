@@ -49,6 +49,8 @@ export function PasswordField({ label, error, style, onFocus, onBlur, ...rest }:
           {...rest}
         />
         <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
           hitSlop={AppTheme.spacing.m}
           onPress={() => setShowPassword((v) => !v)}
           style={styles.eyeButton}
@@ -100,7 +102,7 @@ paddingRight: AppTheme.spacing.xl,
     padding: AppTheme.spacing.xs,
   },
   errorText: {
-    color: AppTheme.colors.error,
+    color: AppTheme.colors.dangerText,
     ...AppTheme.typography.caption,
   },
 });

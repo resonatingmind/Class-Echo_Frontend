@@ -10,7 +10,7 @@ type Props = {
 export function PlannerToolbar({ onQuickAssignment }: Props) {
   return (
     <View style={styles.container}>
-      <Pressable style={styles.button} onPress={onQuickAssignment}>
+      <Pressable accessibilityRole="button" style={styles.button} onPress={onQuickAssignment}>
         <Ionicons name="person-add" size={18} color="#5e5a5a" />
 
         <Text style={styles.text}>Quick Assignment</Text>

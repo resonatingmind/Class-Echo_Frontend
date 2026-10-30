@@ -82,6 +82,9 @@ export function CalendarPicker({ visible, value, onClose, onSelect }: Props) {
         <Pressable style={styles.card} onPress={(e) => e.stopPropagation()}>
           <View style={styles.header}>
             <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Previous month"
+              hitSlop={8}
               onPress={() =>
                 setCurrentMonth(new Date(currentYear, currentMonthIndex - 1, 1))
               }
@@ -100,6 +103,7 @@ export function CalendarPicker({ visible, value, onClose, onSelect }: Props) {
               }}
             >
               <Pressable
+                accessibilityRole="button"
                 style={styles.dropdownButton}
                 onPress={() => setMonthModalVisible(true)}
               >
@@ -115,6 +119,7 @@ export function CalendarPicker({ visible, value, onClose, onSelect }: Props) {
               </Pressable>
 
               <Pressable
+                accessibilityRole="button"
                 style={styles.dropdownButton}
                 onPress={() => setYearModalVisible(true)}
               >
@@ -129,6 +134,9 @@ export function CalendarPicker({ visible, value, onClose, onSelect }: Props) {
             </View>
 
             <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Next month"
+              hitSlop={8}
               onPress={() =>
                 setCurrentMonth(new Date(currentYear, currentMonthIndex + 1, 1))
               }
@@ -153,6 +161,7 @@ export function CalendarPicker({ visible, value, onClose, onSelect }: Props) {
             {days.map((date, index) =>
               date ? (
                 <Pressable
+                  accessibilityRole="button"
                   key={index}
                   style={[
                     styles.day,
@@ -186,7 +195,7 @@ export function CalendarPicker({ visible, value, onClose, onSelect }: Props) {
             )}
           </View>
 
-          <Pressable style={styles.cancel} onPress={onClose}>
+          <Pressable accessibilityRole="button" style={styles.cancel} onPress={onClose}>
             <Text style={styles.cancelText}>Cancel</Text>
           </Pressable>
         </Pressable>
@@ -279,7 +288,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
   },
   cancelText: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     fontWeight: "700",
     fontSize: 16,
   },

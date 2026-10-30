@@ -50,6 +50,8 @@ export function SecondaryButton({
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ disabled: disabled || loading, busy: loading }}
         onPress={onPress}
         disabled={disabled || loading}
         onPressIn={handlePressIn}

@@ -32,6 +32,7 @@ function FilterChip({
   return (
     <>
       <Pressable
+        accessibilityRole="button"
         disabled={disabled}
         onPress={() => setIsOpen(true)}
         style={[
@@ -71,6 +72,7 @@ function FilterChip({
                 const isSelected = (value ?? "") === item.value;
                 return (
                   <Pressable
+                    accessibilityRole="button"
                     onPress={() => {
                       onChange(item.value === "" ? null : item.value);
                       setIsOpen(false);
@@ -163,7 +165,7 @@ export function ClassFilterBar({
       />
 
       {hasActiveFilter ? (
-        <Pressable onPress={() => onChange({})} style={styles.clearBtn}>
+        <Pressable accessibilityRole="button" onPress={() => onChange({})} style={styles.clearBtn}>
           <Ionicons color={AppTheme.colors.primary} name="close" size={14} />
           <Text style={styles.clearText}>Clear</Text>
         </Pressable>
@@ -201,7 +203,7 @@ const styles = StyleSheet.create({
     ...AppTheme.typography.body,
     flexShrink: 1,
   },
-  chipTextActive: { color: AppTheme.colors.primary, fontWeight: "600" },
+  chipTextActive: { color: AppTheme.colors.primaryText, fontWeight: "600" },
   clearBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -209,7 +211,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: AppTheme.spacing.s,
     paddingVertical: AppTheme.spacing.s,
   },
-  clearText: { color: AppTheme.colors.primary, ...AppTheme.typography.button },
+  clearText: { color: AppTheme.colors.primaryText, ...AppTheme.typography.button },
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.4)",
@@ -243,5 +245,5 @@ const styles = StyleSheet.create({
     borderBottomColor: AppTheme.colors.divider,
   },
   itemText: { color: AppTheme.colors.textPrimary, ...AppTheme.typography.body },
-  itemTextSelected: { color: AppTheme.colors.primary, fontWeight: "600" },
+  itemTextSelected: { color: AppTheme.colors.primaryText, fontWeight: "600" },
 });

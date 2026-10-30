@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     borderColor: AppTheme.colors.border,
   },
   statNumber: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.heading1,
   },
   statLabel: {
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   },
   pendingValue: {
     marginTop: AppTheme.spacing.xs,
-    color: AppTheme.colors.error,
+    color: AppTheme.colors.dangerText,
     ...AppTheme.typography.heading1,
   },
   quickGrid: {
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   teacherScore: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.heading2,
   },
 });

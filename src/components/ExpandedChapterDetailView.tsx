@@ -135,7 +135,7 @@ export function ExpandedChapterDetailView({
           </View>
         </View>
         {role === "teacher" && onAddLearningPlan ? (
-          <Pressable style={styles.secondaryActionBtn} onPress={onAddLearningPlan}>
+          <Pressable accessibilityRole="button" style={styles.secondaryActionBtn} onPress={onAddLearningPlan}>
             <Ionicons name="add" size={13} color={AppTheme.colors.info} />
             <Text style={styles.secondaryActionText}>Add lecture</Text>
           </Pressable>
@@ -153,13 +153,13 @@ export function ExpandedChapterDetailView({
           <View style={styles.emptyBtnRow}>
             {/* Audio belongs to a lecture, so a lecture has to exist first. */}
             {role === "teacher" && onAddLearningPlan ? (
-              <Pressable style={styles.inlineAddBtn} onPress={onAddLearningPlan}>
+              <Pressable accessibilityRole="button" style={styles.inlineAddBtn} onPress={onAddLearningPlan}>
                 <Ionicons name="add-circle-outline" size={14} color={AppTheme.colors.info} />
                 <Text style={styles.inlineAddText}>Create Lecture Title</Text>
               </Pressable>
             ) : null}
             {onOpenChapterDetail ? (
-              <Pressable style={styles.inlineAddBtn} onPress={onOpenChapterDetail}>
+              <Pressable accessibilityRole="button" style={styles.inlineAddBtn} onPress={onOpenChapterDetail}>
                 <Ionicons name="calendar-outline" size={14} color={AppTheme.colors.info} />
                 <Text style={styles.inlineAddText}>Open Lecture Planner</Text>
               </Pressable>
@@ -200,6 +200,7 @@ export function ExpandedChapterDetailView({
               return (
                 <View key={lp.id || idx} style={styles.subTableRow}>
                   <Pressable
+                    accessibilityRole="button"
                     style={[{ flex: 2.8 }, styles.cellCol, canClick && styles.clickableCell]}
                     onPress={canClick ? handlePress : undefined}
                     disabled={!canClick}
@@ -232,6 +233,8 @@ export function ExpandedChapterDetailView({
                   <View style={[{ flex: 0.8, alignItems: "center", justifyContent: "center" }, styles.cellCol]}>
                     {onEditLearningPlan ? (
                       <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel="Edit learning plan"
                         style={styles.actionIconBtn}
                         onPress={() => onEditLearningPlan(lp)}
                         hitSlop={8}
@@ -240,6 +243,7 @@ export function ExpandedChapterDetailView({
                       </Pressable>
                     ) : role === "teacher" && onAddRecording ? (
                       <Pressable
+                        accessibilityRole="button"
                         style={styles.subRecordBtn}
                         onPress={() => onAddRecording(lp.id, lectureName)}
                       >
@@ -271,6 +275,7 @@ export function ExpandedChapterDetailView({
               return (
                 <View key={`${lp.id || idx}-${rec.id}`} style={styles.subTableRow}>
                   <Pressable
+                    accessibilityRole="button"
                     style={[{ flex: 2.8 }, styles.cellCol, canClick && styles.clickableCell]}
                     onPress={canClick ? handlePress : undefined}
                     disabled={!canClick}
@@ -305,15 +310,18 @@ export function ExpandedChapterDetailView({
                   <View style={[{ flex: 0.8, alignItems: "center", justifyContent: "center", flexDirection: "row", gap: 4 }, styles.cellCol]}>
                     {onViewRecordingReport ? (
                       <Pressable
+                        accessibilityRole="button"
                         style={styles.subReportBtn}
                         onPress={() => onViewRecordingReport(rec)}
-                        hitSlop={6}
+                        hitSlop={8}
                       >
                         <Ionicons name="document-text-outline" size={12} color={AppTheme.colors.info} />
                         <Text style={styles.subReportText}>Report</Text>
                       </Pressable>
                     ) : recIdx === 0 && onEditLearningPlan ? (
                       <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel="Edit learning plan"
                         style={styles.actionIconBtn}
                         onPress={() => onEditLearningPlan(lp)}
                         hitSlop={8}
@@ -340,6 +348,7 @@ export function ExpandedChapterDetailView({
             return (
               <View key={rec.id} style={styles.subTableRow}>
                 <Pressable
+                  accessibilityRole="button"
                   style={[{ flex: 2.8 }, styles.cellCol, canClick && styles.clickableCell]}
                   onPress={canClick ? () => onViewRecordingReport!(rec) : undefined}
                   disabled={!canClick}
@@ -369,9 +378,10 @@ export function ExpandedChapterDetailView({
                 <View style={[{ flex: 0.8, alignItems: "center", justifyContent: "center" }, styles.cellCol]}>
                   {onViewRecordingReport ? (
                     <Pressable
+                      accessibilityRole="button"
                       style={styles.subReportBtn}
                       onPress={() => onViewRecordingReport(rec)}
-                      hitSlop={6}
+                      hitSlop={8}
                     >
                       <Ionicons name="document-text-outline" size={12} color={AppTheme.colors.info} />
                       <Text style={styles.subReportText}>Report</Text>
@@ -389,14 +399,14 @@ export function ExpandedChapterDetailView({
       {/* Footer Row */}
       <View style={styles.footerRow}>
         {onAddDocument ? (
-          <Pressable style={styles.footerBtn} onPress={onAddDocument}>
+          <Pressable accessibilityRole="button" style={styles.footerBtn} onPress={onAddDocument}>
             <Ionicons name="document-attach-outline" size={15} color={AppTheme.colors.info} />
             <Text style={styles.footerBtnText}>Chapter PDF Materials</Text>
           </Pressable>
         ) : null}
 
         {onOpenChapterDetail ? (
-          <Pressable style={styles.footerBtn} onPress={onOpenChapterDetail}>
+          <Pressable accessibilityRole="button" style={styles.footerBtn} onPress={onOpenChapterDetail}>
             <Ionicons name="easel-outline" size={15} color={AppTheme.colors.slate600} />
             <Text style={styles.footerBtnTextMuted}>Open Chapter Details →</Text>
           </Pressable>
@@ -463,7 +473,7 @@ const styles = StyleSheet.create({
   breadcrumbTitleCount: {
     fontSize: 11,
     fontWeight: "600",
-    color: AppTheme.colors.info,
+    color: AppTheme.colors.infoStrong,
   },
   topActionsRow: {
     flexDirection: "row",
@@ -493,7 +503,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   secondaryActionText: {
-    color: AppTheme.colors.info,
+    color: AppTheme.colors.infoStrong,
     fontSize: 11,
     fontWeight: "700",
   },
@@ -536,7 +546,7 @@ const styles = StyleSheet.create({
   inlineAddText: {
     fontSize: 12,
     fontWeight: "700",
-    color: AppTheme.colors.info,
+    color: AppTheme.colors.infoStrong,
   },
 
   /* Sub-Table Styles */
@@ -584,7 +594,7 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.slate900,
   },
   clickableTitle: {
-    color: AppTheme.colors.info,
+    color: AppTheme.colors.infoStrong,
   },
   titleMetaBadgeRow: {
     flexDirection: "row",
@@ -595,7 +605,7 @@ const styles = StyleSheet.create({
   titleTypeBadge: {
     fontSize: 9,
     fontWeight: "700",
-    color: AppTheme.colors.info,
+    color: AppTheme.colors.infoStrong,
     backgroundColor: AppTheme.colors.infoBg,
     paddingHorizontal: 5,
     paddingVertical: 1,
@@ -612,7 +622,7 @@ const styles = StyleSheet.create({
   },
   mutedPlaceholder: {
     fontSize: 11,
-    color: AppTheme.colors.slate400,
+    color: AppTheme.colors.slate500,
     fontStyle: "italic",
   },
   addPlanSmallBtn: {
@@ -630,7 +640,7 @@ const styles = StyleSheet.create({
   addPlanSmallText: {
     fontSize: 11,
     fontWeight: "700",
-    color: AppTheme.colors.info,
+    color: AppTheme.colors.infoStrong,
   },
   videoMetaWrap: {
     flexDirection: "row",
@@ -655,7 +665,7 @@ const styles = StyleSheet.create({
   attachVideoSmallText: {
     fontSize: 11,
     fontWeight: "700",
-    color: AppTheme.colors.info,
+    color: AppTheme.colors.infoStrong,
   },
   subScoreText: {
     fontSize: 12,
@@ -684,7 +694,7 @@ const styles = StyleSheet.create({
   },
   emptyActionText: {
     fontSize: 12,
-    color: AppTheme.colors.slate400,
+    color: AppTheme.colors.slate500,
   },
   subReportBtn: {
     flexDirection: "row",
@@ -698,7 +708,7 @@ const styles = StyleSheet.create({
   subReportText: {
     fontSize: 11,
     fontWeight: "700",
-    color: AppTheme.colors.info,
+    color: AppTheme.colors.infoStrong,
   },
   subRecordBtn: {
     flexDirection: "row",
@@ -732,7 +742,7 @@ const styles = StyleSheet.create({
   footerBtnText: {
     fontSize: 12,
     fontWeight: "700",
-    color: AppTheme.colors.info,
+    color: AppTheme.colors.infoStrong,
   },
   footerBtnTextMuted: {
     fontSize: 12,

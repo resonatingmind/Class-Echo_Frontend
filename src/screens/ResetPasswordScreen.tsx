@@ -127,7 +127,7 @@ export function ResetPasswordScreen({ navigation, route }: Props) {
               </Text>
             </View>
             <PrimaryButton title="Request a new link" onPress={() => goTo("ForgotPassword")} />
-            <Pressable onPress={() => goTo("Login")}>
+            <Pressable accessibilityRole="button" onPress={() => goTo("Login")}>
               <Text style={styles.link}>Back to sign in</Text>
             </Pressable>
           </View>
@@ -206,7 +206,7 @@ export function ResetPasswordScreen({ navigation, route }: Props) {
                 Reset links expire 60 minutes after they are sent and work once.
               </Text>
 
-              <Pressable onPress={() => goTo("ForgotPassword")}>
+              <Pressable accessibilityRole="button" onPress={() => goTo("ForgotPassword")}>
                 <Text style={styles.link}>Request a new link</Text>
               </Pressable>
             </View>
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     gap: AppTheme.spacing.s,
   },
   errorText: {
-    color: AppTheme.colors.error,
+    color: AppTheme.colors.dangerText,
     ...AppTheme.typography.body,
     flex: 1,
   },
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   link: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.button,
     textAlign: "center",
   },

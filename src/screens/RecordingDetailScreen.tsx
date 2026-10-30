@@ -188,7 +188,7 @@ const lp = StyleSheet.create({
     paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999,
     backgroundColor: AppTheme.colors.primaryLight, borderWidth: 1, borderColor: AppTheme.colors.primary + '40',
   },
-  text: { fontSize: 12, fontWeight: '700', color: AppTheme.colors.primaryDark },
+  text: { fontSize: 12, fontWeight: '700', color: AppTheme.colors.primaryText },
 });
 
 /** The weakest dimension relative to its max; the report expands it by default. */
@@ -224,7 +224,7 @@ function EvidenceQuote({ text, start, title }: { text: string; start?: number | 
 const HIGHLIGHTS: { key: HighlightKey; label: string; icon: string; color: string }[] = [
   { key: 'best_moment', label: 'Best moment', icon: 'star-outline', color: AppTheme.colors.successText },
   { key: 'moment_to_rethink', label: 'Moment to rethink', icon: 'refresh-circle-outline', color: AppTheme.colors.warningStrong },
-  { key: 'best_interaction', label: 'Best student interaction', icon: 'chatbubbles-outline', color: AppTheme.colors.primaryDark },
+  { key: 'best_interaction', label: 'Best student interaction', icon: 'chatbubbles-outline', color: AppTheme.colors.primaryText },
 ];
 
 /** Three moments worth hearing again, at the top of the report. Teacher only, like every clip. */
@@ -276,7 +276,7 @@ const hl = StyleSheet.create({
   label: { fontSize: 12, fontWeight: '800', letterSpacing: 0.4 },
   note: { fontSize: 13, lineHeight: 19, color: AppTheme.colors.textPrimary },
   play: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 'auto' },
-  time: { fontSize: 12, fontWeight: '700', color: AppTheme.colors.primaryDark },
+  time: { fontSize: 12, fontWeight: '700', color: AppTheme.colors.primaryText },
 });
 
 /** The transcript, line by line with times and speakers when known; tapping a line plays from there. */
@@ -592,7 +592,7 @@ const fc = StyleSheet.create({
   tryText: { fontSize: 15, lineHeight: 22, color: AppTheme.colors.textPrimary },
   why: { fontSize: 13, lineHeight: 19, color: AppTheme.colors.textSecondary },
   toggle: { flexDirection: 'row', alignItems: 'center', gap: 4, minHeight: 44, alignSelf: 'flex-start' },
-  toggleText: { fontSize: 14, fontWeight: '700', color: AppTheme.colors.primary },
+  toggleText: { fontSize: 14, fontWeight: '700', color: AppTheme.colors.primaryText },
 });
 
 const STEPS = ['Uploading', 'Transcribing', 'Analysing', 'Ready'] as const;
@@ -662,6 +662,7 @@ function FailedState({ errorReason, canReplace, retrying, onRetry, onReplace }: 
 
   const retryButton = (
     <Pressable
+      accessibilityRole="button"
       disabled={retrying}
       onPress={onRetry}
       style={[styles.retryButton, styles.failurePrimary]}
@@ -675,7 +676,7 @@ function FailedState({ errorReason, canReplace, retrying, onRetry, onReplace }: 
     </Pressable>
   );
   const replaceButton = (
-    <Pressable onPress={onReplace} style={[styles.retryButton, styles.failurePrimary]}>
+    <Pressable accessibilityRole="button" onPress={onReplace} style={[styles.retryButton, styles.failurePrimary]}>
       <Ionicons color={AppTheme.colors.white} name="cloud-upload-outline" size={16} />
       <Text style={styles.retryButtonText}>Upload different audio</Text>
     </Pressable>
@@ -688,16 +689,17 @@ function FailedState({ errorReason, canReplace, retrying, onRetry, onReplace }: 
       {primary === 'replace' ? replaceButton : retryButton}
       <View style={styles.failureLinks}>
         {primary === 'replace' ? (
-          <Pressable disabled={retrying} onPress={onRetry} style={styles.failureLink}>
+          <Pressable accessibilityRole="button" disabled={retrying} onPress={onRetry} style={styles.failureLink}>
             <Text style={styles.failureLinkText}>{retrying ? 'Queuing…' : 'Retry analysis'}</Text>
           </Pressable>
         ) : canReplace ? (
-          <Pressable onPress={onReplace} style={styles.failureLink}>
+          <Pressable accessibilityRole="button" onPress={onReplace} style={styles.failureLink}>
             <Text style={styles.failureLinkText}>Upload different audio</Text>
           </Pressable>
         ) : null}
         {errorReason ? (
           <Pressable
+            accessibilityRole="button"
             accessibilityState={{ expanded: showDetails }}
             onPress={() => setShowDetails((v) => !v)}
             style={styles.failureLink}
@@ -1205,6 +1207,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
 
             {session?.role === 'teacher' ? (
               <Pressable
+                accessibilityRole="button"
                 onPress={handleNavigateToReplaceAudio}
                 style={styles.sheetOption}
               >
@@ -1221,6 +1224,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
             ) : null}
 
             <Pressable
+              accessibilityRole="button"
               onPress={() => {
                 setShowOptionsSheet(false);
                 setShowEditModal(true);
@@ -1236,7 +1240,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
               </View>
             </Pressable>
 
-            <Pressable onPress={() => void handleArchive()} style={styles.sheetOption}>
+            <Pressable accessibilityRole="button" onPress={() => void handleArchive()} style={styles.sheetOption}>
               <View style={styles.sheetOptionIcon}>
                 <Ionicons color={AppTheme.colors.warning} name="archive-outline" size={20} />
               </View>
@@ -1246,7 +1250,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
               </View>
             </Pressable>
 
-            <Pressable onPress={() => void handleDelete()} style={styles.sheetOption}>
+            <Pressable accessibilityRole="button" onPress={() => void handleDelete()} style={styles.sheetOption}>
               <View style={styles.sheetOptionIcon}>
                 <Ionicons color={AppTheme.colors.dangerText} name="trash-outline" size={20} />
               </View>
@@ -1300,10 +1304,11 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
             />
 
             <View style={styles.modalActions}>
-              <Pressable onPress={() => setShowEditModal(false)} style={styles.secondaryButton}>
+              <Pressable accessibilityRole="button" onPress={() => setShowEditModal(false)} style={styles.secondaryButton}>
                 <Text style={styles.secondaryButtonText}>Cancel</Text>
               </Pressable>
               <Pressable
+                accessibilityRole="button"
                 disabled={updatingDetails}
                 onPress={() => void handleUpdate()}
                 style={[styles.primaryButton, updatingDetails && styles.buttonDisabled]}
@@ -1382,7 +1387,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
-  subjectLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 1.1, color: AppTheme.colors.primary },
+  subjectLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 1.1, color: AppTheme.colors.primaryText },
   heroTitle: { fontSize: 28, fontWeight: '800', color: AppTheme.colors.textPrimary, letterSpacing: -0.6 },
   heroDescription: { fontSize: 14, lineHeight: 22, color: AppTheme.colors.textSecondary },
   heroBadgeRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8 },
@@ -1461,7 +1466,7 @@ const styles = StyleSheet.create({
   failurePrimary: { backgroundColor: AppTheme.colors.primary, minHeight: 44, paddingHorizontal: 18 },
   failureLinks: { flexDirection: 'row', flexWrap: 'wrap', gap: 16 },
   failureLink: { minHeight: 44, justifyContent: 'center' },
-  failureLinkText: { fontSize: 13, fontWeight: '700', color: AppTheme.colors.primaryDark },
+  failureLinkText: { fontSize: 13, fontWeight: '700', color: AppTheme.colors.primaryText },
   failureDetails: {
     fontSize: 12, lineHeight: 18, color: AppTheme.colors.textSecondary,
     padding: 10, borderRadius: AppTheme.radius.medium, backgroundColor: AppTheme.colors.background,

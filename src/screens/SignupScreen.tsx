@@ -275,7 +275,7 @@ export function SignupScreen({ navigation }: Props) {
 
               <View style={styles.loginRow}>
                 <Text style={styles.loginLabel}>Already have an account?</Text>
-                <Pressable onPress={() => navigation.navigate("Login")}>
+                <Pressable accessibilityRole="button" onPress={() => navigation.navigate("Login")}>
                   <Text style={styles.loginLink}> Sign In</Text>
                 </Pressable>
               </View>
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
     gap: AppTheme.spacing.s,
   },
   errorText: {
-    color: AppTheme.colors.error,
+    color: AppTheme.colors.dangerText,
     ...AppTheme.typography.body,
     flex: 1,
   },
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
     ...AppTheme.typography.body,
   },
   loginLink: {
-    color: AppTheme.colors.primary,
+    color: AppTheme.colors.primaryText,
     ...AppTheme.typography.button,
   },
   footer: {

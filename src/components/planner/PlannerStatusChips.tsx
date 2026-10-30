@@ -21,6 +21,7 @@ export function PlannerStatusChips({
   return (
     <View style={styles.row}>
       <Pressable
+        accessibilityRole="button"
         style={[styles.chip, !showOnlyUnassigned && styles.chipActive]}
         onPress={onShowAll}
       >
@@ -36,6 +37,7 @@ export function PlannerStatusChips({
 
       {unassignedCount > 0 ? (
         <Pressable
+          accessibilityRole="button"
           style={[
             styles.chip,
             styles.warningChip,
@@ -103,7 +105,7 @@ const styles = StyleSheet.create({
   warningChipText: {
     fontFamily: AppTheme.typography.family.bold,
     fontSize: 12,
-    color: AppTheme.colors.warning,
+    color: AppTheme.colors.warningText,
   },
 });
 

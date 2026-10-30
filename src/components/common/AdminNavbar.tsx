@@ -35,7 +35,7 @@ export function AdminNavbar({ title, rightActions, onBack, onProfilePress }: Pro
     <View style={styles.header}>
       <View style={styles.headerLeft}>
         {onBack ? (
-          <Pressable onPress={onBack} style={styles.backBtn}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Go back" hitSlop={8} onPress={onBack} style={styles.backBtn}>
             <Ionicons color={AppTheme.colors.textPrimary} name="chevron-back" size={24} />
           </Pressable>
         ) : (
@@ -45,7 +45,7 @@ export function AdminNavbar({ title, rightActions, onBack, onProfilePress }: Pro
       <Text style={[styles.headerTitle, isMobile && styles.headerTitleMobile]} numberOfLines={1}>{title}</Text>
       <View style={styles.headerRight}>
         {rightActions}
-        <Pressable onPress={handleProfilePress} style={styles.iconBtn}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Profile" hitSlop={8} onPress={handleProfilePress} style={styles.iconBtn}>
           <Ionicons color={AppTheme.colors.textPrimary} name="person-circle-outline" size={28} />
         </Pressable>
       </View>

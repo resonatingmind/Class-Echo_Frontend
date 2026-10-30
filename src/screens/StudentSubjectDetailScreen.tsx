@@ -93,7 +93,7 @@ export function StudentSubjectDetailScreen({ navigation, route }: Props) {
   return (
     <SafeAreaView edges={['top']} style={styles.safe}>
       <View style={styles.header}>
-        <Pressable onPress={() => {
+        <Pressable accessibilityRole="button" accessibilityLabel="Go back" hitSlop={8} onPress={() => {
           if (navigation.canGoBack()) {
             navigation.goBack();
           } else {
@@ -141,7 +141,7 @@ export function StudentSubjectDetailScreen({ navigation, route }: Props) {
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
-              <Text style={[styles.statValue, { color: colors.warning }]}>
+              <Text style={[styles.statValue, { color: AppTheme.colors.warningText }]}>
                 {recordings.length - completedCount}
               </Text>
               <Text style={styles.statLabel}>PENDING</Text>
@@ -178,6 +178,7 @@ export function StudentSubjectDetailScreen({ navigation, route }: Props) {
                   const s = statusStyle(recording.status);
                   return (
                     <Pressable
+                      accessibilityRole="button"
                       key={recording.id}
                       onPress={() => navigation.navigate('RecordingDetail', { recording, subjectName })}
                       style={styles.card}
@@ -244,7 +245,7 @@ const styles = StyleSheet.create({
     borderBottomColor: AppTheme.colors.border,
     gap: 8,
   },
-  heroKicker: { fontSize: 11, fontWeight: '700', letterSpacing: 1.1, color: AppTheme.colors.primary },
+  heroKicker: { fontSize: 11, fontWeight: '700', letterSpacing: 1.1, color: AppTheme.colors.primaryText },
   heroTitle: { fontSize: 30, fontWeight: '800', color: AppTheme.colors.textPrimary, letterSpacing: -0.5 },
   heroBody: { fontSize: 14, lineHeight: 20, color: AppTheme.colors.textSecondary },
   statsStrip: {

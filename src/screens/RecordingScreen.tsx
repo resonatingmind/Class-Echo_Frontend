@@ -853,6 +853,8 @@ export function RecordingScreen({ navigation, route }: Props) {
     <SafeAreaView edges={['top']} style={styles.safe}>
       <View style={styles.header}>
         <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
           hitSlop={8}
           onPress={state === 'recording' || state === 'paused' ? () => void cancelRecording() : () => {
             if (navigation.canGoBack()) {
@@ -891,7 +893,7 @@ export function RecordingScreen({ navigation, route }: Props) {
               <Text style={{ fontSize: 13, fontWeight: '700', color: AppTheme.colors.infoStrong }}>
                 Replacing Lecture Audio
               </Text>
-              <Text style={{ fontSize: 12, color: AppTheme.colors.info, marginTop: 2, lineHeight: 16 }}>
+              <Text style={{ fontSize: 12, color: AppTheme.colors.infoStrong, marginTop: 2, lineHeight: 16 }}>
                 Recording or uploading a new audio file will replace the previous recording and trigger a fresh AI evaluation.
               </Text>
             </View>
@@ -910,6 +912,7 @@ export function RecordingScreen({ navigation, route }: Props) {
               </Text>
               <View style={styles.recoveryActions}>
                 <Pressable
+                  accessibilityRole="button"
                   disabled={recovering}
                   onPress={() => void restoreDraft()}
                   style={[styles.recoveryPrimary, recovering && styles.recoveryDisabled]}
@@ -921,6 +924,7 @@ export function RecordingScreen({ navigation, route }: Props) {
                   )}
                 </Pressable>
                 <Pressable
+                  accessibilityRole="button"
                   disabled={recovering}
                   onPress={() => void dismissDraft()}
                   style={styles.recoverySecondary}
@@ -933,7 +937,7 @@ export function RecordingScreen({ navigation, route }: Props) {
         ) : null}
 
         {recoveryNotice ? (
-          <Pressable onPress={() => setRecoveryNotice(null)} style={styles.noticeCard}>
+          <Pressable accessibilityRole="button" onPress={() => setRecoveryNotice(null)} style={styles.noticeCard}>
             <Ionicons color={AppTheme.colors.infoStrong} name="information-circle" size={20} />
             <Text style={styles.noticeText}>{recoveryNotice}</Text>
             <Ionicons color={AppTheme.colors.info} name="close" size={16} />
@@ -965,6 +969,7 @@ export function RecordingScreen({ navigation, route }: Props) {
 
             {__DEV__ && isSpeechSupported && (
               <Pressable
+                accessibilityRole="button"
                 onPress={() => setIsDictatingEnabled(!isDictatingEnabled)}
                 style={styles.toggleRow}
               >
@@ -981,12 +986,12 @@ export function RecordingScreen({ navigation, route }: Props) {
             )}
 
             <View style={[styles.actionChoiceRow, isMobile && { flexDirection: 'column' }]}>
-              <Pressable onPress={() => void startRecording()} style={[styles.recordBtn, isMobile ? { width: '100%' } : { flex: 1 }]}>
+              <Pressable accessibilityRole="button" onPress={() => void startRecording()} style={[styles.recordBtn, isMobile ? { width: '100%' } : { flex: 1 }]}>
                 <Ionicons color={AppTheme.colors.white} name="mic" size={22} />
                 <Text style={styles.recordBtnText}>Start Live Recording</Text>
               </Pressable>
 
-              <Pressable onPress={() => void pickAudioFile()} style={[styles.uploadChoiceBtn, isMobile ? { width: '100%' } : {}]}>
+              <Pressable accessibilityRole="button" onPress={() => void pickAudioFile()} style={[styles.uploadChoiceBtn, isMobile ? { width: '100%' } : {}]}>
                 <Ionicons color={AppTheme.colors.info} name="cloud-upload-outline" size={22} />
                 <Text style={styles.uploadChoiceText}>Upload Audio File</Text>
               </Pressable>
@@ -1065,6 +1070,7 @@ export function RecordingScreen({ navigation, route }: Props) {
             <View style={styles.recordingActions}>
               {/* Icon-only on phones: three labelled buttons do not fit side by side. */}
               <Pressable
+                accessibilityRole="button"
                 accessibilityLabel="Discard recording"
                 onPress={() => void cancelRecording()}
                 style={[styles.cancelBtn, isMobile && styles.iconOnlyBtn]}
@@ -1073,6 +1079,7 @@ export function RecordingScreen({ navigation, route }: Props) {
                 {!isMobile ? <Text style={styles.cancelBtnText}>Discard</Text> : null}
               </Pressable>
               <Pressable
+                accessibilityRole="button"
                 onPress={() => (state === 'paused' ? void resumeRecording() : pauseRecording())}
                 style={[styles.pauseBtn, state === 'paused' && styles.resumeBtn]}
               >
@@ -1085,7 +1092,7 @@ export function RecordingScreen({ navigation, route }: Props) {
                   {state === 'paused' ? 'Resume' : 'Pause'}
                 </Text>
               </Pressable>
-              <Pressable onPress={() => void stopRecording()} style={styles.stopBtn}>
+              <Pressable accessibilityRole="button" onPress={() => void stopRecording()} style={styles.stopBtn}>
                 <View style={styles.stopIcon} />
                 <Text style={styles.stopBtnText}>Stop</Text>
               </Pressable>
@@ -1110,7 +1117,7 @@ export function RecordingScreen({ navigation, route }: Props) {
                   {formatAudioTime(previewStatus.currentTime)} / {formatAudioTime(previewStatus.duration || recordedDuration)}
                 </Text>
               </View>
-              <Pressable onPress={() => void togglePreview()} style={styles.previewButton}>
+              <Pressable accessibilityRole="button" onPress={() => void togglePreview()} style={styles.previewButton}>
                 <View style={styles.previewIcon}>
                   {!previewStatus.isLoaded ? (
                     <ActivityIndicator color={AppTheme.colors.primary} size="small" />
@@ -1197,6 +1204,7 @@ export function RecordingScreen({ navigation, route }: Props) {
                       const isSel = !creatingNewLecture && selectedLearningPlanId === lp.id;
                       return (
                         <Pressable
+                          accessibilityRole="button"
                           key={lp.id}
                           onPress={() => selectExistingLecture(lp)}
                           style={{
@@ -1220,6 +1228,7 @@ export function RecordingScreen({ navigation, route }: Props) {
                       );
                     })}
                     <Pressable
+                      accessibilityRole="button"
                       onPress={selectNewLecture}
                       style={{
                         paddingHorizontal: 12,
@@ -1259,7 +1268,7 @@ export function RecordingScreen({ navigation, route }: Props) {
                       }
                     }}
                     placeholder="Enter lecture title"
-                    placeholderTextColor={AppTheme.colors.textPlaceholder}
+                    placeholderTextColor={AppTheme.colors.hint}
                     style={[styles.input, lectureTitleError && { borderColor: AppTheme.colors.recording }]}
                     value={lectureTitle}
                   />
@@ -1278,7 +1287,7 @@ export function RecordingScreen({ navigation, route }: Props) {
                 numberOfLines={4}
                 onChangeText={setDescription}
                 placeholder="Optional summary or notes for this class"
-                placeholderTextColor={AppTheme.colors.textPlaceholder}
+                placeholderTextColor={AppTheme.colors.hint}
                 style={[styles.input, styles.descriptionInput]}
                 value={description}
               />
@@ -1304,6 +1313,7 @@ export function RecordingScreen({ navigation, route }: Props) {
 
             <View style={styles.footerActions}>
               <Pressable
+                accessibilityRole="button"
                 disabled={uploading}
                 onPress={() => void reRecord()}
                 style={[styles.secondaryBtn, uploading && styles.btnDisabled]}
@@ -1312,6 +1322,7 @@ export function RecordingScreen({ navigation, route }: Props) {
                 <Text style={styles.secondaryBtnText}>Record Again</Text>
               </Pressable>
               <Pressable
+                accessibilityRole="button"
                 disabled={uploading}
                 onPress={() => void handleUpload()}
                 style={[styles.primaryBtn, uploading && styles.btnDisabled]}
@@ -1372,7 +1383,7 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
     backgroundColor: AppTheme.colors.primaryLight,
   },
-  suggestionHintText: { flex: 1, fontSize: 12, lineHeight: 17, color: AppTheme.colors.primaryDark },
+  suggestionHintText: { flex: 1, fontSize: 12, lineHeight: 17, color: AppTheme.colors.primaryText },
   chapterEmpty: { fontSize: 13, lineHeight: 19, color: AppTheme.colors.textSecondary },
   chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: {
@@ -1433,7 +1444,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 18,
   },
-  uploadChoiceText: { color: AppTheme.colors.info, fontSize: 15, fontWeight: '800' },
+  uploadChoiceText: { color: AppTheme.colors.infoStrong, fontSize: 15, fontWeight: '800' },
   recoveryCard: {
     flexDirection: 'row',
     gap: 12,
@@ -1637,7 +1648,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '600',
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
   },
   uploadErrorBox: {
     flexDirection: 'row',
@@ -1763,7 +1774,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   placeholderText: {
-    color: AppTheme.colors.textPlaceholder,
+    color: AppTheme.colors.hint,
     fontStyle: 'italic',
   },
   errorText: {

@@ -18,7 +18,7 @@ export function AdminSchoolCard({ school, onPress }: AdminSchoolCardProps) {
     .join('');
 
   return (
-    <Pressable onPress={onPress} style={styles.card}>
+    <Pressable accessibilityRole="button" onPress={onPress} style={styles.card}>
       <View style={styles.topRow}>
         <View style={styles.identityRow}>
           <View style={styles.badge}>
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   badgeText: {
-    color: AppTheme.colors.primaryDark,
+    color: AppTheme.colors.primaryText,
     fontSize: 18,
     fontWeight: '800',
   },

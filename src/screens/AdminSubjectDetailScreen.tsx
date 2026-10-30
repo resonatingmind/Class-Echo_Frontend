@@ -90,7 +90,7 @@ function RecordingRow({
         <View style={[styles.statusBadge, { backgroundColor: status.bg }]}>
           <Text style={[styles.statusText, { color: status.text }]}>{status.label}</Text>
         </View>
-        <Pressable hitSlop={8} onPress={handleDelete} style={styles.deleteBtn}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Delete recording" hitSlop={8} onPress={handleDelete} style={styles.deleteBtn}>
           <Ionicons color={AppTheme.colors.error} name="trash-outline" size={16} />
         </Pressable>
       </View>
@@ -170,7 +170,7 @@ export function AdminSubjectDetailScreen({ navigation, route }: Props) {
         </View>
         <Text style={styles.headerTitle}>Super Admin</Text>
         <View style={styles.headerRight}>
-          <Pressable onPress={signOut} style={styles.iconBtn}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Sign out" hitSlop={8} onPress={signOut} style={styles.iconBtn}>
             <Ionicons color={AppTheme.colors.textPrimary} name="log-out-outline" size={24} />
           </Pressable>
         </View>
@@ -193,7 +193,7 @@ export function AdminSubjectDetailScreen({ navigation, route }: Props) {
         >
           <View style={styles.centerContainer}>
             <View style={styles.body}>
-              <Pressable onPress={() => navigation.goBack()} style={styles.backBtnRow}>
+              <Pressable accessibilityRole="button" onPress={() => navigation.goBack()} style={styles.backBtnRow}>
                 <Ionicons name="arrow-back" size={20} color={AppTheme.colors.textSecondary} />
                 <Text style={styles.backBtnText}>Back</Text>
               </Pressable>
@@ -224,7 +224,7 @@ export function AdminSubjectDetailScreen({ navigation, route }: Props) {
                   </View>
                   <View style={styles.statDivider} />
                   <View style={styles.statItem}>
-                    <Text style={[styles.statValue, { color: AppTheme.colors.warning }]}>
+                    <Text style={[styles.statValue, { color: AppTheme.colors.warningText }]}>
                       {recordings.length - completedCount}
                     </Text>
                     <Text style={styles.statLabel}>PENDING</Text>
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  studentAvatarText: { fontSize: 15, fontWeight: '800', color: AppTheme.colors.primary },
+  studentAvatarText: { fontSize: 15, fontWeight: '800', color: AppTheme.colors.primaryText },
 });
 
 

@@ -51,7 +51,9 @@ export function PlannerSubjectRow({
             <Ionicons name="alert-circle-outline" size={14} color={AppTheme.colors.warning} />
             <Text style={styles.unassignedText}>Needs teacher</Text>
             <Pressable
+              accessibilityRole="button"
               style={styles.assignButton}
+              hitSlop={10}
               onPress={() => onAssignTeacher?.(item)}
             >
               <Text style={styles.assignButtonText}>Assign</Text>
@@ -59,6 +61,7 @@ export function PlannerSubjectRow({
           </>
         ) : (
           <Pressable
+            accessibilityRole="button"
             style={styles.teacherRow}
             onPress={() => onTeacherPress?.(item)}
           >
@@ -143,7 +146,7 @@ const styles = StyleSheet.create({
   unassignedText: {
     fontFamily: AppTheme.typography.family.semibold,
     fontSize: 12,
-    color: AppTheme.colors.warning,
+    color: AppTheme.colors.warningText,
     flex: 1,
   },
 

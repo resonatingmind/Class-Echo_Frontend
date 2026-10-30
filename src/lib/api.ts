@@ -10,6 +10,9 @@ import {
   SelfRating,
   SelfRatingArea,
   SharedClip,
+  Milestone,
+  SchoolGrowth,
+  AdminTeacherGrowth,
 } from '../types/api';
 import {
   ClassOut,
@@ -836,6 +839,7 @@ export async function updateSchoolAdminMe(
     name?: string | null;
     school_name?: string | null;
     school_address?: string | null;
+    streak_min_recordings?: number;
   },
 ) {
   return request<SchoolAdminProfileOut>(
@@ -1132,60 +1136,6 @@ export type TeacherAnalyticsFilters = {
   search?: string;
   endDate?: string;
 };
-
-export async function getTeacherAnalytics(
-  token: string,
-  teacherId: number,
-  filters?: TeacherAnalyticsFilters,
-) {
-  const params = new URLSearchParams();
-
-  if (filters?.search?.trim()) {
-    params.append("search", filters.search.trim());
-  }
-  if (filters?.classId) {
-    params.append("class_id", String(filters.classId));
-  }
-
-  if (filters?.subjectId) {
-    params.append("subject_id", String(filters.subjectId));
-  }
-
-  if (filters?.semester) {
-    params.append("semester", String(filters.semester));
-  }
-
-  if (filters?.status) {
-    params.append("status", filters.status);
-  }
-
-  if (filters?.startDate) {
-    params.append("start_date", filters.startDate);
-  }
-
-  if (filters?.endDate) {
-    params.append("end_date", filters.endDate);
-  }
-
-  const query = params.toString();
-
-  return request<TeacherAnalytics>(
-    `/school/teachers/${teacherId}/analytics${query ? `?${query}` : ""}`,
-    {},
-    token,
-  );
-}
-
-export async function getTeacherAnalyticsFilters(
-  token: string,
-  teacherId: number,
-) {
-  return request<AnalyticsFilters>(
-    `/school/teachers/${teacherId}/analytics/filters`,
-    {},
-    token,
-  );
-}
 
 export interface TeacherSubjectSummary {
   id: number;
@@ -2104,16 +2054,6 @@ export async function getSchoolAnalytics(
   return request<SchoolAnalytics>("/school/dashboard/analytics", {}, token);
 }
 
-export async function getTeacherRanking(
-  token: string,
-): Promise<TeacherRanking> {
-  return request<TeacherRanking>(
-    "/school/dashboard/teacher-ranking",
-    {},
-    token,
-  );
-}
-
 export async function getRecentActivity(
   token: string,
 ): Promise<RecentActivity> {
@@ -2332,6 +2272,25 @@ export async function removeDeviceToken(token: string, pushToken: string): Promi
 /** My Growth: trends per area and focus progress, against the teacher's own past. */
 export async function getMyGrowth(token: string) {
   return request<GrowthOut>("/teacher/growth", {}, token);
+}
+
+/** Show a milestone to the school admin, or make it private again. */
+export async function setMilestoneShared(token: string, milestoneId: number, shared: boolean) {
+  return request<Milestone>(
+    `/teacher/milestones/${milestoneId}`,
+    { method: "PUT", body: JSON.stringify({ shared }) },
+    token,
+  );
+}
+
+/** School admin: every teacher's status against their own past, and common weak areas. */
+export async function getSchoolGrowth(token: string) {
+  return request<SchoolGrowth>("/school/growth", {}, token);
+}
+
+/** School admin: one teacher's trends, focus, streak, and what they shared. */
+export async function getTeacherGrowthForAdmin(token: string, teacherId: number) {
+  return request<AdminTeacherGrowth>(`/school/teachers/${teacherId}/growth`, {}, token);
 }
 
 /** Leave a lecture out of My Growth trends (needs a doesn't-fit-this-class dispute), or put it back. */

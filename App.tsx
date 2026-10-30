@@ -64,7 +64,7 @@ const linking = {
 
       SchoolAdminClassDetail: "admin/class/:classId",
       SchoolAdminTeacherDetail: "admin/teacher/:teacherId",
-      SchoolAdminTeacherAnalytics: "admin/teacher/:teacherId/analytics",
+      SchoolAdminTeacherGrowth: { path: "admin/teacher/:teacherId/growth", alias: ["admin/teacher/:teacherId/analytics"] },
       SchoolAdminTeacherRecordings: "admin/teacher/:teacherId/recordings",
       SchoolAdminSubjectChapters: "admin/subject/:subjectId/chapters",
       SchoolAdminChapterDetail: "admin/chapter/:chapterId",

@@ -16,12 +16,15 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { useAuth } from "../context/AuthContext";
 import {
+  getMyGrowth,
   getTeacherDashboard,
   getTeacherMe,
   getTeacherSubjectRecordings,
   getTeacherTimetable,
 } from "../lib/api";
+import { FocusProgressCard, StreakCard } from "../components/teacher/GrowthSummary";
 import {
+  GrowthOut,
   RecordingWithReport,
   TeacherDashboardSubject,
   TeacherOut,
@@ -80,6 +83,7 @@ export function TeacherDashboardScreen() {
   const [subjects,   setSubjects]   = useState<TeacherDashboardSubject[]>([]);
   const [timetable,  setTimetable]  = useState<TimetableEntryOut[]>([]);
   const [latestReport, setLatestReport] = useState<RecentRecording | null>(null);
+  const [growth, setGrowth] = useState<GrowthOut | null>(null);
   const [loading,    setLoading]    = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -96,6 +100,8 @@ export function TeacherDashboardScreen() {
       setProfile(profileData);
       setSubjects(dashboard.subjects);
       setTimetable(timetableData);
+      // Focus and streak are extra; the dashboard works without them.
+      getMyGrowth(session.token).then(setGrowth, () => setGrowth(null));
 
       // Only subjects with a recording can hold the latest report.
       const withRecordings = dashboard.subjects.filter((s) => s.recording_count > 0);
@@ -288,6 +294,12 @@ export function TeacherDashboardScreen() {
               <Ionicons name="chevron-forward" size={16} color={AppTheme.colors.primary} />
             </View>
           </Pressable>
+        ) : null}
+
+        {/* ── Focus and streak: hidden until there is something to show ── */}
+        {growth?.focus ? <FocusProgressCard focus={growth.focus} /> : null}
+        {growth?.streak && (growth.streak.weeks > 0 || growth.streak.this_week > 0) ? (
+          <StreakCard streak={growth.streak} />
         ) : null}
 
         {/* ── Today's Schedule ── */}

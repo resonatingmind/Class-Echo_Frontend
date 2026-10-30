@@ -409,13 +409,13 @@ try {
             <Pressable
               style={[styles.actionBtn, styles.actionBtnSecondary]}
               onPress={() =>
-                navigation.navigate("SchoolAdminTeacherAnalytics", {
+                navigation.navigate("SchoolAdminTeacherGrowth", {
                   teacherId: teacher.id,
                 })
               }
             >
-              <Ionicons name="bar-chart" size={20} color={AppTheme.colors.primary} />
-              <Text style={styles.actionBtnTextSecondary}>View Analytics</Text>
+              <Ionicons name="trending-up" size={20} color={AppTheme.colors.primary} />
+              <Text style={styles.actionBtnTextSecondary}>View Growth</Text>
             </Pressable>
 
             <Pressable

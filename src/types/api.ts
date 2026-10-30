@@ -290,6 +290,8 @@ export type SchoolAdminProfileOut = {
   school_name: string;
   school_logo_url: string | null;
   school_address: string | null;
+  /** Recordings a week needs to count towards a teacher's streak. */
+  streak_min_recordings?: number;
   created_at: string;
 };
 
@@ -559,6 +561,9 @@ export type RecordingWithReport = {
   learning_plan_id?: number | null;
   learning_plan?: LearningPlanOut | null;
   report?: LLMReportOut | null;
+  /** School admin's view: the report stays with the teacher; only shared moments are sent. */
+  report_private?: boolean;
+  shared_clips?: SharedClip[] | null;
 };
 
 export type StudentWithClassOut = {
@@ -988,4 +993,56 @@ export type GrowthOut = {
     recent: number;
     improved: number;
   } | null;
+  streak?: Streak | null;
+  /** Newest first. On the admin's view, only the ones the teacher shared. */
+  milestones?: Milestone[];
+};
+
+/** Weeks in a row with at least `threshold` recordings; holiday weeks skipped. */
+export type Streak = { weeks: number; best: number; threshold: number; this_week: number };
+
+export type Milestone = {
+  id: number;
+  /** first_recording, ten_lectures, streak_4_weeks, focus_achieved:<area>, best_engagement,
+   *  chapter_covered:<chapter id>, five_self_ratings, self_match_3 */
+  key: string;
+  achieved_at: string;
+  meta: { area?: string; chapter?: string; score?: number; max?: number };
+  shared: boolean;
+};
+
+export type TeacherStatus = 'improving' | 'steady' | 'needs_support';
+
+/** A moment a teacher shared, with just enough of the lecture to play it. */
+export type SharedClipForAdmin = SharedClip & {
+  recording_id: number;
+  lecture_title: string | null;
+  recorded_at: string;
+  audio_url: string;
+  segments: TranscriptSegment[];
+};
+
+/** GET /school/teachers/{id}/growth */
+export type AdminTeacherGrowth = {
+  teacher_id: number;
+  name: string;
+  status: TeacherStatus | null;
+  growth: GrowthOut;
+  shared_clips: SharedClipForAdmin[];
+};
+
+/** GET /school/growth: each teacher against their own past, and the school's weak spots. No ranking. */
+export type SchoolGrowth = {
+  teachers: {
+    teacher_id: number;
+    name: string;
+    status: TeacherStatus | null;
+    lecture_count: number;
+    overall_change: number | null;
+    focus_area: string | null;
+    streak_weeks: number;
+  }[];
+  teachers_counted: number;
+  weakest_areas: { area: string; teachers: number; share: number }[];
+  status_counts: Partial<Record<TeacherStatus | 'not_enough_data', number>>;
 };

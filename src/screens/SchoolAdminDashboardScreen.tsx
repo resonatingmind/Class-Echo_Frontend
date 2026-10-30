@@ -13,8 +13,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AdminNavbar } from "../components/common/AdminNavbar";
 import { useAuth } from "../context/AuthContext";
-import { getSchoolDashboardOverview, getTeacherRanking } from "../lib/api";
-import { SchoolDashboardOverview, TeacherRanking } from "../types/api";
+import { getSchoolDashboardOverview, getSchoolGrowth } from "../lib/api";
+import { SchoolDashboardOverview, SchoolGrowth } from "../types/api";
+import { SchoolGrowthCard } from "../components/admin/SchoolGrowthCard";
 import { AppTheme } from "../theme/AppTheme";
 
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -28,18 +29,19 @@ export function SchoolAdminDashboardScreen({ navigation }: Props) {
   const { session } = useAuth();
   const [loading, setLoading] = useState(true);
   const [overview, setOverview] = useState<SchoolDashboardOverview | null>(null);
-  const [ranking, setRanking] = useState<TeacherRanking | null>(null);
+  const [growth, setGrowth] = useState<SchoolGrowth | null>(null);
 
   const load = useCallback(async () => {
     if (!session) return;
     setLoading(true);
     try {
-      const [overviewData, rankingData] = await Promise.all([
+      const [overviewData, growthData] = await Promise.all([
         getSchoolDashboardOverview(session.token),
-        getTeacherRanking(session.token),
+        // Growth is extra; the overview still shows without it.
+        getSchoolGrowth(session.token).catch(() => null),
       ]);
       setOverview(overviewData);
-      setRanking(rankingData);
+      setGrowth(growthData);
     } finally {
       setLoading(false);
     }
@@ -112,39 +114,13 @@ export function SchoolAdminDashboardScreen({ navigation }: Props) {
                   </View>
                 </View>
 
-                {/* Top Teachers */}
-                {ranking && ranking.teachers.length > 0 && (
-                  <>
-                    <Text style={styles.sectionTitle}>Top Teachers</Text>
-                    <View style={styles.list}>
-                      {ranking.teachers.map((teacher, index) => {
-                        const medal =
-                          index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : "🏅";
-
-                        return (
-                          <View key={teacher.teacher_id} style={styles.card}>
-                            <View style={styles.cardTop}>
-                              <View style={styles.cardIcon}>
-                                <Text style={styles.cardInitials}>{medal}</Text>
-                              </View>
-                              <View style={styles.cardBodyText}>
-                                <Text style={styles.cardName} numberOfLines={1}>
-                                  {teacher.teacher_name}
-                                </Text>
-                                <Text style={styles.cardAddress} numberOfLines={1}>
-                                  {teacher.total_lectures} Lectures
-                                </Text>
-                              </View>
-                              <View style={styles.scoreContainer}>
-                                <Text style={styles.teacherScore}>{teacher.overall_score}%</Text>
-                              </View>
-                            </View>
-                          </View>
-                        );
-                      })}
-                    </View>
-                  </>
-                )}
+                {/* Teacher growth: each against their own past, never ranked */}
+                {growth && growth.teachers.length > 0 ? (
+                  <SchoolGrowthCard
+                    growth={growth}
+                    onOpenTeacher={(teacherId) => navigation.navigate("SchoolAdminTeacherGrowth", { teacherId })}
+                  />
+                ) : null}
               </View>
             </View>
           </ScrollView>

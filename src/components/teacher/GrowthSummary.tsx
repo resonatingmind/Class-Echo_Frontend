@@ -1,11 +1,13 @@
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, Switch, Text, View } from 'react-native';
 
-import { getMyGrowth } from '../../lib/api';
+import { getMyGrowth, setMilestoneShared } from '../../lib/api';
+import { describeMilestone } from '../../lib/milestones';
 import { DIMENSION_LABELS } from '../../lib/reportFindings';
 import { AppTheme } from '../../theme/AppTheme';
-import { AreaTrend, GrowthOut } from '../../types/api';
+import { AreaTrend, GrowthOut, Milestone, Streak } from '../../types/api';
+import { MonthlySummaryButton } from './MonthlySummary';
 
 type Props = {
   token: string;
@@ -72,36 +74,101 @@ function TrendRow({ trend, label, isFocus }: { trend: AreaTrend; label: string; 
   );
 }
 
-/**
- * The top of My Growth: how each area is moving (last lectures vs the ones
- * before), and progress on the current focus. Only ever compared with the
- * teacher's own past, and only within one scoring rubric.
- */
-export function GrowthSummary({ token, reloadKey }: Props) {
-  const [growth, setGrowth] = useState<GrowthOut | null>(null);
-  const [failed, setFailed] = useState(false);
+/** Your focus, with a dot per recent lecture that beat the earlier average. */
+export function FocusProgressCard({ focus, label = 'YOUR FOCUS' }: { focus: NonNullable<GrowthOut['focus']>; label?: string }) {
+  return (
+    <View style={styles.focusCard}>
+      <Text style={styles.focusLabel}>{label} · {areaLabel(focus.area).toUpperCase()}</Text>
+      <Text style={styles.focusText}>{focus.try_this}</Text>
+      {focus.recent > 0 ? (
+        <View style={styles.progressRow}>
+          <View style={styles.dots}>
+            {Array.from({ length: focus.recent }, (_, i) => (
+              <View key={i} style={[styles.dot, i < focus.improved && styles.dotOn]} />
+            ))}
+          </View>
+          <Text style={styles.progressText}>
+            {focus.improved} of the last {focus.recent} lectures beat the earlier average
+          </Text>
+        </View>
+      ) : null}
+    </View>
+  );
+}
 
-  useEffect(() => {
-    let live = true;
-    setFailed(false);
-    getMyGrowth(token)
-      .then((g) => live && setGrowth(g))
-      .catch(() => live && setFailed(true));
-    return () => {
-      live = false;
-    };
-  }, [token, reloadKey]);
-
-  // Trends are extra; the lesson list below still works without them.
-  if (failed) return null;
-  if (!growth) {
-    return (
-      <View style={styles.loading}>
-        <ActivityIndicator color={AppTheme.colors.hint} />
+/** Weeks in a row, and how this week is going. */
+export function StreakCard({ streak, own = true }: { streak: Streak; own?: boolean }) {
+  const left = Math.max(0, streak.threshold - streak.this_week);
+  return (
+    <View accessible style={styles.streakCard}>
+      <Ionicons color={streak.weeks > 0 ? '#C2410C' : AppTheme.colors.hint} name="flame-outline" size={22} />
+      <View style={styles.streakBody}>
+        <Text style={styles.streakTitle}>
+          {streak.weeks > 0 ? `${streak.weeks}-week streak` : own ? 'Start a streak this week' : 'No streak yet'}
+        </Text>
+        <Text style={styles.streakSub}>
+          {!own
+            ? `${streak.this_week} of ${streak.threshold} recordings this week.`
+            : left > 0
+              ? `${left} more recording${left === 1 ? '' : 's'} this week keeps it going.`
+              : 'This week counts.'}
+          {streak.best > streak.weeks ? ` Best: ${streak.best} weeks.` : ''}
+        </Text>
       </View>
-    );
-  }
+    </View>
+  );
+}
 
+/** Milestones, newest first. The teacher can show each one to their admin; the admin sees only shared ones. */
+export function MilestoneList({ milestones, onToggleShare }: {
+  milestones: Milestone[];
+  /** Teacher only. */
+  onToggleShare?: (m: Milestone) => void;
+}) {
+  if (milestones.length === 0) return null;
+  return (
+    <View style={styles.card}>
+      {milestones.map((m) => {
+        const text = describeMilestone(m);
+        return (
+          <View key={m.id} style={styles.milestone}>
+            <Ionicons color={AppTheme.colors.primaryDark} name={text.icon as any} size={20} />
+            <View style={styles.rowBody}>
+              <Text style={styles.rowLabel}>{text.title}</Text>
+              <Text style={styles.rowSub}>
+                {text.detail} {new Date(m.achieved_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              </Text>
+            </View>
+            {onToggleShare ? (
+              <View style={styles.shareSwitch}>
+                <Text style={styles.shareLabel}>{m.shared ? 'Shown to admin' : 'Private'}</Text>
+                <Switch
+                  accessibilityLabel={`Show ${text.title} to your admin`}
+                  onValueChange={() => onToggleShare(m)}
+                  value={m.shared}
+                />
+              </View>
+            ) : null}
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+/**
+ * Trends, focus progress, streak and milestones. Only ever compared with the
+ * teacher's own past, and only within one scoring rubric. The admin sees the
+ * same view with shared milestones only.
+ */
+export function GrowthView({ growth, audience, onToggleShare, actions }: {
+  growth: GrowthOut;
+  audience: 'teacher' | 'admin';
+  onToggleShare?: (m: Milestone) => void;
+  /** Shown under the heading, e.g. the monthly summary button. */
+  actions?: ReactNode;
+}) {
+  const own = audience === 'teacher';
   const notes: string[] = [];
   if (growth.older_rubric_count > 0) {
     notes.push(
@@ -120,41 +187,36 @@ export function GrowthSummary({ token, reloadKey }: Props) {
     (a, b) => Number(b.area === focus?.area) - Number(a.area === focus?.area),
   );
 
+  const milestones = growth.milestones ?? [];
+
   return (
     <View style={styles.wrap}>
       <View style={styles.head}>
-        <Text style={styles.title}>How you're growing</Text>
+        <Text style={styles.title}>{own ? "How you're growing" : 'Growth'}</Text>
         <Text style={styles.subtitle}>
-          Your last {growth.window} lectures compared with the {growth.window} before. Only ever compared with your own past.
+          {own ? 'Your' : 'The'} last {growth.window} lectures compared with the {growth.window} before. Only ever
+          compared with {own ? 'your' : 'their'} own past.
         </Text>
+        {actions}
       </View>
+
+      {growth.streak ? <StreakCard own={own} streak={growth.streak} /> : null}
 
       {growth.lecture_count === 0 ? (
         <View style={[styles.card, styles.emptyCard]}>
           <Ionicons name="trending-up-outline" size={28} color={AppTheme.colors.hint} />
-          <Text style={styles.emptyTitle}>Your trends start with your next report</Text>
-          <Text style={styles.emptyBody}>Record a few lectures and you'll see how each area is moving.</Text>
+          <Text style={styles.emptyTitle}>
+            {own ? 'Your trends start with your next report' : 'No scored lectures yet'}
+          </Text>
+          <Text style={styles.emptyBody}>
+            {own
+              ? "Record a few lectures and you'll see how each area is moving."
+              : 'Trends appear once this teacher has a few reports.'}
+          </Text>
         </View>
       ) : (
         <>
-          {focus ? (
-            <View style={styles.focusCard}>
-              <Text style={styles.focusLabel}>YOUR FOCUS · {areaLabel(focus.area).toUpperCase()}</Text>
-              <Text style={styles.focusText}>{focus.try_this}</Text>
-              {focus.recent > 0 ? (
-                <View style={styles.progressRow}>
-                  <View style={styles.dots}>
-                    {Array.from({ length: focus.recent }, (_, i) => (
-                      <View key={i} style={[styles.dot, i < focus.improved && styles.dotOn]} />
-                    ))}
-                  </View>
-                  <Text style={styles.progressText}>
-                    {focus.improved} of your last {focus.recent} lectures beat your earlier average
-                  </Text>
-                </View>
-              ) : null}
-            </View>
-          ) : null}
+          {focus ? <FocusProgressCard focus={focus} label={own ? 'YOUR FOCUS' : 'CURRENT FOCUS'} /> : null}
 
           <View style={styles.card}>
             <TrendRow label="Overall score" trend={growth.overall} />
@@ -168,7 +230,69 @@ export function GrowthSummary({ token, reloadKey }: Props) {
       {notes.map((n) => (
         <Text key={n} style={styles.note}>{n}</Text>
       ))}
+
+      {milestones.length > 0 ? (
+        <>
+          <View style={styles.head}>
+            <Text style={styles.title}>Milestones</Text>
+            <Text style={styles.subtitle}>
+              {own ? 'Private unless you choose to show one to your admin.' : 'Only the milestones this teacher chose to share.'}
+            </Text>
+          </View>
+          <MilestoneList milestones={milestones} onToggleShare={onToggleShare} />
+        </>
+      ) : null}
     </View>
+  );
+}
+
+/** The top of My Growth: loads the teacher's growth and lets them share milestones. */
+export function GrowthSummary({ token, reloadKey }: Props) {
+  const [growth, setGrowth] = useState<GrowthOut | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let live = true;
+    setFailed(false);
+    getMyGrowth(token)
+      .then((g) => live && setGrowth(g))
+      .catch(() => live && setFailed(true));
+    return () => {
+      live = false;
+    };
+  }, [token, reloadKey]);
+
+  const toggleShare = async (m: Milestone) => {
+    const flip = (shared: boolean) =>
+      setGrowth((g) => g && {
+        ...g,
+        milestones: g.milestones?.map((x) => (x.id === m.id ? { ...x, shared } : x)),
+      });
+    flip(!m.shared);
+    try {
+      await setMilestoneShared(token, m.id, !m.shared);
+    } catch (e) {
+      flip(m.shared);
+      Alert.alert('Could not save', e instanceof Error ? e.message : 'Please try again.');
+    }
+  };
+
+  // Trends are extra; the lesson list below still works without them.
+  if (failed) return null;
+  if (!growth) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator color={AppTheme.colors.hint} />
+      </View>
+    );
+  }
+  return (
+    <GrowthView
+      actions={<MonthlySummaryButton growth={growth} />}
+      audience="teacher"
+      growth={growth}
+      onToggleShare={(m) => void toggleShare(m)}
+    />
   );
 }
 
@@ -233,4 +357,27 @@ const styles = StyleSheet.create({
   dotOn: { backgroundColor: AppTheme.colors.primary },
   progressText: { flex: 1, fontSize: 13, color: AppTheme.colors.textSecondary },
   note: { fontSize: 12, lineHeight: 17, color: AppTheme.colors.textSecondary },
+  streakCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: AppTheme.spacing.m,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.large,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
+    padding: AppTheme.spacing.l,
+  },
+  streakBody: { flex: 1, gap: 2 },
+  streakTitle: { fontSize: 15, fontWeight: '800', color: AppTheme.colors.textPrimary },
+  streakSub: { fontSize: 13, lineHeight: 18, color: AppTheme.colors.textSecondary },
+  milestone: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: AppTheme.spacing.m,
+    paddingVertical: AppTheme.spacing.m,
+    borderBottomWidth: 1,
+    borderBottomColor: AppTheme.colors.divider,
+  },
+  shareSwitch: { alignItems: 'center', gap: 2, minWidth: 88 },
+  shareLabel: { fontSize: 11, fontWeight: '600', color: AppTheme.colors.textSecondary },
 });

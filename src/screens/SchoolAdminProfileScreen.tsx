@@ -28,6 +28,7 @@ import {
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { AppTheme } from "../theme/AppTheme";
 import { SchoolAdminProfileOut } from "../types/api";
+import { StreakSetting } from "../components/admin/StreakSetting";
 
 type Props = NativeStackScreenProps<RootStackParamList, "SchoolAdminProfile">;
 
@@ -347,6 +348,14 @@ export function SchoolAdminProfileScreen({ navigation }: Props) {
                     </Pressable>
                   ) : null}
                 </View>
+
+                {profile && session?.token ? (
+                  <StreakSetting
+                    onSaved={(value) => setProfile({ ...profile, streak_min_recordings: value })}
+                    token={session.token}
+                    value={profile.streak_min_recordings ?? 2}
+                  />
+                ) : null}
 
                 <Pressable onPress={signOut} style={styles.signOutButton}>
                   <Ionicons color={AppTheme.colors.error} name="log-out-outline" size={20} />

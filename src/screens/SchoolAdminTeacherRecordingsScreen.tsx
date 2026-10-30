@@ -150,18 +150,13 @@ export function SchoolAdminTeacherRecordingsScreen({
             new Date(b.uploaded_at).getTime()
           );
 
-        case "Highest Score":
-          return (b.overall_score ?? 0) - (a.overall_score ?? 0);
-
-        case "Lowest Score":
-          return (a.overall_score ?? 0) - (b.overall_score ?? 0);
-
         default:
           return 0;
       }
     });
 
-  const sortOptions = ["Newest", "Oldest", "Highest Score", "Lowest Score"];
+  // No score sorting: reports and scores stay with the teacher.
+  const sortOptions = ["Newest", "Oldest"];
   const statuses = [
     "All",
     ...new Set(recordings.map((r) => r.status).filter(Boolean)),
@@ -184,16 +179,6 @@ export function SchoolAdminTeacherRecordingsScreen({
   const failed = recordings.filter(
     (r) => r.status?.toLowerCase() === "failed",
   ).length;
-
-  const scoredRecordings = recordings.filter((r) => r.overall_score != null);
-
-  const averageScore =
-    scoredRecordings.length > 0
-      ? Math.round(
-          scoredRecordings.reduce((sum, r) => sum + (r.overall_score ?? 0), 0) /
-            scoredRecordings.length,
-        )
-      : 0;
 
   const activeFilterCount =
     Number(statusFilter !== "All") +
@@ -264,13 +249,6 @@ export function SchoolAdminTeacherRecordingsScreen({
                 <Text style={styles.statLabel}>Failed</Text>
               </View>
 
-              <View style={[styles.statCard, styles.statCardAverage, isMobile ? { width: "47%" } : { flex: 1 }]}>
-                <View style={[styles.statIconWrap, styles.statIconAverage]}>
-                  <Ionicons name="bar-chart-outline" size={24} color="#0369A1" />
-                </View>
-                <Text style={[styles.statNumber, { color: "#0369A1" }]}>{averageScore}%</Text>
-                <Text style={styles.statLabel}>Average Score</Text>
-              </View>
             </View>
             <View style={[styles.searchRow, isMobile && { flexDirection: "column" }]}>
               <View style={[styles.searchContainer, isMobile ? { width: "100%", marginBottom: 12, flex: undefined } : {}]}>
@@ -432,28 +410,7 @@ export function SchoolAdminTeacherRecordingsScreen({
                     </Text>
                   </View>
                 </View>
-                
-                <View style={[styles.scoreContainer, isMobile && { width: "100%", alignItems: "flex-start" }]}>
-                  {recording.overall_score != null ? (
-                    <View style={[
-                      styles.scoreBadge, 
-                      recording.overall_score >= 80 ? styles.scoreHigh : recording.overall_score >= 50 ? styles.scoreMed : styles.scoreLow
-                    ]}>
-                      <Text style={[
-                        styles.scoreText,
-                        recording.overall_score >= 80 ? styles.scoreTextHigh : recording.overall_score >= 50 ? styles.scoreTextMed : styles.scoreTextLow
-                      ]}>
-                        {recording.overall_score}
-                      </Text>
-                      <Text style={[
-                        styles.scoreMax,
-                        recording.overall_score >= 80 ? styles.scoreTextHigh : recording.overall_score >= 50 ? styles.scoreTextMed : styles.scoreTextLow
-                      ]}>/100</Text>
-                    </View>
-                  ) : (
-                    <Text style={styles.noScoreText}>--</Text>
-                  )}
-                </View>
+
               </View>
             </Pressable>
           ))}

@@ -907,7 +907,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
         canPlay={isTeacher}
         recordingId={recording.id}
         segments={recording.transcript_segments}
-        sharedClips={report?.shared_clips}
+        sharedClips={report?.shared_clips ?? recording.shared_clips}
         token={session?.token}
       >
       {/* Global Header */}
@@ -966,7 +966,18 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
         </View>
 
         {/* Report: (self-rating first) → summary → highlights → what went well → focus → details (collapsed) */}
-        {askSelfRating && session?.token ? (
+        {recording.report_private ? (
+          <View style={styles.reportWrap}>
+            <View style={[styles.card, styles.privateCard]}>
+              <Ionicons color={AppTheme.colors.textSecondary} name="lock-closed-outline" size={20} />
+              <Text style={styles.privateText}>
+                The report on this lecture is private to the teacher. You can see their growth over time, and any
+                moments they choose to share appear here.
+              </Text>
+            </View>
+            <SharedClipsCard />
+          </View>
+        ) : askSelfRating && session?.token ? (
           <SelfRatingPrompt onDone={setSavedSelfRating} recordingId={recording.id} token={session.token} />
         ) : recording.status === 'completed' && (report || overallScore != null) ? (
           <FindingFeedbackProvider
@@ -1131,8 +1142,8 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
           </View>
         )}
 
-        {/* Recording: below the report, since most teachers come for the feedback */}
-        <View style={styles.card}>
+        {/* Recording: below the report, since most teachers come for the feedback. Teacher's own lectures only. */}
+        {recording.report_private ? null : <View style={styles.card}>
           <Text style={styles.cardHeading}>Recording</Text>
           {audioUrl ? (
             <ReportAudioPlayer audioUrl={audioUrl} fallbackDuration={recording.duration_seconds} />
@@ -1148,7 +1159,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
               <Ionicons color={AppTheme.colors.textSecondary} name="chevron-forward" size={16} />
             </Pressable>
           ) : null}
-        </View>
+        </View>}
             </View>
           </View>
         </ScrollView>
@@ -1409,6 +1420,8 @@ const styles = StyleSheet.create({
   transcriptScroll: { padding: AppTheme.spacing.l, maxWidth: 800, width: '100%', alignSelf: 'center' },
   transcriptText: { fontSize: 16, lineHeight: 26, color: AppTheme.colors.textPrimary },
   reportWrap: { gap: 16 },
+  privateCard: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
+  privateText: { flex: 1, fontSize: 14, lineHeight: 20, color: AppTheme.colors.textSecondary },
   overallNotes: { fontSize: 15, lineHeight: 23, color: AppTheme.colors.textPrimary },
   sectionLabel: {
     fontSize: 11, fontWeight: '800', letterSpacing: 1.2,

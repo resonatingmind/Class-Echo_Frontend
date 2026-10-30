@@ -31,25 +31,25 @@ type Props = {
 };
 
 function getScoreColor(score: number | undefined | null) {
-  if (score == null) return "#64748B";
-  if (score >= 80) return "#127A40";
+  if (score == null) return AppTheme.colors.slate500;
+  if (score >= 80) return AppTheme.colors.successText;
   if (score >= 60) return AppTheme.colors.primary;
-  if (score >= 40) return "#92400E";
-  return "#B42318";
+  if (score >= 40) return AppTheme.colors.warningStrong;
+  return AppTheme.colors.dangerText;
 }
 
 function getStatusStyle(status?: string | null) {
   const norm = (status || "").toLowerCase();
   if (norm === "completed" || norm === "analysed") {
-    return { bg: "#E8F7EE", text: "#127A40", label: "Analysed" };
+    return { bg: AppTheme.colors.successBg, text: AppTheme.colors.successText, label: "Analysed" };
   } else if (norm === "processing") {
-    return { bg: "#FFF4E0", text: "#92400E", label: "Processing" };
+    return { bg: AppTheme.colors.warningBg, text: AppTheme.colors.warningStrong, label: "Processing" };
   } else if (norm === "pending") {
     return { bg: AppTheme.colors.surfaceMuted, text: AppTheme.colors.textSecondary, label: "Pending" };
   } else if (norm === "failed") {
-    return { bg: "#FFF1F1", text: "#B42318", label: "Failed" };
+    return { bg: AppTheme.colors.dangerBg, text: AppTheme.colors.dangerText, label: "Failed" };
   } else {
-    return { bg: "#F1F5F9", text: "#64748B", label: "No Audio" };
+    return { bg: AppTheme.colors.slate100, text: AppTheme.colors.slate500, label: "No Audio" };
   }
 }
 
@@ -72,7 +72,7 @@ export function ExpandedChapterDetailView({
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="small" color="#0284C7" />
+        <ActivityIndicator size="small" color={AppTheme.colors.info} />
         <Text style={styles.loadingText}>
           Loading lecture table for {chapterName}...
         </Text>
@@ -121,7 +121,7 @@ export function ExpandedChapterDetailView({
       <View style={[styles.statsBar, { justifyContent: "space-between" }]}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
           <View style={styles.statItem}>
-            <Ionicons name="mic-outline" size={14} color="#64748B" />
+            <Ionicons name="mic-outline" size={14} color={AppTheme.colors.slate500} />
             <Text style={styles.statLabel}>Total Lectures:</Text>
             <Text style={styles.statValue}>{titleRows.length + unassignedRecordings.length}</Text>
           </View>
@@ -136,7 +136,7 @@ export function ExpandedChapterDetailView({
         </View>
         {role === "teacher" && onAddLearningPlan ? (
           <Pressable style={styles.secondaryActionBtn} onPress={onAddLearningPlan}>
-            <Ionicons name="add" size={13} color="#0284C7" />
+            <Ionicons name="add" size={13} color={AppTheme.colors.info} />
             <Text style={styles.secondaryActionText}>Add lecture</Text>
           </Pressable>
         ) : null}
@@ -145,7 +145,7 @@ export function ExpandedChapterDetailView({
       {/* NESTED LECTURE TABLE */}
       {titleRows.length === 0 && unassignedRecordings.length === 0 ? (
         <View style={styles.emptyCard}>
-          <Ionicons name="folder-open-outline" size={32} color="#94A3B8" />
+          <Ionicons name="folder-open-outline" size={32} color={AppTheme.colors.slate400} />
           <Text style={styles.emptyTitle}>No Lecture Titles Added Yet</Text>
           <Text style={styles.emptyText}>
             Add a lecture title to populate this lecture table.
@@ -154,13 +154,13 @@ export function ExpandedChapterDetailView({
             {/* Audio belongs to a lecture, so a lecture has to exist first. */}
             {role === "teacher" && onAddLearningPlan ? (
               <Pressable style={styles.inlineAddBtn} onPress={onAddLearningPlan}>
-                <Ionicons name="add-circle-outline" size={14} color="#0284C7" />
+                <Ionicons name="add-circle-outline" size={14} color={AppTheme.colors.info} />
                 <Text style={styles.inlineAddText}>Create Lecture Title</Text>
               </Pressable>
             ) : null}
             {onOpenChapterDetail ? (
               <Pressable style={styles.inlineAddBtn} onPress={onOpenChapterDetail}>
-                <Ionicons name="calendar-outline" size={14} color="#0284C7" />
+                <Ionicons name="calendar-outline" size={14} color={AppTheme.colors.info} />
                 <Text style={styles.inlineAddText}>Open Lecture Planner</Text>
               </Pressable>
             ) : null}
@@ -236,14 +236,14 @@ export function ExpandedChapterDetailView({
                         onPress={() => onEditLearningPlan(lp)}
                         hitSlop={8}
                       >
-                        <Ionicons name="create-outline" size={15} color="#0284C7" />
+                        <Ionicons name="create-outline" size={15} color={AppTheme.colors.info} />
                       </Pressable>
                     ) : role === "teacher" && onAddRecording ? (
                       <Pressable
                         style={styles.subRecordBtn}
                         onPress={() => onAddRecording(lp.id, lectureName)}
                       >
-                        <Ionicons name="mic-outline" size={12} color="#ffffff" />
+                        <Ionicons name="mic-outline" size={12} color={AppTheme.colors.white} />
                         <Text style={styles.subRecordText}>+ Audio</Text>
                       </Pressable>
                     ) : (
@@ -309,7 +309,7 @@ export function ExpandedChapterDetailView({
                         onPress={() => onViewRecordingReport(rec)}
                         hitSlop={6}
                       >
-                        <Ionicons name="document-text-outline" size={12} color="#0284C7" />
+                        <Ionicons name="document-text-outline" size={12} color={AppTheme.colors.info} />
                         <Text style={styles.subReportText}>Report</Text>
                       </Pressable>
                     ) : recIdx === 0 && onEditLearningPlan ? (
@@ -318,7 +318,7 @@ export function ExpandedChapterDetailView({
                         onPress={() => onEditLearningPlan(lp)}
                         hitSlop={8}
                       >
-                        <Ionicons name="create-outline" size={15} color="#0284C7" />
+                        <Ionicons name="create-outline" size={15} color={AppTheme.colors.info} />
                       </Pressable>
                     ) : (
                       <Text style={styles.emptyActionText}>—</Text>
@@ -373,7 +373,7 @@ export function ExpandedChapterDetailView({
                       onPress={() => onViewRecordingReport(rec)}
                       hitSlop={6}
                     >
-                      <Ionicons name="document-text-outline" size={12} color="#0284C7" />
+                      <Ionicons name="document-text-outline" size={12} color={AppTheme.colors.info} />
                       <Text style={styles.subReportText}>Report</Text>
                     </Pressable>
                   ) : (
@@ -390,14 +390,14 @@ export function ExpandedChapterDetailView({
       <View style={styles.footerRow}>
         {onAddDocument ? (
           <Pressable style={styles.footerBtn} onPress={onAddDocument}>
-            <Ionicons name="document-attach-outline" size={15} color="#0284C7" />
+            <Ionicons name="document-attach-outline" size={15} color={AppTheme.colors.info} />
             <Text style={styles.footerBtnText}>Chapter PDF Materials</Text>
           </Pressable>
         ) : null}
 
         {onOpenChapterDetail ? (
           <Pressable style={styles.footerBtn} onPress={onOpenChapterDetail}>
-            <Ionicons name="easel-outline" size={15} color="#475569" />
+            <Ionicons name="easel-outline" size={15} color={AppTheme.colors.slate600} />
             <Text style={styles.footerBtnTextMuted}>Open Chapter Details →</Text>
           </Pressable>
         ) : null}
@@ -418,31 +418,31 @@ const styles = StyleSheet.create({
   dropdownTitle: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#0F172A",
+    color: AppTheme.colors.slate900,
   },
   loadingContainer: {
     padding: 16,
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    backgroundColor: "#F8FAFC",
+    backgroundColor: AppTheme.colors.slate50,
     borderRadius: AppTheme.radius.small,
   },
   loadingText: {
     fontSize: 13,
-    color: "#64748B",
+    color: AppTheme.colors.slate500,
     fontWeight: "600",
   },
   breadcrumbBar: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: AppTheme.colors.white,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: AppTheme.radius.small,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: AppTheme.colors.slate200,
   },
   breadcrumbLine: {
     flexDirection: "row",
@@ -452,18 +452,18 @@ const styles = StyleSheet.create({
   breadcrumbSubject: {
     fontSize: 11,
     fontWeight: "700",
-    color: "#64748B",
+    color: AppTheme.colors.slate500,
     textTransform: "uppercase",
   },
   breadcrumbChapter: {
     fontSize: 12,
     fontWeight: "800",
-    color: "#0F172A",
+    color: AppTheme.colors.slate900,
   },
   breadcrumbTitleCount: {
     fontSize: 11,
     fontWeight: "600",
-    color: "#0284C7",
+    color: AppTheme.colors.info,
   },
   topActionsRow: {
     flexDirection: "row",
@@ -473,13 +473,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    backgroundColor: "#0284C7",
+    backgroundColor: AppTheme.colors.info,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 6,
   },
   actionBtnText: {
-    color: "#ffffff",
+    color: AppTheme.colors.white,
     fontSize: 11,
     fontWeight: "700",
   },
@@ -487,34 +487,34 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    backgroundColor: "#E0F2FE",
+    backgroundColor: AppTheme.colors.infoBg,
     paddingHorizontal: 8,
     paddingVertical: 5,
     borderRadius: 6,
   },
   secondaryActionText: {
-    color: "#0284C7",
+    color: AppTheme.colors.info,
     fontSize: 11,
     fontWeight: "700",
   },
   emptyCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: AppTheme.colors.white,
     padding: 16,
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: AppTheme.colors.slate200,
     alignItems: "center",
     gap: 6,
   },
   emptyTitle: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#0F172A",
+    color: AppTheme.colors.slate900,
     marginTop: 4,
   },
   emptyText: {
     fontSize: 12,
-    color: "#64748B",
+    color: AppTheme.colors.slate500,
     textAlign: "center",
   },
   emptyBtnRow: {
@@ -526,41 +526,41 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    backgroundColor: "#F0F9FF",
+    backgroundColor: AppTheme.colors.infoSoft,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: "#BAE6FD",
+    borderColor: AppTheme.colors.infoBorder,
   },
   inlineAddText: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#0284C7",
+    color: AppTheme.colors.info,
   },
 
   /* Sub-Table Styles */
   subTableWrapper: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: AppTheme.colors.white,
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
-    borderColor: "#CBD5E1",
+    borderColor: AppTheme.colors.slate300,
     overflow: "hidden",
   },
   subTableHeader: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F1F5F9",
+    backgroundColor: AppTheme.colors.slate100,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: "#CBD5E1",
+    borderBottomColor: AppTheme.colors.slate300,
   },
 
   subHeaderCell: {
     fontSize: 10,
     fontWeight: "800",
-    color: "#475569",
+    color: AppTheme.colors.slate600,
     letterSpacing: 0.5,
   },
   subTableRow: {
@@ -569,7 +569,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#F1F5F9",
+    borderBottomColor: AppTheme.colors.slate100,
   },
   cellCol: {
     paddingRight: 6,
@@ -581,10 +581,10 @@ const styles = StyleSheet.create({
   subTopicTitle: {
     fontSize: 13,
     fontWeight: "700",
-    color: "#0F172A",
+    color: AppTheme.colors.slate900,
   },
   clickableTitle: {
-    color: "#0284C7",
+    color: AppTheme.colors.info,
   },
   titleMetaBadgeRow: {
     flexDirection: "row",
@@ -595,33 +595,33 @@ const styles = StyleSheet.create({
   titleTypeBadge: {
     fontSize: 9,
     fontWeight: "700",
-    color: "#0284C7",
-    backgroundColor: "#E0F2FE",
+    color: AppTheme.colors.info,
+    backgroundColor: AppTheme.colors.infoBg,
     paddingHorizontal: 5,
     paddingVertical: 1,
     borderRadius: 4,
   },
   subDateText: {
     fontSize: 10,
-    color: "#64748B",
+    color: AppTheme.colors.slate500,
   },
   teachingPlanText: {
     fontSize: 11,
-    color: "#334155",
+    color: AppTheme.colors.slate700,
     lineHeight: 15,
   },
   mutedPlaceholder: {
     fontSize: 11,
-    color: "#94A3B8",
+    color: AppTheme.colors.slate400,
     fontStyle: "italic",
   },
   addPlanSmallBtn: {
     flexDirection: "row",
     alignItems: "center",
     gap: 3,
-    backgroundColor: "#F0F9FF",
+    backgroundColor: AppTheme.colors.infoSoft,
     borderWidth: 1,
-    borderColor: "#BAE6FD",
+    borderColor: AppTheme.colors.infoBorder,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
@@ -630,7 +630,7 @@ const styles = StyleSheet.create({
   addPlanSmallText: {
     fontSize: 11,
     fontWeight: "700",
-    color: "#0284C7",
+    color: AppTheme.colors.info,
   },
   videoMetaWrap: {
     flexDirection: "row",
@@ -640,13 +640,13 @@ const styles = StyleSheet.create({
   videoTitleText: {
     fontSize: 11,
     fontWeight: "600",
-    color: "#0F172A",
+    color: AppTheme.colors.slate900,
   },
   attachVideoSmallBtn: {
     flexDirection: "row",
     alignItems: "center",
     gap: 3,
-    backgroundColor: "#E0F2FE",
+    backgroundColor: AppTheme.colors.infoBg,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
@@ -655,7 +655,7 @@ const styles = StyleSheet.create({
   attachVideoSmallText: {
     fontSize: 11,
     fontWeight: "700",
-    color: "#0284C7",
+    color: AppTheme.colors.info,
   },
   subScoreText: {
     fontSize: 12,
@@ -674,9 +674,9 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 6,
-    backgroundColor: "#F0F9FF",
+    backgroundColor: AppTheme.colors.infoSoft,
     borderWidth: 1,
-    borderColor: "#BAE6FD",
+    borderColor: AppTheme.colors.infoBorder,
     alignItems: "center",
     justifyContent: "center",
     // @ts-ignore
@@ -684,13 +684,13 @@ const styles = StyleSheet.create({
   },
   emptyActionText: {
     fontSize: 12,
-    color: "#94A3B8",
+    color: AppTheme.colors.slate400,
   },
   subReportBtn: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    backgroundColor: "#E0F2FE",
+    backgroundColor: AppTheme.colors.infoBg,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
@@ -698,13 +698,13 @@ const styles = StyleSheet.create({
   subReportText: {
     fontSize: 11,
     fontWeight: "700",
-    color: "#0284C7",
+    color: AppTheme.colors.info,
   },
   subRecordBtn: {
     flexDirection: "row",
     alignItems: "center",
     gap: 3,
-    backgroundColor: "#0284C7",
+    backgroundColor: AppTheme.colors.info,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
@@ -712,7 +712,7 @@ const styles = StyleSheet.create({
   subRecordText: {
     fontSize: 11,
     fontWeight: "700",
-    color: "#ffffff",
+    color: AppTheme.colors.white,
   },
 
   footerRow: {
@@ -720,7 +720,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     borderTopWidth: 1,
-    borderTopColor: "#E2E8F0",
+    borderTopColor: AppTheme.colors.slate200,
     paddingTop: 10,
     marginTop: 2,
   },
@@ -732,20 +732,20 @@ const styles = StyleSheet.create({
   footerBtnText: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#0284C7",
+    color: AppTheme.colors.info,
   },
   footerBtnTextMuted: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#64748B",
+    color: AppTheme.colors.slate500,
   },
   statsBar: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F8FAFC",
+    backgroundColor: AppTheme.colors.slate50,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: AppTheme.colors.slate200,
     paddingVertical: 10,
     paddingHorizontal: 16,
     gap: 16,
@@ -759,16 +759,16 @@ const styles = StyleSheet.create({
   statLabel: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#64748B",
+    color: AppTheme.colors.slate500,
   },
   statValue: {
     fontSize: 13,
     fontWeight: "800",
-    color: "#0F172A",
+    color: AppTheme.colors.slate900,
   },
   statDivider: {
     width: 1,
     height: 14,
-    backgroundColor: "#CBD5E1",
+    backgroundColor: AppTheme.colors.slate300,
   },
 });

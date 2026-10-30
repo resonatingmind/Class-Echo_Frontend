@@ -47,7 +47,7 @@ const statStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.25)",
   },
-  chipValue: { fontSize: 15, fontWeight: "800", color: "#FFFFFF", lineHeight: 20 },
+  chipValue: { fontSize: 15, fontWeight: "800", color: AppTheme.colors.white, lineHeight: 20 },
   chipLabel: { fontSize: 10, color: "rgba(255,255,255,0.75)", fontWeight: "500", letterSpacing: 0.3 },
 });
 
@@ -183,7 +183,7 @@ export function TeacherTimetableScreen({ embedded = false }: { embedded?: boolea
 
             {/* ── Hero Banner ─────────────────────────────────────── */}
             <LinearGradient
-              colors={["#1D8EF5", "#156FD6", "#0D4FAA"]}
+              colors={[AppTheme.colors.primary, AppTheme.colors.primaryDark, "#0D4FAA"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.heroBanner}
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 20,
     fontWeight: "800",
-    color: "#FFFFFF",
+    color: AppTheme.colors.white,
     letterSpacing: -0.3,
   },
   heroSubtitle: {
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
   heroGlassBtnText: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#FFFFFF",
+    color: AppTheme.colors.white,
   },
   heroStats: {
     gap: 8,

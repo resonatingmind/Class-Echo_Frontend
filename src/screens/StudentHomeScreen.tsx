@@ -22,8 +22,8 @@ import { StudentProfileOut, SubjectOut } from '../types/api';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'StudentHome'>;
 
-const CARD_COLORS = ['#E8F4FF', '#FFF4E0', '#E8F7EE', '#F4E8FF', '#FFE8E8'];
-const ACCENT_COLORS = [AppTheme.colors.primary, '#F59E0B', '#22C55E', '#9333EA', '#EF4444'];
+const CARD_COLORS = ['#E8F4FF', AppTheme.colors.warningBg, AppTheme.colors.successBg, '#F4E8FF', '#FFE8E8'];
+const ACCENT_COLORS = [AppTheme.colors.primary, AppTheme.colors.warning, AppTheme.colors.success, '#9333EA', AppTheme.colors.error];
 
 export function StudentHomeScreen({ navigation }: Props) {
   const { session } = useAuth();
@@ -123,7 +123,7 @@ export function StudentHomeScreen({ navigation }: Props) {
                     {profile?.class_name?.toUpperCase()}
                   </Text>
                   <View style={[styles.cardArrow, { backgroundColor: accent }]}>
-                    <Ionicons color="#fff" name="arrow-forward" size={16} />
+                    <Ionicons color={AppTheme.colors.white} name="arrow-forward" size={16} />
                   </View>
                 </View>
                 <Text style={styles.cardTitle}>{item.name}</Text>

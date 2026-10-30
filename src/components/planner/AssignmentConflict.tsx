@@ -71,43 +71,43 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#0F172A",
+    color: AppTheme.colors.slate900,
   },
 
   message: {
     marginTop: 8,
     marginBottom: 20,
-    color: "#64748B",
+    color: AppTheme.colors.slate500,
   },
 
   card: {
-    backgroundColor: "#F8FAFC",
+    backgroundColor: AppTheme.colors.slate50,
     borderRadius: AppTheme.radius.medium,
     padding: 16,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: AppTheme.colors.slate200,
   },
 
   label: {
     fontSize: 13,
-    color: "#64748B",
+    color: AppTheme.colors.slate500,
     marginBottom: 4,
   },
 
   value: {
     fontSize: 17,
     fontWeight: "600",
-    color: "#0F172A",
+    color: AppTheme.colors.slate900,
   },
 
   email: {
     marginTop: 4,
-    color: "#64748B",
+    color: AppTheme.colors.slate500,
   },
 
   divider: {
     height: 1,
-    backgroundColor: "#E2E8F0",
+    backgroundColor: AppTheme.colors.slate200,
     marginVertical: 16,
   },
 
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   },
 
   cancelText: {
-    color: "#64748B",
+    color: AppTheme.colors.slate500,
     fontWeight: "600",
   },
 
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   },
 
   replaceText: {
-    color: "#fff",
+    color: AppTheme.colors.white,
     fontWeight: "700",
   },
 });

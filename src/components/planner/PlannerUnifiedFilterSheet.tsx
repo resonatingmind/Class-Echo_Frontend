@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.4)",
   },
   sheet: {
-    backgroundColor: "#fff",
+    backgroundColor: AppTheme.colors.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: "85%",
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderTopWidth: 1,
     borderTopColor: AppTheme.colors.divider,
-    backgroundColor: "#fff",
+    backgroundColor: AppTheme.colors.white,
     gap: 12,
   },
   clearBtn: {
@@ -239,6 +239,6 @@ const styles = StyleSheet.create({
   applyBtnText: {
     fontSize: 15,
     fontFamily: AppTheme.typography.family.bold,
-    color: "#fff",
+    color: AppTheme.colors.white,
   },
 });

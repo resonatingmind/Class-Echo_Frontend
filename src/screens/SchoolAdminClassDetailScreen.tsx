@@ -38,11 +38,11 @@ import { SubjectOut, TeacherOut } from '../types/api';
 type Props = NativeStackScreenProps<RootStackParamList, 'SchoolAdminClassDetail'>;
 
 const SUBJECT_COLORS = [
-  { bg: '#D1E4FF', text: AppTheme.colors.primaryDark },
-  { bg: '#E8F7EE', text: '#127A40' },
-  { bg: '#FFF4E0', text: '#92400E' },
-  { bg: '#F5F0FF', text: '#6B21A8' },
-  { bg: '#FFE8EC', text: '#9B1239' },
+  { bg: AppTheme.colors.primarySoft, text: AppTheme.colors.primaryDark },
+  { bg: AppTheme.colors.successBg, text: AppTheme.colors.successText },
+  { bg: AppTheme.colors.warningBg, text: AppTheme.colors.warningStrong },
+  { bg: AppTheme.colors.purpleBg, text: AppTheme.colors.purple },
+  { bg: AppTheme.colors.roseBg, text: AppTheme.colors.rose },
 ];
 
 // ── Add Subject Modal ────────────────────────────────────────────────────────
@@ -110,7 +110,7 @@ function AddSubjectModal({
 
           {error ? (
             <View style={styles.modalError}>
-              <Ionicons color="#B42318" name="alert-circle-outline" size={14} />
+              <Ionicons color={AppTheme.colors.dangerText} name="alert-circle-outline" size={14} />
               <Text style={styles.modalErrorText}>{error}</Text>
             </View>
           ) : null}
@@ -125,7 +125,7 @@ function AddSubjectModal({
               style={[styles.modalSubmitBtn, (!canSubmit || submitting) && styles.btnDisabled]}
             >
               {submitting ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <ActivityIndicator color={AppTheme.colors.white} size="small" />
               ) : (
                 <Text style={styles.modalSubmitText}>Add Subject</Text>
               )}
@@ -181,7 +181,7 @@ function SubjectCard({
           }}
           style={{ padding: 4 }}
         >
-          <Ionicons name="trash-outline" size={18} color="#B42318" />
+          <Ionicons name="trash-outline" size={18} color={AppTheme.colors.dangerText} />
         </Pressable>
       </View>
 
@@ -439,7 +439,7 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
               onPress={() => setShowAddSubject(true)}
               style={styles.addSubjectBtn}
             >
-              <Ionicons color="#fff" name="add" size={14} />
+              <Ionicons color={AppTheme.colors.white} name="add" size={14} />
               <Text style={styles.addSubjectText}>Add Subject</Text>
             </Pressable>
           </View>
@@ -612,7 +612,7 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
             {editClassError ? (
               <View style={styles.modalError}>
                 <Ionicons
-                  color="#B42318"
+                  color={AppTheme.colors.dangerText}
                   name="alert-circle-outline"
                   size={14}
                 />
@@ -635,7 +635,7 @@ export function SchoolAdminClassDetailScreen({ navigation, route }: Props) {
                 ]}
               >
                 {editingClass ? (
-                  <ActivityIndicator color="#fff" size="small" />
+                  <ActivityIndicator color={AppTheme.colors.white} size="small" />
                 ) : (
                   <Text style={styles.modalSubmitText}>Save</Text>
                 )}
@@ -733,7 +733,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
   },
-  addSubjectText: { color: "#fff", ...AppTheme.typography.body, fontWeight: "700" },
+  addSubjectText: { color: AppTheme.colors.white, ...AppTheme.typography.body, fontWeight: "700" },
 
   // Stats
   statsGrid: {
@@ -885,12 +885,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: "#FFF1F1",
+    backgroundColor: AppTheme.colors.dangerBg,
     borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
-  modalErrorText: { color: "#B42318", ...AppTheme.typography.body, flex: 1 },
+  modalErrorText: { color: AppTheme.colors.dangerText, ...AppTheme.typography.body, flex: 1 },
   modalActions: { flexDirection: "row", gap: 12, marginTop: 4 },
   modalCancelBtn: {
     flex: 1,
@@ -914,7 +914,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   btnDisabled: { opacity: 0.45 },
-  modalSubmitText: { color: "#fff", ...AppTheme.typography.button },
+  modalSubmitText: { color: AppTheme.colors.white, ...AppTheme.typography.button },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -957,7 +957,7 @@ const styles = StyleSheet.create({
   },
 
   filterTextActive: {
-    color: "#fff",
+    color: AppTheme.colors.white,
   },
 
   assignmentDate: {

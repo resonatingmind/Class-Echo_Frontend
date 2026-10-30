@@ -66,7 +66,7 @@ export function FormInput({
   const s = SIZE[size];
 
   const shellBorderColor = error
-    ? '#DC2626'
+    ? AppTheme.colors.danger
     : focused
     ? AppTheme.colors.primary
     : AppTheme.colors.border;
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   },
   error: {
     fontSize: 12,
-    color: '#DC2626',
+    color: AppTheme.colors.danger,
     paddingHorizontal: 2,
   },
   hint: {

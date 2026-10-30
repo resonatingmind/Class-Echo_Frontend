@@ -57,18 +57,18 @@ const HEADER_HEIGHT = 64;
 
 const BORDER_COLOR = "#E4EAF0";
 const HEADER_BG = "#F0F5FF";
-const CELL_BG = "#FFFFFF";
+const CELL_BG = AppTheme.colors.white;
 const GRADE_BG = "#F7F9FF";
 
 // ─── Subject colour palette ───────────────────────────────────────────────────
 const SUBJECT_COLORS = [
-  { bg: "#EFF6FF", accent: "#3B82F6", text: "#1D4ED8" },
-  { bg: "#F0FDF4", accent: "#22C55E", text: "#15803D" },
-  { bg: "#FFF7ED", accent: "#F97316", text: "#C2410C" },
+  { bg: AppTheme.colors.infoSoft, accent: "#3B82F6", text: "#1D4ED8" },
+  { bg: "#F0FDF4", accent: AppTheme.colors.success, text: AppTheme.colors.successDeep },
+  { bg: AppTheme.colors.orangeTint, accent: "#F97316", text: AppTheme.colors.orangeText },
   { bg: "#FDF4FF", accent: "#A855F7", text: "#7E22CE" },
-  { bg: "#FFF1F2", accent: "#F43F5E", text: "#BE123C" },
+  { bg: AppTheme.colors.dangerBg, accent: "#F43F5E", text: "#BE123C" },
   { bg: "#ECFEFF", accent: "#06B6D4", text: "#0E7490" },
-  { bg: "#FEFCE8", accent: "#EAB308", text: "#854D0E" },
+  { bg: "#FEFCE8", accent: "#EAB308", text: AppTheme.colors.warningDeep },
   { bg: "#F0FDFA", accent: "#14B8A6", text: "#0F766E" },
 ];
 
@@ -144,7 +144,7 @@ const statStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.25)",
   },
-  chipValue: { fontSize: 15, fontWeight: "800", color: "#FFFFFF", lineHeight: 20 },
+  chipValue: { fontSize: 15, fontWeight: "800", color: AppTheme.colors.white, lineHeight: 20 },
   chipLabel: { fontSize: 10, color: "rgba(255,255,255,0.75)", fontWeight: "500", letterSpacing: 0.3 },
 });
 
@@ -438,7 +438,7 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
                   hitSlop={6}
                   onPress={() => setDeleteTarget(entry)}
                 >
-                  <Ionicons name="trash-outline" size={10} color="#EF4444" />
+                  <Ionicons name="trash-outline" size={10} color={AppTheme.colors.error} />
                 </Pressable>
               </View>
             </View>
@@ -506,7 +506,7 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
                     hitSlop={10}
                     onPress={() => setDeleteTarget(entry)}
                   >
-                    <Ionicons name="trash-outline" size={12} color="#EF4444" />
+                    <Ionicons name="trash-outline" size={12} color={AppTheme.colors.error} />
                   </Pressable>
                 </View>
               </View>
@@ -548,7 +548,7 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
 
             {/* ── Hero Banner ─────────────────────────────────────── */}
             <LinearGradient
-              colors={["#1D8EF5", "#156FD6", "#0D4FAA"]}
+              colors={[AppTheme.colors.primary, AppTheme.colors.primaryDark, "#0D4FAA"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.heroBanner}
@@ -679,7 +679,7 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
                                   return (
                                     <View key={col.key} style={styles.mobileBreakWrapper}>
                                       <View style={styles.mobileBreakHeader}>
-                                        <Ionicons name="cafe" size={13} color="#C2410C" />
+                                        <Ionicons name="cafe" size={13} color={AppTheme.colors.orangeText} />
                                         <Text style={styles.mobileBreakLabel} numberOfLines={1}>
                                           {col.label || "Break"}
                                         </Text>
@@ -748,7 +748,7 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
                               ]}
                             >
                               <View style={styles.breakBadgeHeader}>
-                                <Ionicons name="cafe" size={13} color="#C2410C" />
+                                <Ionicons name="cafe" size={13} color={AppTheme.colors.orangeText} />
                               </View>
                               <Text style={styles.breakHeaderTitle} numberOfLines={1}>
                                 {col.label || "Break"}
@@ -819,7 +819,7 @@ export function SchoolAdminTimetableScreen({ navigation }: Props) {
                                     ]}
                                   >
                                     <View style={styles.breakDataInner}>
-                                      <Ionicons name="cafe-outline" size={13} color="#EA580C" />
+                                      <Ionicons name="cafe-outline" size={13} color={AppTheme.colors.orange} />
                                       <Text style={styles.breakDataTitle} numberOfLines={1}>
                                         {col.label || "Break"}
                                       </Text>
@@ -972,7 +972,7 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 20,
     fontWeight: "800",
-    color: "#FFFFFF",
+    color: AppTheme.colors.white,
     letterSpacing: -0.3,
   },
   heroSubtitle: {
@@ -995,7 +995,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: AppTheme.colors.white,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: AppTheme.radius.pill,
@@ -1019,7 +1019,7 @@ const styles = StyleSheet.create({
   heroGlassBtnText: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#FFFFFF",
+    color: AppTheme.colors.white,
   },
   heroStats: {
     gap: 8,
@@ -1113,30 +1113,30 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   breakHeaderCell: {
-    backgroundColor: "#FFF7ED",
+    backgroundColor: AppTheme.colors.orangeTint,
     borderBottomWidth: 2,
-    borderBottomColor: "#FDBA74",
+    borderBottomColor: AppTheme.colors.orangeBorder,
   },
   breakBadgeHeader: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: "#FFEDD5",
+    backgroundColor: AppTheme.colors.orangeSoft,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 2,
     borderWidth: 1,
-    borderColor: "#FDBA74",
+    borderColor: AppTheme.colors.orangeBorder,
   },
   breakHeaderTitle: {
     fontSize: 11,
     fontWeight: "800",
-    color: "#C2410C",
+    color: AppTheme.colors.orangeText,
     textAlign: "center",
   },
   breakHeaderTime: {
     fontSize: 10,
-    color: "#9A3412",
+    color: AppTheme.colors.orangeStrong,
     fontWeight: "600",
     textAlign: "center",
   },
@@ -1154,7 +1154,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  periodBadgeText: { fontSize: 12, fontWeight: "800", color: "#FFFFFF" },
+  periodBadgeText: { fontSize: 12, fontWeight: "800", color: AppTheme.colors.white },
   headerPeriodTime: {
     fontSize: 10,
     color: AppTheme.colors.textSecondary,
@@ -1232,12 +1232,12 @@ const styles = StyleSheet.create({
   breakDataTitle: {
     fontSize: 11,
     fontWeight: "700",
-    color: "#C2410C",
+    color: AppTheme.colors.orangeText,
     textAlign: "center",
   },
   breakDataSub: {
     fontSize: 9,
-    color: "#9A3412",
+    color: AppTheme.colors.orangeStrong,
     marginTop: 2,
     textAlign: "center",
   },
@@ -1302,7 +1302,7 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textPrimary,
   },
   mobileClassCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: AppTheme.colors.white,
     borderRadius: AppTheme.radius.large,
     borderWidth: 1,
     borderColor: BORDER_COLOR,
@@ -1375,7 +1375,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 8,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: AppTheme.colors.gray50,
   },
   mobileEmptyText: {
     fontSize: 12,
@@ -1397,12 +1397,12 @@ const styles = StyleSheet.create({
   mobileBreakLabel: {
     fontSize: 12,
     fontWeight: "800",
-    color: "#C2410C",
+    color: AppTheme.colors.orangeText,
   },
   mobileBreakCard: {
-    backgroundColor: "#FFF7ED",
+    backgroundColor: AppTheme.colors.orangeTint,
     borderWidth: 1,
-    borderColor: "#FDBA74",
+    borderColor: AppTheme.colors.orangeBorder,
     borderStyle: "dashed",
     borderRadius: 12,
     height: 100,
@@ -1413,12 +1413,12 @@ const styles = StyleSheet.create({
   mobileBreakCardTime: {
     fontSize: 10,
     fontWeight: "700",
-    color: "#C2410C",
+    color: AppTheme.colors.orangeText,
     textAlign: "center",
   },
   mobileBreakCardSub: {
     fontSize: 10,
-    color: "#9A3412",
+    color: AppTheme.colors.orangeStrong,
     marginTop: 4,
     textAlign: "center",
   },

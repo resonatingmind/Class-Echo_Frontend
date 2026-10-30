@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
   },
 
   rowUnassigned: {
-    backgroundColor: "#FDF3E3",
+    backgroundColor: AppTheme.colors.warningBg,
   },
 
   topLine: {

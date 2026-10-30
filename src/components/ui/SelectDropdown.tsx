@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   inputError: {
-    borderColor: "#B42318",
+    borderColor: AppTheme.colors.dangerText,
   },
   inputText: {
     color: AppTheme.colors.textPrimary,
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textPlaceholder,
   },
   errorText: {
-    color: "#B42318",
+    color: AppTheme.colors.dangerText,
     ...AppTheme.typography.caption,
   },
   modalOverlay: {

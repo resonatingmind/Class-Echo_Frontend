@@ -38,11 +38,11 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 const STATUS_TONES: Record<string, { fg: string; bg: string }> = {
-  active: { fg: "#127A40", bg: "#E7F6EE" },
+  active: { fg: AppTheme.colors.successText, bg: AppTheme.colors.successBg },
   invited: { fg: "#1D4ED8", bg: "#E8F0FE" },
-  pending_approval: { fg: "#B45309", bg: "#FEF3C7" },
-  suspended: { fg: "#B42318", bg: "#FEE4E2" },
-  rejected: { fg: "#B42318", bg: "#FEE4E2" },
+  pending_approval: { fg: AppTheme.colors.warningText, bg: AppTheme.colors.warningSoft },
+  suspended: { fg: AppTheme.colors.dangerText, bg: AppTheme.colors.dangerSoft },
+  rejected: { fg: AppTheme.colors.dangerText, bg: AppTheme.colors.dangerSoft },
 };
 
 export function AdminPeopleScreen() {
@@ -118,7 +118,7 @@ export function AdminPeopleScreen() {
             style={styles.searchBtn}
           >
             {searching ? (
-              <ActivityIndicator color="#FFFFFF" size="small" />
+              <ActivityIndicator color={AppTheme.colors.white} size="small" />
             ) : (
               <Text style={styles.searchBtnText}>Search</Text>
             )}
@@ -182,14 +182,14 @@ export function AdminPeopleScreen() {
                     style={[
                       styles.badge,
                       {
-                        backgroundColor: user.has_password ? "#E7F6EE" : "#FEF3C7",
+                        backgroundColor: user.has_password ? AppTheme.colors.successBg : AppTheme.colors.warningSoft,
                       },
                     ]}
                   >
                     <Text
                       style={[
                         styles.badgeText,
-                        { color: user.has_password ? "#127A40" : "#B45309" },
+                        { color: user.has_password ? AppTheme.colors.successText : AppTheme.colors.warningText },
                       ]}
                     >
                       {user.has_password ? "password set" : "no password yet"}
@@ -277,8 +277,8 @@ const styles = StyleSheet.create({
     minWidth: 68,
     alignItems: "center",
   },
-  searchBtnText: { color: "#FFFFFF", fontWeight: "700", fontSize: 12 },
-  errorText: { fontSize: 12, color: "#B42318" },
+  searchBtnText: { color: AppTheme.colors.white, fontWeight: "700", fontSize: 12 },
+  errorText: { fontSize: 12, color: AppTheme.colors.dangerText },
   emptyText: {
     fontSize: 13,
     color: AppTheme.colors.textSecondary,

@@ -97,9 +97,9 @@ export function ReportAudioPlayer({ audioUrl, fallbackDuration }: Props) {
           style={styles.playBtn}
         >
           {loading ? (
-            <ActivityIndicator color="#fff" size="small" />
+            <ActivityIndicator color={AppTheme.colors.white} size="small" />
           ) : (
-            <Ionicons color="#fff" name={status.playing ? 'pause' : 'play'} size={26} />
+            <Ionicons color={AppTheme.colors.white} name={status.playing ? 'pause' : 'play'} size={26} />
           )}
         </Pressable>
         <Pressable
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     marginLeft: -THUMB / 2,
     backgroundColor: AppTheme.colors.primary,
     borderWidth: 2,
-    borderColor: '#fff',
+    borderColor: AppTheme.colors.white,
   },
   footerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   time: { fontSize: 12, fontWeight: '600', color: AppTheme.colors.textSecondary, minWidth: 44 },

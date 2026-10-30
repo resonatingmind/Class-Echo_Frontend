@@ -19,7 +19,7 @@ export function PlannerHeader({ onCreatePress }: Props) {
           ]} 
           onPress={onCreatePress}
         >
-          <Ionicons name="add" size={16} color="#fff" />
+          <Ionicons name="add" size={16} color={AppTheme.colors.white} />
           <Text style={styles.addText}>Quick assignment</Text>
         </Pressable>
       </View>
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     ...AppTheme.shadows.subtle,
   },
   addText: {
-    color: "#fff",
+    color: AppTheme.colors.white,
     ...AppTheme.typography.button,
   },
 });

@@ -15,11 +15,11 @@ type Props = {
 };
 
 const ACCENTS = [
-  { bg: "#EAF3FF", border: "#CFE3FF", chip: AppTheme.colors.primaryDark },
-  { bg: "#EAFBF1", border: "#CBEFDA", chip: "#127A40" },
-  { bg: "#FFF6E8", border: "#FBE3B8", chip: "#92400E" },
-  { bg: "#F6F0FF", border: "#E2D3FA", chip: "#6B21A8" },
-  { bg: "#FFEEF2", border: "#F9C7D3", chip: "#9B1239" },
+  { bg: AppTheme.colors.primaryLight, border: "#CFE3FF", chip: AppTheme.colors.primaryDark },
+  { bg: "#EAFBF1", border: "#CBEFDA", chip: AppTheme.colors.successText },
+  { bg: "#FFF6E8", border: "#FBE3B8", chip: AppTheme.colors.warningStrong },
+  { bg: AppTheme.colors.purpleBg, border: "#E2D3FA", chip: AppTheme.colors.purple },
+  { bg: "#FFEEF2", border: "#F9C7D3", chip: AppTheme.colors.rose },
 ];
 
 export function PeriodCard({ period, isNow, isNext, onRecord }: Props) {

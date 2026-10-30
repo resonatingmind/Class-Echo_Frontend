@@ -200,7 +200,7 @@ export function ImportTimetableModal({ visible, onClose, token, onImported }: Pr
                   disabled={!pickedUri || uploading}
                 >
                   {uploading ? (
-                    <ActivityIndicator color="#FFFFFF" />
+                    <ActivityIndicator color={AppTheme.colors.white} />
                   ) : (
                     <Text style={styles.submitText}>Import Timetable</Text>
                   )}
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
 
   errorText: {
     marginTop: 16,
-    color: "#DC2626",
+    color: AppTheme.colors.danger,
     fontSize: 13,
   },
 
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
   },
 
   submitText: {
-    color: "#FFFFFF",
+    color: AppTheme.colors.white,
     fontSize: 16,
     fontWeight: "700",
   },

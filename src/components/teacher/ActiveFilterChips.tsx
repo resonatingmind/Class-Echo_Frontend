@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   },
 
   clear: {
-    color: "#EF4444",
+    color: AppTheme.colors.error,
     fontWeight: "700",
   },
 });

@@ -23,13 +23,13 @@ const STATUS_STYLES: Record<
   string,
   { bg: string; text: string; icon: keyof typeof Ionicons.glyphMap }
 > = {
-  Completed: { bg: "#E7F6EC", text: AppTheme.colors.success, icon: "checkmark-circle" },
-  Processing: { bg: "#FDF3E3", text: AppTheme.colors.warning, icon: "time-outline" },
+  Completed: { bg: AppTheme.colors.successBg, text: AppTheme.colors.success, icon: "checkmark-circle" },
+  Processing: { bg: AppTheme.colors.warningBg, text: AppTheme.colors.warning, icon: "time-outline" },
 };
 
 const DEFAULT_STATUS_STYLE = {
   bg: "#FBE7E7",
-  text: "#DC2626",
+  text: AppTheme.colors.danger,
   icon: "ellipse-outline" as keyof typeof Ionicons.glyphMap,
 };
 
@@ -108,8 +108,8 @@ export function PlannerChapterCard({
           <Text style={styles.metricLabel}>Material</Text>
           <View style={styles.metricActionRow}>
             <Pressable onPress={onOpenDocuments} style={styles.countChip}>
-              <Ionicons name="document-text-outline" size={14} color="#7C3AED" />
-              <Text style={[styles.countChipText, { color: "#7C3AED" }]}>
+              <Ionicons name="document-text-outline" size={14} color={AppTheme.colors.violet} />
+              <Text style={[styles.countChipText, { color: AppTheme.colors.violet }]}>
                 {chapter.document_count}
               </Text>
             </Pressable>
@@ -127,8 +127,8 @@ export function PlannerChapterCard({
         <View style={styles.metricGroup}>
           <Text style={styles.metricLabel}>Recordings</Text>
           <Pressable onPress={() => void toggleExpand()} style={styles.countChip}>
-            <Ionicons name="videocam-outline" size={14} color="#EA580C" />
-            <Text style={[styles.countChipText, { color: "#EA580C" }]}>
+            <Ionicons name="videocam-outline" size={14} color={AppTheme.colors.orange} />
+            <Text style={[styles.countChipText, { color: AppTheme.colors.orange }]}>
               {chapter.recording_count}
             </Text>
           </Pressable>

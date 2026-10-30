@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: AppTheme.colors.white,
 
     borderRadius: 20,
 
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
 
     fontWeight: "700",
 
-    color: "#0F172A",
+    color: AppTheme.colors.slate900,
   },
 
   subtitle: {
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
 
     marginBottom: 22,
 
-    color: "#64748B",
+    color: AppTheme.colors.slate500,
   },
 
   input: {
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
 
     borderWidth: 1,
 
-    borderColor: "#CBD5E1",
+    borderColor: AppTheme.colors.slate300,
 
     borderRadius: AppTheme.radius.medium,
 
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
   },
 
   cancelText: {
-    color: "#64748B",
+    color: AppTheme.colors.slate500,
 
     fontWeight: "600",
   },
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
   },
 
   assignText: {
-    color: "#64748B",
+    color: AppTheme.colors.slate500,
     fontWeight: "700",
   },
 });

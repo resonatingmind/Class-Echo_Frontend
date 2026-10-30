@@ -75,16 +75,16 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     padding: 16,
     borderRadius: AppTheme.radius.medium,
-    backgroundColor: "#F8FAFC",
+    backgroundColor: AppTheme.colors.slate50,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: AppTheme.colors.slate200,
   },
 
   title: {
     fontSize: 17,
     fontWeight: "700",
     marginBottom: 14,
-    color: "#0F172A",
+    color: AppTheme.colors.slate900,
   },
 
   row: {
@@ -95,23 +95,23 @@ const styles = StyleSheet.create({
 
   label: {
     fontWeight: "600",
-    color: "#475569",
+    color: AppTheme.colors.slate600,
   },
 
   value: {
-    color: "#0F172A",
+    color: AppTheme.colors.slate900,
   },
 
   divider: {
     marginVertical: 12,
     borderTopWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: AppTheme.colors.slate200,
   },
 
   action: {
     fontSize: 14,
     marginBottom: 6,
-    color: "#334155",
+    color: AppTheme.colors.slate700,
   },
 });
 

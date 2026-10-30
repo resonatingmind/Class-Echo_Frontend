@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   },
 
   chipTextActive: {
-    color: "#FFFFFF",
+    color: AppTheme.colors.white,
   },
 });
 

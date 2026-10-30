@@ -485,12 +485,12 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
                     <Ionicons
                       name="flash"
                       size={15}
-                      color={showGenerator ? "#FFFFFF" : AppTheme.colors.primary}
+                      color={showGenerator ? AppTheme.colors.white : AppTheme.colors.primary}
                     />
                     <Text
                       style={[
                         styles.generatorToggleText,
-                        showGenerator && { color: "#FFFFFF" },
+                        showGenerator && { color: AppTheme.colors.white },
                       ]}
                     >
                       {showGenerator ? "Hide Custom Generator" : "⚡ Custom Schedule Generator"}
@@ -499,7 +499,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
                   <Ionicons
                     name={showGenerator ? "chevron-up" : "chevron-down"}
                     size={16}
-                    color={showGenerator ? "#FFFFFF" : AppTheme.colors.primary}
+                    color={showGenerator ? AppTheme.colors.white : AppTheme.colors.primary}
                   />
                 </Pressable>
 
@@ -619,7 +619,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
                         <Ionicons
                           name={genAddLunch ? "checkbox" : "square-outline"}
                           size={20}
-                          color={genAddLunch ? "#EA580C" : AppTheme.colors.textSecondary}
+                          color={genAddLunch ? AppTheme.colors.orange : AppTheme.colors.textSecondary}
                         />
                         <Text style={styles.lunchCheckLabel}>Insert Break / Lunch</Text>
                       </Pressable>
@@ -659,7 +659,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
                       ]}
                       onPress={handleGenerateCustom}
                     >
-                      <Ionicons name="sparkles" size={15} color="#FFFFFF" />
+                      <Ionicons name="sparkles" size={15} color={AppTheme.colors.white} />
                       <Text style={styles.generateBtnText}>Generate & Populate Periods</Text>
                     </Pressable>
                   </View>
@@ -735,7 +735,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
                           onPress={() => toggleRowType(row.id)}
                         >
                           {isBreak ? (
-                            <Ionicons name="cafe" size={15} color="#C2410C" />
+                            <Ionicons name="cafe" size={15} color={AppTheme.colors.orangeText} />
                           ) : (
                             <Text style={styles.periodBadgeText}>P{pNum}</Text>
                           )}
@@ -877,7 +877,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
                             <Text
                               style={[
                                 styles.timePreview,
-                                isBreak && { color: "#C2410C" },
+                                isBreak && { color: AppTheme.colors.orangeText },
                               ]}
                             >
                               {fmt12(row.startTime)} – {fmt12(row.endTime)}
@@ -896,7 +896,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
                           hitSlop={8}
                           style={styles.removeBtn}
                         >
-                          <Ionicons name="trash-outline" size={16} color="#EF4444" />
+                          <Ionicons name="trash-outline" size={16} color={AppTheme.colors.error} />
                         </Pressable>
                       </View>
                     );
@@ -927,7 +927,7 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
                     ]}
                     onPress={() => addBreakRow("Lunch Break")}
                   >
-                    <Ionicons name="cafe-outline" size={18} color="#EA580C" />
+                    <Ionicons name="cafe-outline" size={18} color={AppTheme.colors.orange} />
                     <Text style={styles.addBreakText}>+ Add Lunch / Break</Text>
                   </Pressable>
                 </View>
@@ -955,10 +955,10 @@ export function PeriodSetupModal({ visible, onClose, onSave, initialSlots = [] }
                   disabled={saving}
                 >
                   {saving ? (
-                    <ActivityIndicator color="#fff" size="small" />
+                    <ActivityIndicator color={AppTheme.colors.white} size="small" />
                   ) : (
                     <>
-                      <Ionicons name="checkmark" size={18} color="#fff" />
+                      <Ionicons name="checkmark" size={18} color={AppTheme.colors.white} />
                       <Text style={styles.saveText}>Save Schedule</Text>
                     </>
                   )}
@@ -1137,7 +1137,7 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textSecondary,
   },
   quickChipTextActive: {
-    color: "#FFFFFF",
+    color: AppTheme.colors.white,
   },
 
   lunchOptionRow: {
@@ -1158,7 +1158,7 @@ const styles = StyleSheet.create({
   lunchCheckLabel: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#C2410C",
+    color: AppTheme.colors.orangeText,
   },
   lunchConfigRow: {
     flexDirection: "row",
@@ -1174,13 +1174,13 @@ const styles = StyleSheet.create({
     width: 32,
     height: 30,
     borderWidth: 1,
-    borderColor: "#FDBA74",
+    borderColor: AppTheme.colors.orangeBorder,
     borderRadius: 4,
     textAlign: "center",
     fontSize: 12,
     fontWeight: "700",
-    color: "#C2410C",
-    backgroundColor: "#FFF7ED",
+    color: AppTheme.colors.orangeText,
+    backgroundColor: AppTheme.colors.orangeTint,
   },
 
   generateBtn: {
@@ -1196,7 +1196,7 @@ const styles = StyleSheet.create({
   generateBtnText: {
     fontSize: 13,
     fontWeight: "800",
-    color: "#FFFFFF",
+    color: AppTheme.colors.white,
   },
 
   templateStrip: {
@@ -1257,7 +1257,7 @@ const styles = StyleSheet.create({
   },
   breakRow: {
     backgroundColor: "#FFFBF7",
-    borderColor: "#FDBA74",
+    borderColor: AppTheme.colors.orangeBorder,
   },
 
   periodBadge: {
@@ -1270,14 +1270,14 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   breakBadge: {
-    backgroundColor: "#FFEDD5",
+    backgroundColor: AppTheme.colors.orangeSoft,
     borderWidth: 1,
-    borderColor: "#FDBA74",
+    borderColor: AppTheme.colors.orangeBorder,
   },
   periodBadgeText: {
     fontSize: 12,
     fontWeight: "800",
-    color: "#FFFFFF",
+    color: AppTheme.colors.white,
   },
 
   periodFields: {
@@ -1308,7 +1308,7 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.primary,
   },
   typeOptionBreakActive: {
-    backgroundColor: "#EA580C",
+    backgroundColor: AppTheme.colors.orange,
   },
   typeOptionText: {
     fontSize: 10,
@@ -1316,16 +1316,16 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textSecondary,
   },
   typeOptionTextActive: {
-    color: "#FFFFFF",
+    color: AppTheme.colors.white,
   },
   typeOptionBreakTextActive: {
-    color: "#FFFFFF",
+    color: AppTheme.colors.white,
   },
 
   breakNoticeText: {
     fontSize: 11,
     fontWeight: "700",
-    color: "#C2410C",
+    color: AppTheme.colors.orangeText,
   },
 
   timesRow: {
@@ -1357,15 +1357,15 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.surface,
   },
   breakInput: {
-    borderColor: "#FDBA74",
-    backgroundColor: "#FFFFFF",
-    color: "#C2410C",
+    borderColor: AppTheme.colors.orangeBorder,
+    backgroundColor: AppTheme.colors.white,
+    color: AppTheme.colors.orangeText,
     fontWeight: "700",
   },
 
   inputError: {
-    borderColor: "#EF4444",
-    backgroundColor: "#FFF1F2",
+    borderColor: AppTheme.colors.error,
+    backgroundColor: AppTheme.colors.dangerBg,
   },
 
   timeDash: {
@@ -1383,21 +1383,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 7,
     paddingVertical: 3,
     borderRadius: 6,
-    backgroundColor: "#FFEDD5",
+    backgroundColor: AppTheme.colors.orangeSoft,
     borderWidth: 1,
-    borderColor: "#FDBA74",
+    borderColor: AppTheme.colors.orangeBorder,
   },
   suggestionChipActive: {
-    backgroundColor: "#EA580C",
-    borderColor: "#EA580C",
+    backgroundColor: AppTheme.colors.orange,
+    borderColor: AppTheme.colors.orange,
   },
   suggestionChipText: {
     fontSize: 10,
     fontWeight: "700",
-    color: "#9A3412",
+    color: AppTheme.colors.orangeStrong,
   },
   suggestionChipTextActive: {
-    color: "#FFFFFF",
+    color: AppTheme.colors.white,
   },
 
   timePreview: {
@@ -1409,7 +1409,7 @@ const styles = StyleSheet.create({
 
   rowError: {
     fontSize: 11,
-    color: "#DC2626",
+    color: AppTheme.colors.danger,
     marginTop: 2,
   },
 
@@ -1417,7 +1417,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: "#FEF2F2",
+    backgroundColor: AppTheme.colors.dangerBg,
     alignItems: "center",
     justifyContent: "center",
     marginTop: 20,
@@ -1457,7 +1457,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1.5,
-    borderColor: "#FDBA74",
+    borderColor: AppTheme.colors.orangeBorder,
     borderStyle: "dashed",
     justifyContent: "center",
     backgroundColor: "#FFFBF7",
@@ -1465,7 +1465,7 @@ const styles = StyleSheet.create({
   addBreakText: {
     fontSize: 13,
     fontWeight: "700",
-    color: "#EA580C",
+    color: AppTheme.colors.orange,
   },
 
   // ── Footer ───────────────────────────────────────────────────────
@@ -1505,6 +1505,6 @@ const styles = StyleSheet.create({
   saveText: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#FFFFFF",
+    color: AppTheme.colors.white,
   },
 });

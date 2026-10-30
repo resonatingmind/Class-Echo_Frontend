@@ -160,7 +160,7 @@ export function SetPasswordModal({
             {canActivate ? (
               <Pressable onPress={() => setActivate((v) => !v)} style={styles.checkRow}>
                 <View style={[styles.checkbox, activate && styles.checkboxOn]}>
-                  {activate ? <Ionicons color="#fff" name="checkmark" size={13} /> : null}
+                  {activate ? <Ionicons color={AppTheme.colors.white} name="checkmark" size={13} /> : null}
                 </View>
                 <Text style={styles.checkLabel}>
                   Activate this account now (skips the emailed invitation)
@@ -183,7 +183,7 @@ export function SetPasswordModal({
             />
 
             <View style={styles.warnCard}>
-              <Ionicons color="#B45309" name="information-circle-outline" size={15} />
+              <Ionicons color={AppTheme.colors.warningText} name="information-circle-outline" size={15} />
               <Text style={styles.warnText}>
                 Any invitation link already sent to this address stops working once
                 you save.
@@ -192,7 +192,7 @@ export function SetPasswordModal({
 
             {message ? (
               <View style={styles.errorCard}>
-                <Ionicons color="#B42318" name="alert-circle-outline" size={16} />
+                <Ionicons color={AppTheme.colors.dangerText} name="alert-circle-outline" size={16} />
                 <Text style={styles.errorText}>{message}</Text>
               </View>
             ) : null}
@@ -208,7 +208,7 @@ export function SetPasswordModal({
               style={[styles.primaryBtn, busy && styles.disabled]}
             >
               {busy ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <ActivityIndicator color={AppTheme.colors.white} size="small" />
               ) : (
                 <Text style={styles.primaryBtnText}>Save password</Text>
               )}
@@ -293,22 +293,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: AppTheme.spacing.s,
-    backgroundColor: '#FFFBEB',
+    backgroundColor: AppTheme.colors.warningTint,
     borderRadius: AppTheme.radius.medium,
     padding: AppTheme.spacing.m,
     marginTop: AppTheme.spacing.l,
   },
-  warnText: { flex: 1, color: '#B45309', ...AppTheme.typography.caption },
+  warnText: { flex: 1, color: AppTheme.colors.warningText, ...AppTheme.typography.caption },
   errorCard: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: AppTheme.spacing.s,
-    backgroundColor: '#FDF2F2',
+    backgroundColor: AppTheme.colors.dangerBg,
     borderRadius: AppTheme.radius.medium,
     padding: AppTheme.spacing.m,
     marginTop: AppTheme.spacing.m,
   },
-  errorText: { flex: 1, color: '#B42318', ...AppTheme.typography.caption },
+  errorText: { flex: 1, color: AppTheme.colors.dangerText, ...AppTheme.typography.caption },
   actions: { flexDirection: 'row', gap: AppTheme.spacing.m, justifyContent: 'flex-end' },
   secondaryBtn: {
     paddingHorizontal: AppTheme.spacing.l,
@@ -330,6 +330,6 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
     backgroundColor: AppTheme.colors.primary,
   },
-  primaryBtnText: { color: '#fff', ...AppTheme.typography.caption, fontWeight: '700' },
+  primaryBtnText: { color: AppTheme.colors.white, ...AppTheme.typography.caption, fontWeight: '700' },
   disabled: { opacity: 0.5 },
 });

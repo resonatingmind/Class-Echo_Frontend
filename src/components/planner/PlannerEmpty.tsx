@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     height: 82,
     borderRadius: 41,
 
-    backgroundColor: "#EFF6FF",
+    backgroundColor: AppTheme.colors.infoSoft,
 
     justifyContent: "center",
     alignItems: "center",
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
 
     textAlign: "center",
 
-    color: "#64748B",
+    color: AppTheme.colors.slate500,
 
     fontSize: 15,
 

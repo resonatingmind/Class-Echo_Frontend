@@ -77,7 +77,7 @@ export function AssignTeacherModal({
 
           {error ? (
             <View style={styles.modalError}>
-              <Ionicons color="#B42318" name="alert-circle-outline" size={14} />
+              <Ionicons color={AppTheme.colors.dangerText} name="alert-circle-outline" size={14} />
               <Text style={styles.modalErrorText}>{error}</Text>
             </View>
           ) : null}
@@ -89,10 +89,10 @@ export function AssignTeacherModal({
               style={styles.unassignBtn}
             >
               {unassigning ? (
-                <ActivityIndicator color="#B42318" size="small" />
+                <ActivityIndicator color={AppTheme.colors.dangerText} size="small" />
               ) : (
                 <>
-                  <Ionicons name="person-remove-outline" size={16} color="#B42318" />
+                  <Ionicons name="person-remove-outline" size={16} color={AppTheme.colors.dangerText} />
                   <Text style={styles.unassignBtnText}>Unassign Current Teacher</Text>
                 </>
               )}
@@ -174,12 +174,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#FFF1F1',
+    backgroundColor: AppTheme.colors.dangerBg,
     borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
-  modalErrorText: { color: '#B42318', fontSize: 13, flex: 1 },
+  modalErrorText: { color: AppTheme.colors.dangerText, fontSize: 13, flex: 1 },
   teacherList: { maxHeight: 300 },
   teacherRow: {
     flexDirection: 'row',
@@ -224,15 +224,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#FFF1F1',
+    backgroundColor: AppTheme.colors.dangerBg,
     borderWidth: 1,
-    borderColor: '#FCA5A5',
+    borderColor: AppTheme.colors.dangerBorderStrong,
     paddingVertical: 10,
     borderRadius: AppTheme.radius.medium,
     marginTop: 4,
   },
   unassignBtnText: {
-    color: '#B42318',
+    color: AppTheme.colors.dangerText,
     fontSize: 14,
     fontWeight: '700',
   },

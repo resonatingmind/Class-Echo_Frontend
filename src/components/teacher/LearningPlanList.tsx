@@ -25,7 +25,7 @@ export function LearningPlanList({
   if (items.length === 0) {
     return (
       <View style={styles.emptyState}>
-        <Ionicons name="journal-outline" size={40} color="#94A3B8" />
+        <Ionicons name="journal-outline" size={40} color={AppTheme.colors.slate400} />
         <Text style={styles.emptyTitle}>No Lecture Planner Entries</Text>
         <Text style={styles.emptySubtitle}>
           Add entries to the Lecture Planner for this chapter to align lecture recordings with planned learning outcomes.

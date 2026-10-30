@@ -108,11 +108,11 @@ const styles = StyleSheet.create({
   },
 
   badgeSuccess: {
-    backgroundColor: "#E7F6EC",
+    backgroundColor: AppTheme.colors.successBg,
   },
 
   badgeWarning: {
-    backgroundColor: "#FDF3E3",
+    backgroundColor: AppTheme.colors.warningBg,
   },
 
   badgeText: {

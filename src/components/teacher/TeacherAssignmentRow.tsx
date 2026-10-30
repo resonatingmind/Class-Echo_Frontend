@@ -17,12 +17,12 @@ function formatAverageScore(score: number | null | undefined) {
 export function TeacherAssignmentRow({ row, onPress }: Props) {
   const scoreColor = (() => {
     if (row.average_score === null || row.average_score === undefined) {
-      return { bg: "#F3F4F6", text: "#6B7280" };
+      return { bg: AppTheme.colors.gray100, text: AppTheme.colors.textSecondary };
     }
     const score = row.average_score;
-    if (score >= 8.0) return { bg: "#DCFCE7", text: "#15803D" };
-    if (score >= 5.0) return { bg: "#FEF3C7", text: "#B45309" };
-    return { bg: "#FEE2E2", text: "#B91C1C" };
+    if (score >= 8.0) return { bg: AppTheme.colors.successTint, text: AppTheme.colors.successDeep };
+    if (score >= 5.0) return { bg: AppTheme.colors.warningSoft, text: AppTheme.colors.warningText };
+    return { bg: AppTheme.colors.dangerSoft, text: AppTheme.colors.dangerStrong };
   })();
 
   return (

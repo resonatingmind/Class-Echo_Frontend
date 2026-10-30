@@ -97,7 +97,7 @@ export function ChapterEditorModal({
               onPress={handleSave}
             >
               {loading ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <ActivityIndicator color={AppTheme.colors.white} size="small" />
               ) : (
                 <Text style={styles.saveText}>{submitText}</Text>
               )}
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.surface,
     borderRadius: AppTheme.radius.xlarge,
     padding: AppTheme.spacing.xl,
-    shadowColor: "#000",
+    shadowColor: AppTheme.colors.black,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
     shadowRadius: 24,
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   saveText: {
-    color: "#fff",
+    color: AppTheme.colors.white,
     fontSize: 15,
     fontWeight: "700",
   },

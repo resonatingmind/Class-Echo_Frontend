@@ -7,7 +7,7 @@ export function AppLogo({ showText = true }: { showText?: boolean }) {
   return (
     <View style={styles.container}>
       <View style={styles.logoIcon}>
-        <Ionicons color="#fff" name="pulse" size={24} />
+        <Ionicons color={AppTheme.colors.white} name="pulse" size={24} />
       </View>
       {showText && <Text style={styles.logoText}>ClassEcho</Text>}
     </View>

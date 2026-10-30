@@ -267,9 +267,9 @@ function ClipSheet({ audioUrl, moment, segments, title, onClose }: {
               style={cs.play}
             >
               {loading ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <ActivityIndicator color={AppTheme.colors.white} size="small" />
               ) : (
-                <Ionicons color="#fff" name={status.playing ? 'pause' : 'play'} size={24} />
+                <Ionicons color={AppTheme.colors.white} name={status.playing ? 'pause' : 'play'} size={24} />
               )}
             </Pressable>
             <Text style={cs.time}>{formatAudioTime(Math.max(from, Math.min(now, to)))}</Text>

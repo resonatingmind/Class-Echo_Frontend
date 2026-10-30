@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     borderColor: AppTheme.colors.border,
     borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 16,
-    backgroundColor: "#fff",
+    backgroundColor: AppTheme.colors.white,
     marginBottom: 14,
   },
 
@@ -98,6 +98,6 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
     borderColor: AppTheme.colors.border,
-    backgroundColor: "#fff",
+    backgroundColor: AppTheme.colors.white,
   },
 });

@@ -153,7 +153,7 @@ function AddTeacherModal({
 
           {error ? (
             <View style={styles.modalError}>
-              <Ionicons color="#B42318" name="alert-circle-outline" size={14} />
+              <Ionicons color={AppTheme.colors.dangerText} name="alert-circle-outline" size={14} />
               <Text style={styles.modalErrorText}>{error}</Text>
             </View>
           ) : null}
@@ -171,7 +171,7 @@ function AddTeacherModal({
               ]}
             >
               {submitting ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <ActivityIndicator color={AppTheme.colors.white} size="small" />
               ) : (
                 <Text style={styles.modalSubmitText}>Send Invitation</Text>
               )}
@@ -315,7 +315,7 @@ export function SchoolAdminTeachersScreen({ navigation }: Props) {
                     onPress={() => setShowAdd(true)}
                     style={styles.addTeacherBtn}
                   >
-                    <Ionicons color="#fff" name="person-add" size={14} />
+                    <Ionicons color={AppTheme.colors.white} name="person-add" size={14} />
                     <Text style={styles.addTeacherText}>Add Teacher</Text>
                   </Pressable>
                 </View>
@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#ECFDF3",
+    backgroundColor: AppTheme.colors.successSoft,
     marginBottom: AppTheme.spacing.m,
   },
   addTeacherBtn: {
@@ -456,7 +456,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: AppTheme.spacing.m,
     paddingVertical: AppTheme.spacing.s,
   },
-  addTeacherText: { color: "#fff", ...AppTheme.typography.button },
+  addTeacherText: { color: AppTheme.colors.white, ...AppTheme.typography.button },
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
@@ -567,12 +567,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: "#FFF1F1",
+    backgroundColor: AppTheme.colors.dangerBg,
     borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
-  modalErrorText: { color: "#B42318", flex: 1, ...AppTheme.typography.body },
+  modalErrorText: { color: AppTheme.colors.dangerText, flex: 1, ...AppTheme.typography.body },
   modalActions: { flexDirection: "row", gap: 12, marginTop: 4 },
   modalCancelBtn: {
     flex: 1,
@@ -596,6 +596,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   btnDisabled: { opacity: 0.45 },
-  modalSubmitText: { color: "#fff", ...AppTheme.typography.button },
+  modalSubmitText: { color: AppTheme.colors.white, ...AppTheme.typography.button },
 });
 

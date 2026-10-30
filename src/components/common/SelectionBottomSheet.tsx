@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   },
 
   sheet: {
-    backgroundColor: "#fff",
+    backgroundColor: AppTheme.colors.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 20,
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 16,
     marginBottom: 16,
-    backgroundColor: "#fff",
+    backgroundColor: AppTheme.colors.white,
   },
 
   item: {
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     borderBottomWidth: 1,
-    borderBottomColor: "#F1F5F9",
+    borderBottomColor: AppTheme.colors.slate100,
   },
 
   itemText: {

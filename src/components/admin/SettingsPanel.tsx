@@ -192,7 +192,7 @@ export function SettingsPanel({ token }: { token: string }) {
                       ]}
                     >
                       {busyKey === setting.key ? (
-                        <ActivityIndicator color="#FFFFFF" size="small" />
+                        <ActivityIndicator color={AppTheme.colors.white} size="small" />
                       ) : (
                         <Text style={styles.saveText}>Save</Text>
                       )}
@@ -202,7 +202,7 @@ export function SettingsPanel({ token }: { token: string }) {
 
                 {savedKey === setting.key ? (
                   <View style={styles.savedRow}>
-                    <Ionicons color="#127A40" name="checkmark-circle" size={13} />
+                    <Ionicons color={AppTheme.colors.successText} name="checkmark-circle" size={13} />
                     <Text style={styles.savedText}>Saved</Text>
                   </View>
                 ) : null}
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.textSecondary,
     lineHeight: 18,
   },
-  error: { fontSize: 12, color: "#B42318", lineHeight: 17 },
+  error: { fontSize: 12, color: AppTheme.colors.dangerText, lineHeight: 17 },
   group: { gap: AppTheme.spacing.s },
   groupTitle: {
     fontSize: 11,
@@ -279,8 +279,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   saveBtnDisabled: { backgroundColor: AppTheme.colors.disabled },
-  saveText: { color: "#FFFFFF", fontWeight: "700", fontSize: 12 },
+  saveText: { color: AppTheme.colors.white, fontWeight: "700", fontSize: 12 },
   savedRow: { flexDirection: "row", alignItems: "center", gap: 4 },
-  savedText: { fontSize: 11, color: "#127A40", fontWeight: "700" },
+  savedText: { fontSize: 11, color: AppTheme.colors.successText, fontWeight: "700" },
   defaultNote: { fontSize: 11, color: AppTheme.colors.hint },
 });

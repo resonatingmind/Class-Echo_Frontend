@@ -107,43 +107,43 @@ try {
       case "active":
         return {
           text: "Active Teacher",
-          bgColor: "#ECFDF3",
-          textColor: "#16A34A",
+          bgColor: AppTheme.colors.successSoft,
+          textColor: AppTheme.colors.successBright,
           icon: "checkmark-circle" as const,
         };
       case "pending_approval":
         return {
           text: "Pending Approval",
           bgColor: "#FEF08A",
-          textColor: "#854D0E",
+          textColor: AppTheme.colors.warningDeep,
           icon: "time-outline" as const,
         };
       case "invited":
         return {
           text: "Invited",
-          bgColor: "#F3F4F6",
-          textColor: "#374151",
+          bgColor: AppTheme.colors.gray100,
+          textColor: AppTheme.colors.gray700,
           icon: "mail-outline" as const,
         };
       case "suspended":
         return {
           text: "Suspended",
-          bgColor: "#FEE2E2",
-          textColor: "#991B1B",
+          bgColor: AppTheme.colors.dangerSoft,
+          textColor: AppTheme.colors.dangerDeep,
           icon: "ban-outline" as const,
         };
       case "rejected":
         return {
           text: "Declined",
-          bgColor: "#FEE2E2",
-          textColor: "#991B1B",
+          bgColor: AppTheme.colors.dangerSoft,
+          textColor: AppTheme.colors.dangerDeep,
           icon: "close-circle-outline" as const,
         };
       default:
         return {
           text: status,
-          bgColor: "#F3F4F6",
-          textColor: "#374151",
+          bgColor: AppTheme.colors.gray100,
+          textColor: AppTheme.colors.gray700,
           icon: "help-circle-outline" as const,
         };
     }
@@ -368,14 +368,14 @@ try {
                 style={[styles.actionBtn, styles.actionBtnSuccess]}
                 onPress={handleApprove}
               >
-                <Ionicons name="checkmark-circle" size={20} color="#fff" />
+                <Ionicons name="checkmark-circle" size={20} color={AppTheme.colors.white} />
                 <Text style={styles.actionBtnText}>Approve Request</Text>
               </Pressable>
               <Pressable
                 style={[styles.actionBtn, styles.actionBtnDanger]}
                 onPress={handleReject}
               >
-                <Ionicons name="close-circle" size={20} color="#fff" />
+                <Ionicons name="close-circle" size={20} color={AppTheme.colors.white} />
                 <Text style={styles.actionBtnText}>Decline Request</Text>
               </Pressable>
             </View>
@@ -387,7 +387,7 @@ try {
                 style={[styles.actionBtn, styles.actionBtnDanger]}
                 onPress={handleSuspend}
               >
-                <Ionicons name="ban" size={20} color="#fff" />
+                <Ionicons name="ban" size={20} color={AppTheme.colors.white} />
                 <Text style={styles.actionBtnText}>Suspend Account</Text>
               </Pressable>
             </View>
@@ -399,7 +399,7 @@ try {
                 style={[styles.actionBtn, styles.actionBtnSuccess]}
                 onPress={handleReactivate}
               >
-                <Ionicons name="checkmark-circle" size={20} color="#fff" />
+                <Ionicons name="checkmark-circle" size={20} color={AppTheme.colors.white} />
                 <Text style={styles.actionBtnText}>Reactivate Account</Text>
               </Pressable>
             </View>
@@ -540,7 +540,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    shadowColor: "#000",
+    shadowColor: AppTheme.colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -548,11 +548,11 @@ const styles = StyleSheet.create({
   },
 
   actionBtnSuccess: {
-    backgroundColor: "#16A34A",
+    backgroundColor: AppTheme.colors.successBright,
   },
 
   actionBtnDanger: {
-    backgroundColor: "#DC2626",
+    backgroundColor: AppTheme.colors.danger,
   },
 
   actionBtnSecondary: {
@@ -563,7 +563,7 @@ const styles = StyleSheet.create({
   },
 
   actionBtnText: {
-    color: "#fff",
+    color: AppTheme.colors.white,
     fontWeight: "700",
     fontSize: 15,
   },
@@ -583,7 +583,7 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: "center",
     gap: 18,
-    shadowColor: "#000",
+    shadowColor: AppTheme.colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -614,12 +614,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 20,
-    backgroundColor: "#ECFDF3",
+    backgroundColor: AppTheme.colors.successSoft,
     gap: 5,
   },
 
   statusText: {
-    color: "#16A34A",
+    color: AppTheme.colors.successBright,
     fontWeight: "600",
   },
 
@@ -641,7 +641,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#D1E4FF",
+    borderColor: AppTheme.colors.primarySoft,
   },
 
   chipText: {

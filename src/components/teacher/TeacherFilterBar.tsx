@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
   },
 
   search: {
-    backgroundColor: "#fff",
+    backgroundColor: AppTheme.colors.white,
     borderWidth: 1,
     borderColor: AppTheme.colors.border,
     borderRadius: AppTheme.radius.medium,

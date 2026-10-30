@@ -150,8 +150,8 @@ const styles = StyleSheet.create({
     borderColor: AppTheme.colors.border,
   },
   deleteBtn: {
-    backgroundColor: "#FFF1F1",
-    borderColor: "#FECACA",
+    backgroundColor: AppTheme.colors.dangerBg,
+    borderColor: AppTheme.colors.dangerBorder,
   },
   content: {
     padding: 16,

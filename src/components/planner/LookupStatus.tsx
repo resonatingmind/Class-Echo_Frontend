@@ -49,12 +49,12 @@ const styles = StyleSheet.create({
 
     fontWeight: "600",
 
-    color: "#334155",
+    color: AppTheme.colors.slate700,
   },
   description: {
     marginTop: 4,
     fontSize: 12,
-    color: "#64748B",
+    color: AppTheme.colors.slate500,
   },
 });
 

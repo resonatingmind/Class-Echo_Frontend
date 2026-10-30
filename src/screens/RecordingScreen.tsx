@@ -875,7 +875,7 @@ export function RecordingScreen({ navigation, route }: Props) {
         {replaceRecordingId ? (
           <View
             style={{
-              backgroundColor: '#EFF6FF',
+              backgroundColor: AppTheme.colors.infoSoft,
               borderColor: '#BFDBFE',
               borderWidth: 1,
               borderRadius: AppTheme.radius.medium,
@@ -886,12 +886,12 @@ export function RecordingScreen({ navigation, route }: Props) {
               marginBottom: 16,
             }}
           >
-            <Ionicons name="refresh-circle" size={24} color="#0284C7" />
+            <Ionicons name="refresh-circle" size={24} color={AppTheme.colors.info} />
             <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 13, fontWeight: '700', color: '#0369A1' }}>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: AppTheme.colors.infoStrong }}>
                 Replacing Lecture Audio
               </Text>
-              <Text style={{ fontSize: 12, color: '#0284C7', marginTop: 2, lineHeight: 16 }}>
+              <Text style={{ fontSize: 12, color: AppTheme.colors.info, marginTop: 2, lineHeight: 16 }}>
                 Recording or uploading a new audio file will replace the previous recording and trigger a fresh AI evaluation.
               </Text>
             </View>
@@ -900,7 +900,7 @@ export function RecordingScreen({ navigation, route }: Props) {
 
         {recoverableDraft && state === 'idle' ? (
           <View style={styles.recoveryCard}>
-            <Ionicons color="#B45309" name="warning" size={24} />
+            <Ionicons color={AppTheme.colors.warningText} name="warning" size={24} />
             <View style={{ flex: 1 }}>
               <Text style={styles.recoveryTitle}>Unfinished lecture found</Text>
               <Text style={styles.recoveryBody}>
@@ -915,7 +915,7 @@ export function RecordingScreen({ navigation, route }: Props) {
                   style={[styles.recoveryPrimary, recovering && styles.recoveryDisabled]}
                 >
                   {recovering ? (
-                    <ActivityIndicator color="#fff" size="small" />
+                    <ActivityIndicator color={AppTheme.colors.white} size="small" />
                   ) : (
                     <Text style={styles.recoveryPrimaryText}>Recover</Text>
                   )}
@@ -934,15 +934,15 @@ export function RecordingScreen({ navigation, route }: Props) {
 
         {recoveryNotice ? (
           <Pressable onPress={() => setRecoveryNotice(null)} style={styles.noticeCard}>
-            <Ionicons color="#0369A1" name="information-circle" size={20} />
+            <Ionicons color={AppTheme.colors.infoStrong} name="information-circle" size={20} />
             <Text style={styles.noticeText}>{recoveryNotice}</Text>
-            <Ionicons color="#0284C7" name="close" size={16} />
+            <Ionicons color={AppTheme.colors.info} name="close" size={16} />
           </Pressable>
         ) : null}
 
         {recorderError ? (
           <View style={styles.recorderErrorCard}>
-            <Ionicons color="#B91C1C" name="alert-circle" size={20} />
+            <Ionicons color={AppTheme.colors.dangerStrong} name="alert-circle" size={20} />
             <Text style={styles.recorderErrorText}>{recorderError}</Text>
           </View>
         ) : null}
@@ -982,12 +982,12 @@ export function RecordingScreen({ navigation, route }: Props) {
 
             <View style={[styles.actionChoiceRow, isMobile && { flexDirection: 'column' }]}>
               <Pressable onPress={() => void startRecording()} style={[styles.recordBtn, isMobile ? { width: '100%' } : { flex: 1 }]}>
-                <Ionicons color="#fff" name="mic" size={22} />
+                <Ionicons color={AppTheme.colors.white} name="mic" size={22} />
                 <Text style={styles.recordBtnText}>Start Live Recording</Text>
               </Pressable>
 
               <Pressable onPress={() => void pickAudioFile()} style={[styles.uploadChoiceBtn, isMobile ? { width: '100%' } : {}]}>
-                <Ionicons color="#0284C7" name="cloud-upload-outline" size={22} />
+                <Ionicons color={AppTheme.colors.info} name="cloud-upload-outline" size={22} />
                 <Text style={styles.uploadChoiceText}>Upload Audio File</Text>
               </Pressable>
             </View>
@@ -1010,9 +1010,9 @@ export function RecordingScreen({ navigation, route }: Props) {
 
             <View style={[styles.waveformCard, state === 'paused' && styles.waveformCardPaused]}>
               <AudioWaveform
-                activeColor={state === 'paused' ? '#94A3B8' : '#E53935'}
+                activeColor={state === 'paused' ? AppTheme.colors.slate400 : AppTheme.colors.recording}
                 bars={previewBars}
-                inactiveColor={state === 'paused' ? '#E2E8F0' : '#FAD4D4'}
+                inactiveColor={state === 'paused' ? AppTheme.colors.slate200 : '#FAD4D4'}
                 progress={1}
               />
             </View>
@@ -1020,11 +1020,11 @@ export function RecordingScreen({ navigation, route }: Props) {
             {isSpeechSupported && isDictatingEnabled && state === 'recording' && (
               <View style={styles.dictationCard}>
                 <View style={styles.dictationHeader}>
-                  <Ionicons name="chatbubble-ellipses" size={16} color={dictationError ? '#E53935' : AppTheme.colors.primary} />
+                  <Ionicons name="chatbubble-ellipses" size={16} color={dictationError ? AppTheme.colors.recording : AppTheme.colors.primary} />
                   <Text style={styles.dictationTitle}>
                     {dictationError ? `Dictation Error: ${dictationError}` : 'Live Dictation Transcript'}
                   </Text>
-                  <View style={[styles.livePulse, { backgroundColor: dictationError ? '#E53935' : colors.success }]} />
+                  <View style={[styles.livePulse, { backgroundColor: dictationError ? AppTheme.colors.recording : colors.success }]} />
                 </View>
                 <ScrollView style={styles.dictationScroll} nestedScrollEnabled>
                   <Text style={styles.dictationText}>
@@ -1077,7 +1077,7 @@ export function RecordingScreen({ navigation, route }: Props) {
                 style={[styles.pauseBtn, state === 'paused' && styles.resumeBtn]}
               >
                 <Ionicons
-                  color={state === 'paused' ? '#fff' : '#B45309'}
+                  color={state === 'paused' ? AppTheme.colors.white : AppTheme.colors.warningText}
                   name={state === 'paused' ? 'play' : 'pause'}
                   size={20}
                 />
@@ -1097,7 +1097,7 @@ export function RecordingScreen({ navigation, route }: Props) {
           <>
             <View style={styles.stoppedTop}>
               <View style={styles.doneCircle}>
-                <Ionicons color="#127A40" name="checkmark" size={36} />
+                <Ionicons color={AppTheme.colors.successText} name="checkmark" size={36} />
               </View>
               <Text style={styles.doneTitle}>Recording Ready</Text>
               <Text style={styles.doneDuration}>Length: {formatAudioTime(recordedDuration)}</Text>
@@ -1204,15 +1204,15 @@ export function RecordingScreen({ navigation, route }: Props) {
                             paddingVertical: 8,
                             borderRadius: AppTheme.radius.medium,
                             borderWidth: 1,
-                            borderColor: isSel ? "#0284C7" : AppTheme.colors.border,
-                            backgroundColor: isSel ? "#E0F2FE" : AppTheme.colors.surface,
+                            borderColor: isSel ? AppTheme.colors.info : AppTheme.colors.border,
+                            backgroundColor: isSel ? AppTheme.colors.infoBg : AppTheme.colors.surface,
                           }}
                         >
-                          <Text style={{ fontSize: 13, color: isSel ? "#0369A1" : AppTheme.colors.textPrimary, fontWeight: '700' }}>
+                          <Text style={{ fontSize: 13, color: isSel ? AppTheme.colors.infoStrong : AppTheme.colors.textPrimary, fontWeight: '700' }}>
                             {lp.sub_topic}
                           </Text>
                           {lp.topic_name ? (
-                            <Text style={{ fontSize: 11, color: isSel ? "#0284C7" : AppTheme.colors.textSecondary }}>
+                            <Text style={{ fontSize: 11, color: isSel ? AppTheme.colors.info : AppTheme.colors.textSecondary }}>
                               {lp.topic_name} {lp.date ? `(${lp.date})` : ''}
                             </Text>
                           ) : null}
@@ -1227,19 +1227,19 @@ export function RecordingScreen({ navigation, route }: Props) {
                         borderRadius: AppTheme.radius.medium,
                         borderWidth: 1,
                         borderStyle: 'dashed',
-                        borderColor: creatingNewLecture ? "#0284C7" : AppTheme.colors.border,
-                        backgroundColor: creatingNewLecture ? "#E0F2FE" : AppTheme.colors.surface,
+                        borderColor: creatingNewLecture ? AppTheme.colors.info : AppTheme.colors.border,
+                        backgroundColor: creatingNewLecture ? AppTheme.colors.infoBg : AppTheme.colors.surface,
                         justifyContent: 'center',
                       }}
                     >
-                      <Text style={{ fontSize: 13, color: creatingNewLecture ? "#0369A1" : AppTheme.colors.textSecondary, fontWeight: '700' }}>
+                      <Text style={{ fontSize: 13, color: creatingNewLecture ? AppTheme.colors.infoStrong : AppTheme.colors.textSecondary, fontWeight: '700' }}>
                         + New lecture
                       </Text>
                     </Pressable>
                   </View>
                 </View>
                 {lectureSelectError ? (
-                  <Text style={{ color: '#E53935', fontSize: 12, marginTop: 4, fontWeight: '600' }}>
+                  <Text style={{ color: AppTheme.colors.recording, fontSize: 12, marginTop: 4, fontWeight: '600' }}>
                     {lectureSelectError}
                   </Text>
                 ) : null}
@@ -1260,11 +1260,11 @@ export function RecordingScreen({ navigation, route }: Props) {
                     }}
                     placeholder="Enter lecture title"
                     placeholderTextColor={AppTheme.colors.textPlaceholder}
-                    style={[styles.input, lectureTitleError && { borderColor: '#E53935' }]}
+                    style={[styles.input, lectureTitleError && { borderColor: AppTheme.colors.recording }]}
                     value={lectureTitle}
                   />
                   {lectureTitleError ? (
-                    <Text style={{ color: '#E53935', fontSize: 12, marginTop: 4, marginBottom: 4, fontWeight: '600' }}>
+                    <Text style={{ color: AppTheme.colors.recording, fontSize: 12, marginTop: 4, marginBottom: 4, fontWeight: '600' }}>
                       {lectureTitleError}
                     </Text>
                   ) : null}
@@ -1286,7 +1286,7 @@ export function RecordingScreen({ navigation, route }: Props) {
 
             {uploadError ? (
               <View style={styles.uploadErrorBox}>
-                <Ionicons color="#B42318" name="alert-circle-outline" size={18} />
+                <Ionicons color={AppTheme.colors.dangerText} name="alert-circle-outline" size={18} />
                 <Text style={styles.uploadErrorText}>{uploadError}</Text>
               </View>
             ) : null}
@@ -1316,7 +1316,7 @@ export function RecordingScreen({ navigation, route }: Props) {
                 onPress={() => void handleUpload()}
                 style={[styles.primaryBtn, uploading && styles.btnDisabled]}
               >
-                {uploading ? <ActivityIndicator color="#fff" size="small" /> : null}
+                {uploading ? <ActivityIndicator color={AppTheme.colors.white} size="small" /> : null}
                 <Text style={styles.primaryBtnText}>
                   {uploading
                     ? uploadPhase === 'finalizing'
@@ -1385,9 +1385,9 @@ const styles = StyleSheet.create({
     borderColor: AppTheme.colors.border,
     backgroundColor: AppTheme.colors.surface,
   },
-  chipSelected: { borderColor: '#0284C7', backgroundColor: '#E0F2FE' },
+  chipSelected: { borderColor: AppTheme.colors.info, backgroundColor: AppTheme.colors.infoBg },
   chipText: { fontSize: 13, fontWeight: '700', color: AppTheme.colors.textPrimary },
-  chipTextSelected: { color: '#0369A1' },
+  chipTextSelected: { color: AppTheme.colors.infoStrong },
   micRing: {
     width: 132,
     height: 132,
@@ -1419,81 +1419,81 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 18,
   },
-  recordBtnText: { color: '#fff', fontSize: 15, fontWeight: '800' },
+  recordBtnText: { color: AppTheme.colors.white, fontSize: 15, fontWeight: '800' },
   uploadChoiceBtn: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#E0F2FE',
+    backgroundColor: AppTheme.colors.infoBg,
     borderWidth: 1,
-    borderColor: '#BAE6FD',
+    borderColor: AppTheme.colors.infoBorder,
     paddingVertical: 16,
     paddingHorizontal: 12,
     borderRadius: 18,
   },
-  uploadChoiceText: { color: '#0284C7', fontSize: 15, fontWeight: '800' },
+  uploadChoiceText: { color: AppTheme.colors.info, fontSize: 15, fontWeight: '800' },
   recoveryCard: {
     flexDirection: 'row',
     gap: 12,
     alignItems: 'flex-start',
-    backgroundColor: '#FFFBEB',
-    borderColor: '#FCD34D',
+    backgroundColor: AppTheme.colors.warningTint,
+    borderColor: AppTheme.colors.warningBorder,
     borderWidth: 1,
     borderRadius: AppTheme.radius.medium,
     padding: 14,
     marginBottom: 16,
   },
-  recoveryTitle: { fontSize: 14, fontWeight: '800', color: '#92400E' },
-  recoveryBody: { fontSize: 12, color: '#B45309', marginTop: 2, lineHeight: 16 },
+  recoveryTitle: { fontSize: 14, fontWeight: '800', color: AppTheme.colors.warningStrong },
+  recoveryBody: { fontSize: 12, color: AppTheme.colors.warningText, marginTop: 2, lineHeight: 16 },
   recoveryActions: { flexDirection: 'row', gap: 10, marginTop: 12 },
   recoveryPrimary: {
     minWidth: 96,
     alignItems: 'center',
     borderRadius: 12,
-    backgroundColor: '#B45309',
+    backgroundColor: AppTheme.colors.warningText,
     paddingVertical: 9,
     paddingHorizontal: 16,
   },
-  recoveryPrimaryText: { color: '#fff', fontSize: 13, fontWeight: '800' },
+  recoveryPrimaryText: { color: AppTheme.colors.white, fontSize: 13, fontWeight: '800' },
   recoveryDisabled: { opacity: 0.7 },
   recoverySecondary: {
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#FCD34D',
+    borderColor: AppTheme.colors.warningBorder,
     paddingVertical: 9,
     paddingHorizontal: 16,
   },
-  recoverySecondaryText: { color: '#B45309', fontSize: 13, fontWeight: '700' },
+  recoverySecondaryText: { color: AppTheme.colors.warningText, fontSize: 13, fontWeight: '700' },
   noticeCard: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: AppTheme.colors.infoSoft,
     borderColor: '#BFDBFE',
     borderWidth: 1,
     borderRadius: AppTheme.radius.medium,
     padding: 12,
     marginBottom: 16,
   },
-  noticeText: { flex: 1, fontSize: 12, color: '#0369A1', lineHeight: 16 },
+  noticeText: { flex: 1, fontSize: 12, color: AppTheme.colors.infoStrong, lineHeight: 16 },
   recorderErrorCard: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    backgroundColor: '#FEF2F2',
-    borderColor: '#FECACA',
+    backgroundColor: AppTheme.colors.dangerBg,
+    borderColor: AppTheme.colors.dangerBorder,
     borderWidth: 1,
     borderRadius: AppTheme.radius.medium,
     padding: 12,
     marginBottom: 16,
   },
-  recorderErrorText: { flex: 1, fontSize: 12, color: '#B91C1C', lineHeight: 16 },
+  recorderErrorText: { flex: 1, fontSize: 12, color: AppTheme.colors.dangerStrong, lineHeight: 16 },
   recordingTop: { alignItems: 'center', gap: 10, marginTop: 16 },
   liveRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  liveDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#E53935' },
-  liveLabel: { fontSize: 12, fontWeight: '800', letterSpacing: 1.2, color: '#E53935' },
+  liveDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: AppTheme.colors.recording },
+  liveLabel: { fontSize: 12, fontWeight: '800', letterSpacing: 1.2, color: AppTheme.colors.recording },
   timerText: { fontSize: 38, fontWeight: '800', color: AppTheme.colors.textPrimary },
   waveformCard: {
     flex: 1,
@@ -1504,9 +1504,9 @@ const styles = StyleSheet.create({
     borderColor: '#F0D0D0',
     backgroundColor: '#FFF6F6',
   },
-  pausedDot: { backgroundColor: '#B45309' },
-  pausedLabel: { color: '#B45309' },
-  waveformCardPaused: { borderColor: '#E2E8F0', backgroundColor: '#F8FAFC' },
+  pausedDot: { backgroundColor: AppTheme.colors.warningText },
+  pausedLabel: { color: AppTheme.colors.warningText },
+  waveformCardPaused: { borderColor: AppTheme.colors.slate200, backgroundColor: AppTheme.colors.slate50 },
   pausedHint: {
     textAlign: 'center',
     fontSize: 13,
@@ -1530,14 +1530,14 @@ const styles = StyleSheet.create({
     gap: 8,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#FCD34D',
-    backgroundColor: '#FFFBEB',
+    borderColor: AppTheme.colors.warningBorder,
+    backgroundColor: AppTheme.colors.warningTint,
     paddingVertical: 16,
   },
-  pauseBtnText: { color: '#B45309', fontSize: 15, fontWeight: '800' },
+  pauseBtnText: { color: AppTheme.colors.warningText, fontSize: 15, fontWeight: '800' },
   iconOnlyBtn: { flex: 0, paddingHorizontal: 18 },
-  resumeBtn: { borderColor: '#127A40', backgroundColor: '#127A40' },
-  resumeBtnText: { color: '#fff' },
+  resumeBtn: { borderColor: AppTheme.colors.successText, backgroundColor: AppTheme.colors.successText },
+  resumeBtnText: { color: AppTheme.colors.white },
   cancelBtn: {
     flex: 1,
     flexDirection: 'row',
@@ -1558,17 +1558,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 10,
     borderRadius: 18,
-    backgroundColor: '#E53935',
+    backgroundColor: AppTheme.colors.recording,
     paddingVertical: 16,
   },
-  stopIcon: { width: 14, height: 14, borderRadius: 4, backgroundColor: '#fff' },
-  stopBtnText: { color: '#fff', fontSize: 15, fontWeight: '800' },
+  stopIcon: { width: 14, height: 14, borderRadius: 4, backgroundColor: AppTheme.colors.white },
+  stopBtnText: { color: AppTheme.colors.white, fontSize: 15, fontWeight: '800' },
   stoppedTop: { alignItems: 'center', gap: 10 },
   doneCircle: {
     width: 88,
     height: 88,
     borderRadius: 44,
-    backgroundColor: '#E8F7EE',
+    backgroundColor: AppTheme.colors.successBg,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1645,16 +1645,16 @@ const styles = StyleSheet.create({
     gap: 10,
     padding: 14,
     borderRadius: 16,
-    backgroundColor: '#FFF1F1',
+    backgroundColor: AppTheme.colors.dangerBg,
     borderWidth: 1,
-    borderColor: '#FECDCA',
+    borderColor: AppTheme.colors.dangerBorder,
   },
   uploadErrorText: {
     flex: 1,
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '600',
-    color: '#B42318',
+    color: AppTheme.colors.dangerText,
   },
   footerActions: { flexDirection: 'row', gap: 12 },
   secondaryBtn: {
@@ -1680,7 +1680,7 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.primary,
     paddingVertical: 15,
   },
-  primaryBtnText: { fontSize: 15, fontWeight: '800', color: '#fff' },
+  primaryBtnText: { fontSize: 15, fontWeight: '800', color: AppTheme.colors.white },
   btnDisabled: { opacity: 0.55 },
   toggleRow: {
     flexDirection: 'row',
@@ -1714,7 +1714,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: AppTheme.radius.medium,
-    backgroundColor: '#fff',
+    backgroundColor: AppTheme.colors.white,
     transform: [{ translateX: 0 }],
   },
   toggleInnerActive: {
@@ -1767,7 +1767,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   errorText: {
-    color: '#E53935',
+    color: AppTheme.colors.recording,
     fontStyle: 'italic',
     fontSize: 13,
   },

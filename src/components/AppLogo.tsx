@@ -15,7 +15,7 @@ export function AppLogo({ compact = false, showBadge = true }: AppLogoProps) {
       {showBadge ? (
         <View style={[styles.badge, compact && styles.badgeCompact]}>
           <Feather
-            color="#FFFFFF"
+            color={AppTheme.colors.white}
             name="bar-chart-2"
             size={compact ? 14 : 18}
             style={styles.icon}

@@ -138,9 +138,9 @@ export function StudentProfileScreen({ navigation }: Props) {
               )}
               <View style={styles.cameraBadge}>
                 {uploading ? (
-                  <ActivityIndicator color="#fff" size="small" />
+                  <ActivityIndicator color={AppTheme.colors.white} size="small" />
                 ) : (
-                  <Ionicons color="#fff" name="camera" size={14} />
+                  <Ionicons color={AppTheme.colors.white} name="camera" size={14} />
                 )}
               </View>
             </Pressable>
@@ -210,14 +210,14 @@ export function StudentProfileScreen({ navigation }: Props) {
                 onPress={() => void handleSave()}
                 style={[styles.primaryButton, (saving || !draftName.trim()) && styles.buttonDisabled]}
               >
-                {saving ? <ActivityIndicator color="#fff" size="small" /> : null}
+                {saving ? <ActivityIndicator color={AppTheme.colors.white} size="small" /> : null}
                 <Text style={styles.primaryButtonText}>{saving ? 'Saving…' : 'Save Changes'}</Text>
               </Pressable>
             ) : null}
           </View>
 
           <Pressable onPress={signOut} style={styles.signOutButton}>
-            <Ionicons color="#EF4444" name="log-out-outline" size={18} />
+            <Ionicons color={AppTheme.colors.error} name="log-out-outline" size={18} />
             <Text style={styles.signOutText}>Sign Out</Text>
           </Pressable>
         </ScrollView>
@@ -253,9 +253,9 @@ const styles = StyleSheet.create({
   avatarWrap: { 
     position: 'relative',
     padding: 4,
-    backgroundColor: '#fff',
+    backgroundColor: AppTheme.colors.white,
     borderRadius: 60,
-    shadowColor: '#000',
+    shadowColor: AppTheme.colors.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
     width: 104,
     height: 104,
     borderRadius: 52,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: AppTheme.colors.gray100,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: '#fff',
+    borderColor: AppTheme.colors.white,
   },
   roleBadge: {
     marginTop: 4,
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 24,
     gap: 16,
-    shadowColor: '#000',
+    shadowColor: AppTheme.colors.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.03,
     shadowRadius: 16,
@@ -316,8 +316,8 @@ const styles = StyleSheet.create({
     minHeight: 52,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#F9FAFB',
+    borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.gray50,
     paddingHorizontal: 16,
     fontSize: 16,
     color: AppTheme.colors.textPrimary,
@@ -337,21 +337,21 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  primaryButtonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  primaryButtonText: { color: AppTheme.colors.white, fontSize: 16, fontWeight: '700' },
   buttonDisabled: { opacity: 0.5 },
   signOutButton: {
     marginTop: 12,
     height: 52,
     borderRadius: 16,
-    backgroundColor: '#FEF2F2',
+    backgroundColor: AppTheme.colors.dangerBg,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
     borderWidth: 1,
-    borderColor: '#FCA5A5',
+    borderColor: AppTheme.colors.dangerBorderStrong,
   },
-  signOutText: { color: '#DC2626', fontSize: 16, fontWeight: '700' },
+  signOutText: { color: AppTheme.colors.danger, fontSize: 16, fontWeight: '700' },
 });
 
 

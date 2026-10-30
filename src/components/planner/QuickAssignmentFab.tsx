@@ -10,7 +10,7 @@ type Props = {
 export function QuickAssignmentFab({ onPress }: Props) {
   return (
     <Pressable onPress={onPress} style={styles.fab}>
-      <Ionicons name="add" size={30} color="#fff" />
+      <Ionicons name="add" size={30} color={AppTheme.colors.white} />
     </Pressable>
   );
 }
@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
 
     elevation: 8,
 
-    shadowColor: "#000",
+    shadowColor: AppTheme.colors.black,
     shadowOpacity: 0.25,
     shadowRadius: 8,
     shadowOffset: {

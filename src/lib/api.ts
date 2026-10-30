@@ -785,6 +785,10 @@ export async function getAdminSubjectRecordings(
   );
 }
 
+export async function getAdminRecordingDetail(token: string, recordingId: number) {
+  return request<RecordingWithReport>(`/admin/recordings/${recordingId}`, {}, token);
+}
+
 export async function deleteAdminRecording(token: string, recordingId: number) {
   return request<void>(
     `/admin/recordings/${recordingId}`,

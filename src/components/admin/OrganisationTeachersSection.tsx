@@ -29,18 +29,18 @@ const EMAIL_RE = /\S+@\S+\.\S+/;
 type InviteDraft = { key: string; name: string; email: string };
 
 const STATUS_STYLES: Record<string, { label: string; color: string; background: string }> = {
-  invited: { label: 'Invite sent', color: '#B45309', background: '#FFFBEB' },
-  pending_approval: { label: 'Awaiting approval', color: '#B45309', background: '#FFFBEB' },
-  active: { label: 'Active', color: '#127A40', background: '#E8F7EE' },
-  suspended: { label: 'Suspended', color: '#6B7280', background: '#F3F4F6' },
-  rejected: { label: 'Rejected', color: '#B42318', background: '#FDF2F2' },
+  invited: { label: 'Invite sent', color: AppTheme.colors.warningText, background: AppTheme.colors.warningTint },
+  pending_approval: { label: 'Awaiting approval', color: AppTheme.colors.warningText, background: AppTheme.colors.warningTint },
+  active: { label: 'Active', color: AppTheme.colors.successText, background: AppTheme.colors.successBg },
+  suspended: { label: 'Suspended', color: AppTheme.colors.textSecondary, background: AppTheme.colors.gray100 },
+  rejected: { label: 'Rejected', color: AppTheme.colors.dangerText, background: AppTheme.colors.dangerBg },
 };
 
 function StatusPill({ status }: { status: string }) {
   const style = STATUS_STYLES[status] ?? {
     label: status,
     color: AppTheme.colors.textSecondary,
-    background: '#F3F4F6',
+    background: AppTheme.colors.gray100,
   };
   return (
     <View style={[styles.pill, { backgroundColor: style.background }]}>
@@ -234,7 +234,7 @@ export function OrganisationTeachersSection({
           </Text>
         </View>
         <Pressable onPress={openInvite} style={styles.inviteBtn}>
-          <Ionicons color="#fff" name="mail-outline" size={16} />
+          <Ionicons color={AppTheme.colors.white} name="mail-outline" size={16} />
           <Text style={styles.inviteBtnText}>Invite teachers</Text>
         </Pressable>
       </View>
@@ -243,7 +243,7 @@ export function OrganisationTeachersSection({
           same resend affordance as the teachers below it. */}
       {school.admin?.status === 'invited' ? (
         <View style={styles.adminPendingCard}>
-          <Ionicons color="#B45309" name="time-outline" size={16} />
+          <Ionicons color={AppTheme.colors.warningText} name="time-outline" size={16} />
           <Text style={styles.adminPendingText}>
             {school.admin.name} has not accepted their school admin invitation yet.
           </Text>
@@ -259,7 +259,7 @@ export function OrganisationTeachersSection({
 
       {notice ? (
         <View style={styles.noticeCard}>
-          <Ionicons color="#127A40" name="checkmark-circle-outline" size={16} />
+          <Ionicons color={AppTheme.colors.successText} name="checkmark-circle-outline" size={16} />
           <Text style={styles.noticeText}>{notice}</Text>
           <Pressable hitSlop={8} onPress={() => setNotice(null)}>
             <Ionicons color={AppTheme.colors.textSecondary} name="close" size={16} />
@@ -269,7 +269,7 @@ export function OrganisationTeachersSection({
 
       {loadError ? (
         <View style={styles.errorCard}>
-          <Ionicons color="#B42318" name="alert-circle-outline" size={16} />
+          <Ionicons color={AppTheme.colors.dangerText} name="alert-circle-outline" size={16} />
           <Text style={styles.errorText}>{loadError}</Text>
         </View>
       ) : null}
@@ -437,7 +437,7 @@ export function OrganisationTeachersSection({
                   {inviteResults.map((r) => (
                     <View key={r.email} style={styles.resultRow}>
                       <Ionicons
-                        color={r.outcome === 'skipped' ? '#B45309' : '#127A40'}
+                        color={r.outcome === 'skipped' ? AppTheme.colors.warningText : AppTheme.colors.successText}
                         name={
                           r.outcome === 'skipped'
                             ? 'alert-circle-outline'
@@ -460,7 +460,7 @@ export function OrganisationTeachersSection({
 
               {inviteError ? (
                 <View style={styles.errorCard}>
-                  <Ionicons color="#B42318" name="alert-circle-outline" size={16} />
+                  <Ionicons color={AppTheme.colors.dangerText} name="alert-circle-outline" size={16} />
                   <Text style={styles.errorText}>{inviteError}</Text>
                 </View>
               ) : null}
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
     backgroundColor: AppTheme.colors.primary,
   },
-  inviteBtnText: { color: '#fff', ...AppTheme.typography.label, fontWeight: '700' },
+  inviteBtnText: { color: AppTheme.colors.white, ...AppTheme.typography.label, fontWeight: '700' },
   adminPendingCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -518,10 +518,10 @@ const styles = StyleSheet.create({
     padding: AppTheme.spacing.m,
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
-    borderColor: '#FCD34D',
-    backgroundColor: '#FFFBEB',
+    borderColor: AppTheme.colors.warningBorder,
+    backgroundColor: AppTheme.colors.warningTint,
   },
-  adminPendingText: { flex: 1, color: '#92400E', ...AppTheme.typography.caption },
+  adminPendingText: { flex: 1, color: AppTheme.colors.warningStrong, ...AppTheme.typography.caption },
   noticeCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -530,9 +530,9 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
     borderColor: '#BBF7D0',
-    backgroundColor: '#E8F7EE',
+    backgroundColor: AppTheme.colors.successBg,
   },
-  noticeText: { flex: 1, color: '#127A40', ...AppTheme.typography.caption },
+  noticeText: { flex: 1, color: AppTheme.colors.successText, ...AppTheme.typography.caption },
   errorCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -540,11 +540,11 @@ const styles = StyleSheet.create({
     padding: AppTheme.spacing.m,
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
-    borderColor: '#FDE8E8',
-    backgroundColor: '#FDF2F2',
+    borderColor: AppTheme.colors.dangerSoft,
+    backgroundColor: AppTheme.colors.dangerBg,
     marginTop: AppTheme.spacing.s,
   },
-  errorText: { flex: 1, color: '#B42318', ...AppTheme.typography.caption },
+  errorText: { flex: 1, color: AppTheme.colors.dangerText, ...AppTheme.typography.caption },
   loadingBox: { paddingVertical: AppTheme.spacing.xxl, alignItems: 'center' },
   emptyBox: {
     alignItems: 'center',
@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#EFF6FF',
+    backgroundColor: AppTheme.colors.infoSoft,
   },
   avatarText: { color: AppTheme.colors.primary, ...AppTheme.typography.caption, fontWeight: '700' },
   rowInfo: { flex: 1, minWidth: 0, gap: 2 },
@@ -597,7 +597,7 @@ const styles = StyleSheet.create({
   pillText: { ...AppTheme.typography.caption, fontWeight: '700' },
   linkBtn: { paddingVertical: 2 },
   linkBtnText: { color: AppTheme.colors.primary, ...AppTheme.typography.caption, fontWeight: '700' },
-  destructive: { color: '#B42318' },
+  destructive: { color: AppTheme.colors.dangerText },
   disabled: { opacity: 0.45 },
   modalBackdrop: {
     flex: 1,
@@ -671,5 +671,5 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
     backgroundColor: AppTheme.colors.primary,
   },
-  primaryBtnText: { color: '#fff', ...AppTheme.typography.label, fontWeight: '700' },
+  primaryBtnText: { color: AppTheme.colors.white, ...AppTheme.typography.label, fontWeight: '700' },
 });

@@ -27,13 +27,13 @@ type Props = NativeStackScreenProps<RootStackParamList, 'AdminSubjectDetail'>;
 function statusStyle(status: RecordingStatus) {
   switch (status) {
     case 'completed':
-      return { bg: '#E8F7EE', text: '#127A40', label: 'Done' };
+      return { bg: AppTheme.colors.successBg, text: AppTheme.colors.successText, label: 'Done' };
     case 'processing':
-      return { bg: '#FFF4E0', text: '#92400E', label: 'Processing' };
+      return { bg: AppTheme.colors.warningBg, text: AppTheme.colors.warningStrong, label: 'Processing' };
     case 'pending':
       return { bg: AppTheme.colors.background, text: AppTheme.colors.textSecondary, label: 'Pending' };
     case 'failed':
-      return { bg: '#FFF1F1', text: '#B42318', label: 'Failed' };
+      return { bg: AppTheme.colors.dangerBg, text: AppTheme.colors.dangerText, label: 'Failed' };
   }
 }
 
@@ -219,7 +219,7 @@ export function AdminSubjectDetailScreen({ navigation, route }: Props) {
                   </View>
                   <View style={styles.statDivider} />
                   <View style={styles.statItem}>
-                    <Text style={[styles.statValue, { color: '#127A40' }]}>{completedCount}</Text>
+                    <Text style={[styles.statValue, { color: AppTheme.colors.successText }]}>{completedCount}</Text>
                     <Text style={styles.statLabel}>ANALYSED</Text>
                   </View>
                   <View style={styles.statDivider} />
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
     borderColor: AppTheme.colors.border,
   },
   tabButton: { flex: 1, paddingVertical: 10, borderRadius: AppTheme.radius.medium, alignItems: 'center' },
-  tabButtonActive: { backgroundColor: AppTheme.colors.surface, shadowColor: '#000', shadowOffset: {width: 0, height: 1}, shadowOpacity: 0.05, shadowRadius: 2, elevation: 2 },
+  tabButtonActive: { backgroundColor: AppTheme.colors.surface, shadowColor: AppTheme.colors.black, shadowOffset: {width: 0, height: 1}, shadowOpacity: 0.05, shadowRadius: 2, elevation: 2 },
   tabLabel: { ...AppTheme.typography.body, fontWeight: '600', color: AppTheme.colors.textSecondary },
   tabLabelActive: { color: AppTheme.colors.textPrimary, fontWeight: '700' },
   statsStrip: {

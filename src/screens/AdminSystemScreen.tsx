@@ -35,9 +35,9 @@ import { EmailStatusOut, EmailTestResult, SystemHealthOut } from "../types/api";
 type Section = "health" | "settings";
 
 const TONE: Record<string, { fg: string; bg: string; icon: string }> = {
-  ok: { fg: "#127A40", bg: "#E7F6EE", icon: "checkmark-circle" },
-  warn: { fg: "#B45309", bg: "#FEF3C7", icon: "alert-circle" },
-  error: { fg: "#B42318", bg: "#FEE4E2", icon: "close-circle" },
+  ok: { fg: AppTheme.colors.successText, bg: AppTheme.colors.successBg, icon: "checkmark-circle" },
+  warn: { fg: AppTheme.colors.warningText, bg: AppTheme.colors.warningSoft, icon: "alert-circle" },
+  error: { fg: AppTheme.colors.dangerText, bg: AppTheme.colors.dangerSoft, icon: "close-circle" },
 };
 
 export function AdminSystemScreen() {
@@ -162,18 +162,18 @@ export function AdminSystemScreen() {
             <View
               style={[
                 styles.banner,
-                { backgroundColor: problems.length ? "#FEE4E2" : "#E7F6EE" },
+                { backgroundColor: problems.length ? AppTheme.colors.dangerSoft : AppTheme.colors.successBg },
               ]}
             >
               <Ionicons
-                color={problems.length ? "#B42318" : "#127A40"}
+                color={problems.length ? AppTheme.colors.dangerText : AppTheme.colors.successText}
                 name={problems.length ? "alert-circle" : "checkmark-circle"}
                 size={20}
               />
               <Text
                 style={[
                   styles.bannerText,
-                  { color: problems.length ? "#B42318" : "#127A40" },
+                  { color: problems.length ? AppTheme.colors.dangerText : AppTheme.colors.successText },
                 ]}
               >
                 {problems.length
@@ -232,7 +232,7 @@ export function AdminSystemScreen() {
                   ]}
                 >
                   {testing ? (
-                    <ActivityIndicator color="#FFFFFF" size="small" />
+                    <ActivityIndicator color={AppTheme.colors.white} size="small" />
                   ) : (
                     <Text style={styles.primaryBtnText}>Send</Text>
                   )}
@@ -246,14 +246,14 @@ export function AdminSystemScreen() {
                   style={[
                     styles.result,
                     {
-                      backgroundColor: testResult.delivered ? "#E7F6EE" : "#FEE4E2",
+                      backgroundColor: testResult.delivered ? AppTheme.colors.successBg : AppTheme.colors.dangerSoft,
                     },
                   ]}
                 >
                   <Text
                     style={[
                       styles.resultTitle,
-                      { color: testResult.delivered ? "#127A40" : "#B42318" },
+                      { color: testResult.delivered ? AppTheme.colors.successText : AppTheme.colors.dangerText },
                     ]}
                   >
                     {testResult.delivered
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
   },
   segmentActive: { backgroundColor: AppTheme.colors.primary },
   segmentText: { fontSize: 13, fontWeight: "700", color: AppTheme.colors.textSecondary },
-  segmentTextActive: { color: "#FFFFFF" },
+  segmentTextActive: { color: AppTheme.colors.white },
   content: { padding: AppTheme.spacing.l, paddingBottom: 120, gap: AppTheme.spacing.m },
   center: { alignItems: "center", justifyContent: "center", paddingVertical: 48, gap: 12 },
   errorText: { color: AppTheme.colors.textSecondary, textAlign: "center" },
@@ -371,8 +371,8 @@ const styles = StyleSheet.create({
     minWidth: 76,
   },
   primaryBtnDisabled: { backgroundColor: AppTheme.colors.disabled },
-  primaryBtnText: { color: "#FFFFFF", fontWeight: "700", fontSize: 13 },
-  badText: { fontSize: 12, color: "#B42318", lineHeight: 17 },
+  primaryBtnText: { color: AppTheme.colors.white, fontWeight: "700", fontSize: 13 },
+  badText: { fontSize: 12, color: AppTheme.colors.dangerText, lineHeight: 17 },
   result: { borderRadius: 12, padding: AppTheme.spacing.m, gap: 6 },
   resultTitle: { fontSize: 13, fontWeight: "800" },
   resultDetail: {

@@ -381,7 +381,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
             }}
             style={{ marginRight: 8, padding: 4 }}
           >
-            <Ionicons name="trash-outline" size={22} color="#B42318" />
+            <Ionicons name="trash-outline" size={22} color={AppTheme.colors.dangerText} />
           </Pressable>
         }
       />
@@ -418,7 +418,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                     onPress={openCreateModal}
                     style={styles.addChapterBtn}
                   >
-                    <Ionicons color="#fff" name="add" size={14} />
+                    <Ionicons color={AppTheme.colors.white} name="add" size={14} />
                     <Text style={styles.addChapterText}>Add Chapter</Text>
                   </Pressable>
                 </View>
@@ -464,7 +464,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
             <Text style={styles.emptyTitle}>No chapters yet</Text>
             <Text style={styles.emptyBody}>Create a chapter to begin adding curriculum materials.</Text>
             <Pressable onPress={openCreateModal} style={styles.createBtnInline}>
-              <Ionicons color="#fff" name="add" size={16} />
+              <Ionicons color={AppTheme.colors.white} name="add" size={16} />
               <Text style={styles.createBtnInlineText}>Add Chapter</Text>
             </Pressable>
           </View>
@@ -519,7 +519,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                           });
                         }}
                       >
-                        <Ionicons name="add" size={14} color="#0284C7" />
+                        <Ionicons name="add" size={14} color={AppTheme.colors.info} />
                         <Text style={styles.actionPillText}>Add Lecture</Text>
                       </Pressable>
                       <View style={{ flex: 1 }} />
@@ -535,7 +535,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                         onPress={() => handleDelete(chapter)}
                         style={styles.actionIconBtn}
                       >
-                        <Ionicons color="#B42318" name="trash-outline" size={18} />
+                        <Ionicons color={AppTheme.colors.dangerText} name="trash-outline" size={18} />
                       </Pressable>
                     </View>
 
@@ -618,7 +618,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                 onChangeText={setName}
                 placeholder="e.g. Chemical Reactions, Trigonometry…"
                 placeholderTextColor={AppTheme.colors.textPlaceholder}
-                style={[styles.modalInput, modalError ? { borderColor: '#B42318' } : {}]}
+                style={[styles.modalInput, modalError ? { borderColor: AppTheme.colors.dangerText } : {}]}
                 value={name}
               />
             </View>
@@ -639,7 +639,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
 
             {modalError ? (
               <View style={styles.modalErrorBox}>
-                <Ionicons color="#B42318" name="alert-circle-outline" size={16} />
+                <Ionicons color={AppTheme.colors.dangerText} name="alert-circle-outline" size={16} />
                 <Text style={styles.modalErrorText}>{modalError}</Text>
               </View>
             ) : null}
@@ -654,7 +654,7 @@ export function SchoolAdminSubjectChaptersScreen({ navigation, route }: Props) {
                 style={[styles.modalSubmitBtn, submitting && styles.btnDisabled]}
               >
                 {submitting ? (
-                  <ActivityIndicator color="#fff" size="small" />
+                  <ActivityIndicator color={AppTheme.colors.white} size="small" />
                 ) : (
                   <Text style={styles.modalSubmitText}>
                     {editingChapter ? 'Save' : 'Create'}
@@ -776,7 +776,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     alignSelf: 'flex-start'
   },
-  addChapterText: { color: "#fff", ...AppTheme.typography.body, fontWeight: "700" },
+  addChapterText: { color: AppTheme.colors.white, ...AppTheme.typography.body, fontWeight: "700" },
   importBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -839,12 +839,12 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: AppTheme.radius.small,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: AppTheme.colors.slate100,
   },
   actionPillText: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#0284C7",
+    color: AppTheme.colors.info,
   },
   actionIconBtn: {
     width: 32,
@@ -894,7 +894,7 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
     marginTop: 8,
   },
-  createBtnInlineText: { color: '#fff', ...AppTheme.typography.body, fontWeight: '700' },
+  createBtnInlineText: { color: AppTheme.colors.white, ...AppTheme.typography.body, fontWeight: '700' },
 
   // Modals
   modalOverlay: {
@@ -942,12 +942,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#FFF1F1',
+    backgroundColor: AppTheme.colors.dangerBg,
     borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
-  modalErrorText: { color: '#B42318', ...AppTheme.typography.body, flex: 1, fontWeight: '600' },
+  modalErrorText: { color: AppTheme.colors.dangerText, ...AppTheme.typography.body, flex: 1, fontWeight: '600' },
   modalActions: { flexDirection: 'row', gap: 12, marginTop: 4 },
   modalCancelBtn: {
     flex: 1,
@@ -968,6 +968,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   btnDisabled: { opacity: 0.45 },
-  modalSubmitText: { color: '#fff', ...AppTheme.typography.button },
+  modalSubmitText: { color: AppTheme.colors.white, ...AppTheme.typography.button },
 });
 

@@ -85,14 +85,14 @@ const styles = StyleSheet.create({
   },
 
   chipTextActive: {
-    color: "#FFFFFF",
+    color: AppTheme.colors.white,
   },
 
   warningChip: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    backgroundColor: "#FDF3E3",
+    backgroundColor: AppTheme.colors.warningBg,
   },
 
   warningChipActive: {

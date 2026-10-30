@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   pillGood: {
-    backgroundColor: '#E8F7EE',
+    backgroundColor: AppTheme.colors.successBg,
   },
   pillWarn: {
     backgroundColor: '#FFF0D8',
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   pillTextGood: {
-    color: '#127A40',
+    color: AppTheme.colors.successText,
   },
   pillTextWarn: {
     color: '#A15C00',

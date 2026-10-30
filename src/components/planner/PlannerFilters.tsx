@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     borderColor: AppTheme.colors.background,
   },
   badgeText: {
-    color: "#fff",
+    color: AppTheme.colors.white,
     fontSize: 10,
     fontFamily: AppTheme.typography.family.bold,
   },

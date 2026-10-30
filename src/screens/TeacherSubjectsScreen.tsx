@@ -39,11 +39,11 @@ import { ActiveFilterChips } from "../components/teacher/ActiveFilterChips";
 type Props = any;
 
 const SUBJECT_COLORS = [
-  { bg: '#D1E4FF', text: AppTheme.colors.primaryDark, border: '#A8C8FF' },
-  { bg: '#E8F7EE', text: '#127A40', border: '#A3D9B8' },
-  { bg: '#FFF4E0', text: '#92400E', border: '#FBBF7A' },
-  { bg: '#F5F0FF', text: '#6B21A8', border: '#D8C4F8' },
-  { bg: '#FFE8EC', text: '#9B1239', border: '#F9A8BE' },
+  { bg: AppTheme.colors.primarySoft, text: AppTheme.colors.primaryDark, border: '#A8C8FF' },
+  { bg: AppTheme.colors.successBg, text: AppTheme.colors.successText, border: '#A3D9B8' },
+  { bg: AppTheme.colors.warningBg, text: AppTheme.colors.warningStrong, border: '#FBBF7A' },
+  { bg: AppTheme.colors.purpleBg, text: AppTheme.colors.purple, border: '#D8C4F8' },
+  { bg: AppTheme.colors.roseBg, text: AppTheme.colors.rose, border: '#F9A8BE' },
 ];
 
 type SubjectGroup = { className: string; subjects: SubjectOut[] };

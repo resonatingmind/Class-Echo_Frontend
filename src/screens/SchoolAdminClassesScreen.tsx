@@ -39,11 +39,11 @@ type Props = NativeStackScreenProps<RootStackParamList, "SchoolAdminClasses">;
 
 // Cycling accent colors for class cards
 const CLASS_COLORS = [
-  { bg: "#D1E4FF", text: AppTheme.colors.primary },
-  { bg: "#E8F7EE", text: "#127A40" },
-  { bg: "#FFF4E0", text: "#92400E" },
-  { bg: "#F5F0FF", text: "#6B21A8" },
-  { bg: "#FFE8EC", text: "#9B1239" },
+  { bg: AppTheme.colors.primarySoft, text: AppTheme.colors.primary },
+  { bg: AppTheme.colors.successBg, text: AppTheme.colors.successText },
+  { bg: AppTheme.colors.warningBg, text: AppTheme.colors.warningStrong },
+  { bg: AppTheme.colors.purpleBg, text: AppTheme.colors.purple },
+  { bg: AppTheme.colors.roseBg, text: AppTheme.colors.rose },
 ];
 
 function ClassCard({
@@ -162,7 +162,7 @@ function CreateClassModal({
 
           {error ? (
             <View style={styles.modalError}>
-              <Ionicons color="#B42318" name="alert-circle-outline" size={14} />
+              <Ionicons color={AppTheme.colors.dangerText} name="alert-circle-outline" size={14} />
               <Text style={styles.modalErrorText}>{error}</Text>
             </View>
           ) : null}
@@ -180,7 +180,7 @@ function CreateClassModal({
               ]}
             >
               {submitting ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <ActivityIndicator color={AppTheme.colors.white} size="small" />
               ) : (
                 <Text style={styles.modalSubmitText}>Create Class</Text>
               )}
@@ -275,7 +275,7 @@ export function SchoolAdminClassesScreen({ navigation }: Props) {
                     onPress={() => setShowCreate(true)}
                     style={styles.addClassBtn}
                   >
-                    <Ionicons color="#fff" name="add" size={14} />
+                    <Ionicons color={AppTheme.colors.white} name="add" size={14} />
                     <Text style={styles.addClassText}>Add Class</Text>
                   </Pressable>
                 </View>
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: AppTheme.spacing.m,
     paddingVertical: AppTheme.spacing.s,
   },
-  addClassText: { color: "#fff", ...AppTheme.typography.button },
+  addClassText: { color: AppTheme.colors.white, ...AppTheme.typography.button },
   center: {
     alignItems: "center",
     paddingVertical: AppTheme.spacing.huge,
@@ -486,12 +486,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: "#FFF1F1",
+    backgroundColor: AppTheme.colors.dangerBg,
     borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
-  modalErrorText: { color: "#B42318", flex: 1, ...AppTheme.typography.body },
+  modalErrorText: { color: AppTheme.colors.dangerText, flex: 1, ...AppTheme.typography.body },
   modalActions: { flexDirection: "row", gap: 12, marginTop: 4 },
   modalCancelBtn: {
     flex: 1,
@@ -515,7 +515,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   btnDisabled: { opacity: 0.45 },
-  modalSubmitText: { color: "#fff", ...AppTheme.typography.button },
+  modalSubmitText: { color: AppTheme.colors.white, ...AppTheme.typography.button },
 });
 
 

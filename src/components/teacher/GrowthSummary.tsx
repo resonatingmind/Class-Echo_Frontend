@@ -101,7 +101,7 @@ export function StreakCard({ streak, own = true }: { streak: Streak; own?: boole
   const left = Math.max(0, streak.threshold - streak.this_week);
   return (
     <View accessible style={styles.streakCard}>
-      <Ionicons color={streak.weeks > 0 ? '#C2410C' : AppTheme.colors.hint} name="flame-outline" size={22} />
+      <Ionicons color={streak.weeks > 0 ? AppTheme.colors.orangeText : AppTheme.colors.hint} name="flame-outline" size={22} />
       <View style={styles.streakBody}>
         <Text style={styles.streakTitle}>
           {streak.weeks > 0 ? `${streak.weeks}-week streak` : own ? 'Start a streak this week' : 'No streak yet'}
@@ -337,8 +337,8 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     borderRadius: AppTheme.radius.pill,
   },
-  chipUp: { backgroundColor: '#DCFCE7' },
-  chipDown: { backgroundColor: '#FEF3C7' },
+  chipUp: { backgroundColor: AppTheme.colors.successTint },
+  chipDown: { backgroundColor: AppTheme.colors.warningSoft },
   chipSteady: { backgroundColor: AppTheme.colors.surfaceMuted },
   chipText: { fontSize: 12, fontWeight: '800', color: AppTheme.colors.textPrimary },
   chipSteadyText: { fontSize: 12, fontWeight: '700', color: AppTheme.colors.textSecondary },

@@ -28,6 +28,7 @@ import {
   resolveMediaUrl,
   archiveTeacherRecording,
   deleteTeacherRecording,
+  getAdminRecordingDetail,
   getSchoolRecordingDetail,
   getTeacherRecordingDetail,
   retryRecording,
@@ -88,18 +89,18 @@ const DIMENSIONS: {
 
 function scoreColor(score: number, max: number): string {
   const pct = score / max;
-  if (pct >= 0.8) return '#127A40';
+  if (pct >= 0.8) return AppTheme.colors.successText;
   if (pct >= 0.6) return AppTheme.colors.primary;
-  if (pct >= 0.4) return '#92400E';
-  return '#B42318';
+  if (pct >= 0.4) return AppTheme.colors.warningStrong;
+  return AppTheme.colors.dangerText;
 }
 
 function statusStyle(status: RecordingStatus) {
   switch (status) {
-    case 'completed':  return { bg: '#E8F7EE', text: '#127A40', label: 'Analysed' };
-    case 'processing': return { bg: '#FFF4E0', text: '#92400E', label: 'Processing' };
+    case 'completed':  return { bg: AppTheme.colors.successBg, text: AppTheme.colors.successText, label: 'Analysed' };
+    case 'processing': return { bg: AppTheme.colors.warningBg, text: AppTheme.colors.warningStrong, label: 'Processing' };
     case 'pending':    return { bg: AppTheme.colors.background, text: AppTheme.colors.textSecondary, label: 'Pending' };
-    case 'failed':     return { bg: '#FFF1F1', text: '#B42318', label: 'Failed' };
+    case 'failed':     return { bg: AppTheme.colors.dangerBg, text: AppTheme.colors.dangerText, label: 'Failed' };
   }
 }
 
@@ -185,9 +186,9 @@ function LanguagePill({ text }: { text: string }) {
 const lp = StyleSheet.create({
   pill: {
     paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999,
-    backgroundColor: '#EAF4FF', borderWidth: 1, borderColor: AppTheme.colors.primary + '40',
+    backgroundColor: AppTheme.colors.primaryLight, borderWidth: 1, borderColor: AppTheme.colors.primary + '40',
   },
-  text: { fontSize: 12, fontWeight: '700', color: '#156FD6' },
+  text: { fontSize: 12, fontWeight: '700', color: AppTheme.colors.primaryDark },
 });
 
 /** The weakest dimension relative to its max; the report expands it by default. */
@@ -221,8 +222,8 @@ function EvidenceQuote({ text, start, title }: { text: string; start?: number | 
 }
 
 const HIGHLIGHTS: { key: HighlightKey; label: string; icon: string; color: string }[] = [
-  { key: 'best_moment', label: 'Best moment', icon: 'star-outline', color: '#127A40' },
-  { key: 'moment_to_rethink', label: 'Moment to rethink', icon: 'refresh-circle-outline', color: '#92400E' },
+  { key: 'best_moment', label: 'Best moment', icon: 'star-outline', color: AppTheme.colors.successText },
+  { key: 'moment_to_rethink', label: 'Moment to rethink', icon: 'refresh-circle-outline', color: AppTheme.colors.warningStrong },
   { key: 'best_interaction', label: 'Best student interaction', icon: 'chatbubbles-outline', color: AppTheme.colors.primaryDark },
 ];
 
@@ -383,8 +384,8 @@ const dr = StyleSheet.create({
   topLine: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 24 },
   label: { flex: 1, fontSize: 14, fontWeight: '700', color: AppTheme.colors.textPrimary },
   focusTag: {
-    fontSize: 10, fontWeight: '800', letterSpacing: 0.8, color: '#92400E',
-    backgroundColor: '#FFF4E0', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6, overflow: 'hidden',
+    fontSize: 10, fontWeight: '800', letterSpacing: 0.8, color: AppTheme.colors.warningStrong,
+    backgroundColor: AppTheme.colors.warningBg, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6, overflow: 'hidden',
   },
   score: { fontSize: 14, fontWeight: '800' },
   max: { fontSize: 11, fontWeight: '600' },
@@ -578,7 +579,7 @@ const fc = StyleSheet.create({
   itemBody: { flex: 1, gap: 4 },
   primaryText: { fontSize: 15, lineHeight: 22, fontWeight: '600', color: AppTheme.colors.textPrimary },
   observation: { fontSize: 14, lineHeight: 21, color: AppTheme.colors.textPrimary },
-  area: { fontSize: 12, fontWeight: '700', color: '#92400E' },
+  area: { fontSize: 12, fontWeight: '700', color: AppTheme.colors.warningStrong },
   tryThis: {
     gap: 4,
     padding: 12,
@@ -587,7 +588,7 @@ const fc = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#FDE7C2',
   },
-  tryLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 1, color: '#92400E' },
+  tryLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 1, color: AppTheme.colors.warningStrong },
   tryText: { fontSize: 15, lineHeight: 22, color: AppTheme.colors.textPrimary },
   why: { fontSize: 13, lineHeight: 19, color: AppTheme.colors.textSecondary },
   toggle: { flexDirection: 'row', alignItems: 'center', gap: 4, minHeight: 44, alignSelf: 'flex-start' },
@@ -616,7 +617,7 @@ function ProcessingSteps({ status, step }: {
           <View key={label} style={ps.row}>
             <View style={[ps.marker, done && ps.markerDone, active && ps.markerActive]}>
               {done ? (
-                <Ionicons color="#fff" name="checkmark" size={14} />
+                <Ionicons color={AppTheme.colors.white} name="checkmark" size={14} />
               ) : active && !waiting ? (
                 <ActivityIndicator color={AppTheme.colors.primary} size="small" />
               ) : null}
@@ -639,7 +640,7 @@ const ps = StyleSheet.create({
     width: 24, height: 24, borderRadius: 12, borderWidth: 2,
     borderColor: AppTheme.colors.border, alignItems: 'center', justifyContent: 'center',
   },
-  markerDone: { backgroundColor: '#127A40', borderColor: '#127A40' },
+  markerDone: { backgroundColor: AppTheme.colors.successText, borderColor: AppTheme.colors.successText },
   markerActive: { borderColor: AppTheme.colors.primary },
   label: { fontSize: 15, fontWeight: '600', color: AppTheme.colors.hint },
   labelOn: { color: AppTheme.colors.textPrimary },
@@ -666,16 +667,16 @@ function FailedState({ errorReason, canReplace, retrying, onRetry, onReplace }: 
       style={[styles.retryButton, styles.failurePrimary]}
     >
       {retrying ? (
-        <ActivityIndicator color="#fff" size="small" />
+        <ActivityIndicator color={AppTheme.colors.white} size="small" />
       ) : (
-        <Ionicons color="#fff" name="refresh-outline" size={16} />
+        <Ionicons color={AppTheme.colors.white} name="refresh-outline" size={16} />
       )}
       <Text style={styles.retryButtonText}>{retrying ? 'Queuing…' : 'Retry analysis'}</Text>
     </Pressable>
   );
   const replaceButton = (
     <Pressable onPress={onReplace} style={[styles.retryButton, styles.failurePrimary]}>
-      <Ionicons color="#fff" name="cloud-upload-outline" size={16} />
+      <Ionicons color={AppTheme.colors.white} name="cloud-upload-outline" size={16} />
       <Text style={styles.retryButtonText}>Upload different audio</Text>
     </Pressable>
   );
@@ -737,7 +738,9 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
     if (!session) return;
     try {
       let updated: RecordingWithReport | null = null;
-      if (session.role === 'school_admin' || session.role === 'admin') {
+      if (session.role === 'admin') {
+        updated = await getAdminRecordingDetail(session.token, recordingDetails.id);
+      } else if (session.role === 'school_admin') {
         updated = await getSchoolRecordingDetail(session.token, recordingDetails.id);
       } else {
         updated = await getTeacherRecordingDetail(session.token, recordingDetails.id);
@@ -1012,10 +1015,10 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
             {/* What went well */}
             {strengths.length > 0 ? (
               <View style={styles.card}>
-                <SectionHeading color="#127A40" icon="checkmark-circle-outline" title="What went well" />
+                <SectionHeading color={AppTheme.colors.successText} icon="checkmark-circle-outline" title="What went well" />
                 {strengths.map((item, i) => (
                   <FindingItem
-                    color="#127A40"
+                    color={AppTheme.colors.successText}
                     evidence={item.evidence}
                     momentTitle={dimensionLabel(item.area) ?? 'What went well'}
                     start={item.start}
@@ -1119,7 +1122,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
         ) : (
           <View style={[styles.processingCard, status === 'failed' && styles.processingCardFailed]}>
             {status === 'failed' ? (
-              <Ionicons color="#B42318" name="alert-circle-outline" size={20} />
+              <Ionicons color={AppTheme.colors.dangerText} name="alert-circle-outline" size={20} />
             ) : null}
             <View style={styles.processingBody}>
               {status === 'failed' ? (
@@ -1245,10 +1248,10 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
 
             <Pressable onPress={() => void handleDelete()} style={styles.sheetOption}>
               <View style={styles.sheetOptionIcon}>
-                <Ionicons color="#B42318" name="trash-outline" size={20} />
+                <Ionicons color={AppTheme.colors.dangerText} name="trash-outline" size={20} />
               </View>
               <View style={styles.sheetOptionBody}>
-                <Text style={[styles.sheetOptionTitle, { color: '#B42318' }]}>Delete Permanently</Text>
+                <Text style={[styles.sheetOptionTitle, { color: AppTheme.colors.dangerText }]}>Delete Permanently</Text>
                 <Text style={styles.sheetOptionText}>Completely remove recording and AI analysis report.</Text>
               </View>
             </Pressable>
@@ -1305,7 +1308,7 @@ export function RecordingDetailScreen({ navigation, route }: Props) {
                 onPress={() => void handleUpdate()}
                 style={[styles.primaryButton, updatingDetails && styles.buttonDisabled]}
               >
-                {updatingDetails ? <ActivityIndicator color="#fff" size="small" /> : null}
+                {updatingDetails ? <ActivityIndicator color={AppTheme.colors.white} size="small" /> : null}
                 <Text style={styles.primaryButtonText}>
                   {updatingDetails ? 'Saving…' : 'Save Changes'}
                 </Text>
@@ -1373,7 +1376,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: AppTheme.colors.border,
     gap: AppTheme.spacing.s,
-    shadowColor: '#000',
+    shadowColor: AppTheme.colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -1393,7 +1396,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: AppTheme.colors.border,
     gap: 16,
-    shadowColor: '#000',
+    shadowColor: AppTheme.colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -1438,21 +1441,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 12,
-    shadowColor: '#000',
+    shadowColor: AppTheme.colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 2,
   },
-  processingCardFailed: { borderColor: '#FECACA', backgroundColor: '#FFF8F8' },
+  processingCardFailed: { borderColor: AppTheme.colors.dangerBorder, backgroundColor: '#FFF8F8' },
   processingBody: { flex: 1, gap: 12 },
   processingText: { fontSize: 14, lineHeight: 20, color: AppTheme.colors.textSecondary },
   retryButton: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     alignSelf: 'flex-start', paddingHorizontal: 14, paddingVertical: 9,
-    borderRadius: 999, backgroundColor: '#B42318',
+    borderRadius: 999, backgroundColor: AppTheme.colors.dangerText,
   },
-  retryButtonText: { fontSize: 13, fontWeight: '700', color: '#fff' },
+  retryButtonText: { fontSize: 13, fontWeight: '700', color: AppTheme.colors.white },
   failureBody: { gap: 10 },
   failureTitle: { fontSize: 15, fontWeight: '800', color: AppTheme.colors.textPrimary },
   failurePrimary: { backgroundColor: AppTheme.colors.primary, minHeight: 44, paddingHorizontal: 18 },
@@ -1499,7 +1502,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 16,
-    backgroundColor: '#EAF4FF',
+    backgroundColor: AppTheme.colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1540,7 +1543,7 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
     backgroundColor: AppTheme.colors.primary,
   },
-  primaryButtonText: { fontSize: 15, fontWeight: '800', color: '#fff' },
+  primaryButtonText: { fontSize: 15, fontWeight: '800', color: AppTheme.colors.white },
   buttonDisabled: { opacity: 0.55 },
 });
 

@@ -109,13 +109,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     marginBottom: 12,
-    color: "#0F172A",
+    color: AppTheme.colors.slate900,
   },
 
   input: {
     height: 50,
     borderWidth: 1,
-    borderColor: "#CBD5E1",
+    borderColor: AppTheme.colors.slate300,
     borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 14,
     marginBottom: 14,

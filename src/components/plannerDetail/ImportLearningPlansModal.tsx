@@ -239,7 +239,7 @@ export function ImportLearningPlansModal({
                 ) : (
                   <View style={styles.aiPhotoInfoBox}>
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                      <Ionicons name="sparkles" size={16} color="#0284C7" />
+                      <Ionicons name="sparkles" size={16} color={AppTheme.colors.info} />
                       <Text style={styles.aiPhotoInfoTitle}>AI-Powered Micro Planner Scan</Text>
                     </View>
                     <Text style={styles.aiPhotoInfoBody}>
@@ -271,7 +271,7 @@ export function ImportLearningPlansModal({
 
                 {importedCount !== null ? (
                   <View style={styles.resultBox}>
-                    <Ionicons name="checkmark-circle-outline" size={24} color="#127A40" style={{ marginTop: 2 }} />
+                    <Ionicons name="checkmark-circle-outline" size={24} color={AppTheme.colors.successText} style={{ marginTop: 2 }} />
                     <Text style={styles.resultText}>
                       Successfully imported <Text style={{ fontWeight: "800" }}>{importedCount}</Text> lecture planner entries!
                     </Text>
@@ -285,7 +285,7 @@ export function ImportLearningPlansModal({
                 >
                   {uploading ? (
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                      <ActivityIndicator color="#FFFFFF" />
+                      <ActivityIndicator color={AppTheme.colors.white} />
                       <Text style={styles.submitText}>
                         {importMode === "photo" ? "Scanning Photo with AI..." : "Importing Entries..."}
                       </Text>
@@ -350,8 +350,8 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.small,
   },
   modeTabActive: {
-    backgroundColor: "#FFFFFF",
-    shadowColor: "#000",
+    backgroundColor: AppTheme.colors.white,
+    shadowColor: AppTheme.colors.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 2,
@@ -373,9 +373,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   aiPhotoInfoBox: {
-    backgroundColor: "#F0F9FF",
+    backgroundColor: AppTheme.colors.infoSoft,
     borderWidth: 1,
-    borderColor: "#BAE6FD",
+    borderColor: AppTheme.colors.infoBorder,
     borderRadius: AppTheme.radius.medium,
     padding: 14,
     marginBottom: 16,
@@ -383,12 +383,12 @@ const styles = StyleSheet.create({
   aiPhotoInfoTitle: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#0284C7",
+    color: AppTheme.colors.info,
   },
   aiPhotoInfoBody: {
     fontSize: 13,
     lineHeight: 19,
-    color: "#334155",
+    color: AppTheme.colors.slate700,
   },
   templateLink: {
     flexDirection: "row",
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     marginTop: 16,
-    color: "#DC2626",
+    color: AppTheme.colors.danger,
     fontSize: 13,
   },
   resultBox: {
@@ -429,13 +429,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    backgroundColor: "#E8F7EE",
+    backgroundColor: AppTheme.colors.successBg,
     borderRadius: AppTheme.radius.large,
     padding: 16,
   },
   resultText: {
     fontSize: 14,
-    color: "#127A40",
+    color: AppTheme.colors.successText,
     flex: 1,
   },
   submitButton: {
@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#9AA6B2",
   },
   submitText: {
-    color: "#FFFFFF",
+    color: AppTheme.colors.white,
     fontSize: 16,
     fontWeight: "700",
   },

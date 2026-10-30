@@ -25,13 +25,13 @@ type Props = NativeStackScreenProps<RootStackParamList, 'StudentSubjectDetail'>;
 function statusStyle(status: RecordingStatus) {
   switch (status) {
     case 'completed':
-      return { bg: '#E8F7EE', text: '#127A40', label: 'Done' };
+      return { bg: AppTheme.colors.successBg, text: AppTheme.colors.successText, label: 'Done' };
     case 'processing':
-      return { bg: '#FFF4E0', text: '#92400E', label: 'Processing' };
+      return { bg: AppTheme.colors.warningBg, text: AppTheme.colors.warningStrong, label: 'Processing' };
     case 'pending':
       return { bg: AppTheme.colors.surfaceMuted, text: AppTheme.colors.textSecondary, label: 'Pending' };
     case 'failed':
-      return { bg: '#FFF1F1', text: '#B42318', label: 'Failed' };
+      return { bg: AppTheme.colors.dangerBg, text: AppTheme.colors.dangerText, label: 'Failed' };
   }
 }
 
@@ -136,7 +136,7 @@ export function StudentSubjectDetailScreen({ navigation, route }: Props) {
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
-              <Text style={[styles.statValue, { color: '#127A40' }]}>{completedCount}</Text>
+              <Text style={[styles.statValue, { color: AppTheme.colors.successText }]}>{completedCount}</Text>
               <Text style={styles.statLabel}>ANALYSED</Text>
             </View>
             <View style={styles.statDivider} />

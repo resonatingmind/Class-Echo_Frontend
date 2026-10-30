@@ -65,13 +65,13 @@ const DESTRUCTIVE_ACTIONS = new Set([
 ]);
 
 const STATUS_COLORS: Record<string, { fg: string; bg: string }> = {
-  sent: { fg: "#127A40", bg: "#E7F6EE" },
-  completed: { fg: "#127A40", bg: "#E7F6EE" },
+  sent: { fg: AppTheme.colors.successText, bg: AppTheme.colors.successBg },
+  completed: { fg: AppTheme.colors.successText, bg: AppTheme.colors.successBg },
   queued: { fg: "#1D4ED8", bg: "#E8F0FE" },
   pending: { fg: "#1D4ED8", bg: "#E8F0FE" },
-  processing: { fg: "#B45309", bg: "#FEF3C7" },
-  skipped: { fg: "#B45309", bg: "#FEF3C7" },
-  failed: { fg: "#B42318", bg: "#FEE4E2" },
+  processing: { fg: AppTheme.colors.warningText, bg: AppTheme.colors.warningSoft },
+  skipped: { fg: AppTheme.colors.warningText, bg: AppTheme.colors.warningSoft },
+  failed: { fg: AppTheme.colors.dangerText, bg: AppTheme.colors.dangerSoft },
 };
 
 function StatusPill({ status }: { status: string }) {
@@ -390,7 +390,7 @@ export function AdminOperationsScreen() {
                       styles.pill,
                       {
                         backgroundColor: DESTRUCTIVE_ACTIONS.has(entry.action)
-                          ? "#FEE4E2"
+                          ? AppTheme.colors.dangerSoft
                           : "#F2F4F7",
                       },
                     ]}
@@ -400,7 +400,7 @@ export function AdminOperationsScreen() {
                         styles.pillText,
                         {
                           color: DESTRUCTIVE_ACTIONS.has(entry.action)
-                            ? "#B42318"
+                            ? AppTheme.colors.dangerText
                             : "#475467",
                           textTransform: "none",
                         },
@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
   },
   segmentActive: { backgroundColor: AppTheme.colors.primary },
   segmentText: { fontSize: 13, fontWeight: "700", color: AppTheme.colors.textSecondary },
-  segmentTextActive: { color: "#FFFFFF" },
+  segmentTextActive: { color: AppTheme.colors.white },
   content: { padding: AppTheme.spacing.l, paddingBottom: 120, gap: AppTheme.spacing.m },
   center: { alignItems: "center", justifyContent: "center", paddingVertical: 48, gap: 12 },
   errorText: { color: AppTheme.colors.textSecondary, textAlign: "center" },
@@ -500,7 +500,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: AppTheme.colors.primary,
   },
-  retryBtnText: { color: "#FFFFFF", fontWeight: "700" },
+  retryBtnText: { color: AppTheme.colors.white, fontWeight: "700" },
   card: {
     backgroundColor: AppTheme.colors.surface,
     borderRadius: 16,
@@ -512,7 +512,7 @@ const styles = StyleSheet.create({
   cardTitle: { fontSize: 14, fontWeight: "800", color: AppTheme.colors.textPrimary },
   cardMeta: { fontSize: 12, color: AppTheme.colors.textSecondary },
   cardNote: { fontSize: 12, color: AppTheme.colors.textSecondary, lineHeight: 17 },
-  warnText: { fontSize: 12, color: "#B45309", lineHeight: 17, fontWeight: "600" },
+  warnText: { fontSize: 12, color: AppTheme.colors.warningText, lineHeight: 17, fontWeight: "600" },
   statsRow: { flexDirection: "row", gap: AppTheme.spacing.s },
   statTile: {
     flex: 1,
@@ -522,8 +522,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   statValue: { fontSize: 20, fontWeight: "800", color: AppTheme.colors.textPrimary },
-  statValueBad: { color: "#B42318" },
-  statValueWarn: { color: "#B45309" },
+  statValueBad: { color: AppTheme.colors.dangerText },
+  statValueWarn: { color: AppTheme.colors.warningText },
   statLabel: { fontSize: 11, color: AppTheme.colors.textSecondary, marginTop: 2 },
   filterRow: { flexDirection: "row", gap: AppTheme.spacing.s, flexWrap: "wrap" },
   chip: {
@@ -534,7 +534,7 @@ const styles = StyleSheet.create({
   },
   chipActive: { backgroundColor: AppTheme.colors.textPrimary },
   chipText: { fontSize: 12, fontWeight: "700", color: AppTheme.colors.textSecondary },
-  chipTextActive: { color: "#FFFFFF" },
+  chipTextActive: { color: AppTheme.colors.white },
   row: {
     backgroundColor: AppTheme.colors.surface,
     borderRadius: 14,
@@ -553,7 +553,7 @@ const styles = StyleSheet.create({
   rowSubtitle: { fontSize: 12, color: AppTheme.colors.textSecondary },
   rowError: {
     fontSize: 12,
-    color: "#B42318",
+    color: AppTheme.colors.dangerText,
     lineHeight: 17,
     marginTop: 2,
     fontFamily: undefined,

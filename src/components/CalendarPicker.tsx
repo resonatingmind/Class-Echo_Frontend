@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   selectedDayText: {
-    color: "#fff",
+    color: AppTheme.colors.white,
     fontWeight: "700",
   },
   today: {
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: AppTheme.radius.small,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: AppTheme.colors.gray100,
   },
 
   dropdownText: {

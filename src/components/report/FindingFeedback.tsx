@@ -18,8 +18,8 @@ import { AppTheme } from '../../theme/AppTheme';
 import { FeedbackReason, FeedbackTarget, ReportFeedback } from '../../types/api';
 import { useClips } from './ClipPlayback';
 
-const AGREE_COLOR = '#127A40';
-const DISAGREE_COLOR = '#B42318';
+const AGREE_COLOR = AppTheme.colors.successText;
+const DISAGREE_COLOR = AppTheme.colors.dangerText;
 
 /** The moment a finding cites, so the disagree sheet can play it back. */
 export type FindingMoment = { start: number; title: string };
@@ -310,7 +310,7 @@ function DisagreeSheet({ initialReasons, initialComment, saving, hidden, moment,
               onPress={() => onSave(reasons, comment)}
               style={[ds.primary, saving && ds.disabled]}
             >
-              {saving ? <ActivityIndicator color="#fff" size="small" /> : null}
+              {saving ? <ActivityIndicator color={AppTheme.colors.white} size="small" /> : null}
               <Text style={ds.primaryText}>Save</Text>
             </Pressable>
           </View>
@@ -328,7 +328,7 @@ const fb = StyleSheet.create({
     gap: 8,
     padding: 10,
     borderRadius: AppTheme.radius.medium,
-    backgroundColor: '#FFF1F1',
+    backgroundColor: AppTheme.colors.dangerBg,
   },
   noteIcon: { marginTop: 2 },
   noteBody: { flex: 1, gap: 2 },
@@ -414,6 +414,6 @@ const ds = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
     backgroundColor: AppTheme.colors.primary,
   },
-  primaryText: { fontSize: 15, fontWeight: '800', color: '#fff' },
+  primaryText: { fontSize: 15, fontWeight: '800', color: AppTheme.colors.white },
   disabled: { opacity: 0.55 },
 });

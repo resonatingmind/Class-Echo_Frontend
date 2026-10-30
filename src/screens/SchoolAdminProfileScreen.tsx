@@ -209,9 +209,9 @@ export function SchoolAdminProfileScreen({ navigation }: Props) {
                     )}
                     <View style={styles.cameraBadge}>
                       {avatarUploading ? (
-                        <ActivityIndicator color="#fff" size="small" />
+                        <ActivityIndicator color={AppTheme.colors.white} size="small" />
                       ) : (
-                        <Ionicons color="#fff" name="camera" size={14} />
+                        <Ionicons color={AppTheme.colors.white} name="camera" size={14} />
                       )}
                     </View>
                   </Pressable>
@@ -340,7 +340,7 @@ export function SchoolAdminProfileScreen({ navigation }: Props) {
                       ]}
                     >
                       {saving ? (
-                        <ActivityIndicator color="#fff" size="small" />
+                        <ActivityIndicator color={AppTheme.colors.white} size="small" />
                       ) : null}
                       <Text style={styles.primaryButtonText}>
                         {saving ? "Saving…" : "Save Changes"}
@@ -446,9 +446,9 @@ const styles = StyleSheet.create({
   avatarWrap: { 
     position: 'relative',
     padding: 4,
-    backgroundColor: '#fff',
+    backgroundColor: AppTheme.colors.white,
     borderRadius: 60,
-    shadowColor: '#000',
+    shadowColor: AppTheme.colors.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
     width: 104,
     height: 104,
     borderRadius: 52,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: AppTheme.colors.gray100,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: '#fff',
+    borderColor: AppTheme.colors.white,
   },
   roleBadge: {
     marginTop: 4,
@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 24,
     gap: 16,
-    shadowColor: '#000',
+    shadowColor: AppTheme.colors.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.03,
     shadowRadius: 16,
@@ -523,8 +523,8 @@ const styles = StyleSheet.create({
     minHeight: 52,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#F9FAFB',
+    borderColor: AppTheme.colors.border,
+    backgroundColor: AppTheme.colors.gray50,
     paddingHorizontal: AppTheme.spacing.m,
     ...AppTheme.typography.body,
     color: AppTheme.colors.textPrimary,
@@ -549,7 +549,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  primaryButtonText: { color: "#fff", ...AppTheme.typography.button },
+  primaryButtonText: { color: AppTheme.colors.white, ...AppTheme.typography.button },
   buttonDisabled: { opacity: 0.6 },
   logoRow: { flexDirection: "row", alignItems: "center", gap: AppTheme.spacing.m },
   logoImage: { width: 64, height: 64, borderRadius: AppTheme.radius.medium },
@@ -567,15 +567,15 @@ const styles = StyleSheet.create({
   signOutButton: {
     height: 52,
     borderRadius: 16,
-    backgroundColor: '#FEF2F2',
+    backgroundColor: AppTheme.colors.dangerBg,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: AppTheme.spacing.s,
     marginTop: AppTheme.spacing.m,
     borderWidth: 1,
-    borderColor: '#FCA5A5',
+    borderColor: AppTheme.colors.dangerBorderStrong,
   },
-  signOutText: { color: "#DC2626", ...AppTheme.typography.button, fontWeight: '700' },
+  signOutText: { color: AppTheme.colors.danger, ...AppTheme.typography.button, fontWeight: '700' },
 });
 

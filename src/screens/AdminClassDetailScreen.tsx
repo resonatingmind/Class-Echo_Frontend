@@ -23,11 +23,11 @@ import { ClassOut, SubjectOut } from '../types/api';
 type Props = NativeStackScreenProps<RootStackParamList, 'AdminClassDetail'>;
 
 const SUBJECT_COLORS = [
-  { bg: '#D1E4FF', text: AppTheme.colors.primary },
-  { bg: '#E8F7EE', text: '#127A40' },
-  { bg: '#FFF4E0', text: '#92400E' },
-  { bg: '#F5F0FF', text: '#6B21A8' },
-  { bg: '#FFE8EC', text: '#9B1239' },
+  { bg: AppTheme.colors.primarySoft, text: AppTheme.colors.primary },
+  { bg: AppTheme.colors.successBg, text: AppTheme.colors.successText },
+  { bg: AppTheme.colors.warningBg, text: AppTheme.colors.warningStrong },
+  { bg: AppTheme.colors.purpleBg, text: AppTheme.colors.purple },
+  { bg: AppTheme.colors.roseBg, text: AppTheme.colors.rose },
 ];
 
 function SubjectCard({

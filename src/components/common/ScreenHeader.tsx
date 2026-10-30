@@ -88,7 +88,7 @@ export function ScreenHeader({
 
 const styles = StyleSheet.create({
   outer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: AppTheme.colors.white,
     paddingHorizontal: 16,
   },
   transparent: {

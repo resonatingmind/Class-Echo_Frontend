@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 4,
     alignSelf: "flex-start",
-    backgroundColor: "#FDF3E3",
+    backgroundColor: AppTheme.colors.warningBg,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: AppTheme.radius.medium,

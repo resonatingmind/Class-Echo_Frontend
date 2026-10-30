@@ -154,7 +154,7 @@ export function SelfRatingPrompt({ token, recordingId, onDone }: {
           onPress={() => void save(false)}
           style={[sr.primary, (saving !== null || rated === 0) && sr.disabled]}
         >
-          {saving === 'rate' ? <ActivityIndicator color="#fff" size="small" /> : null}
+          {saving === 'rate' ? <ActivityIndicator color={AppTheme.colors.white} size="small" /> : null}
           <Text style={sr.primaryText}>Show my report</Text>
         </Pressable>
       </View>
@@ -194,7 +194,7 @@ export function SelfRatingComparison({ rating, breakdown }: {
           <Text style={sr.compareValue}>You {r.mine}/5</Text>
           <Text style={sr.compareValue}>Report {r.theirs ?? '—'}/5</Text>
           <Ionicons
-            color={r.match ? '#127A40' : AppTheme.colors.primary}
+            color={r.match ? AppTheme.colors.successText : AppTheme.colors.primary}
             name={r.match ? 'checkmark-circle' : 'search-outline'}
             size={16}
           />
@@ -238,7 +238,7 @@ const sr = StyleSheet.create({
   },
   dotOn: { backgroundColor: AppTheme.colors.primary, borderColor: AppTheme.colors.primary },
   dotText: { fontSize: 14, fontWeight: '700', color: AppTheme.colors.textSecondary },
-  dotTextOn: { color: '#fff' },
+  dotTextOn: { color: AppTheme.colors.white },
   scaleHint: { fontSize: 12, color: AppTheme.colors.textSecondary },
   input: {
     minHeight: 64,
@@ -275,10 +275,10 @@ const sr = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
     backgroundColor: AppTheme.colors.primary,
   },
-  primaryText: { fontSize: 15, fontWeight: '800', color: '#fff' },
+  primaryText: { fontSize: 15, fontWeight: '800', color: AppTheme.colors.white },
   disabled: { opacity: 0.5 },
   compareTitle: { fontSize: 17, fontWeight: '800', color: AppTheme.colors.textPrimary },
-  matchNote: { fontSize: 14, fontWeight: '700', color: '#127A40' },
+  matchNote: { fontSize: 14, fontWeight: '700', color: AppTheme.colors.successText },
   compareRow: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 28 },
   compareLabel: { flex: 1, fontSize: 14, fontWeight: '700', color: AppTheme.colors.textPrimary },
   compareValue: { fontSize: 13, color: AppTheme.colors.textSecondary, minWidth: 64, textAlign: 'right' },

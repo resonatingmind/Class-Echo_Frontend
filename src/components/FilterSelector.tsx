@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   //   borderRadius: AppTheme.radius.large,
   //   padding: 14,
   //   borderWidth: 1,
-  //   borderColor: "#E5E7EB",
+  //   borderColor: AppTheme.colors.border,
   // },
 
   selector: {
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: AppTheme.colors.border,
   },
 
   label: {

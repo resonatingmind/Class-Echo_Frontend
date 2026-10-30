@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: AppTheme.colors.white,
 
     borderRadius: 18,
 

@@ -20,14 +20,14 @@ export function PlannerStatistics({ statistics }: Props) {
 
       <StatCard
         icon="document-text-outline"
-        color="#7C3AED"
+        color={AppTheme.colors.violet}
         value={statistics.total_documents.toString()}
         title="Reference material"
       />
 
       <StatCard
         icon="videocam-outline"
-        color="#EA580C"
+        color={AppTheme.colors.orange}
         value={statistics.total_recordings.toString()}
         title="Recordings"
       />

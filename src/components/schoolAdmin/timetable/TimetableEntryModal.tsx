@@ -268,13 +268,13 @@ export function TimetableEntryModal({
                             key={`break-${slot.number}`}
                             style={[
                               styles.slotChip,
-                              { backgroundColor: "#FFF7ED", borderColor: "#FDBA74", opacity: 0.85 },
+                              { backgroundColor: AppTheme.colors.orangeTint, borderColor: AppTheme.colors.orangeBorder, opacity: 0.85 },
                             ]}
                           >
-                            <Text style={[styles.slotChipNum, { color: "#C2410C", fontSize: 11 }]}>
+                            <Text style={[styles.slotChipNum, { color: AppTheme.colors.orangeText, fontSize: 11 }]}>
                               ☕ {slot.label || "Break"}
                             </Text>
-                            <Text style={[styles.slotChipTime, { color: "#9A3412" }]}>
+                            <Text style={[styles.slotChipTime, { color: AppTheme.colors.orangeStrong }]}>
                               {fmt12(slot.startTime)}
                             </Text>
                           </View>
@@ -363,7 +363,7 @@ export function TimetableEntryModal({
 
                 {(localError || errorMessage) && (
                   <View style={styles.errorRow}>
-                    <Ionicons name="alert-circle-outline" size={14} color="#DC2626" />
+                    <Ionicons name="alert-circle-outline" size={14} color={AppTheme.colors.danger} />
                     <Text style={styles.errorText}>{localError ?? errorMessage}</Text>
                   </View>
                 )}
@@ -378,7 +378,7 @@ export function TimetableEntryModal({
                   disabled={submitting || noPeriods}
                 >
                   {submitting ? (
-                    <ActivityIndicator color="#FFFFFF" />
+                    <ActivityIndicator color={AppTheme.colors.white} />
                   ) : (
                     <Text style={styles.submitText}>
                       {isEditing ? "Save Changes" : "Add Period"}
@@ -503,7 +503,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 8,
-    backgroundColor: "#FFF7ED",
+    backgroundColor: AppTheme.colors.orangeTint,
     borderRadius: AppTheme.radius.medium,
     padding: 12,
     borderWidth: 1,
@@ -512,7 +512,7 @@ const styles = StyleSheet.create({
   noPeriodsBannerText: {
     flex: 1,
     fontSize: 13,
-    color: "#C2410C",
+    color: AppTheme.colors.orangeText,
     lineHeight: 18,
   },
 
@@ -610,7 +610,7 @@ const styles = StyleSheet.create({
   placeholderText: { color: AppTheme.colors.textPlaceholder },
 
   errorRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 14 },
-  errorText: { flex: 1, color: "#DC2626", fontSize: 13 },
+  errorText: { flex: 1, color: AppTheme.colors.danger, fontSize: 13 },
 
   submitButton: {
     marginTop: 24,
@@ -621,5 +621,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   submitDisabled: { backgroundColor: AppTheme.colors.disabled },
-  submitText: { color: "#FFFFFF", fontSize: 16, fontWeight: "700" },
+  submitText: { color: AppTheme.colors.white, fontSize: 16, fontWeight: "700" },
 });

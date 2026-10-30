@@ -66,7 +66,7 @@ export function ConfirmDialog({
                 <TextInput
                   style={styles.passwordInput}
                   placeholder="Enter password to confirm"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor={AppTheme.colors.slate400}
                   secureTextEntry
                   value={passwordValue}
                   onChangeText={onPasswordChange}
@@ -96,7 +96,7 @@ export function ConfirmDialog({
                   disabled={loading}
                 >
                   {loading ? (
-                    <ActivityIndicator color="#FFFFFF" />
+                    <ActivityIndicator color={AppTheme.colors.white} />
                   ) : (
                     <Text style={styles.confirmText}>{confirmText}</Text>
                   )}
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   card: {
     width: "100%",
     maxWidth: 420,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: AppTheme.colors.white,
     borderRadius: 20,
     padding: 24,
   },
@@ -143,13 +143,13 @@ const styles = StyleSheet.create({
 
   passwordInput: {
     borderWidth: 1,
-    borderColor: "#CBD5E1",
+    borderColor: AppTheme.colors.slate300,
     borderRadius: AppTheme.radius.small,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 14,
-    color: "#0F172A",
-    backgroundColor: "#F8FAFC",
+    color: AppTheme.colors.slate900,
+    backgroundColor: AppTheme.colors.slate50,
     marginBottom: 24,
   },
 
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: AppTheme.radius.medium,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: AppTheme.colors.gray100,
   },
 
   cancelText: {
@@ -184,15 +184,15 @@ const styles = StyleSheet.create({
   },
 
   destructiveButton: {
-    backgroundColor: "#DC2626",
+    backgroundColor: AppTheme.colors.danger,
   },
 
   confirmText: {
-    color: "#FFFFFF",
+    color: AppTheme.colors.white,
     fontWeight: "700",
   },
   errorText: {
-    color: "#DC2626",
+    color: AppTheme.colors.danger,
     fontSize: 13,
     marginBottom: 16,
     fontWeight: "500",

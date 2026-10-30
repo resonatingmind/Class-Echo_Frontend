@@ -317,9 +317,9 @@ const styles = StyleSheet.create({
   errorContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FDF2F2",
+    backgroundColor: AppTheme.colors.dangerBg,
     borderWidth: 1,
-    borderColor: "#FDE8E8",
+    borderColor: AppTheme.colors.dangerSoft,
     padding: AppTheme.spacing.m,
     borderRadius: AppTheme.radius.medium,
     gap: AppTheme.spacing.s,

@@ -56,7 +56,7 @@ export function AdminPeriodCard({ entry, onEdit, onDelete }: Props) {
           onPress={() => onDelete(entry)}
           hitSlop={8}
         >
-          <Ionicons name="trash-outline" size={18} color="#DC2626" />
+          <Ionicons name="trash-outline" size={18} color={AppTheme.colors.danger} />
         </Pressable>
       </View>
     </View>
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   },
 
   deleteButton: {
-    backgroundColor: "#FEE2E2",
+    backgroundColor: AppTheme.colors.dangerSoft,
   },
 });
 

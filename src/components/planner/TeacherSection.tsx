@@ -136,7 +136,7 @@ import { AppTheme } from '../../theme/AppTheme';
 
 //     marginBottom: 12,
 
-//     color: "#0F172A",
+//     color: AppTheme.colors.slate900,
 //   },
 
 //   input: {
@@ -144,7 +144,7 @@ import { AppTheme } from '../../theme/AppTheme';
 
 //     borderWidth: 1,
 
-//     borderColor: "#CBD5E1",
+//     borderColor: AppTheme.colors.slate300,
 
 //     borderRadius: AppTheme.radius.medium,
 
@@ -296,21 +296,21 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     marginBottom: 12,
-    color: "#0F172A",
+    color: AppTheme.colors.slate900,
   },
   input: {
     height: 50,
     borderWidth: 1,
-    borderColor: "#CBD5E1",
+    borderColor: AppTheme.colors.slate300,
     borderRadius: AppTheme.radius.medium,
     paddingHorizontal: 14,
     marginBottom: 14,
-    color: "#0F172A",
+    color: AppTheme.colors.slate900,
   },
   disabledInput: {
-    backgroundColor: "#F1F5F9",
-    color: "#64748B",
-    borderColor: "#E2E8F0",
+    backgroundColor: AppTheme.colors.slate100,
+    color: AppTheme.colors.slate500,
+    borderColor: AppTheme.colors.slate200,
   },
   inputContainer: {
     position: "relative",

@@ -48,11 +48,11 @@ import { getTeacherStatusStyle } from "../components/teacher/teacherStatusStyles
 import { ExpandedChapterDetailView } from "../components/ExpandedChapterDetailView";
 
 function getScoreColor(score: number | undefined | null) {
-  if (score == null) return "#64748B";
-  if (score >= 80) return "#127A40";
+  if (score == null) return AppTheme.colors.slate500;
+  if (score >= 80) return AppTheme.colors.successText;
   if (score >= 60) return AppTheme.colors.primary;
-  if (score >= 40) return "#92400E";
-  return "#B42318";
+  if (score >= 40) return AppTheme.colors.warningStrong;
+  return AppTheme.colors.dangerText;
 }
 
 type Props = NativeStackScreenProps<RootStackParamList, "TeacherSubjectWorkspace">;

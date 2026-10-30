@@ -1,3 +1,4 @@
+import { AppTheme } from '../theme/AppTheme';
 export type School = {
   id: string;
   name: string;
@@ -51,7 +52,7 @@ export const schools: School[] = [
     address: '200 Eagle Dr, Naperville, IL',
     classes: '56 Groups',
     students: '1,450 Total',
-    accent: '#FEE2E2',
+    accent: AppTheme.colors.dangerSoft,
     initials: 'CH',
   },
 ];

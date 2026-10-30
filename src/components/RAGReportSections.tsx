@@ -13,16 +13,16 @@ import {
 // ── Color helpers ─────────────────────────────────────────────────────────────
 
 function coverageColor(pct: number): string {
-  if (pct >= 80) return '#127A40';
+  if (pct >= 80) return AppTheme.colors.successText;
   if (pct >= 60) return AppTheme.colors.primary;
-  if (pct >= 40) return '#92400E';
-  return '#B42318';
+  if (pct >= 40) return AppTheme.colors.warningStrong;
+  return AppTheme.colors.dangerText;
 }
 
 const STATUS_CONFIG: Record<string, { bg: string; text: string; icon: string; label: string }> = {
-  achieved: { bg: '#E8F7EE', text: '#127A40', icon: 'checkmark-circle', label: 'Achieved' },
-  partial:  { bg: '#FFF4E0', text: '#92400E', icon: 'ellipse-outline',  label: 'Partial' },
-  missing:  { bg: '#FFF1F1', text: '#B42318', icon: 'close-circle',     label: 'Missing' },
+  achieved: { bg: AppTheme.colors.successBg, text: AppTheme.colors.successText, icon: 'checkmark-circle', label: 'Achieved' },
+  partial:  { bg: AppTheme.colors.warningBg, text: AppTheme.colors.warningStrong, icon: 'ellipse-outline',  label: 'Partial' },
+  missing:  { bg: AppTheme.colors.dangerBg, text: AppTheme.colors.dangerText, icon: 'close-circle',     label: 'Missing' },
 };
 
 // ── Chapter Info Banner ───────────────────────────────────────────────────────
@@ -87,7 +87,7 @@ export function LearningPlanInfoCard({ data }: { data: any }) {
     <View style={lpic.card}>
       <View style={lpic.header}>
         <View style={lpic.iconWrap}>
-          <Ionicons color="#0284C7" name="calendar-outline" size={16} />
+          <Ionicons color={AppTheme.colors.info} name="calendar-outline" size={16} />
         </View>
         <View style={{ flex: 1 }}>
           <Text style={lpic.title}>Lesson Plan</Text>
@@ -132,8 +132,8 @@ const lpic = StyleSheet.create({
   card: {
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#0284C7" + "30",
-    backgroundColor: "#0284C7" + "08",
+    borderColor: AppTheme.colors.info + "30",
+    backgroundColor: AppTheme.colors.info + "08",
     padding: 16,
     gap: 12,
   },
@@ -142,23 +142,23 @@ const lpic = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: AppTheme.radius.medium,
-    backgroundColor: "#E0F2FE",
+    backgroundColor: AppTheme.colors.infoBg,
     alignItems: "center",
     justifyContent: "center",
   },
-  title: { fontSize: 14, fontWeight: "800", color: "#0F172A" },
-  subtitle: { fontSize: 13, fontWeight: "600", color: "#0284C7" },
+  title: { fontSize: 14, fontWeight: "800", color: AppTheme.colors.slate900 },
+  subtitle: { fontSize: 13, fontWeight: "600", color: AppTheme.colors.info },
   dateBadge: {
-    backgroundColor: "#E0F2FE",
+    backgroundColor: AppTheme.colors.infoBg,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
   },
-  dateText: { fontSize: 12, fontWeight: "700", color: "#0369A1" },
+  dateText: { fontSize: 12, fontWeight: "700", color: AppTheme.colors.infoStrong },
   body: { gap: 6, marginTop: 4 },
   itemRow: { gap: 2 },
-  itemLabel: { fontSize: 12, fontWeight: "700", color: "#334155" },
-  itemVal: { fontSize: 13, color: "#475569", lineHeight: 18 },
+  itemLabel: { fontSize: 12, fontWeight: "700", color: AppTheme.colors.slate700 },
+  itemVal: { fontSize: 13, color: AppTheme.colors.slate600, lineHeight: 18 },
 });
 
 // ── Curriculum Coverage Card ──────────────────────────────────────────────────
@@ -195,15 +195,15 @@ export function CurriculumCoverageCard({ data }: { data: CurriculumCoverage }) {
       {data.covered_concepts.length > 0 ? (
         <View style={cc.conceptSection}>
           <View style={cc.sectionHeader}>
-            <Ionicons color="#127A40" name="checkmark-circle" size={14} />
-            <Text style={[cc.sectionTitle, { color: '#127A40' }]}>
+            <Ionicons color={AppTheme.colors.successText} name="checkmark-circle" size={14} />
+            <Text style={[cc.sectionTitle, { color: AppTheme.colors.successText }]}>
               Covered ({data.covered_concepts.length})
             </Text>
           </View>
           <View style={cc.chipWrap}>
             {data.covered_concepts.map((concept, i) => (
               <View key={i} style={[cc.chip, cc.chipCovered]}>
-                <Text style={[cc.chipText, { color: '#127A40' }]}>{concept}</Text>
+                <Text style={[cc.chipText, { color: AppTheme.colors.successText }]}>{concept}</Text>
               </View>
             ))}
           </View>
@@ -214,15 +214,15 @@ export function CurriculumCoverageCard({ data }: { data: CurriculumCoverage }) {
       {data.missing_concepts.length > 0 ? (
         <View style={cc.conceptSection}>
           <View style={cc.sectionHeader}>
-            <Ionicons color="#B42318" name="close-circle" size={14} />
-            <Text style={[cc.sectionTitle, { color: '#B42318' }]}>
+            <Ionicons color={AppTheme.colors.dangerText} name="close-circle" size={14} />
+            <Text style={[cc.sectionTitle, { color: AppTheme.colors.dangerText }]}>
               Missing ({data.missing_concepts.length})
             </Text>
           </View>
           <View style={cc.chipWrap}>
             {data.missing_concepts.map((concept, i) => (
               <View key={i} style={[cc.chip, cc.chipMissing]}>
-                <Text style={[cc.chipText, { color: '#B42318' }]}>{concept}</Text>
+                <Text style={[cc.chipText, { color: AppTheme.colors.dangerText }]}>{concept}</Text>
               </View>
             ))}
           </View>
@@ -259,8 +259,8 @@ const cc = StyleSheet.create({
   chip: {
     paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999, borderWidth: 1,
   },
-  chipCovered: { backgroundColor: '#E8F7EE', borderColor: '#127A40' + '30' },
-  chipMissing: { backgroundColor: '#FFF1F1', borderColor: '#B42318' + '30' },
+  chipCovered: { backgroundColor: AppTheme.colors.successBg, borderColor: AppTheme.colors.successText + '30' },
+  chipMissing: { backgroundColor: AppTheme.colors.dangerBg, borderColor: AppTheme.colors.dangerText + '30' },
   chipText: { fontSize: 12, fontWeight: '600' },
 });
 
@@ -284,12 +284,12 @@ export function ReferenceAlignmentCard({ data }: { data: AccuracyAnalysis }) {
       {data.correct_explanations.length > 0 ? (
         <View style={ra.section}>
           <View style={ra.sectionHeader}>
-            <Ionicons color="#127A40" name="checkmark-circle-outline" size={15} />
-            <Text style={[ra.sectionTitle, { color: '#127A40' }]}>Correctly Explained</Text>
+            <Ionicons color={AppTheme.colors.successText} name="checkmark-circle-outline" size={15} />
+            <Text style={[ra.sectionTitle, { color: AppTheme.colors.successText }]}>Correctly Explained</Text>
           </View>
           {data.correct_explanations.map((item, i) => (
             <View key={i} style={ra.itemRow}>
-              <View style={[ra.dot, { backgroundColor: '#127A40' }]} />
+              <View style={[ra.dot, { backgroundColor: AppTheme.colors.successText }]} />
               <Text style={ra.itemText}>{item}</Text>
             </View>
           ))}
@@ -300,12 +300,12 @@ export function ReferenceAlignmentCard({ data }: { data: AccuracyAnalysis }) {
       {data.potential_inaccuracies.length > 0 ? (
         <View style={ra.section}>
           <View style={ra.sectionHeader}>
-            <Ionicons color="#B42318" name="alert-circle-outline" size={15} />
-            <Text style={[ra.sectionTitle, { color: '#B42318' }]}>Potential Inaccuracies</Text>
+            <Ionicons color={AppTheme.colors.dangerText} name="alert-circle-outline" size={15} />
+            <Text style={[ra.sectionTitle, { color: AppTheme.colors.dangerText }]}>Potential Inaccuracies</Text>
           </View>
           {data.potential_inaccuracies.map((item, i) => (
             <View key={i} style={[ra.inaccuracyRow]}>
-              <Ionicons color="#B42318" name="warning-outline" size={13} style={{ marginTop: 2 }} />
+              <Ionicons color={AppTheme.colors.dangerText} name="warning-outline" size={13} style={{ marginTop: 2 }} />
               <Text style={ra.inaccuracyText}>{item}</Text>
             </View>
           ))}
@@ -334,9 +334,9 @@ const ra = StyleSheet.create({
   itemText: { flex: 1, fontSize: 13, lineHeight: 20, color: AppTheme.colors.textSecondary },
   inaccuracyRow: {
     flexDirection: 'row', alignItems: 'flex-start', gap: 8,
-    padding: 10, borderRadius: AppTheme.radius.medium, backgroundColor: '#FFF1F1',
+    padding: 10, borderRadius: AppTheme.radius.medium, backgroundColor: AppTheme.colors.dangerBg,
   },
-  inaccuracyText: { flex: 1, fontSize: 13, lineHeight: 20, color: '#B42318' },
+  inaccuracyText: { flex: 1, fontSize: 13, lineHeight: 20, color: AppTheme.colors.dangerText },
 });
 
 // ── Learning Objectives Card ──────────────────────────────────────────────────
@@ -352,7 +352,7 @@ export function LearningObjectivesCard({ data }: { data: LearningObjectiveStatus
     <View style={lo.card}>
       <View style={lo.header}>
         <View style={lo.iconWrap}>
-          <Ionicons color="#7C3AED" name="trophy-outline" size={16} />
+          <Ionicons color={AppTheme.colors.violet} name="trophy-outline" size={16} />
         </View>
         <Text style={lo.title}>Learning Objectives</Text>
       </View>
@@ -360,21 +360,21 @@ export function LearningObjectivesCard({ data }: { data: LearningObjectiveStatus
       {/* Summary pills */}
       <View style={lo.summaryRow}>
         {achieved > 0 ? (
-          <View style={[lo.summaryPill, { backgroundColor: '#E8F7EE' }]}>
-            <Ionicons color="#127A40" name="checkmark-circle" size={12} />
-            <Text style={[lo.summaryText, { color: '#127A40' }]}>{achieved} Achieved</Text>
+          <View style={[lo.summaryPill, { backgroundColor: AppTheme.colors.successBg }]}>
+            <Ionicons color={AppTheme.colors.successText} name="checkmark-circle" size={12} />
+            <Text style={[lo.summaryText, { color: AppTheme.colors.successText }]}>{achieved} Achieved</Text>
           </View>
         ) : null}
         {partial > 0 ? (
-          <View style={[lo.summaryPill, { backgroundColor: '#FFF4E0' }]}>
-            <Ionicons color="#92400E" name="ellipse-outline" size={12} />
-            <Text style={[lo.summaryText, { color: '#92400E' }]}>{partial} Partial</Text>
+          <View style={[lo.summaryPill, { backgroundColor: AppTheme.colors.warningBg }]}>
+            <Ionicons color={AppTheme.colors.warningStrong} name="ellipse-outline" size={12} />
+            <Text style={[lo.summaryText, { color: AppTheme.colors.warningStrong }]}>{partial} Partial</Text>
           </View>
         ) : null}
         {missing > 0 ? (
-          <View style={[lo.summaryPill, { backgroundColor: '#FFF1F1' }]}>
-            <Ionicons color="#B42318" name="close-circle" size={12} />
-            <Text style={[lo.summaryText, { color: '#B42318' }]}>{missing} Missing</Text>
+          <View style={[lo.summaryPill, { backgroundColor: AppTheme.colors.dangerBg }]}>
+            <Ionicons color={AppTheme.colors.dangerText} name="close-circle" size={12} />
+            <Text style={[lo.summaryText, { color: AppTheme.colors.dangerText }]}>{missing} Missing</Text>
           </View>
         ) : null}
       </View>

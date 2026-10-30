@@ -471,7 +471,7 @@ export function SchoolsScreen({ navigation }: Props) {
                 style={[styles.modalSaveBtn, { flex: 1, backgroundColor: AppTheme.colors.error }, deleteSaving && { opacity: 0.6 }]}
               >
                 {deleteSaving ? (
-                  <ActivityIndicator color="#fff" size="small" />
+                  <ActivityIndicator color={AppTheme.colors.white} size="small" />
                 ) : (
                   <Text style={styles.modalSaveBtnText}>Confirm Delete</Text>
                 )}
@@ -560,21 +560,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: AppTheme.spacing.xs,
-    backgroundColor: "#E8F7EE",
+    backgroundColor: AppTheme.colors.successBg,
     borderRadius: AppTheme.radius.pill,
     paddingHorizontal: AppTheme.spacing.m,
     paddingVertical: AppTheme.spacing.xs,
   },
   statChipWarn: {
-    backgroundColor: "#FFF4E0",
+    backgroundColor: AppTheme.colors.warningBg,
   },
   statChipText: {
-    color: "#127A40",
+    color: AppTheme.colors.successText,
     ...AppTheme.typography.caption,
     fontWeight: "600",
   },
   statChipTextWarn: {
-    color: "#92400E",
+    color: AppTheme.colors.warningStrong,
   },
   searchBar: {
     flexDirection: "row",
@@ -711,19 +711,19 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   badgeGreen: {
-    backgroundColor: "#E8F7EE",
+    backgroundColor: AppTheme.colors.successBg,
   },
   badgeOrange: {
-    backgroundColor: "#FFF4E0",
+    backgroundColor: AppTheme.colors.warningBg,
   },
   badgeBlue: {
-    backgroundColor: "#EAF4FF",
+    backgroundColor: AppTheme.colors.primaryLight,
   },
   badgeRed: {
-    backgroundColor: "#FDF2F2",
+    backgroundColor: AppTheme.colors.dangerBg,
   },
   badgeGray: {
-    backgroundColor: "#F3F4F6",
+    backgroundColor: AppTheme.colors.gray100,
   },
   statusDot: {
     width: 6,
@@ -731,31 +731,31 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   dotGreen: {
-    backgroundColor: "#22C55E",
+    backgroundColor: AppTheme.colors.success,
     width: 6,
     height: 6,
     borderRadius: 3,
   },
   dotOrange: {
-    backgroundColor: "#F59E0B",
+    backgroundColor: AppTheme.colors.warning,
     width: 6,
     height: 6,
     borderRadius: 3,
   },
   dotBlue: {
-    backgroundColor: "#1D8EF5",
+    backgroundColor: AppTheme.colors.primary,
     width: 6,
     height: 6,
     borderRadius: 3,
   },
   dotRed: {
-    backgroundColor: "#EF4444",
+    backgroundColor: AppTheme.colors.error,
     width: 6,
     height: 6,
     borderRadius: 3,
   },
   dotGray: {
-    backgroundColor: "#9CA3AF",
+    backgroundColor: AppTheme.colors.hint,
     width: 6,
     height: 6,
     borderRadius: 3,
@@ -765,25 +765,25 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   statusGreen: {
-    color: "#127A40",
+    color: AppTheme.colors.successText,
   },
   statusOrange: {
-    color: "#92400E",
+    color: AppTheme.colors.warningStrong,
   },
   statusBlue: {
-    color: "#156FD6",
+    color: AppTheme.colors.primaryDark,
   },
   statusRed: {
-    color: "#EF4444",
+    color: AppTheme.colors.error,
   },
   statusGray: {
-    color: "#6B7280",
+    color: AppTheme.colors.textSecondary,
   },
   statChipInfo: {
-    backgroundColor: "#EAF4FF",
+    backgroundColor: AppTheme.colors.primaryLight,
   },
   statChipTextInfo: {
-    color: "#156FD6",
+    color: AppTheme.colors.primaryDark,
   },
   modalOverlay: {
     flex: 1,
@@ -861,7 +861,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   modalSaveBtnText: {
-    color: "#fff",
+    color: AppTheme.colors.white,
     ...AppTheme.typography.button,
   },
   modalCancelBtn: {

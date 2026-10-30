@@ -106,7 +106,7 @@ export function ChapterLearningPlanModal({
               {initialItem ? "Edit Lecture Planner Entry" : "Add Lecture Planner Entry"}
             </Text>
             <Pressable style={styles.closeBtn} onPress={onClose}>
-              <Ionicons name="close" size={20} color="#64748B" />
+              <Ionicons name="close" size={20} color={AppTheme.colors.slate500} />
             </Pressable>
           </View>
 
@@ -141,7 +141,7 @@ export function ChapterLearningPlanModal({
                     style={[styles.input, { justifyContent: 'center' }]}
                     onPress={() => setShowDatePicker(true)}
                   >
-                    <Text style={{ color: date ? "#0F172A" : "#94A3B8", fontSize: 14 }}>
+                    <Text style={{ color: date ? AppTheme.colors.slate900 : AppTheme.colors.slate400, fontSize: 14 }}>
                       {date ? date : "Select a date"}
                     </Text>
                   </Pressable>
@@ -184,7 +184,7 @@ export function ChapterLearningPlanModal({
               <TextInput
                 style={styles.input}
                 placeholder="e.g. Introduction & Distance Formula"
-                placeholderTextColor="#94A3B8"
+                placeholderTextColor={AppTheme.colors.slate400}
                 value={subTopic}
                 onChangeText={setSubTopic}
               />
@@ -195,7 +195,7 @@ export function ChapterLearningPlanModal({
               <TextInput
                 style={[styles.input, styles.multilineInput]}
                 placeholder="Practice questions are done and concepts will be discussed."
-                placeholderTextColor="#94A3B8"
+                placeholderTextColor={AppTheme.colors.slate400}
                 value={classworkActivities}
                 onChangeText={setClassworkActivities}
                 multiline
@@ -208,7 +208,7 @@ export function ChapterLearningPlanModal({
               <TextInput
                 style={styles.input}
                 placeholder="e.g. Ex - 6.1"
-                placeholderTextColor="#94A3B8"
+                placeholderTextColor={AppTheme.colors.slate400}
                 value={assessmentTask}
                 onChangeText={setAssessmentTask}
               />
@@ -219,7 +219,7 @@ export function ChapterLearningPlanModal({
               <TextInput
                 style={styles.input}
                 placeholder="e.g. None, Board, Projector"
-                placeholderTextColor="#94A3B8"
+                placeholderTextColor={AppTheme.colors.slate400}
                 value={teachingAids}
                 onChangeText={setTeachingAids}
               />
@@ -230,7 +230,7 @@ export function ChapterLearningPlanModal({
               <TextInput
                 style={[styles.input, styles.multilineInput]}
                 placeholder="Able to understand applications of section formula."
-                placeholderTextColor="#94A3B8"
+                placeholderTextColor={AppTheme.colors.slate400}
                 value={learningOutcomes}
                 onChangeText={setLearningOutcomes}
                 multiline
@@ -250,7 +250,7 @@ export function ChapterLearningPlanModal({
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <ActivityIndicator color={AppTheme.colors.white} size="small" />
               ) : (
                 <Text style={styles.saveText}>
                   {initialItem ? "Save Changes" : "Create Entry"}
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalCard: {
-    backgroundColor: "#fff",
+    backgroundColor: AppTheme.colors.white,
     borderRadius: 16,
     width: "100%",
     maxWidth: 600,
@@ -289,13 +289,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#0F172A",
+    color: AppTheme.colors.slate900,
   },
   closeBtn: {
     padding: 4,
   },
   errorText: {
-    color: "#EF4444",
+    color: AppTheme.colors.error,
     fontSize: 13,
     marginBottom: 10,
     fontWeight: "600",
@@ -309,18 +309,18 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#334155",
+    color: AppTheme.colors.slate700,
     marginBottom: 6,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#CBD5E1",
+    borderColor: AppTheme.colors.slate300,
     borderRadius: AppTheme.radius.small,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 14,
-    color: "#0F172A",
-    backgroundColor: "#F8FAFC",
+    color: AppTheme.colors.slate900,
+    backgroundColor: AppTheme.colors.slate50,
   },
   multilineInput: {
     minHeight: 64,
@@ -333,16 +333,16 @@ const styles = StyleSheet.create({
     marginTop: 14,
     paddingTop: 14,
     borderTopWidth: 1,
-    borderTopColor: "#F1F5F9",
+    borderTopColor: AppTheme.colors.slate100,
   },
   cancelBtn: {
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: AppTheme.radius.small,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: AppTheme.colors.slate100,
   },
   cancelText: {
-    color: "#475569",
+    color: AppTheme.colors.slate600,
     fontWeight: "600",
     fontSize: 14,
   },
@@ -350,22 +350,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: AppTheme.radius.small,
-    backgroundColor: "#0284C7",
+    backgroundColor: AppTheme.colors.info,
   },
   disabledBtn: {
     opacity: 0.6,
   },
   saveText: {
-    color: "#fff",
+    color: AppTheme.colors.white,
     fontWeight: "700",
     fontSize: 14,
   },
   disabledInput: {
-    backgroundColor: "#E2E8F0",
-    borderColor: "#CBD5E1",
+    backgroundColor: AppTheme.colors.slate200,
+    borderColor: AppTheme.colors.slate300,
   },
   disabledText: {
-    color: "#475569",
+    color: AppTheme.colors.slate600,
     fontSize: 14,
   },
 });

@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from "react-native";
 
 import { PlannerItemOut } from "../../types/api";
 import { PlannerTableRow } from "./PlannerTableRow";
+import { AppTheme } from "../../theme/AppTheme";
 
 type Props = {
   data: PlannerItemOut[];
@@ -48,13 +49,13 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 24,
 
-    backgroundColor: "#fff",
+    backgroundColor: AppTheme.colors.white,
 
     borderRadius: 16,
 
     borderWidth: 1,
 
-    borderColor: "#E2E8F0",
+    borderColor: AppTheme.colors.slate200,
 
     overflow: "hidden",
   },
@@ -62,11 +63,11 @@ const styles = StyleSheet.create({
   header: {
     height: 52,
 
-    backgroundColor: "#F8FAFC",
+    backgroundColor: AppTheme.colors.slate50,
 
     borderBottomWidth: 1,
 
-    borderBottomColor: "#E2E8F0",
+    borderBottomColor: AppTheme.colors.slate200,
 
     flexDirection: "row",
 
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
 
     fontWeight: "700",
 
-    color: "#64748B",
+    color: AppTheme.colors.slate500,
   },
 });
 

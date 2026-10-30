@@ -52,13 +52,13 @@ type ActiveTab = 'planner' | 'profile' | 'documents' | 'metadata';
 function statusStyle(status: string) {
   const norm = status.toLowerCase();
   if (norm === 'completed') {
-    return { bg: '#E8F7EE', text: '#127A40', label: 'Completed' };
+    return { bg: AppTheme.colors.successBg, text: AppTheme.colors.successText, label: 'Completed' };
   } else if (norm === 'processing') {
-    return { bg: '#FFF4E0', text: '#92400E', label: 'Processing' };
+    return { bg: AppTheme.colors.warningBg, text: AppTheme.colors.warningStrong, label: 'Processing' };
   } else if (norm === 'pending') {
     return { bg: AppTheme.colors.surfaceMuted, text: AppTheme.colors.textSecondary, label: 'Pending' };
   } else {
-    return { bg: '#FFF1F1', text: '#B42318', label: 'Failed' };
+    return { bg: AppTheme.colors.dangerBg, text: AppTheme.colors.dangerText, label: 'Failed' };
   }
 }
 
@@ -451,7 +451,7 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
                   setLpModalVisible(true);
                 }}
               >
-                <Ionicons name="add" size={16} color="#fff" />
+                <Ionicons name="add" size={16} color={AppTheme.colors.white} />
                 <Text style={styles.addPlanText}>Add Entry</Text>
               </Pressable>
             </View>
@@ -468,7 +468,7 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
         ) : activeTab === 'profile' ? (
           !knowledge ? (
             <View style={styles.emptyKbContainer}>
-              <Ionicons color="#94A3B8" name="analytics-outline" size={40} />
+              <Ionicons color={AppTheme.colors.slate400} name="analytics-outline" size={40} />
               <Text style={styles.emptyKbTitle}>No Knowledge Profile Yet</Text>
               <Text style={styles.emptyKbBody}>
                 Upload reference documents (PDF, DOCX, PPTX, or TXT) to automatically construct a structured chapter knowledge profile using AI.
@@ -537,14 +537,14 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
               {knowledge.common_misconceptions?.length > 0 && (
                 <View style={[styles.card, styles.warningCard]}>
                   <View style={styles.cardHeader}>
-                    <Ionicons color="#B42318" name="alert-circle" size={18} />
-                    <Text style={[styles.cardTitle, { color: '#B42318' }]}>
+                    <Ionicons color={AppTheme.colors.dangerText} name="alert-circle" size={18} />
+                    <Text style={[styles.cardTitle, { color: AppTheme.colors.dangerText }]}>
                       Common Misconceptions
                     </Text>
                   </View>
                   {knowledge.common_misconceptions.map((mis, i) => (
                     <View key={i} style={styles.bulletRow}>
-                      <Ionicons color="#B42318" name="close-circle-outline" size={16} style={{ marginTop: 2 }} />
+                      <Ionicons color={AppTheme.colors.dangerText} name="close-circle-outline" size={16} style={{ marginTop: 2 }} />
                       <Text style={[styles.bulletText, { color: '#7A1C1C' }]}>{mis}</Text>
                     </View>
                   ))}
@@ -567,9 +567,9 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
                 style={[styles.addPlanBtn, uploading && styles.btnDisabled]}
               >
                 {uploading ? (
-                  <ActivityIndicator color="#fff" size="small" />
+                  <ActivityIndicator color={AppTheme.colors.white} size="small" />
                 ) : (
-                  <Ionicons color="#fff" name="cloud-upload-outline" size={16} />
+                  <Ionicons color={AppTheme.colors.white} name="cloud-upload-outline" size={16} />
                 )}
                 <Text style={styles.addPlanText}>
                   {uploading ? `${uploadProgress}%` : 'Upload File'}
@@ -579,7 +579,7 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
 
             {documents.length === 0 ? (
               <View style={styles.emptyDocBox}>
-                <Ionicons color="#94A3B8" name="document-attach-outline" size={40} />
+                <Ionicons color={AppTheme.colors.slate400} name="document-attach-outline" size={40} />
                 <Text style={styles.emptyDocTitle}>No reference files</Text>
                 <Text style={styles.emptyDocBody}>
                   Upload reading materials, syllabi, or lesson plans (PDF, DOCX, PPTX, TXT) to generate a knowledge profile.
@@ -628,7 +628,7 @@ export function SchoolAdminChapterDetailScreen({ navigation, route }: Props) {
                           onPress={() => handleDeleteDocument(doc)}
                           style={styles.trashBtn}
                         >
-                          <Ionicons color="#B42318" name="trash-outline" size={16} />
+                          <Ionicons color={AppTheme.colors.dangerText} name="trash-outline" size={16} />
                         </Pressable>
                       </View>
                     </View>
@@ -711,14 +711,14 @@ const styles = StyleSheet.create({
   addPlanBtn: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#0284C7",
+    backgroundColor: AppTheme.colors.info,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: AppTheme.radius.small,
     gap: 6,
   },
   addPlanText: {
-    color: "#fff",
+    color: AppTheme.colors.white,
     fontFamily: AppTheme.typography.family.bold,
     fontSize: 13,
   },
@@ -792,7 +792,7 @@ const styles = StyleSheet.create({
   },
   tabButtonActive: {
     backgroundColor: AppTheme.colors.surface,
-    shadowColor: '#000',
+    shadowColor: AppTheme.colors.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 1,
@@ -822,8 +822,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   warningCard: {
-    backgroundColor: '#FFF1F1',
-    borderColor: '#FECDCA',
+    backgroundColor: AppTheme.colors.dangerBg,
+    borderColor: AppTheme.colors.dangerBorder,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -873,7 +873,7 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
   },
   uploadBtnText: {
-    color: '#fff',
+    color: AppTheme.colors.white,
     fontSize: 13,
     fontFamily: AppTheme.typography.family.bold,
   },
@@ -936,7 +936,7 @@ const styles = StyleSheet.create({
   docCardError: {
     fontSize: 12,
     lineHeight: 16,
-    color: '#B42318',
+    color: AppTheme.colors.dangerText,
     marginTop: 4,
   },
   docCardRight: {
@@ -948,7 +948,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: AppTheme.radius.small,
-    backgroundColor: '#FFF1F1',
+    backgroundColor: AppTheme.colors.dangerBg,
     alignItems: 'center',
     justifyContent: 'center',
   },

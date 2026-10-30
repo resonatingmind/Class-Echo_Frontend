@@ -71,7 +71,7 @@ export function EmailDeliveryCard({ token }: { token: string }) {
     <View style={[styles.card, !healthy && styles.cardWarn]}>
       <Pressable onPress={() => setExpanded((v) => !v)} style={styles.header}>
         <Ionicons
-          color={healthy ? '#127A40' : '#B45309'}
+          color={healthy ? AppTheme.colors.successText : AppTheme.colors.warningText}
           name={healthy ? 'mail-outline' : 'warning-outline'}
           size={18}
         />
@@ -96,7 +96,7 @@ export function EmailDeliveryCard({ token }: { token: string }) {
         <View style={styles.bodyWrap}>
           {status.warnings.map((warning) => (
             <View key={warning} style={styles.warnRow}>
-              <Ionicons color="#B45309" name="alert-circle-outline" size={14} />
+              <Ionicons color={AppTheme.colors.warningText} name="alert-circle-outline" size={14} />
               <Text style={styles.warnText}>{warning}</Text>
             </View>
           ))}
@@ -148,7 +148,7 @@ export function EmailDeliveryCard({ token }: { token: string }) {
               ]}
             >
               {testing ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <ActivityIndicator color={AppTheme.colors.white} size="small" />
               ) : (
                 <Text style={styles.testBtnText}>Send</Text>
               )}
@@ -163,7 +163,7 @@ export function EmailDeliveryCard({ token }: { token: string }) {
               ]}
             >
               <Ionicons
-                color={testResult.delivered ? '#127A40' : '#B42318'}
+                color={testResult.delivered ? AppTheme.colors.successText : AppTheme.colors.dangerText}
                 name={
                   testResult.delivered
                     ? 'checkmark-circle-outline'
@@ -187,7 +187,7 @@ export function EmailDeliveryCard({ token }: { token: string }) {
 
           {testError ? (
             <View style={[styles.resultCard, styles.resultBad]}>
-              <Ionicons color="#B42318" name="alert-circle-outline" size={15} />
+              <Ionicons color={AppTheme.colors.dangerText} name="alert-circle-outline" size={15} />
               <Text style={styles.resultDetail}>{testError}</Text>
             </View>
           ) : null}
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.surface,
     overflow: 'hidden',
   },
-  cardWarn: { borderColor: '#FCD9A5', backgroundColor: '#FFFBEB' },
+  cardWarn: { borderColor: '#FCD9A5', backgroundColor: AppTheme.colors.warningTint },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     gap: AppTheme.spacing.s,
   },
   warnRow: { flexDirection: 'row', gap: AppTheme.spacing.s, alignItems: 'flex-start' },
-  warnText: { flex: 1, color: '#B45309', ...AppTheme.typography.caption },
+  warnText: { flex: 1, color: AppTheme.colors.warningText, ...AppTheme.typography.caption },
   factRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
     backgroundColor: AppTheme.colors.primary,
   },
-  testBtnText: { color: '#fff', ...AppTheme.typography.caption, fontWeight: '700' },
+  testBtnText: { color: AppTheme.colors.white, ...AppTheme.typography.caption, fontWeight: '700' },
   disabled: { opacity: 0.5 },
   resultCard: {
     flexDirection: 'row',
@@ -270,10 +270,10 @@ const styles = StyleSheet.create({
     padding: AppTheme.spacing.m,
     marginTop: AppTheme.spacing.s,
   },
-  resultOk: { backgroundColor: '#E8F7EE' },
-  resultBad: { backgroundColor: '#FDF2F2' },
+  resultOk: { backgroundColor: AppTheme.colors.successBg },
+  resultBad: { backgroundColor: AppTheme.colors.dangerBg },
   resultText: { flex: 1, gap: 4 },
   resultDetail: { flex: 1, color: AppTheme.colors.textPrimary, ...AppTheme.typography.caption },
-  resultError: { color: '#B42318', ...AppTheme.typography.caption },
+  resultError: { color: AppTheme.colors.dangerText, ...AppTheme.typography.caption },
   mono: { fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
 });

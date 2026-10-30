@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: AppTheme.spacing.s,
-    backgroundColor: "#FEF3C7",
+    backgroundColor: AppTheme.colors.warningSoft,
     paddingVertical: AppTheme.spacing.s,
     paddingHorizontal: AppTheme.spacing.l,
   },

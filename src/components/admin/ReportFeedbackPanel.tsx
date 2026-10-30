@@ -4,7 +4,7 @@ import { DIMENSION_LABELS, reasonLabel } from "../../lib/reportFindings";
 import { AppTheme } from "../../theme/AppTheme";
 import { ReportFeedbackSummary } from "../../types/api";
 
-const BAD = "#B42318";
+const BAD = AppTheme.colors.dangerText;
 
 function percent(rate: number): string {
   return `${Math.round(rate * 100)}%`;
@@ -164,7 +164,7 @@ function AdoptionRow({ label, rate, target, detail }: {
     <View style={styles.areaRow}>
       <View style={styles.areaTop}>
         <Text style={styles.areaLabel}>{label}</Text>
-        <Text style={[styles.areaValue, rate != null && { color: met ? "#127A40" : "#B45309" }]}>
+        <Text style={[styles.areaValue, rate != null && { color: met ? AppTheme.colors.successText : AppTheme.colors.warningText }]}>
           {rate != null ? percent(rate) : "—"} · target {percent(target)}
         </Text>
       </View>
@@ -173,7 +173,7 @@ function AdoptionRow({ label, rate, target, detail }: {
           style={[
             styles.fill,
             { width: `${Math.min(100, (rate ?? 0) * 100)}%` },
-            { backgroundColor: met ? "#127A40" : AppTheme.colors.primary },
+            { backgroundColor: met ? AppTheme.colors.successText : AppTheme.colors.primary },
           ]}
         />
       </View>
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   areaTop: { flexDirection: "row", alignItems: "center", gap: AppTheme.spacing.s },
   areaLabel: { flex: 1, fontSize: 13, fontWeight: "700", color: AppTheme.colors.textPrimary },
   areaValue: { fontSize: 12, fontWeight: "700", color: AppTheme.colors.textSecondary },
-  flag: { paddingVertical: 2, paddingHorizontal: 8, borderRadius: 999, backgroundColor: "#FEE4E2" },
+  flag: { paddingVertical: 2, paddingHorizontal: 8, borderRadius: 999, backgroundColor: AppTheme.colors.dangerSoft },
   flagText: { fontSize: 11, fontWeight: "800", color: BAD },
   track: { height: 6, borderRadius: 3, backgroundColor: AppTheme.colors.surfaceMuted, overflow: "hidden" },
   fill: { height: 6, borderRadius: 3, backgroundColor: AppTheme.colors.primary },

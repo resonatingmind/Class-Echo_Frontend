@@ -212,7 +212,7 @@ export function AdminCreateSchoolScreen({ navigation }: Props) {
                   style={[styles.saveBtn, (!isValid || isSubmitting) && styles.saveBtnDisabled]}
                 >
                   {isSubmitting ? (
-                    <ActivityIndicator color="#fff" size="small" />
+                    <ActivityIndicator color={AppTheme.colors.white} size="small" />
                   ) : (
                     <Text style={styles.saveBtnText}>Save School</Text>
                   )}
@@ -221,7 +221,7 @@ export function AdminCreateSchoolScreen({ navigation }: Props) {
 
               {error ? (
                 <View style={styles.errorBox}>
-                  <Ionicons color="#B42318" name="alert-circle-outline" size={16} />
+                  <Ionicons color={AppTheme.colors.dangerText} name="alert-circle-outline" size={16} />
                   <Text style={styles.errorText}>{error}</Text>
                 </View>
               ) : null}
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
   },
   addRowText: { color: AppTheme.colors.primary, ...AppTheme.typography.body, fontWeight: '700' },
   inlineWarning: {
-    color: '#B42318',
+    color: AppTheme.colors.dangerText,
     ...AppTheme.typography.caption,
     marginTop: AppTheme.spacing.s,
   },
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
     opacity: 0.45,
   },
   saveBtnText: {
-    color: '#fff',
+    color: AppTheme.colors.white,
     ...AppTheme.typography.button,
   },
   scroll: {
@@ -441,12 +441,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     borderRadius: AppTheme.radius.medium,
-    backgroundColor: '#FFF1F1',
+    backgroundColor: AppTheme.colors.dangerBg,
     paddingHorizontal: 14,
     paddingVertical: 12,
   },
   errorText: {
-    color: '#B42318',
+    color: AppTheme.colors.dangerText,
     ...AppTheme.typography.body,
     flex: 1,
   },

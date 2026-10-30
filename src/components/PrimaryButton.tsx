@@ -26,10 +26,10 @@ type PrimaryButtonProps = {
 };
 
 const VARIANT = {
-  primary:   { bg: AppTheme.colors.primary,       text: '#FFFFFF',     indicator: '#FFFFFF'     },
+  primary:   { bg: AppTheme.colors.primary,       text: AppTheme.colors.white,     indicator: AppTheme.colors.white     },
   secondary: { bg: AppTheme.colors.primaryLight,  text: AppTheme.colors.primary, indicator: AppTheme.colors.primary },
   ghost:     { bg: 'transparent',       text: AppTheme.colors.primary, indicator: AppTheme.colors.primary },
-  danger:    { bg: '#FEE2E2',           text: '#DC2626',     indicator: '#DC2626'     },
+  danger:    { bg: AppTheme.colors.dangerSoft,           text: AppTheme.colors.danger,     indicator: AppTheme.colors.danger     },
 } as const;
 
 const SIZE = {

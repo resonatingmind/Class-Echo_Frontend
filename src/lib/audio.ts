@@ -51,20 +51,6 @@ export function isAudioMimeType(mimeType: string) {
   return mimeType.startsWith('audio/');
 }
 
-export function buildWaveformBars(seed: number | string, count = 36) {
-  let state = String(seed)
-    .split('')
-    .reduce((acc, char) => acc + char.charCodeAt(0), 17);
-
-  const bars: number[] = [];
-  for (let index = 0; index < count; index += 1) {
-    state = (state * 9301 + 49297) % 233280;
-    const ratio = state / 233280;
-    bars.push(0.18 + ratio * 0.82);
-  }
-  return bars;
-}
-
 export function normalizeMeteringValue(metering?: number) {
   if (metering == null || Number.isNaN(metering)) {
     return 0.16;

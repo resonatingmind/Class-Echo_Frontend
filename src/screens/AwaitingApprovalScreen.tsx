@@ -68,7 +68,7 @@ export function AwaitingApprovalScreen() {
             style={[styles.button, styles.primaryButton, isRefreshing && styles.buttonDisabled]}
           >
             {isRefreshing ? (
-              <ActivityIndicator color="#fff" size="small" />
+              <ActivityIndicator color={AppTheme.colors.white} size="small" />
             ) : (
               <Text style={styles.primaryButtonText}>Check again</Text>
             )}
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.surface,
     borderRadius: 16,
     padding: 24,
-    shadowColor: "#000",
+    shadowColor: AppTheme.colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 15,
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.textPrimary,
   },
   primaryButtonText: {
-    color: "#fff",
+    color: AppTheme.colors.white,
     fontSize: 16,
     fontWeight: "600",
   },

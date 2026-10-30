@@ -150,8 +150,8 @@ function ClassRow({
   index: number;
   onPress: () => void;
 }) {
-  const bgColors = ['#D1E4FF', '#E8F7EE', '#FFF4E0', '#F5F0FF', '#FFE8EC'];
-  const textColors = ['#0061A3', '#127A40', '#92400E', '#6B21A8', '#9B1239'];
+  const bgColors = [AppTheme.colors.primarySoft, AppTheme.colors.successBg, AppTheme.colors.warningBg, AppTheme.colors.purpleBg, AppTheme.colors.roseBg];
+  const textColors = ['#0061A3', AppTheme.colors.successText, AppTheme.colors.warningStrong, AppTheme.colors.purple, AppTheme.colors.rose];
   const colorIdx = index % bgColors.length;
 
   return (
@@ -474,7 +474,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
                 style={[styles.modalSaveBtn, { flex: 1, backgroundColor: AppTheme.colors.error }, actionLoading && { opacity: 0.6 }]}
               >
                 {actionLoading ? (
-                  <ActivityIndicator color="#fff" size="small" />
+                  <ActivityIndicator color={AppTheme.colors.white} size="small" />
                 ) : (
                   <Text style={styles.modalSaveBtnText}>Confirm Reject</Text>
                 )}
@@ -521,7 +521,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
               style={[styles.modalSaveBtn, editSaving && { opacity: 0.6 }]}
             >
               {editSaving ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <ActivityIndicator color={AppTheme.colors.white} size="small" />
               ) : (
                 <Text style={styles.modalSaveBtnText}>Save Changes</Text>
               )}
@@ -578,7 +578,7 @@ export function AdminSchoolDetailScreen({ navigation, route }: Props) {
                 style={[styles.modalSaveBtn, { flex: 1, backgroundColor: AppTheme.colors.error }, actionLoading && { opacity: 0.6 }]}
               >
                 {actionLoading ? (
-                  <ActivityIndicator color="#fff" size="small" />
+                  <ActivityIndicator color={AppTheme.colors.white} size="small" />
                 ) : (
                   <Text style={styles.modalSaveBtnText}>Confirm Delete</Text>
                 )}
@@ -876,7 +876,7 @@ const styles = StyleSheet.create({
     borderColor: AppTheme.colors.border,
     alignItems: 'center',
     gap: 16,
-    shadowColor: '#000',
+    shadowColor: AppTheme.colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -932,7 +932,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: AppTheme.colors.border,
     overflow: 'hidden',
-    shadowColor: '#000',
+    shadowColor: AppTheme.colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -1109,7 +1109,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: AppTheme.colors.border,
     overflow: 'hidden',
-    shadowColor: '#000',
+    shadowColor: AppTheme.colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -1176,7 +1176,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 32,
     gap: 12,
-    shadowColor: '#000',
+    shadowColor: AppTheme.colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -1188,7 +1188,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   approvalCard: {
-    backgroundColor: '#FFFBEB',
+    backgroundColor: AppTheme.colors.warningTint,
     borderColor: '#FDE68A',
     borderWidth: 1,
     borderRadius: AppTheme.radius.large,
@@ -1196,12 +1196,12 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   rejectedCard: {
-    backgroundColor: '#FDF2F2',
-    borderColor: '#FDE8E8',
+    backgroundColor: AppTheme.colors.dangerBg,
+    borderColor: AppTheme.colors.dangerSoft,
   },
   suspendedCard: {
-    backgroundColor: '#F3F4F6',
-    borderColor: '#E5E7EB',
+    backgroundColor: AppTheme.colors.gray100,
+    borderColor: AppTheme.colors.border,
   },
   approvalHeader: {
     flexDirection: 'row',
@@ -1209,7 +1209,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   approvalTitle: {
-    color: '#B45309',
+    color: AppTheme.colors.warningText,
     ...AppTheme.typography.body,
     fontWeight: '700',
   },
@@ -1232,7 +1232,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   approveBtnText: {
-    color: '#fff',
+    color: AppTheme.colors.white,
     ...AppTheme.typography.button,
   },
   rejectBtn: {
@@ -1314,7 +1314,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   modalSaveBtnText: {
-    color: '#fff',
+    color: AppTheme.colors.white,
     ...AppTheme.typography.button,
   },
   modalCancelBtn: {

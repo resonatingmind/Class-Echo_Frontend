@@ -235,17 +235,17 @@ export function SchoolAdminTeacherRecordingsScreen({
 
               <View style={[styles.statCard, styles.statCardCompleted, isMobile ? { width: "47%" } : { flex: 1 }]}>
                 <View style={[styles.statIconWrap, styles.statIconCompleted]}>
-                  <Ionicons name="checkmark-circle-outline" size={24} color="#047857" />
+                  <Ionicons name="checkmark-circle-outline" size={24} color={AppTheme.colors.successStrong} />
                 </View>
-                <Text style={[styles.statNumber, { color: "#047857" }]}>{completed}</Text>
+                <Text style={[styles.statNumber, { color: AppTheme.colors.successStrong }]}>{completed}</Text>
                 <Text style={styles.statLabel}>Completed</Text>
               </View>
 
               <View style={[styles.statCard, styles.statCardFailed, isMobile ? { width: "47%" } : { flex: 1 }]}>
                 <View style={[styles.statIconWrap, styles.statIconFailed]}>
-                  <Ionicons name="alert-circle-outline" size={24} color="#B91C1C" />
+                  <Ionicons name="alert-circle-outline" size={24} color={AppTheme.colors.dangerStrong} />
                 </View>
-                <Text style={[styles.statNumber, { color: "#B91C1C" }]}>{failed}</Text>
+                <Text style={[styles.statNumber, { color: AppTheme.colors.dangerStrong }]}>{failed}</Text>
                 <Text style={styles.statLabel}>Failed</Text>
               </View>
 
@@ -394,9 +394,9 @@ export function SchoolAdminTeacherRecordingsScreen({
                     <Text
                       style={[
                         styles.statusText,
-                        recording.status?.toLowerCase() === "completed" && { color: "#047857" },
-                        recording.status?.toLowerCase() === "processing" && { color: "#B45309" },
-                        recording.status?.toLowerCase() === "failed" && { color: "#B91C1C" },
+                        recording.status?.toLowerCase() === "completed" && { color: AppTheme.colors.successStrong },
+                        recording.status?.toLowerCase() === "processing" && { color: AppTheme.colors.warningText },
+                        recording.status?.toLowerCase() === "failed" && { color: AppTheme.colors.dangerStrong },
                       ]}
                     >
                       {recording.status?.toUpperCase()}
@@ -680,16 +680,16 @@ const styles = StyleSheet.create({
     borderColor: AppTheme.colors.primary + "30",
   },
   statCardCompleted: {
-    backgroundColor: "#ECFDF3",
+    backgroundColor: AppTheme.colors.successSoft,
     borderColor: "#A7F3D0",
   },
   statCardFailed: {
-    backgroundColor: "#FEF2F2",
-    borderColor: "#FECACA",
+    backgroundColor: AppTheme.colors.dangerBg,
+    borderColor: AppTheme.colors.dangerBorder,
   },
   statCardAverage: {
-    backgroundColor: "#F0F9FF",
-    borderColor: "#BAE6FD",
+    backgroundColor: AppTheme.colors.infoSoft,
+    borderColor: AppTheme.colors.infoBorder,
   },
   statIconWrap: {
     width: 48,
@@ -706,10 +706,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#D1FAE5",
   },
   statIconFailed: {
-    backgroundColor: "#FEE2E2",
+    backgroundColor: AppTheme.colors.dangerSoft,
   },
   statIconAverage: {
-    backgroundColor: "#E0F2FE",
+    backgroundColor: AppTheme.colors.infoBg,
   },
   statNumber: {
     fontSize: 28,
@@ -794,7 +794,7 @@ const styles = StyleSheet.create({
   },
   clearFilter: {
     fontSize: 14,
-    color: "#EF4444",
+    color: AppTheme.colors.error,
     fontWeight: "700",
   },
   recordingList: {
@@ -806,7 +806,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: AppTheme.colors.border,
     padding: 20,
-    shadowColor: "#000",
+    shadowColor: AppTheme.colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.03,
     shadowRadius: 8,
@@ -858,13 +858,13 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.background,
   },
   completedBadge: {
-    backgroundColor: "#ECFDF3",
+    backgroundColor: AppTheme.colors.successSoft,
   },
   processingBadge: {
-    backgroundColor: "#FEF3C7",
+    backgroundColor: AppTheme.colors.warningSoft,
   },
   failedBadge: {
-    backgroundColor: "#FEE2E2",
+    backgroundColor: AppTheme.colors.dangerSoft,
   },
   statusText: {
     fontSize: 11,
@@ -898,12 +898,12 @@ const styles = StyleSheet.create({
     borderColor: "#BBF7D0",
   },
   scoreMed: {
-    backgroundColor: "#FFFBEB",
+    backgroundColor: AppTheme.colors.warningTint,
     borderColor: "#FEF08A",
   },
   scoreLow: {
-    backgroundColor: "#FEF2F2",
-    borderColor: "#FECACA",
+    backgroundColor: AppTheme.colors.dangerBg,
+    borderColor: AppTheme.colors.dangerBorder,
   },
   scoreText: {
     fontSize: 24,
@@ -916,8 +916,8 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   scoreTextHigh: { color: "#166534" },
-  scoreTextMed: { color: "#854D0E" },
-  scoreTextLow: { color: "#991B1B" },
+  scoreTextMed: { color: AppTheme.colors.warningDeep },
+  scoreTextLow: { color: AppTheme.colors.dangerDeep },
   noScoreText: {
     fontSize: 20,
     fontWeight: "700",
@@ -1017,7 +1017,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   applyText: {
-    color: "#fff",
+    color: AppTheme.colors.white,
     fontWeight: "700",
     fontSize: 16,
   },

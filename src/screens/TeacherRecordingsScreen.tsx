@@ -52,7 +52,7 @@ const statStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.25)",
   },
-  chipValue: { fontSize: 15, fontWeight: "800", color: "#FFFFFF", lineHeight: 20 },
+  chipValue: { fontSize: 15, fontWeight: "800", color: AppTheme.colors.white, lineHeight: 20 },
   chipLabel: { fontSize: 10, color: "rgba(255,255,255,0.75)", fontWeight: "500", letterSpacing: 0.3 },
 });
 import { RootStackParamList } from "../navigation/AppNavigator";
@@ -67,10 +67,10 @@ type RichRecording = RecordingWithReport & {
 };
 
 const STATUS_STYLES: Record<string, { bg: string; text: string }> = {
-  completed:  { bg: "#ECFDF3", text: "#047857" },
-  processing: { bg: "#FFF7ED", text: "#B45309" },
-  pending:    { bg: "#F0F9FF", text: "#0369A1" },
-  failed:     { bg: "#FEF2F2", text: "#B91C1C" },
+  completed:  { bg: AppTheme.colors.successSoft, text: AppTheme.colors.successStrong },
+  processing: { bg: AppTheme.colors.orangeTint, text: AppTheme.colors.warningText },
+  pending:    { bg: AppTheme.colors.infoSoft, text: AppTheme.colors.infoStrong },
+  failed:     { bg: AppTheme.colors.dangerBg, text: AppTheme.colors.dangerStrong },
 };
 
 function getStatusStyle(status: string) {
@@ -78,15 +78,15 @@ function getStatusStyle(status: string) {
 }
 
 function scoreColor(score: number): string {
-  if (score >= 80) return "#047857";
-  if (score >= 50) return "#B45309";
-  return "#B91C1C";
+  if (score >= 80) return AppTheme.colors.successStrong;
+  if (score >= 50) return AppTheme.colors.warningText;
+  return AppTheme.colors.dangerStrong;
 }
 
 function scoreBg(score: number): string {
-  if (score >= 80) return "#ECFDF3";
-  if (score >= 50) return "#FFF7ED";
-  return "#FEF2F2";
+  if (score >= 80) return AppTheme.colors.successSoft;
+  if (score >= 50) return AppTheme.colors.orangeTint;
+  return AppTheme.colors.dangerBg;
 }
 
 function formatDate(iso: string): string {
@@ -279,7 +279,7 @@ export function TeacherRecordingsScreen() {
           <View style={styles.body}>
         {/* ── Hero Banner ─────────────────────────────────────── */}
         <LinearGradient
-          colors={["#1D8EF5", "#156FD6", "#0D4FAA"]}
+          colors={[AppTheme.colors.primary, AppTheme.colors.primaryDark, "#0D4FAA"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.heroBanner}
@@ -641,7 +641,7 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 20,
     fontWeight: "800",
-    color: "#FFFFFF",
+    color: AppTheme.colors.white,
     letterSpacing: -0.3,
   },
   heroSubtitle: {
@@ -674,7 +674,7 @@ const styles = StyleSheet.create({
   heroGlassBtnText: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#FFFFFF",
+    color: AppTheme.colors.white,
   },
   heroStats: {
     gap: 8,

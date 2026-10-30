@@ -85,9 +85,9 @@ export function ChapterActionSheet({
                   onDelete();
                 }}
               >
-                <Ionicons name="trash-outline" size={20} color="#DC2626" />
+                <Ionicons name="trash-outline" size={20} color={AppTheme.colors.danger} />
 
-                <Text style={[styles.itemText, { color: "#DC2626" }]}>
+                <Text style={[styles.itemText, { color: AppTheme.colors.danger }]}>
                   Delete Chapter
                 </Text>
               </Pressable>
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
   },
 
   sheet: {
-    backgroundColor: "#fff",
+    backgroundColor: AppTheme.colors.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 20,
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: AppTheme.radius.medium,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: AppTheme.colors.gray100,
   },
 
   cancelText: {

@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     borderRadius: AppTheme.radius.medium,
     borderWidth: 1,
     borderColor: AppTheme.colors.border,
-    backgroundColor: "#fff",
+    backgroundColor: AppTheme.colors.white,
     paddingHorizontal: 14,
     flexDirection: "row",
     justifyContent: "space-between",

@@ -15,6 +15,7 @@ import { useEffect, useRef } from "react";
 import { AuthProvider } from './src/context/AuthContext';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { MaintenanceBanner } from './src/components/common/MaintenanceBanner';
+import { ClassReminders } from './src/components/teacher/ClassReminders';
 import { colors } from './src/theme/colors';
 import * as Linking from "expo-linking";
 
@@ -127,6 +128,7 @@ export default function App() {
               the login form — a user who cannot sign in during maintenance
               needs the explanation more than anyone. */}
           <MaintenanceBanner />
+          <ClassReminders navigationRef={navigationRef} />
           <AppNavigator />
         </NavigationContainer>
       </AuthProvider>

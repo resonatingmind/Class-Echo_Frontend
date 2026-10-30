@@ -2294,6 +2294,41 @@ export async function getClassBrief(token: string, entryId: number, on: string) 
   return request<NextClassBriefOut>(`/teacher/timetable/${entryId}/brief?on=${on}`, {}, token);
 }
 
+/** The teacher saw the brief before this class (counted once per day). Best effort. */
+export async function markClassBriefOpened(
+  token: string,
+  entryId: number,
+  on: string,
+  source: 'dashboard' | 'push' = 'dashboard',
+): Promise<void> {
+  try {
+    await request<void>(
+      `/teacher/timetable/${entryId}/brief/opened`,
+      { method: "POST", body: JSON.stringify({ on, source }) },
+      token,
+    );
+  } catch {
+    // Usage counting must never get in the way of the brief.
+  }
+}
+
+/** Register this phone for class reminders, with its timezone (timetable times are local). */
+export async function registerDeviceToken(
+  token: string,
+  body: { token: string; platform: 'ios' | 'android'; timezone: string },
+): Promise<void> {
+  await request<void>("/teacher/device-token", { method: "PUT", body: JSON.stringify(body) }, token);
+}
+
+/** Stop reminders on this phone, e.g. on sign-out. */
+export async function removeDeviceToken(token: string, pushToken: string): Promise<void> {
+  await request<void>(
+    "/teacher/device-token",
+    { method: "DELETE", body: JSON.stringify({ token: pushToken }) },
+    token,
+  );
+}
+
 /** My Growth: trends per area and focus progress, against the teacher's own past. */
 export async function getMyGrowth(token: string) {
   return request<GrowthOut>("/teacher/growth", {}, token);

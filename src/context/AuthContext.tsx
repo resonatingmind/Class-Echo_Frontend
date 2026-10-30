@@ -12,6 +12,7 @@ import * as SecureStore from "../lib/secureStore";
 
 import { login, getTeacherMe, getSchoolAdminMe } from "../lib/api";
 import { setUnauthorizedHandler } from "../lib/authSession";
+import { forgetClassReminders } from "../lib/classReminders";
 import { UserRole } from "../types/api";
 
 const TOKEN_KEY = "auth_token";
@@ -117,6 +118,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
   );
 
   const signOut = useCallback(async () => {
+    await forgetClassReminders();
     await SecureStore.deleteItemAsync(TOKEN_KEY);
     await SecureStore.deleteItemAsync(ROLE_KEY);
     await SecureStore.deleteItemAsync(STATUS_KEY);

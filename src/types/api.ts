@@ -490,6 +490,10 @@ export type ReportFeedbackIn = {
 
 export type ReportFeedbackSummary = {
   adoption: {
+    brief_opens: number;
+    /** Timetabled classes since the first brief open; holidays included. */
+    brief_classes: number;
+    brief_open_rate: number | null;
     reports_opened: number;
     open_rate: number | null;
     median_hours_to_open: number | null;

@@ -50,6 +50,12 @@ export function ReportFeedbackPanel({ summary }: { summary: ReportFeedbackSummar
           rate={a.self_rating_completion}
           target={0.5}
         />
+        <AdoptionRow
+          detail={`${a.brief_opens} of ${a.brief_classes} timetabled classes, holidays included`}
+          label="Brief opened before class"
+          rate={a.brief_open_rate}
+          target={0.4}
+        />
       </View>
 
       <View style={styles.card}>

@@ -2,7 +2,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { getClassBrief, setClassBriefMuted } from '../../lib/api';
+import { getClassBrief, markClassBriefOpened, setClassBriefMuted } from '../../lib/api';
 import { todayIsoDate } from '../../lib/lectureContext';
 import { AppTheme } from '../../theme/AppTheme';
 import { NextClassBriefOut } from '../../types/api';
@@ -65,6 +65,12 @@ export function NextClassBrief({ token, entryId, collapsed = false }: Props) {
       live = false;
     };
   }, [token, entryId]);
+
+  // Seeing the brief open is what counts as an open (the brief open-rate metric).
+  const seen = !!brief && !brief.muted && open;
+  useEffect(() => {
+    if (seen) void markClassBriefOpened(token, entryId, todayIsoDate());
+  }, [seen, token, entryId]);
 
   const setMuted = async (muted: boolean) => {
     setSaving(true);

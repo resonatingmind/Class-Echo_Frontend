@@ -1,6 +1,6 @@
 import { AppTheme } from '../theme/AppTheme';
 import { ComponentProps, useRef } from 'react';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import {
   ActivityIndicator,
   Animated,

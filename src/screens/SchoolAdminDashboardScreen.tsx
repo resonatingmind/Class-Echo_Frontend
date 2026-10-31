@@ -20,7 +20,7 @@ import { AppTheme } from "../theme/AppTheme";
 
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { AppLogo } from "../components/ui/AppLogo";
 
 type Props = NativeStackScreenProps<RootStackParamList, "SchoolAdminTabs">;

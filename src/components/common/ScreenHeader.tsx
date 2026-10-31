@@ -1,6 +1,6 @@
 import { AppTheme } from '../../theme/AppTheme';
 import { ReactNode } from 'react';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import {
   StyleSheet,
   Text,

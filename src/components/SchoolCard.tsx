@@ -1,5 +1,7 @@
 import { AppTheme } from '../theme/AppTheme';
-import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import Feather from '@expo/vector-icons/Feather';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { School } from '../data/schools';

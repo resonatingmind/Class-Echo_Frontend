@@ -10,7 +10,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { ScreenShell } from "../components/common/ScreenShell";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 
 import { DaySelector } from "../components/teacher/timetable/DaySelector";

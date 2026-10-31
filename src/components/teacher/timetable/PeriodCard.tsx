@@ -1,5 +1,5 @@
 import { AppTheme } from '../../../theme/AppTheme';
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { TimetableEntryOut } from "../../../types/api";

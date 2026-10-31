@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, Text, View } from "react-native";
 
 import { getPublicSystemStatus } from "../../lib/api";

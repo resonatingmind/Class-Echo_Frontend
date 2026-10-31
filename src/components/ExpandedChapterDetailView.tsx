@@ -6,7 +6,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { AppTheme } from "../theme/AppTheme";
 import { LearningPlanOut, RecordingWithReport } from "../types/api";
 import { formatAudioTime } from "../lib/audio";

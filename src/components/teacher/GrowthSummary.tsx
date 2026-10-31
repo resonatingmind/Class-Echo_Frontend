@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useState } from 'react';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { ActivityIndicator, Alert, StyleSheet, Switch, Text, View } from 'react-native';
 
 import { getMyGrowth, setMilestoneShared } from '../../lib/api';

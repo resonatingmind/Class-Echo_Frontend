@@ -1,5 +1,5 @@
 import { AppTheme } from '../theme/AppTheme';
-import { Feather } from '@expo/vector-icons';
+import Feather from '@expo/vector-icons/Feather';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { colors } from '../theme/colors';

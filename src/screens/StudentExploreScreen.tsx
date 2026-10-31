@@ -1,6 +1,6 @@
 import { AppTheme } from '../theme/AppTheme';
 import { useEffect, useState } from 'react';
-import { Feather } from '@expo/vector-icons';
+import Feather from '@expo/vector-icons/Feather';
 import {
   Pressable,
   ScrollView,

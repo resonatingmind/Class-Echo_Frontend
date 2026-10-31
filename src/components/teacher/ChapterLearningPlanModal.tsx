@@ -13,7 +13,7 @@ import {
   createElement
 } from "react-native";
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { AppTheme } from "../../theme/AppTheme";
 import { LearningPlanOut, LearningPlanCreatePayload } from "../../types/api";
 
